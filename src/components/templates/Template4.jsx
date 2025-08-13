@@ -63,23 +63,13 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="George's Plumbing and Heating" className="h-32 mb-2 ml-auto" />
+            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.4rem] mb-2 ml-auto" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6 mb-4">
-          <div className="bg-gray-100 p-4 rounded">
-            <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>
-              Quote From
-            </h3>
-            <p>
-              <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
-            </p>
-            <p className="whitespace-pre-line">{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
-            <p>{yourCompany.phone || "info@georgesplumbingandheating.ca"}</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded">
-            <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>
+          <div className="bg-gray-100 p-2 rounded">
+            <h3 className="text-lg font-semibold mb-1" style={{color: '#194578'}}>
               Quote For
             </h3>
             <p>
@@ -93,6 +83,16 @@ const Template4 = ({ data }) => {
               {billTo.province && `, ${billTo.province}`}
               {billTo.postalCode && ` ${billTo.postalCode}`}
             </p>
+          </div>
+          <div className="bg-gray-100 p-2 rounded">
+            <h3 className="text-lg font-semibold mb-1" style={{color: '#194578'}}>
+              Quote From
+            </h3>
+            <p>
+              <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
+            </p>
+            <p className="whitespace-pre-line">{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
+            <p>{yourCompany.phone || "info@georgesplumbingandheating.ca"}</p>
           </div>
         </div>
 
@@ -120,10 +120,10 @@ const Template4 = ({ data }) => {
                   {item.quantity || 0}
                 </td>
                 <td className="p-2 text-right border border-gray-300">
-                  ${(item.amount || 0).toFixed(2)}
+                  ${(item.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </td>
                 <td className="p-2 text-right border border-gray-300">
-                  ${((item.quantity || 0) * (item.amount || 0)).toFixed(2)}
+                  ${((item.quantity || 0) * (item.amount || 0)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </td>
               </tr>
             ))}
@@ -138,12 +138,12 @@ const Template4 = ({ data }) => {
                 <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Financing Payment Details</h3>
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
-                  <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toFixed(2)}</p>
-                  <p><strong>Admin Fee:</strong> ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toFixed(2)}</p>
+                  <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                  <p><strong>Admin Fee:</strong> ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
                   <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
                   <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
-                  <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toFixed(2)}</p>
+                  <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                 </div>
               </div>
             )}
@@ -154,16 +154,16 @@ const Template4 = ({ data }) => {
                 <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Rebates & Incentives</h3>
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   {rebatesIncentives.federalRebate > 0 && (
-                    <p><strong>Federal Rebate:</strong> ${rebatesIncentives.federalRebate.toFixed(2)}</p>
+                    <p><strong>Federal Rebate:</strong> ${rebatesIncentives.federalRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   )}
                   {rebatesIncentives.provincialRebate > 0 && (
-                    <p><strong>Provincial Rebate:</strong> ${rebatesIncentives.provincialRebate.toFixed(2)}</p>
+                    <p><strong>Provincial Rebate:</strong> ${rebatesIncentives.provincialRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   )}
                   {rebatesIncentives.utilityRebate > 0 && (
-                    <p><strong>Utility Rebate:</strong> ${rebatesIncentives.utilityRebate.toFixed(2)}</p>
+                    <p><strong>Utility Rebate (Monthly):</strong> ${rebatesIncentives.utilityRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} per month</p>
                   )}
                   {rebatesIncentives.manufacturerRebate > 0 && (
-                    <p><strong>Manufacturer Rebate:</strong> ${rebatesIncentives.manufacturerRebate.toFixed(2)}</p>
+                    <p><strong>Manufacturer Rebate:</strong> ${rebatesIncentives.manufacturerRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   )}
                 </div>
               </div>
@@ -171,18 +171,18 @@ const Template4 = ({ data }) => {
           </div>
           <div>
             <p className="flex justify-between">
-              <span>Sub Total:</span> <span>${subTotal.toFixed(2)}</span>
+              <span>Sub Total:</span> <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             </p>
             {taxPercentage > 0 && (
               <>
                 <p className="flex justify-between">
-                  <span>Tax({taxPercentage}%):</span> <span>${taxAmount.toFixed(2)}</span>
+                  <span>Tax({taxPercentage}%):</span> <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </p>
               </>
             )}
             <hr className="my-2" />
             <p className="flex justify-between font-bold text-lg mt-2">
-              <span>Total:</span> <span>${grandTotal.toFixed(2)}</span>
+              <span>Total:</span> <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             </p>
           </div>
         </div>
