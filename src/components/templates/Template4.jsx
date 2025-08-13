@@ -41,8 +41,8 @@ const Template4 = ({ data }) => {
 
   return (
     <BaseTemplate data={data}>
-      <div className="bg-white p-8 max-w-4xl mx-auto">
-        <div className="flex justify-between items-start mb-8">
+      <div className="bg-white p-6 max-w-4xl mx-auto">
+        <div className="flex justify-between items-start mb-4">
           <div>
             <h1 className="text-4xl font-bold mb-4" style={{color: '#194578'}}>QUOTE</h1>
             <p>
@@ -63,11 +63,11 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="George's Plumbing and Heating" className="h-16 mb-4 ml-auto" />
+            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="George's Plumbing and Heating" className="h-32 mb-2 ml-auto" />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-4">
           <div className="bg-gray-100 p-4 rounded">
             <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>
               Quote From
@@ -96,7 +96,7 @@ const Template4 = ({ data }) => {
           </div>
         </div>
 
-        <table className="w-full mb-8 border border-gray-300">
+        <table className="w-full mb-4 border border-gray-300">
           <thead style={{backgroundColor: '#194578', color: 'white'}}>
             <tr>
               <th className="p-2 text-left border border-gray-300">
@@ -130,12 +130,12 @@ const Template4 = ({ data }) => {
           </tbody>
         </table>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
             {/* Financing Section */}
             {financing && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4" style={{color: '#194578'}}>Financing Payment Details</h3>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Financing Payment Details</h3>
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                   <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toFixed(2)}</p>
@@ -151,7 +151,7 @@ const Template4 = ({ data }) => {
             {/* Rebates Section */}
             {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{color: '#194578'}}>Rebates & Incentives</h3>
+                <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Rebates & Incentives</h3>
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   {rebatesIncentives.federalRebate > 0 && (
                     <p><strong>Federal Rebate:</strong> ${rebatesIncentives.federalRebate.toFixed(2)}</p>
@@ -189,32 +189,32 @@ const Template4 = ({ data }) => {
 
 
         {/* Terms and Conditions */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Terms and Conditions</h3>
+        <div className="mb-3">
+          <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
           <div className="text-xs text-gray-700 leading-relaxed">
             <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
           </div>
         </div>
 
         {notes && (
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-2" style={{color: '#194578'}}>Additional Notes</h3>
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Additional Notes</h3>
             <p className="text-xs">{notes}</p>
           </div>
         )}
 
         {/* Signature Section */}
-        <div className="mt-12 border-t pt-8">
-          <div className="grid grid-cols-2 gap-8">
+        <div className="mt-6">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold mb-4" style={{color: '#194578'}}>Customer Signature</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
               <div className="border-b-2 border-gray-300 mb-2 h-12"></div>
               <p className="text-sm text-gray-600">Customer Signature</p>
               <div className="border-b border-gray-300 mb-2 h-8 mt-4"></div>
               <p className="text-sm text-gray-600">Date</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4" style={{color: '#194578'}}>Company Representative</h3>
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Company Representative</h3>
               <div className="border-b-2 border-gray-300 mb-2 h-12"></div>
               <p className="text-sm text-gray-600">Authorized Signature</p>
               <div className="border-b border-gray-300 mb-2 h-8 mt-4"></div>
