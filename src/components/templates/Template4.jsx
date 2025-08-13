@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import BaseTemplate from './BaseTemplate';
 
 import { getProductDescription } from '../../utils/productDescriptions';
-import georgesLogo from '../../assets/georges-logo.png';
 
 const Template4 = ({ data }) => {
   const { 
@@ -64,7 +63,7 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <img src={georgesLogo} alt="George's Plumbing and Heating" className="h-16 mb-4 ml-auto" />
+            <h2 className="text-2xl font-bold mb-4" style={{color: '#194578'}}>George's Plumbing and Heating</h2>
           </div>
         </div>
 
