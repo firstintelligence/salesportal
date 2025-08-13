@@ -63,7 +63,7 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <h2 className="text-2xl font-bold mb-4" style={{color: '#194578'}}>George's Plumbing and Heating</h2>
+            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="George's Plumbing and Heating" className="h-16 mb-4 ml-auto" />
           </div>
         </div>
 
