@@ -546,35 +546,19 @@ const Index = () => {
           </form>
         </div>
 
-        <div className="w-full md:w-1/2 bg-white rounded-lg shadow-lg overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-4 p-6">Quote Preview</h2>
-          <div className="scale-50 origin-top-left transform-gpu">
-            {React.createElement(templates.template4, {
-              data: {
-                billTo,
-                shipTo,
-                invoice,
-                yourCompany,
-                items,
-                taxPercentage,
-                taxAmount,
-                subTotal,
-                grandTotal,
-                financing,
-                rebatesIncentives,
-                notes,
-                selectedCurrency
-              }
-            })}
+        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto">
+          <h2 className="text-2xl font-semibold mb-4">Quote Preview</h2>
+          <div 
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
+            onClick={() => handleTemplateClick(4)}
+          >
+            <img
+              src="/assets/template4-preview.png"
+              alt="Template 4 Preview"
+              className="w-full h-auto object-cover rounded"
+            />
           </div>
-          <div className="p-6">
-            <button
-              onClick={() => handleTemplateClick(4)}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium"
-            >
-              Generate Full Quote
-            </button>
-          </div>
+          <p className="text-center font-medium mt-2">Click to generate quote</p>
         </div>
       </div>
     </div>
