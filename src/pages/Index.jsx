@@ -54,7 +54,7 @@ const noteOptions = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const [selectedCurrency, setSelectedCurrency] = useState("CAD");
   const [billTo, setBillTo] = useState({ name: "", address: "", phone: "" });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
   const [invoice, setInvoice] = useState({
@@ -63,9 +63,9 @@ const Index = () => {
     number: "",
   });
   const [yourCompany, setYourCompany] = useState({
-    name: "",
-    address: "",
-    phone: "",
+    name: "George's Plumbing and Heating",
+    address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
+    phone: "info@georgesplumbingandheating.ca",
   });
   const [items, setItems] = useState([]);
   const [taxPercentage, settaxPercentage] = useState(0);
@@ -90,12 +90,16 @@ const Index = () => {
         parsedData.invoice || { date: "", paymentDate: "", number: "" }
       );
       setYourCompany(
-        parsedData.yourCompany || { name: "", address: "", phone: "" }
+        parsedData.yourCompany || { 
+          name: "George's Plumbing and Heating",
+          address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
+          phone: "info@georgesplumbingandheating.ca"
+        }
       );
       setItems(parsedData.items || []);
       settaxPercentage(parsedData.taxPercentage || 0);
       setNotes(parsedData.notes || "");
-      setSelectedCurrency(parsedData.selectedCurrency || "INR"); // Load selectedCurrency from localStorage
+      setSelectedCurrency("CAD"); // Always use CAD
     } else {
       // If no saved data, set invoice number
       setInvoice((prev) => ({
@@ -308,7 +312,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      <h1 className="text-3xl font-bold mb-8 text-center">Bill Generator</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Quote Generator</h1>
       <div className="fixed top-4 left-4 flex gap-2">
         <button
           onClick={clearForm}
@@ -353,8 +357,6 @@ const Index = () => {
             <BillToSection
               billTo={billTo}
               handleInputChange={handleInputChange(setBillTo)}
-              selectedCurrency={selectedCurrency}
-              setSelectedCurrency={setSelectedCurrency}
             />
             <ShipToSection
               shipTo={shipTo}
@@ -481,31 +483,19 @@ const Index = () => {
           </form>
         </div>
 
-        <div
-          className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto"
-          // style={{ maxHeight: "calc(100vh - 2rem)" }}
-        >
-          <h2 className="text-2xl font-semibold mb-4">Template Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {templates.map((template, index) => (
-              <div
-                key={index}
-                className="template-card bg-gray-100 p-4 rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                onClick={() => handleTemplateClick(index + 1)}
-              >
-                <img
-                  src={`/assets/template${index + 1}-preview.png`}
-                  alt={template.name}
-                  className={`w-full ${
-                    template.name === "Template 10"
-                      ? "h-[38px] w-[57px]"
-                      : "h-50"
-                  } object-cover rounded mb-2`}
-                />
-                <p className="text-center font-medium">{template.name}</p>
-              </div>
-            ))}
+        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto">
+          <h2 className="text-2xl font-semibold mb-4">Quote Preview</h2>
+          <div 
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
+            onClick={() => handleTemplateClick(4)}
+          >
+            <img
+              src="/assets/template4-preview.png"
+              alt="Template 4 Preview"
+              className="w-full h-auto object-cover rounded"
+            />
           </div>
+          <p className="text-center font-medium mt-2">Click to generate quote</p>
         </div>
       </div>
     </div>
