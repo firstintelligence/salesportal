@@ -8,7 +8,19 @@ import Template7 from '../components/templates/Template7';
 import Template8 from '../components/templates/Template8';
 import Template9 from '../components/templates/Template9';
 
-export const templates = [
+export const templates = {
+  template1: Template1,
+  template2: Template2,
+  template3: Template3,
+  template4: Template4,
+  template5: Template5,
+  template6: Template6,
+  template7: Template7,
+  template8: Template8,
+  template9: Template9,
+};
+
+export const templatesArray = [
   { name: 'Template 1', component: Template1 },
   { name: 'Template 2', component: Template2 },
   { name: 'Template 3', component: Template3 },
@@ -21,5 +33,5 @@ export const templates = [
 ];
 
 export const getTemplate = (templateNumber) => {
-  return templates[templateNumber - 1]?.component || templates[0].component; // Default to Template1 if not found
+  return templatesArray[templateNumber - 1]?.component || templatesArray[0].component; // Default to Template1 if not found
 };
