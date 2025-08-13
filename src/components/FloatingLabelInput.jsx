@@ -7,7 +7,7 @@ const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, name, c
         type={type}
         id={id}
         name={name}
-        className={`block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer ${className}`}
+        className={`block px-2.5 pb-2.5 pt-4 w-full h-[60px] text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer ${className}`}
         placeholder=" "
         value={value}
         onChange={onChange}
