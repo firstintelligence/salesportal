@@ -2,9 +2,7 @@ import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { calculateMonthlyPayment } from '../utils/financingCalculations';
-import { formatCurrency } from '../utils/formatCurrency';
-
-const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
+const FinancingSection = ({ financing, setFinancing }) => {
   const interestRates = [
     0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
   ];
@@ -36,15 +34,15 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
         
         <FloatingLabelInput
           id="loanAmount"
-          label={`Loan Amount (${currencyCode})`}
-          value={formatCurrency(financing.loanAmount, currencyCode)}
+          label="Loan Amount"
+          value={`$${financing.loanAmount.toLocaleString()}`}
           disabled
         />
 
         <FloatingLabelInput
           id="adminFee"
-          label={`Admin Fee (${currencyCode})`}
-          value={formatCurrency(adminFee, currencyCode)}
+          label="Admin Fee"
+          value={`$${adminFee.toLocaleString()}`}
           disabled
         />
 
@@ -104,8 +102,8 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
 
           <FloatingLabelInput
             id="monthlyPayment"
-            label={`Monthly Payment (${currencyCode})`}
-            value={formatCurrency(monthlyPayment, currencyCode)}
+            label="Monthly Payment"
+            value={`$${monthlyPayment.toLocaleString()}`}
             disabled
           />
         </div>

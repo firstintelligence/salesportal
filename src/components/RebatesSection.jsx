@@ -1,8 +1,6 @@
 import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
-import { formatCurrency } from '../utils/formatCurrency';
-
-const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode }) => {
+const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   const handleRebateChange = (field, value) => {
     setRebatesIncentives(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
   };
@@ -16,7 +14,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FloatingLabelInput
           id="federalRebate"
-          label={`Federal Rebate (${currencyCode})`}
+          label="Federal Rebate"
           type="number"
           value={rebatesIncentives.federalRebate}
           onChange={(e) => handleRebateChange('federalRebate', e.target.value)}
@@ -24,7 +22,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode 
         
         <FloatingLabelInput
           id="provincialRebate"
-          label={`Provincial Rebate (${currencyCode})`}
+          label="Provincial Rebate"
           type="number"
           value={rebatesIncentives.provincialRebate}
           onChange={(e) => handleRebateChange('provincialRebate', e.target.value)}
@@ -34,7 +32,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <FloatingLabelInput
           id="utilityRebate"
-          label={`Utility Rebate (${currencyCode})`}
+          label="Utility Rebate"
           type="number"
           value={rebatesIncentives.utilityRebate}
           onChange={(e) => handleRebateChange('utilityRebate', e.target.value)}
@@ -42,7 +40,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode 
         
         <FloatingLabelInput
           id="manufacturerRebate"
-          label={`Manufacturer Rebate (${currencyCode})`}
+          label="Manufacturer Rebate"
           type="number"
           value={rebatesIncentives.manufacturerRebate}
           onChange={(e) => handleRebateChange('manufacturerRebate', e.target.value)}
@@ -52,7 +50,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives, currencyCode 
       <div className="mt-4 p-4 bg-gray-100 rounded">
         <div className="flex justify-between font-bold">
           <span>Total Rebates & Incentives:</span>
-          <span>{formatCurrency(totalRebates, currencyCode)}</span>
+          <span>${totalRebates.toLocaleString()}</span>
         </div>
       </div>
     </div>

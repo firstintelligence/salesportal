@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatCurrency } from '../utils/formatCurrency'; // Corrected import path
+
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import BillToSection from '../components/BillToSection';
 import ShipToSection from '../components/ShipToSection';
@@ -57,7 +57,7 @@ const noteOptions = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedCurrency, setSelectedCurrency] = useState("CAD");
+  
   const [billTo, setBillTo] = useState({ 
     firstName: "", 
     lastName: "", 
@@ -147,7 +147,7 @@ const Index = () => {
         manufacturerRebate: 0
       });
       setNotes(parsedData.notes || "Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
-      setSelectedCurrency("CAD"); // Always use CAD
+      
     } else {
       // If no saved data, set default values
       setInvoice((prev) => ({
@@ -173,7 +173,6 @@ const Index = () => {
       financing,
       rebatesIncentives,
       notes,
-      selectedCurrency,
     };
     localStorage.setItem("formData", JSON.stringify(formData));
   }, [
@@ -189,7 +188,6 @@ const Index = () => {
     grandTotal,
     financing,
     rebatesIncentives,
-    selectedCurrency,
   ]);
 
   const handleInputChange = (setter) => (e) => {
@@ -314,7 +312,6 @@ const Index = () => {
       financing,
       rebatesIncentives,
       notes,
-      selectedCurrency,
     };
     navigate("/template", {
       state: { formData, selectedTemplate: templateNumber },
@@ -351,19 +348,19 @@ const Index = () => {
     });
     setItems([
       {
-        name: "Residential Heat Pump",
-        description: "High-efficiency heat pump system for residential use",
+        name: "Residential Heat Pump - Premium",
+        description: "High-efficiency heat pump system for residential use (16 SEER)",
         quantity: 1,
-        amount: 8500,
-        total: 8500,
-        productId: "heat-pump-residential"
+        amount: 15500,
+        total: 15500,
+        productId: "heat-pump-residential-premium"
       },
       {
         name: "Smart Thermostat",
         description: "Wi-Fi enabled smart thermostat with app control", 
         quantity: 1,
-        amount: 650,
-        total: 650,
+        amount: 850,
+        total: 850,
         productId: "thermostat-smart"
       }
     ]);
@@ -477,20 +474,18 @@ const Index = () => {
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
-              currencyCode={selectedCurrency}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FinancingSection 
                 financing={financing} 
                 setFinancing={setFinancing} 
-                currencyCode={selectedCurrency} 
               />
 
               <RebatesSection 
                 rebatesIncentives={rebatesIncentives} 
                 setRebatesIncentives={setRebatesIncentives} 
-                currencyCode={selectedCurrency} 
+                 
               />
             </div>
 
@@ -498,7 +493,7 @@ const Index = () => {
               <h3 className="text-lg font-medium mb-2">Totals</h3>
               <div className="flex justify-between mb-2">
                 <span>Sub Total:</span>
-                <span>{formatCurrency(subTotal, selectedCurrency)}</span>
+                <span>${subTotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Tax Rate (%):</span>
@@ -514,11 +509,11 @@ const Index = () => {
               </div>
               <div className="flex justify-between mb-2">
                 <span>Tax Amount:</span>
-                <span>{formatCurrency(taxAmount, selectedCurrency)}</span>
+                <span>${taxAmount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between font-bold">
                 <span>Grand Total:</span>
-                <span>{formatCurrency(grandTotal, selectedCurrency)}</span>
+                <span>${grandTotal.toLocaleString()}</span>
               </div>
             </div>
 

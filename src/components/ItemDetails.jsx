@@ -3,16 +3,9 @@ import FloatingLabelInput from './FloatingLabelInput';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatCurrency, getCurrencySymbol } from '../utils/formatCurrency.js';
 import { hvacProducts, getProductsByCategory } from '../utils/hvacProducts.js';
 
-const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCode: propCurrencyCode }) => {
-  let currencyCode = propCurrencyCode;
-  if (!currencyCode) {
-    console.warn("Warning: currencyCode prop not provided to ItemDetails. Defaulting to 'CAD'.");
-    currencyCode = 'CAD';
-  }
-  const currencySymbol = getCurrencySymbol(currencyCode);
+const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
   const productCategories = getProductsByCategory();
 
   return (
@@ -44,7 +37,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
                       <div className="px-2 py-1 text-sm font-semibold text-gray-500">{category}</div>
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {formatCurrency(product.basePrice, currencyCode)}
+                          {product.name} - ${product.basePrice.toLocaleString()}
                         </SelectItem>
                       ))}
                     </div>
@@ -61,14 +54,14 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
             />
             <FloatingLabelInput
               id={`itemAmount${index}`}
-              label={`Amount (${currencySymbol})`}
+              label="Amount"
               type="number"
               value={item.amount}
               onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
             />
             <FloatingLabelInput
               id={`itemTotal${index}`}
-              label={`Total (${currencySymbol})`}
+              label="Total"
               type="number"
               value={(item.quantity * item.amount).toFixed(2)}
               disabled

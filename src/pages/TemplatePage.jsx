@@ -69,23 +69,6 @@ const TemplatePage = () => {
         </Button>
       </div>
 
-      <div className="mb-8 overflow-x-auto">
-        <div className="flex space-x-4">
-          {templates.map((template, index) => (
-            <div
-              key={index}
-              className={`cursor-pointer p-4 border rounded ${
-                currentTemplate === index + 1
-                  ? "border-blue-500"
-                  : "border-gray-300"
-              }`}
-              onClick={() => handleTemplateChange(index + 1)}
-            >
-              {template.name}
-            </div>
-          ))}
-        </div>
-      </div>
 
       <div className="w-[210mm] h-[297mm] mx-auto border shadow-lg">
         <InvoiceTemplate data={formData} templateNumber={currentTemplate} />
