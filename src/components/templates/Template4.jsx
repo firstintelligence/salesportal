@@ -2,6 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import BaseTemplate from './BaseTemplate';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { getProductDescription } from '../../utils/productDescriptions';
 import georgesLogo from '../../assets/georges-logo.png';
 
 const Template4 = ({ data }) => {
@@ -50,10 +51,7 @@ const Template4 = ({ data }) => {
           </div>
           <div className="text-right">
             <img src={georgesLogo} alt="George's Plumbing and Heating" className="h-16 mb-4 ml-auto" />
-            <h2 className="text-2xl font-bold">
-              {yourCompany.name || "George's Plumbing and Heating"}
-            </h2>
-            <p>{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
+            <p className="whitespace-pre-line">{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
             <p>{yourCompany.phone || "info@georgesplumbingandheating.ca"}</p>
           </div>
         </div>
@@ -102,11 +100,10 @@ const Template4 = ({ data }) => {
             {items.map((item, index) => (
               <tr key={index} className="bg-gray-100">
                 <td className="p-2 border border-gray-300">
-                  {`${index + 1}. ${item.name || "Item Name"}`}
-                  <br />
-                  <span className="text-sm text-gray-600">
-                    {item.description || "Item Description"}
-                  </span>
+                  <div className="font-semibold">{`${index + 1}. ${item.name || "Item Name"}`}</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {getProductDescription(item.productId) || item.description || "Item Description"}
+                  </div>
                 </td>
                 <td className="p-2 text-right border border-gray-300">
                   {item.quantity || 0}
@@ -122,8 +119,30 @@ const Template4 = ({ data }) => {
           </tbody>
         </table>
 
-        <div className="flex justify-end mb-8">
-          <div className="w-1/3">
+        <div className="grid grid-cols-3 gap-8 mb-8">
+          <div className="col-span-2">
+            {/* Rebates Section */}
+            {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
+              <div>
+                <h3 className="text-lg font-semibold text-blue-600 mb-4">Rebates & Incentives</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {rebatesIncentives.federalRebate > 0 && (
+                    <p><strong>Federal Rebate:</strong> {formatCurrency(rebatesIncentives.federalRebate, selectedCurrency)}</p>
+                  )}
+                  {rebatesIncentives.provincialRebate > 0 && (
+                    <p><strong>Provincial Rebate:</strong> {formatCurrency(rebatesIncentives.provincialRebate, selectedCurrency)}</p>
+                  )}
+                  {rebatesIncentives.utilityRebate > 0 && (
+                    <p><strong>Utility Rebate:</strong> {formatCurrency(rebatesIncentives.utilityRebate, selectedCurrency)}</p>
+                  )}
+                  {rebatesIncentives.manufacturerRebate > 0 && (
+                    <p><strong>Manufacturer Rebate:</strong> {formatCurrency(rebatesIncentives.manufacturerRebate, selectedCurrency)}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <div>
             <p className="flex justify-between">
               <span>Sub Total:</span> <span>{formatCurrency(subTotal, selectedCurrency)}</span>
             </p>
@@ -145,9 +164,10 @@ const Template4 = ({ data }) => {
         {financing && (
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-blue-600 mb-4">Financing Payment Details</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-2 text-sm">
               <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
               <p><strong>Loan Amount:</strong> {formatCurrency(financing.loanAmount || 0, selectedCurrency)}</p>
+              <p><strong>Admin Fee:</strong> {formatCurrency(Math.min((financing.loanAmount || 0) * 0.0149, 149), selectedCurrency)}</p>
               <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
               <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
               <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
@@ -164,30 +184,22 @@ const Template4 = ({ data }) => {
           </div>
         )}
 
-        {/* Rebates Section */}
-        {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-blue-600 mb-4">Rebates & Incentives</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              {rebatesIncentives.federalRebate > 0 && (
-                <p><strong>Federal Rebate:</strong> {formatCurrency(rebatesIncentives.federalRebate, selectedCurrency)}</p>
-              )}
-              {rebatesIncentives.provincialRebate > 0 && (
-                <p><strong>Provincial Rebate:</strong> {formatCurrency(rebatesIncentives.provincialRebate, selectedCurrency)}</p>
-              )}
-              {rebatesIncentives.utilityRebate > 0 && (
-                <p><strong>Utility Rebate:</strong> {formatCurrency(rebatesIncentives.utilityRebate, selectedCurrency)}</p>
-              )}
-              {rebatesIncentives.manufacturerRebate > 0 && (
-                <p><strong>Manufacturer Rebate:</strong> {formatCurrency(rebatesIncentives.manufacturerRebate, selectedCurrency)}</p>
-              )}
-            </div>
+        {/* Terms and Conditions */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-blue-600 mb-2">Terms and Conditions</h3>
+          <div className="text-sm text-gray-700 space-y-1">
+            <p>• Quote valid for 30 days from date issued</p>
+            <p>• All work performed by licensed technicians</p>
+            <p>• Prices include applicable taxes and permits</p>
+            <p>• Warranty terms as per manufacturer specifications</p>
+            <p>• Additional charges may apply for unexpected complications</p>
+            <p>• Payment terms: Net 30 days or financing options available</p>
           </div>
-        )}
+        </div>
 
         {notes && (
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-blue-600 mb-2">Notes</h3>
+            <h3 className="text-lg font-semibold text-blue-600 mb-2">Additional Notes</h3>
             <p>{notes}</p>
           </div>
         )}

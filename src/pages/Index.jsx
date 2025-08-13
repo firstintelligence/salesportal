@@ -97,7 +97,7 @@ const Index = () => {
   const [taxAmount, setTaxAmount] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState("Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -146,7 +146,7 @@ const Index = () => {
         utilityRebate: 0,
         manufacturerRebate: 0
       });
-      setNotes(parsedData.notes || "");
+      setNotes(parsedData.notes || "Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
       setSelectedCurrency("CAD"); // Always use CAD
     } else {
       // If no saved data, set default values
@@ -431,41 +431,12 @@ const Index = () => {
           <FiEdit size={24} />
         </button>
       </div>
-      <button
-        onClick={() =>
-          navigate("/receipt", {
-            state: {
-              formData: {
-                billTo,
-                shipTo,
-                invoice,
-                yourCompany,
-                items,
-                taxPercentage,
-                financing,
-                rebatesIncentives,
-                notes,
-                selectedCurrency,
-              },
-            },
-          })
-        }
-        className="fixed top-4 right-4 bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-600"
-        aria-label="Switch to Receipt"
-      >
-        <FiFileText size={24} />
-      </button>
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
           <form>
             <BillToSection
               billTo={billTo}
               handleInputChange={handleInputChange(setBillTo)}
-            />
-            <ShipToSection
-              shipTo={shipTo}
-              handleInputChange={handleInputChange(setShipTo)}
-              billTo={billTo}
             />
 
             <div className="mb-6">
@@ -509,17 +480,19 @@ const Index = () => {
               currencyCode={selectedCurrency}
             />
 
-            <FinancingSection
-              financing={financing}
-              setFinancing={setFinancing}
-              currencyCode={selectedCurrency}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FinancingSection 
+                financing={financing} 
+                setFinancing={setFinancing} 
+                currencyCode={selectedCurrency} 
+              />
 
-            <RebatesSection
-              rebatesIncentives={rebatesIncentives}
-              setRebatesIncentives={setRebatesIncentives}
-              currencyCode={selectedCurrency}
-            />
+              <RebatesSection 
+                rebatesIncentives={rebatesIncentives} 
+                setRebatesIncentives={setRebatesIncentives} 
+                currencyCode={selectedCurrency} 
+              />
+            </div>
 
             <div className="mb-6">
               <h3 className="text-lg font-medium mb-2">Totals</h3>

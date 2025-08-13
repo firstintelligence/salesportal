@@ -15,6 +15,8 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
     financing.loanTerm
   );
 
+  const adminFee = Math.min(financing.loanAmount * 0.0149, 149);
+
   const handleFinancingChange = (field, value) => {
     setFinancing(prev => ({ ...prev, [field]: value }));
   };
@@ -23,7 +25,7 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
     <div className="mb-6">
       <h2 className="text-2xl font-semibold mb-4">Financing Payment Details</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <FloatingLabelInput
           id="financeCompany"
           label="Finance Company"
@@ -38,9 +40,14 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
           value={formatCurrency(financing.loanAmount, currencyCode)}
           disabled
         />
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <FloatingLabelInput
+          id="adminFee"
+          label={`Admin Fee (${currencyCode})`}
+          value={formatCurrency(adminFee, currencyCode)}
+          disabled
+        />
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
           <Select 
@@ -74,34 +81,34 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
-          <Select 
-            value={financing.interestRate.toString()} 
-            onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {interestRates.map(rate => (
-                <SelectItem key={rate} value={rate.toString()}>
-                  {rate}%
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
+            <Select 
+              value={financing.interestRate.toString()} 
+              onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {interestRates.map(rate => (
+                  <SelectItem key={rate} value={rate.toString()}>
+                    {rate}%
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FloatingLabelInput
+            id="monthlyPayment"
+            label={`Monthly Payment (${currencyCode})`}
+            value={formatCurrency(monthlyPayment, currencyCode)}
+            disabled
+          />
         </div>
-
-        <FloatingLabelInput
-          id="monthlyPayment"
-          label={`Monthly Payment (${currencyCode})`}
-          value={formatCurrency(monthlyPayment, currencyCode)}
-          disabled
-        />
       </div>
     </div>
   );

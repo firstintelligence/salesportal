@@ -20,8 +20,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
       <h2 className="text-2xl font-semibold mb-4">Item Details</h2>
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2 items-end">
+            <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
                 value={item.productId || ''} 
@@ -35,7 +35,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-[60px]">
                   <SelectValue placeholder="Select HVAC product" />
                 </SelectTrigger>
                 <SelectContent>

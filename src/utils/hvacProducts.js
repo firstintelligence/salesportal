@@ -96,6 +96,13 @@ export const hvacProducts = [
     description: 'Wi-Fi enabled smart thermostat with app control',
     basePrice: 650,
     category: 'Controls'
+  },
+  {
+    id: 'home-energy-assessment',
+    name: 'Home Energy Assessment',
+    description: 'Comprehensive energy audit and efficiency analysis',
+    basePrice: 750,
+    category: 'Service'
   }
 ];
 
