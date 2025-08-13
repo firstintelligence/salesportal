@@ -36,14 +36,14 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
         
         <FloatingLabelInput
           id="loanAmount"
-          label={`Loan Amount (${currencyCode})`}
+          label="Loan Amount"
           value={formatCurrency(financing.loanAmount, currencyCode)}
           disabled
         />
 
         <FloatingLabelInput
           id="adminFee"
-          label={`Admin Fee (${currencyCode})`}
+          label="Admin Fee"
           value={formatCurrency(adminFee, currencyCode)}
           disabled
         />
@@ -104,7 +104,7 @@ const FinancingSection = ({ financing, setFinancing, currencyCode }) => {
 
           <FloatingLabelInput
             id="monthlyPayment"
-            label={`Monthly Payment (${currencyCode})`}
+            label="Monthly Payment"
             value={formatCurrency(monthlyPayment, currencyCode)}
             disabled
           />

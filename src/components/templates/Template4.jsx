@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import BaseTemplate from './BaseTemplate';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { getProductDescription } from '../../utils/productDescriptions';
-import georgesLogo from '../../assets/georges-logo.png';
+import georgesLogo from '/lovable-uploads/7dc0bf56-7b6c-4ba3-838b-e524de86693a.png';
 
 const Template4 = ({ data }) => {
   const { 
@@ -187,13 +187,8 @@ const Template4 = ({ data }) => {
         {/* Terms and Conditions */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-blue-600 mb-2">Terms and Conditions</h3>
-          <div className="text-sm text-gray-700 space-y-1">
-            <p>• Quote valid for 30 days from date issued</p>
-            <p>• All work performed by licensed technicians</p>
-            <p>• Prices include applicable taxes and permits</p>
-            <p>• Warranty terms as per manufacturer specifications</p>
-            <p>• Additional charges may apply for unexpected complications</p>
-            <p>• Payment terms: Net 30 days or financing options available</p>
+          <div className="text-sm text-gray-700">
+            <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
           </div>
         </div>
 
@@ -203,6 +198,21 @@ const Template4 = ({ data }) => {
             <p>{notes}</p>
           </div>
         )}
+
+        {/* Signature Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-blue-600 mb-4">Customer Signature</h3>
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <div className="border-b border-gray-400 mb-2 h-12"></div>
+              <p className="text-sm text-gray-600">Customer Signature</p>
+            </div>
+            <div>
+              <div className="border-b border-gray-400 mb-2 h-12"></div>
+              <p className="text-sm text-gray-600">Date</p>
+            </div>
+          </div>
+        </div>
       </div>
     </BaseTemplate>
   );

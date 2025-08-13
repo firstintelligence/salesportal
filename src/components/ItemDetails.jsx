@@ -61,14 +61,14 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
             />
             <FloatingLabelInput
               id={`itemAmount${index}`}
-              label={`Amount (${currencySymbol})`}
+              label="Amount"
               type="number"
               value={item.amount}
               onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
             />
             <FloatingLabelInput
               id={`itemTotal${index}`}
-              label={`Total (${currencySymbol})`}
+              label="Total"
               type="number"
               value={(item.quantity * item.amount).toFixed(2)}
               disabled
