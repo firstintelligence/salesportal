@@ -2,15 +2,18 @@ import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency, getCurrencySymbol } from '../utils/formatCurrency.js';
+import { hvacProducts, getProductsByCategory } from '../utils/hvacProducts.js';
 
 const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCode: propCurrencyCode }) => {
   let currencyCode = propCurrencyCode;
   if (!currencyCode) {
-    console.warn("Warning: currencyCode prop not provided to ItemDetails. Defaulting to 'INR'.");
-    currencyCode = 'INR';
+    console.warn("Warning: currencyCode prop not provided to ItemDetails. Defaulting to 'CAD'.");
+    currencyCode = 'CAD';
   }
   const currencySymbol = getCurrencySymbol(currencyCode);
+  const productCategories = getProductsByCategory();
 
   return (
     <div className="mb-6">
@@ -18,25 +21,50 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, currencyCod
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
-            <FloatingLabelInput
-              id={`itemName${index}`}
-              label="Name"
-              value={item.name}
-              onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
+              <Select 
+                value={item.productId || ''} 
+                onValueChange={(value) => {
+                  const product = hvacProducts.find(p => p.id === value);
+                  if (product) {
+                    handleItemChange(index, 'productId', value);
+                    handleItemChange(index, 'name', product.name);
+                    handleItemChange(index, 'description', product.description);
+                    handleItemChange(index, 'amount', product.basePrice);
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select HVAC product" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(productCategories).map(([category, products]) => (
+                    <div key={category}>
+                      <div className="px-2 py-1 text-sm font-semibold text-gray-500">{category}</div>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id}>
+                          {product.name} - {formatCurrency(product.basePrice, currencyCode)}
+                        </SelectItem>
+                      ))}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <FloatingLabelInput
               id={`itemQuantity${index}`}
               label="Quantity"
               type="number"
               value={item.quantity}
-              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value))}
+              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
             />
             <FloatingLabelInput
               id={`itemAmount${index}`}
               label={`Amount (${currencySymbol})`}
               type="number"
               value={item.amount}
-              onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value))}
+              onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
             />
             <FloatingLabelInput
               id={`itemTotal${index}`}

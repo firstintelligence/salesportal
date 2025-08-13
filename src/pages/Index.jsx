@@ -5,10 +5,13 @@ import FloatingLabelInput from '../components/FloatingLabelInput';
 import BillToSection from '../components/BillToSection';
 import ShipToSection from '../components/ShipToSection';
 import ItemDetails from "../components/ItemDetails";
+import FinancingSection from "../components/FinancingSection";
+import RebatesSection from "../components/RebatesSection";
 import { templates } from "../utils/templateRegistry";
-import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; // Added FiTrash2 icon
+import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
 import { RefreshCw } from "lucide-react";
-import { set, sub } from "date-fns";
+import { addDays } from "date-fns";
+import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 
 const generateRandomInvoiceNumber = () => {
   const length = Math.floor(Math.random() * 6) + 3;
@@ -55,12 +58,34 @@ const noteOptions = [
 const Index = () => {
   const navigate = useNavigate();
   const [selectedCurrency, setSelectedCurrency] = useState("CAD");
-  const [billTo, setBillTo] = useState({ name: "", address: "", phone: "" });
+  const [billTo, setBillTo] = useState({ 
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    phone: "", 
+    address: "", 
+    city: "", 
+    province: "", 
+    postalCode: "" 
+  });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
   const [invoice, setInvoice] = useState({
     date: "",
     paymentDate: "",
     number: "",
+  });
+  const [financing, setFinancing] = useState({
+    financeCompany: "Financeit Canada Inc.",
+    loanAmount: 0,
+    amortizationPeriod: 180,
+    loanTerm: 24,
+    interestRate: 0
+  });
+  const [rebatesIncentives, setRebatesIncentives] = useState({
+    federalRebate: 0,
+    provincialRebate: 0,
+    utilityRebate: 0,
+    manufacturerRebate: 0
   });
   const [yourCompany, setYourCompany] = useState({
     name: "George's Plumbing and Heating",
@@ -84,7 +109,16 @@ const Index = () => {
     const savedFormData = localStorage.getItem("formData");
     if (savedFormData) {
       const parsedData = JSON.parse(savedFormData);
-      setBillTo(parsedData.billTo || { name: "", address: "", phone: "" });
+      setBillTo(parsedData.billTo || { 
+        firstName: "", 
+        lastName: "", 
+        email: "", 
+        phone: "", 
+        address: "", 
+        city: "", 
+        province: "ON", 
+        postalCode: "" 
+      });
       setShipTo(parsedData.shipTo || { name: "", address: "", phone: "" });
       setInvoice(
         parsedData.invoice || { date: "", paymentDate: "", number: "" }
@@ -97,15 +131,30 @@ const Index = () => {
         }
       );
       setItems(parsedData.items || []);
-      settaxPercentage(parsedData.taxPercentage || 0);
+      const province = parsedData.billTo?.province || 'ON';
+      settaxPercentage(getProvincialTax(province));
+      setFinancing(parsedData.financing || {
+        financeCompany: "Financeit Canada Inc.",
+        loanAmount: 0,
+        amortizationPeriod: 180,
+        loanTerm: 24,
+        interestRate: 0
+      });
+      setRebatesIncentives(parsedData.rebatesIncentives || {
+        federalRebate: 0,
+        provincialRebate: 0,
+        utilityRebate: 0,
+        manufacturerRebate: 0
+      });
       setNotes(parsedData.notes || "");
       setSelectedCurrency("CAD"); // Always use CAD
     } else {
-      // If no saved data, set invoice number
+      // If no saved data, set default values
       setInvoice((prev) => ({
         ...prev,
-        number: generateRandomInvoiceNumber(),
+        number: "GPH0000", // Will be updated when customer info is entered
       }));
+      settaxPercentage(getProvincialTax('ON')); // Default to Ontario
     }
   }, []);
 
@@ -121,8 +170,10 @@ const Index = () => {
       taxAmount,
       subTotal,
       grandTotal,
+      financing,
+      rebatesIncentives,
       notes,
-      selectedCurrency, // Add selectedCurrency to localStorage
+      selectedCurrency,
     };
     localStorage.setItem("formData", JSON.stringify(formData));
   }, [
@@ -136,12 +187,37 @@ const Index = () => {
     taxAmount,
     subTotal,
     grandTotal,
-    selectedCurrency, // Add selectedCurrency to localStorage dependency array
+    financing,
+    rebatesIncentives,
+    selectedCurrency,
   ]);
 
   const handleInputChange = (setter) => (e) => {
     const { name, value } = e.target;
-    setter((prev) => ({ ...prev, [name]: value }));
+    setter((prev) => {
+      const newData = { ...prev, [name]: value };
+      
+      // Auto-generate invoice number when customer info changes
+      if (setter === setBillTo && (name === 'firstName' || name === 'lastName' || name === 'phone')) {
+        const firstName = name === 'firstName' ? value : prev.firstName;
+        const lastName = name === 'lastName' ? value : prev.lastName;
+        const phone = name === 'phone' ? value : prev.phone;
+        
+        if (firstName && lastName && phone) {
+          setInvoice(prevInvoice => ({
+            ...prevInvoice,
+            number: generateInvoiceNumber(firstName, lastName, phone)
+          }));
+        }
+      }
+      
+      // Update tax rate when province changes
+      if (setter === setBillTo && name === 'province') {
+        settaxPercentage(getProvincialTax(value));
+      }
+      
+      return newData;
+    });
   };
 
   const handleItemChange = (index, field, value) => {
@@ -157,7 +233,7 @@ const Index = () => {
   const addItem = () => {
     setItems([
       ...items,
-      { name: "", description: "", quantity: 0, amount: 0, total: 0 },
+      { name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" },
     ]);
   };
 
@@ -200,9 +276,29 @@ const Index = () => {
     // updateTotals will be called by the useEffect listening to taxPercentage change
   };
 
+  // Auto-set payment date to 7 days after invoice date
+  useEffect(() => {
+    if (invoice.date) {
+      const paymentDate = addDays(new Date(invoice.date), 7);
+      setInvoice(prev => ({
+        ...prev,
+        paymentDate: paymentDate.toISOString().split('T')[0]
+      }));
+    }
+  }, [invoice.date]);
+
+  // Update financing loan amount when grand total changes
+  useEffect(() => {
+    const loanAmount = calculateLoanAmount(grandTotal);
+    setFinancing(prev => ({
+      ...prev,
+      loanAmount
+    }));
+  }, [grandTotal]);
+
   useEffect(() => {
     updateTotals();
-  }, [items, taxPercentage]); // subTotal, taxAmount, grandTotal removed from deps as they are set by updateTotals & its chain
+  }, [items, taxPercentage]);
 
   const handleTemplateClick = (templateNumber) => {
     const formData = {
@@ -215,8 +311,10 @@ const Index = () => {
       taxAmount,
       subTotal,
       grandTotal,
+      financing,
+      rebatesIncentives,
       notes,
-      selectedCurrency, // Add this
+      selectedCurrency,
     };
     navigate("/template", {
       state: { formData, selectedTemplate: templateNumber },
@@ -225,9 +323,14 @@ const Index = () => {
 
   const fillDummyData = () => {
     setBillTo({
-      name: "John Doe",
-      address: "123 Main St, Anytown, USA",
-      phone: "(555) 123-4567",
+      firstName: "John",
+      lastName: "Doe", 
+      email: "john.doe@email.com",
+      phone: "5551234567",
+      address: "123 Main St",
+      city: "Toronto",
+      province: "ON",
+      postalCode: "M5V 3A3"
     });
     setShipTo({
       name: "Jane Smith",
@@ -248,64 +351,63 @@ const Index = () => {
     });
     setItems([
       {
-        name: "Product A",
-        description: "High-quality item",
-        quantity: 2,
-        amount: 50,
-        total: 100,
-      },
-      {
-        name: "Service B",
-        description: "Professional service",
+        name: "Residential Heat Pump",
+        description: "High-efficiency heat pump system for residential use",
         quantity: 1,
-        amount: 200,
-        total: 200,
+        amount: 8500,
+        total: 8500,
+        productId: "heat-pump-residential"
       },
       {
-        name: "Product C",
-        description: "Another great product",
-        quantity: 3,
-        amount: 30,
-        total: 90,
-      },
-      {
-        name: "Service D",
-        description: "Another professional service",
-        quantity: 2,
-        amount: 150,
-        total: 300,
-      },
-      {
-        name: "Product E",
-        description: "Yet another product",
+        name: "Smart Thermostat",
+        description: "Wi-Fi enabled smart thermostat with app control", 
         quantity: 1,
-        amount: 75,
-        total: 75,
-      },
-      {
-        name: "Service F",
-        description: "Yet another service",
-        quantity: 4,
-        amount: 100,
-        total: 400,
-      },
+        amount: 650,
+        total: 650,
+        productId: "thermostat-smart"
+      }
     ]);
-    settaxPercentage(10);
-    calculateSubTotal();
-    setNotes("Thank you for your business!");
+    settaxPercentage(getProvincialTax("ON"));
+    setNotes("Thank you for choosing George's Plumbing and Heating!");
   };
 
   const clearForm = () => {
-    setBillTo({ name: "", address: "", phone: "" });
+    setBillTo({ 
+      firstName: "", 
+      lastName: "", 
+      email: "", 
+      phone: "", 
+      address: "", 
+      city: "", 
+      province: "ON", 
+      postalCode: "" 
+    });
     setShipTo({ name: "", address: "", phone: "" });
     setInvoice({
       date: "",
       paymentDate: "",
-      number: generateRandomInvoiceNumber(),
+      number: "GPH0000",
     });
-    setYourCompany({ name: "", address: "", phone: "" });
-    setItems([{ name: "", description: "", quantity: 0, amount: 0, total: 0 }]);
-    settaxPercentage(0);
+    setYourCompany({
+      name: "George's Plumbing and Heating",
+      address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
+      phone: "info@georgesplumbingandheating.ca"
+    });
+    setItems([{ name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
+    settaxPercentage(getProvincialTax("ON"));
+    setFinancing({
+      financeCompany: "Financeit Canada Inc.",
+      loanAmount: 0,
+      amortizationPeriod: 180,
+      loanTerm: 24,
+      interestRate: 0
+    });
+    setRebatesIncentives({
+      federalRebate: 0,
+      provincialRebate: 0,
+      utilityRebate: 0,
+      manufacturerRebate: 0
+    });
     setNotes("");
     localStorage.removeItem("formData");
   };
@@ -340,8 +442,10 @@ const Index = () => {
                 yourCompany,
                 items,
                 taxPercentage,
+                financing,
+                rebatesIncentives,
                 notes,
-                selectedCurrency, // Ensure this is passed
+                selectedCurrency,
               },
             },
           })
@@ -366,19 +470,20 @@ const Index = () => {
 
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-4">
-                Invoice Information
+                Quote Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FloatingLabelInput
                   id="invoiceNumber"
-                  label="Invoice Number"
+                  label="Quote Number"
                   value={invoice.number}
                   onChange={handleInputChange(setInvoice)}
                   name="number"
+                  disabled
                 />
                 <FloatingLabelInput
                   id="invoiceDate"
-                  label="Invoice Date"
+                  label="Quote Date"
                   type="date"
                   value={invoice.date}
                   onChange={handleInputChange(setInvoice)}
@@ -386,48 +491,33 @@ const Index = () => {
                 />
                 <FloatingLabelInput
                   id="paymentDate"
-                  label="Payment Date"
+                  label="Valid Until"
                   type="date"
                   value={invoice.paymentDate}
-                  onChange={handleInputChange(setInvoice)}
+                  disabled
                   name="paymentDate"
                 />
               </div>
             </div>
 
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-4">Your Company</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FloatingLabelInput
-                  id="yourCompanyName"
-                  label="Name"
-                  value={yourCompany.name}
-                  onChange={handleInputChange(setYourCompany)}
-                  name="name"
-                />
-                <FloatingLabelInput
-                  id="yourCompanyPhone"
-                  label="Phone"
-                  value={yourCompany.phone}
-                  onChange={handleInputChange(setYourCompany)}
-                  name="phone"
-                />
-              </div>
-              <FloatingLabelInput
-                id="yourCompanyAddress"
-                label="Address"
-                value={yourCompany.address}
-                onChange={handleInputChange(setYourCompany)}
-                name="address"
-                className="mt-4"
-              />
-            </div>
 
             <ItemDetails
               items={items}
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
+              currencyCode={selectedCurrency}
+            />
+
+            <FinancingSection
+              financing={financing}
+              setFinancing={setFinancing}
+              currencyCode={selectedCurrency}
+            />
+
+            <RebatesSection
+              rebatesIncentives={rebatesIncentives}
+              setRebatesIncentives={setRebatesIncentives}
               currencyCode={selectedCurrency}
             />
 
