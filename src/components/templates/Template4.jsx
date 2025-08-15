@@ -155,9 +155,39 @@ const Template4 = ({ data }) => {
               </div>
             )}
 
+            {/* Terms and Conditions */}
+            <div>
+              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
+              <div className="text-xs text-gray-700 leading-tight">
+                <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="bg-gray-50 p-3 rounded border mb-2">
+              <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
+              <div className="space-y-1">
+                <p className="flex justify-between text-sm">
+                  <span>Sub Total:</span> 
+                  <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </p>
+                {taxPercentage > 0 && (
+                  <p className="flex justify-between text-sm">
+                    <span>Tax ({taxPercentage}%):</span> 
+                    <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </p>
+                )}
+                <hr className="my-2 border-gray-300" />
+                <p className="flex justify-between font-bold text-base">
+                  <span>Total:</span> 
+                  <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </p>
+              </div>
+            </div>
+
             {/* Rebates Section */}
             {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
-              <div>
+              <div className="bg-gray-50 p-3 rounded border">
                 <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Rebates & Incentives</h3>
                 <div className="grid grid-cols-1 gap-1 text-xs">
                   {rebatesIncentives.federalRebate > 0 && (
@@ -176,45 +206,16 @@ const Template4 = ({ data }) => {
               </div>
             )}
           </div>
-          <div className="bg-gray-50 p-3 rounded border">
-            <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
-            <div className="space-y-1">
-              <p className="flex justify-between text-sm">
-                <span>Sub Total:</span> 
-                <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </p>
-              {taxPercentage > 0 && (
-                <p className="flex justify-between text-sm">
-                  <span>Tax ({taxPercentage}%):</span> 
-                  <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                </p>
-              )}
-              <hr className="my-2 border-gray-300" />
-              <p className="flex justify-between font-bold text-base">
-                <span>Total:</span> 
-                <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </p>
-            </div>
-          </div>
         </div>
 
 
-        {/* Terms and Conditions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
-          <div>
-            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
-            <div className="text-xs text-gray-700 leading-tight">
-              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
-            </div>
+        {/* Additional Notes */}
+        {notes && (
+          <div className="mb-2">
+            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
+            <p className="text-xs">{notes}</p>
           </div>
-          
-          {notes && (
-            <div>
-              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
-              <p className="text-xs">{notes}</p>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Signature Section */}
         <div className="mt-2">
