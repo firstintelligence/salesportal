@@ -26,11 +26,11 @@ const Template4 = ({ data }) => {
 
   // Calculate monthly payment dynamically
   const calculateMonthlyPayment = () => {
-    if (!financing.loanAmount || !financing.loanTerm) return 0;
+    if (!financing.loanAmount || !financing.amortizationPeriod) return 0;
     
     const principal = financing.loanAmount;
     const rate = (financing.interestRate || 0) / 100 / 12;
-    const term = financing.loanTerm;
+    const term = financing.amortizationPeriod;
     
     if (rate === 0) {
       return principal / term;

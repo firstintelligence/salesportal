@@ -4,15 +4,15 @@ export const calculateLoanAmount = (invoiceTotal) => {
   return invoiceTotal + fee;
 };
 
-// Calculate monthly payment using loan amount, interest rate, and term
-export const calculateMonthlyPayment = (loanAmount, interestRate, termMonths) => {
+// Calculate monthly payment using loan amount, interest rate, and amortization period
+export const calculateMonthlyPayment = (loanAmount, interestRate, amortizationPeriod) => {
   if (interestRate === 0) {
-    return loanAmount / termMonths;
+    return loanAmount / amortizationPeriod;
   }
   
   const monthlyRate = interestRate / 100 / 12;
-  const payment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) / 
-                  (Math.pow(1 + monthlyRate, termMonths) - 1);
+  const payment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, amortizationPeriod)) / 
+                  (Math.pow(1 + monthlyRate, amortizationPeriod) - 1);
   
   return payment;
 };
