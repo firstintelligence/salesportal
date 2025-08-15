@@ -4,16 +4,14 @@ import jsPDF from 'jspdf';
 export const generatePDF = async (invoiceData, templateNumber) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const invoice = document.createElement('div');
-      document.body.appendChild(invoice);
-      
-      // Render the InvoiceTemplate component to a string
-      const InvoiceTemplate = (await import('../components/InvoiceTemplate')).default;
-      const ReactDOMServer = (await import('react-dom/server')).default;
-      const React = (await import('react')).default;
-      
-      const invoiceElement = React.createElement(InvoiceTemplate, { data: invoiceData, templateNumber });
-      const invoiceHTML = ReactDOMServer.renderToString(invoiceElement);
+      // Find the existing template element in the DOM instead of rendering to string
+      const existingTemplate = document.querySelector('[data-template-preview]');
+      if (!existingTemplate) {
+        throw new Error('Template preview not found');
+      }
+
+      // Clone the existing element to avoid modifying the original
+      const templateClone = existingTemplate.cloneNode(true);
       
       // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
       // 0.25 inches = 6.35mm margins all around
@@ -23,26 +21,33 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const contentWidthMM = pageWidthMM - (marginMM * 2);
       const contentHeightMM = pageHeightMM - (marginMM * 2);
       
-      // Create a container that represents just the content area (without margins)
-      invoice.style.width = `${contentWidthMM}mm`;
-      invoice.style.height = `${contentHeightMM}mm`;
-      invoice.style.backgroundColor = 'white';
-      invoice.style.position = 'absolute';
-      invoice.style.top = '-9999px'; // Hide off-screen
-      invoice.style.left = '-9999px';
-      invoice.style.fontFamily = 'Arial, sans-serif';
-      invoice.style.overflow = 'hidden';
-      invoice.style.padding = '0';
-      invoice.style.margin = '0';
-      invoice.style.boxSizing = 'border-box';
+      // Create a wrapper for PDF generation with proper sizing
+      const pdfWrapper = document.createElement('div');
+      pdfWrapper.style.position = 'absolute';
+      pdfWrapper.style.top = '-9999px';
+      pdfWrapper.style.left = '-9999px';
+      pdfWrapper.style.width = `${contentWidthMM}mm`;
+      pdfWrapper.style.height = `${contentHeightMM}mm`;
+      pdfWrapper.style.backgroundColor = 'white';
+      pdfWrapper.style.overflow = 'hidden';
+      pdfWrapper.style.padding = '20px';
+      pdfWrapper.style.boxSizing = 'border-box';
+      pdfWrapper.style.fontFamily = 'Arial, sans-serif';
       
-      // Add the content
-      invoice.innerHTML = invoiceHTML;
+      // Style the cloned template for PDF
+      templateClone.style.width = '100%';
+      templateClone.style.height = '100%';
+      templateClone.style.transform = 'scale(0.8)';
+      templateClone.style.transformOrigin = 'top left';
+      templateClone.style.overflow = 'hidden';
       
-      // Wait for any fonts/images to load
-      await new Promise(resolve => setTimeout(resolve, 200));
+      pdfWrapper.appendChild(templateClone);
+      document.body.appendChild(pdfWrapper);
       
-      const canvas = await html2canvas(invoice, {
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const canvas = await html2canvas(pdfWrapper, {
         scale: 2,
         useCORS: true,
         logging: false,
@@ -96,7 +101,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
 
       pdf.save(fileName);
       
-      document.body.removeChild(invoice);
+      document.body.removeChild(pdfWrapper);
       resolve();
     } catch (error) {
       reject(error);
