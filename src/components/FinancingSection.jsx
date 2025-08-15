@@ -36,14 +36,14 @@ const FinancingSection = ({ financing, setFinancing }) => {
           <FloatingLabelInput
             id="loanAmount"
             label="Loan Amount"
-            value={`$${financing.loanAmount.toFixed(2)}`}
+            value={`$${(financing.loanAmount || 0).toFixed(2)}`}
             disabled
           />
 
           <FloatingLabelInput
             id="adminFee"
             label="Admin Fee"
-            value={`$${adminFee.toFixed(2)}`}
+            value={`$${Math.min((financing.loanAmount || 0) * 0.0149, 149).toFixed(2)}`}
             disabled
           />
         </div>
@@ -51,7 +51,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
           <Select 
-            value={financing.amortizationPeriod.toString()} 
+            value={(financing.amortizationPeriod || 180).toString()} 
             onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
           >
             <SelectTrigger>
@@ -67,7 +67,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Loan Term</label>
           <Select 
-            value={financing.loanTerm.toString()} 
+            value={(financing.loanTerm || 24).toString()} 
             onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
           >
             <SelectTrigger>
@@ -86,7 +86,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
-              value={financing.interestRate.toString()} 
+              value={(financing.interestRate || 0).toString()} 
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
             >
               <SelectTrigger>
