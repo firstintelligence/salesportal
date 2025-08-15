@@ -155,13 +155,6 @@ const Template4 = ({ data }) => {
               </div>
             )}
 
-            {/* Terms and Conditions */}
-            <div>
-              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
-              <div className="text-xs text-gray-700 leading-tight">
-                <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
-              </div>
-            </div>
           </div>
           <div>
             <div className="bg-gray-50 p-3 rounded border mb-2">
@@ -209,13 +202,22 @@ const Template4 = ({ data }) => {
         </div>
 
 
-        {/* Additional Notes */}
-        {notes && (
-          <div className="mb-2">
-            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
-            <p className="text-xs">{notes}</p>
+        {/* Terms and Conditions and Additional Notes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
+          <div>
+            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
+            <div className="text-xs text-gray-700 leading-tight">
+              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
+            </div>
           </div>
-        )}
+          
+          {notes && (
+            <div>
+              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
+              <p className="text-xs">{notes}</p>
+            </div>
+          )}
+        </div>
 
         {/* Signature Section */}
         <div className="mt-2">
