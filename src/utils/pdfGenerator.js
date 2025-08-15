@@ -16,10 +16,10 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const invoiceHTML = ReactDOMServer.renderToString(invoiceElement);
       
       // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
-      // 0.25 inches = 6.35mm margins all around
+      // 0.5 inches = 12.7mm margins all around (increased from 0.25 inches)
       const pageWidthMM = 215.9;
       const pageHeightMM = 279.4;
-      const marginMM = 6.35;
+      const marginMM = 12.7; // Increased margin size
       
       // Create a container that represents the full page with margins
       invoice.style.width = `${pageWidthMM}mm`;
@@ -30,12 +30,13 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       invoice.style.position = 'absolute';
       invoice.style.top = '-9999px'; // Hide off-screen
       invoice.style.left = '-9999px';
+      invoice.style.fontFamily = 'Arial, sans-serif'; // Ensure consistent font rendering
       
       // Add the content
       invoice.innerHTML = invoiceHTML;
       
       // Wait for any fonts/images to load
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200)); // Increased wait time
       
       const canvas = await html2canvas(invoice, {
         scale: 2,
@@ -43,6 +44,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         logging: false,
         width: pageWidthMM * 3.78, // Convert mm to pixels (96 DPI)
         height: pageHeightMM * 3.78,
+        backgroundColor: '#ffffff',
       });
       
       const imgData = canvas.toDataURL('image/png');
