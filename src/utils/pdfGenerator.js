@@ -19,8 +19,11 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       
       // 0.25 inches = 6.35mm margins all around
       const margin = 6.35;
-      const contentWidth = 210 - (2 * margin); // 197.3mm
-      const contentHeight = 297 - (2 * margin); // 284.3mm
+      // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
+      const pageWidth = 215.9;
+      const pageHeight = 279.4;
+      const contentWidth = pageWidth - (2 * margin); // 203.2mm
+      const contentHeight = pageHeight - (2 * margin); // 266.7mm
       
       invoice.style.width = `${contentWidth}mm`;
       invoice.style.height = `${contentHeight}mm`;
@@ -35,7 +38,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       });
       
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF('p', 'mm', [pageWidth, pageHeight]); // US Letter size
       
       // Add the content with margins
       pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight, undefined, 'FAST');
