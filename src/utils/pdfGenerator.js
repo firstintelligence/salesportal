@@ -15,33 +15,41 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const invoiceElement = React.createElement(InvoiceTemplate, { data: invoiceData, templateNumber });
       const invoiceHTML = ReactDOMServer.renderToString(invoiceElement);
       
+      // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
+      // 0.25 inches = 6.35mm margins all around
+      const pageWidthMM = 215.9;
+      const pageHeightMM = 279.4;
+      const marginMM = 6.35;
+      
+      // Create a container that represents the full page with margins
+      invoice.style.width = `${pageWidthMM}mm`;
+      invoice.style.height = `${pageHeightMM}mm`;
+      invoice.style.padding = `${marginMM}mm`;
+      invoice.style.boxSizing = 'border-box';
+      invoice.style.backgroundColor = 'white';
+      invoice.style.position = 'absolute';
+      invoice.style.top = '-9999px'; // Hide off-screen
+      invoice.style.left = '-9999px';
+      
+      // Add the content
       invoice.innerHTML = invoiceHTML;
       
-      // 0.25 inches = 6.35mm margins all around
-      const margin = 6.35;
-      // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
-      const pageWidth = 215.9;
-      const pageHeight = 279.4;
-      const contentWidth = pageWidth - (2 * margin); // 203.2mm
-      const contentHeight = pageHeight - (2 * margin); // 266.7mm
-      
-      invoice.style.width = `${contentWidth}mm`;
-      invoice.style.height = `${contentHeight}mm`;
-      invoice.style.padding = '0';
-      invoice.style.margin = '0';
-      invoice.style.boxSizing = 'border-box';
+      // Wait for any fonts/images to load
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const canvas = await html2canvas(invoice, {
         scale: 2,
         useCORS: true,
         logging: false,
+        width: pageWidthMM * 3.78, // Convert mm to pixels (96 DPI)
+        height: pageHeightMM * 3.78,
       });
       
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', [pageWidth, pageHeight]); // US Letter size
+      const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]); // US Letter size
       
-      // Add the content with margins
-      pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight, undefined, 'FAST');
+      // Add the full page image (which already includes the margins)
+      pdf.addImage(imgData, 'PNG', 0, 0, pageWidthMM, pageHeightMM, undefined, 'FAST');
       const { number, date, paymentDate } = invoiceData.invoice;
       const { name: companyName } = invoiceData.yourCompany;
       const { name: billToName } = invoiceData.billTo;
