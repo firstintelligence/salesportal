@@ -28,7 +28,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                   }
                 }}
               >
-                <SelectTrigger className="h-[60px]">
+                <SelectTrigger className="h-[40px]">
                   <SelectValue placeholder="Select HVAC product" />
                 </SelectTrigger>
                 <SelectContent>
