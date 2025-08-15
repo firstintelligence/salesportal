@@ -16,8 +16,17 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const invoiceHTML = ReactDOMServer.renderToString(invoiceElement);
       
       invoice.innerHTML = invoiceHTML;
-      invoice.style.width = '210mm';
-      invoice.style.height = '297mm';
+      
+      // 0.25 inches = 6.35mm margins all around
+      const margin = 6.35;
+      const contentWidth = 210 - (2 * margin); // 197.3mm
+      const contentHeight = 297 - (2 * margin); // 284.3mm
+      
+      invoice.style.width = `${contentWidth}mm`;
+      invoice.style.height = `${contentHeight}mm`;
+      invoice.style.padding = '0';
+      invoice.style.margin = '0';
+      invoice.style.boxSizing = 'border-box';
       
       const canvas = await html2canvas(invoice, {
         scale: 2,
@@ -28,13 +37,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // 0.25 inches = 6.35mm margins all around
-      const margin = 6.35;
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const contentWidth = pageWidth - (2 * margin);
-      const contentHeight = pageHeight - (2 * margin);
-      
+      // Add the content with margins
       pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight, undefined, 'FAST');
       const { number, date, paymentDate } = invoiceData.invoice;
       const { name: companyName } = invoiceData.yourCompany;
