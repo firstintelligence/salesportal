@@ -10,7 +10,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
   const monthlyPayment = calculateMonthlyPayment(
     financing.loanAmount, 
     financing.interestRate, 
-    financing.loanTerm
+    financing.amortizationPeriod
   );
 
   const adminFee = Math.min(financing.loanAmount * 0.0149, 149);
@@ -32,19 +32,21 @@ const FinancingSection = ({ financing, setFinancing }) => {
           disabled
         />
         
-        <FloatingLabelInput
-          id="loanAmount"
-          label="Loan Amount"
-          value={`$${financing.loanAmount.toLocaleString()}`}
-          disabled
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FloatingLabelInput
+            id="loanAmount"
+            label="Loan Amount"
+            value={`$${financing.loanAmount.toFixed(2)}`}
+            disabled
+          />
 
-        <FloatingLabelInput
-          id="adminFee"
-          label="Admin Fee"
-          value={`$${adminFee.toLocaleString()}`}
-          disabled
-        />
+          <FloatingLabelInput
+            id="adminFee"
+            label="Admin Fee"
+            value={`$${adminFee.toFixed(2)}`}
+            disabled
+          />
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
@@ -103,7 +105,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
           <FloatingLabelInput
             id="monthlyPayment"
             label="Monthly Payment"
-            value={`$${monthlyPayment.toLocaleString()}`}
+            value={`$${monthlyPayment.toFixed(2)}`}
             disabled
           />
         </div>
