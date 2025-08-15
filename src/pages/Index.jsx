@@ -98,6 +98,7 @@ const Index = () => {
   const [subTotal, setSubTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
   const [notes, setNotes] = useState("Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
+  const [isInvoice, setIsInvoice] = useState(false); // Toggle for invoice vs quote
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -312,6 +313,7 @@ const Index = () => {
       financing,
       rebatesIncentives,
       notes,
+      isInvoice,
     };
     navigate("/template", {
       state: { formData, selectedTemplate: templateNumber },
@@ -437,13 +439,28 @@ const Index = () => {
             />
 
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-4">
-                Quote Information
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-semibold">
+                  {isInvoice ? 'Invoice' : 'Quote'} Information
+                </h2>
+                <div className="flex items-center gap-2">
+                  <span className={!isInvoice ? 'font-semibold' : ''}>Quote</span>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isInvoice}
+                      onChange={(e) => setIsInvoice(e.target.checked)}
+                    />
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                  <span className={isInvoice ? 'font-semibold' : ''}>Invoice</span>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FloatingLabelInput
                   id="invoiceNumber"
-                  label="Quote Number"
+                  label={`${isInvoice ? 'Invoice' : 'Quote'} Number`}
                   value={invoice.number}
                   onChange={handleInputChange(setInvoice)}
                   name="number"
@@ -451,7 +468,7 @@ const Index = () => {
                 />
                 <FloatingLabelInput
                   id="invoiceDate"
-                  label="Quote Date"
+                  label={`${isInvoice ? 'Invoice' : 'Quote'} Date`}
                   type="date"
                   value={invoice.date}
                   onChange={handleInputChange(setInvoice)}
@@ -459,7 +476,7 @@ const Index = () => {
                 />
                 <FloatingLabelInput
                   id="paymentDate"
-                  label="Valid Until"
+                  label={isInvoice ? 'Due Date' : 'Valid Until'}
                   type="date"
                   value={invoice.paymentDate}
                   disabled

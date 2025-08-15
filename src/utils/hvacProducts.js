@@ -1,45 +1,69 @@
 export const hvacProducts = [
+  // Heat Pumps by Tonnage
   {
-    id: 'heat-pump-residential-basic',
-    name: 'Residential Heat Pump - Basic',
-    description: 'High-efficiency heat pump system for residential use (14 SEER)',
+    id: 'heat-pump-2-ton',
+    name: '2 Ton Heat Pump (14 SEER, 24,000 BTU)',
+    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
     basePrice: 12500,
-    category: 'Heat Pumps'
+    category: 'Heat Pumps',
+    seer: 14,
+    btu: 24000
   },
   {
-    id: 'heat-pump-residential-premium',
-    name: 'Residential Heat Pump - Premium',
-    description: 'High-efficiency heat pump system for residential use (16 SEER)',
+    id: 'heat-pump-3-ton',
+    name: '3 Ton Heat Pump (16 SEER, 36,000 BTU)',
+    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
     basePrice: 15500,
-    category: 'Heat Pumps'
+    category: 'Heat Pumps',
+    seer: 16,
+    btu: 36000
   },
   {
-    id: 'heat-pump-residential-ultra',
-    name: 'Residential Heat Pump - Ultra',
-    description: 'Ultra high-efficiency heat pump system for residential use (18+ SEER)',
+    id: 'heat-pump-4-ton',
+    name: '4 Ton Heat Pump (18 SEER, 48,000 BTU)',
+    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
     basePrice: 18500,
-    category: 'Heat Pumps'
+    category: 'Heat Pumps',
+    seer: 18,
+    btu: 48000
   },
   {
-    id: 'heat-pump-commercial',
-    name: 'Commercial Heat Pump',
-    description: 'Heavy-duty heat pump system for commercial applications',
+    id: 'heat-pump-5-ton',
+    name: '5 Ton Heat Pump (20 SEER, 60,000 BTU)',
+    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
     basePrice: 22000,
-    category: 'Heat Pumps'
+    category: 'Heat Pumps',
+    seer: 20,
+    btu: 60000
   },
-  {
-    id: 'furnace-gas-80',
-    name: 'Gas Furnace 80% AFUE',
-    description: '80% efficiency natural gas furnace',
-    basePrice: 4500,
-    category: 'Furnaces'
-  },
+  
+  // Furnaces with specified efficiency ratings
   {
     id: 'furnace-gas-95',
-    name: 'Gas Furnace 95% AFUE',
-    description: '95% high-efficiency condensing gas furnace',
+    name: 'Gas Furnace 95% AFUE (80,000 BTU)',
+    description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
+    basePrice: 6500,
+    category: 'Furnaces',
+    efficiency: 95,
+    btu: 80000
+  },
+  {
+    id: 'furnace-gas-96',
+    name: 'Gas Furnace 96% AFUE (100,000 BTU)',
+    description: '96% high-efficiency condensing gas furnace with variable speed blower and professional installation',
     basePrice: 7500,
-    category: 'Furnaces'
+    category: 'Furnaces',
+    efficiency: 96,
+    btu: 100000
+  },
+  {
+    id: 'furnace-gas-98',
+    name: 'Gas Furnace 98% AFUE (120,000 BTU)',
+    description: '98% ultra high-efficiency condensing gas furnace with modulating burner and professional installation',
+    basePrice: 9500,
+    category: 'Furnaces',
+    efficiency: 98,
+    btu: 120000
   },
   {
     id: 'ac-central-14-seer',
@@ -55,47 +79,38 @@ export const hvacProducts = [
     basePrice: 8500,
     category: 'Air Conditioning'
   },
+  // Navien Tankless Water Heaters
   {
-    id: 'tankless-gas-1-2-bath',
-    name: 'Tankless Gas Water Heater (1-2 Bathrooms)',
-    description: 'On-demand natural gas water heater, 120,000 BTU',
+    id: 'navien-tankless-1-2-bath',
+    name: 'Navien Tankless Water Heater (1-2 Bathrooms, 120,000 BTU)',
+    description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
     basePrice: 3800,
-    category: 'Water Heating'
+    category: 'Water Heating',
+    btu: 120000
   },
   {
-    id: 'tankless-gas-2-3-bath',
-    name: 'Tankless Gas Water Heater (2-3 Bathrooms)',
-    description: 'On-demand natural gas water heater, 160,000 BTU',
+    id: 'navien-tankless-2-3-bath',
+    name: 'Navien Tankless Water Heater (2-3 Bathrooms, 160,000 BTU)',
+    description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
     basePrice: 4500,
-    category: 'Water Heating'
+    category: 'Water Heating',
+    btu: 160000
   },
   {
-    id: 'tankless-gas-3-4-bath',
-    name: 'Tankless Gas Water Heater (3-4 Bathrooms)',
-    description: 'On-demand natural gas water heater, 199,000 BTU',
+    id: 'navien-tankless-3-4-bath',
+    name: 'Navien Tankless Water Heater (3-4 Bathrooms, 199,000 BTU)',
+    description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
     basePrice: 5200,
-    category: 'Water Heating'
+    category: 'Water Heating',
+    btu: 199000
   },
   {
-    id: 'tankless-gas-4-plus-bath',
-    name: 'Tankless Gas Water Heater (4+ Bathrooms)',
-    description: 'On-demand natural gas water heater, 240,000 BTU',
+    id: 'navien-tankless-4-plus-bath',
+    name: 'Navien Tankless Water Heater (4+ Bathrooms, 240,000 BTU)',
+    description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
     basePrice: 6200,
-    category: 'Water Heating'
-  },
-  {
-    id: 'tankless-electric-1-2-bath',
-    name: 'Tankless Electric Water Heater (1-2 Bathrooms)',
-    description: 'On-demand electric water heater, 18 kW',
-    basePrice: 2800,
-    category: 'Water Heating'
-  },
-  {
-    id: 'tankless-electric-2-3-bath',
-    name: 'Tankless Electric Water Heater (2-3 Bathrooms)',
-    description: 'On-demand electric water heater, 24 kW',
-    basePrice: 3400,
-    category: 'Water Heating'
+    category: 'Water Heating',
+    btu: 240000
   },
   {
     id: 'cv40',
@@ -168,10 +183,10 @@ export const hvacProducts = [
     category: 'Controls'
   },
   {
-    id: 'home-energy-assessment',
-    name: 'Home Energy Assessment',
-    description: 'Comprehensive energy audit and efficiency analysis',
-    basePrice: 950,
+    id: 'home-energy-audit',
+    name: 'Home Energy Audit',
+    description: 'Comprehensive energy assessment including blower door test, thermal imaging, and efficiency recommendations',
+    basePrice: 750,
     category: 'Service'
   },
   {

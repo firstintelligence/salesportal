@@ -5,7 +5,13 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
     setRebatesIncentives(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
   };
 
-  const totalRebates = Object.values(rebatesIncentives).reduce((sum, value) => sum + value, 0);
+  // Calculate total rebates with utility rebate multiplied by 12 (annual)
+  const totalRebates = Object.entries(rebatesIncentives).reduce((sum, [key, value]) => {
+    if (key === 'utilityRebate') {
+      return sum + (value * 12); // Multiply monthly utility rebate by 12
+    }
+    return sum + value;
+  }, 0);
 
   return (
     <div className="mb-6">
@@ -14,7 +20,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FloatingLabelInput
           id="federalRebate"
-          label="Federal Rebate"
+          label="Canada Greener Homes Rebate"
           type="number"
           value={rebatesIncentives.federalRebate}
           onChange={(e) => handleRebateChange('federalRebate', e.target.value)}
@@ -22,7 +28,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
         
         <FloatingLabelInput
           id="provincialRebate"
-          label="Provincial Rebate"
+          label="Enbridge Rebate"
           type="number"
           value={rebatesIncentives.provincialRebate}
           onChange={(e) => handleRebateChange('provincialRebate', e.target.value)}
@@ -32,7 +38,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <FloatingLabelInput
           id="utilityRebate"
-          label="Utility Rebate"
+          label="Utility Rebate (Monthly)"
           type="number"
           value={rebatesIncentives.utilityRebate}
           onChange={(e) => handleRebateChange('utilityRebate', e.target.value)}

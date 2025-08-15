@@ -18,6 +18,7 @@ const Template4 = ({ data }) => {
     financing = {},
     rebatesIncentives = {},
     notes = '', 
+    isInvoice = false,
   } = data || {};
 
   const customerName = billTo.firstName && billTo.lastName 
@@ -44,19 +45,21 @@ const Template4 = ({ data }) => {
       <div className="bg-white p-3 max-w-4xl mx-auto">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>QUOTE</h1>
+            <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
+              {isInvoice ? 'INVOICE' : 'QUOTE'}
+            </h1>
             <p className="text-sm mb-1">
-              <span className="font-semibold">Quote#:</span>{" "}
+              <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>{" "}
               {invoice.number || "N/A"}
             </p>
             <p className="text-sm mb-1">
-              <span className="font-semibold">Quote Date:</span>{" "}
+              <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>{" "}
               {invoice.date
                 ? format(new Date(invoice.date), "MMM dd, yyyy")
                 : "N/A"}
             </p>
             <p className="text-sm">
-              <span className="font-semibold">Valid Until:</span>{" "}
+              <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>{" "}
               {invoice.paymentDate
                 ? format(new Date(invoice.paymentDate), "MMM dd, yyyy")
                 : "N/A"}
@@ -70,29 +73,30 @@ const Template4 = ({ data }) => {
         <div className="grid grid-cols-2 gap-3 mb-2">
           <div className="bg-gray-100 p-1 rounded">
             <h3 className="text-sm font-semibold mb-0.5" style={{color: '#194578'}}>
-              Quote For
+              {isInvoice ? 'Invoice' : 'Quote'} For
             </h3>
             <p className="text-sm">
               <strong>{customerName}</strong>
             </p>
-            <p className="text-xs">{billTo.email || ""}</p>
-            <p className="text-xs">{billTo.phone || ""}</p>
             <p className="text-xs">
               {billTo.address && `${billTo.address}`}
               {billTo.city && `, ${billTo.city}`}
               {billTo.province && `, ${billTo.province}`}
               {billTo.postalCode && ` ${billTo.postalCode}`}
             </p>
+            <p className="text-xs">{billTo.phone || ""}</p>
+            <p className="text-xs">{billTo.email || ""}</p>
           </div>
           <div className="bg-gray-100 p-1 rounded">
             <h3 className="text-sm font-semibold mb-0.5" style={{color: '#194578'}}>
-              Quote From
+              {isInvoice ? 'Invoice' : 'Quote'} From
             </h3>
             <p className="text-sm">
               <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
             </p>
             <p className="whitespace-pre-line text-xs">{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
             <p className="text-xs">{yourCompany.phone || "info@georgesplumbingandheating.ca"}</p>
+            <p className="text-xs">{yourCompany.email || "info@georgesplumbingandheating.ca"}</p>
           </div>
         </div>
 
@@ -102,6 +106,7 @@ const Template4 = ({ data }) => {
               <th className="p-1 text-left border border-gray-300 text-sm">
                 Item #/Item Description
               </th>
+              <th className="p-1 text-left border border-gray-300 text-sm">Description</th>
               <th className="p-1 text-right border border-gray-300 text-sm">Qty.</th>
               <th className="p-1 text-right border border-gray-300 text-sm">Rate</th>
               <th className="p-1 text-right border border-gray-300 text-sm">Amount</th>
@@ -112,7 +117,9 @@ const Template4 = ({ data }) => {
               <tr key={index} className="bg-gray-100">
                 <td className="p-1 border border-gray-300">
                   <div className="font-semibold text-sm">{`${index + 1}. ${item.name || "Item Name"}`}</div>
-                  <div className="text-xs text-gray-600">
+                </td>
+                <td className="p-1 border border-gray-300">
+                  <div className="text-xs text-gray-600 whitespace-pre-line">
                     {getProductDescription(item.productId) || item.description || "Item Description"}
                   </div>
                 </td>
@@ -154,13 +161,13 @@ const Template4 = ({ data }) => {
                 <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Rebates & Incentives</h3>
                 <div className="grid grid-cols-1 gap-1 text-xs">
                   {rebatesIncentives.federalRebate > 0 && (
-                    <p><strong>Federal Rebate:</strong> ${rebatesIncentives.federalRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p><strong>Canada Greener Homes Rebate:</strong> ${rebatesIncentives.federalRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   )}
                   {rebatesIncentives.provincialRebate > 0 && (
-                    <p><strong>Provincial Rebate:</strong> ${rebatesIncentives.provincialRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p><strong>Enbridge Rebate:</strong> ${rebatesIncentives.provincialRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   )}
                   {rebatesIncentives.utilityRebate > 0 && (
-                    <p><strong>Utility Rebate (Monthly):</strong> ${rebatesIncentives.utilityRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} per month</p>
+                    <p><strong>Utility Rebate (Annual):</strong> ${(rebatesIncentives.utilityRebate * 12).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${rebatesIncentives.utilityRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} per month)</p>
                   )}
                   {rebatesIncentives.manufacturerRebate > 0 && (
                     <p><strong>Manufacturer Rebate:</strong> ${rebatesIncentives.manufacturerRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
@@ -169,39 +176,45 @@ const Template4 = ({ data }) => {
               </div>
             )}
           </div>
-          <div>
-            <p className="flex justify-between text-sm mb-1">
-              <span>Sub Total:</span> <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-            </p>
-            {taxPercentage > 0 && (
-              <>
-                <p className="flex justify-between text-sm mb-1">
-                  <span>Tax({taxPercentage}%):</span> <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+          <div className="bg-gray-50 p-3 rounded border">
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
+            <div className="space-y-1">
+              <p className="flex justify-between text-sm">
+                <span>Sub Total:</span> 
+                <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </p>
+              {taxPercentage > 0 && (
+                <p className="flex justify-between text-sm">
+                  <span>Tax ({taxPercentage}%):</span> 
+                  <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </p>
-              </>
-            )}
-            <hr className="my-1" />
-            <p className="flex justify-between font-bold text-base mt-1">
-              <span>Total:</span> <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-            </p>
+              )}
+              <hr className="my-2 border-gray-300" />
+              <p className="flex justify-between font-bold text-base">
+                <span>Total:</span> 
+                <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </p>
+            </div>
           </div>
         </div>
 
 
         {/* Terms and Conditions */}
-        <div className="mb-1">
-          <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
-          <div className="text-xs text-gray-700 leading-tight">
-            <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
+          <div>
+            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
+            <div className="text-xs text-gray-700 leading-tight">
+              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
+            </div>
           </div>
+          
+          {notes && (
+            <div>
+              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
+              <p className="text-xs">{notes}</p>
+            </div>
+          )}
         </div>
-
-        {notes && (
-          <div className="mb-1">
-            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
-            <p className="text-xs">{notes}</p>
-          </div>
-        )}
 
         {/* Signature Section */}
         <div className="mt-2">
