@@ -16,42 +16,46 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const invoiceHTML = ReactDOMServer.renderToString(invoiceElement);
       
       // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
-      // 0.5 inches = 12.7mm margins all around (increased from 0.25 inches)
+      // 0.25 inches = 6.35mm margins all around
       const pageWidthMM = 215.9;
       const pageHeightMM = 279.4;
-      const marginMM = 12.7; // Increased margin size
+      const marginMM = 6.35; // 0.25 inches
+      const contentWidthMM = pageWidthMM - (marginMM * 2);
+      const contentHeightMM = pageHeightMM - (marginMM * 2);
       
-      // Create a container that represents the full page with margins
-      invoice.style.width = `${pageWidthMM}mm`;
-      invoice.style.height = `${pageHeightMM}mm`;
-      invoice.style.padding = `${marginMM}mm`;
-      invoice.style.boxSizing = 'border-box';
+      // Create a container that represents just the content area (without margins)
+      invoice.style.width = `${contentWidthMM}mm`;
+      invoice.style.height = `${contentHeightMM}mm`;
       invoice.style.backgroundColor = 'white';
       invoice.style.position = 'absolute';
       invoice.style.top = '-9999px'; // Hide off-screen
       invoice.style.left = '-9999px';
-      invoice.style.fontFamily = 'Arial, sans-serif'; // Ensure consistent font rendering
+      invoice.style.fontFamily = 'Arial, sans-serif';
+      invoice.style.overflow = 'hidden';
+      invoice.style.padding = '0';
+      invoice.style.margin = '0';
+      invoice.style.boxSizing = 'border-box';
       
       // Add the content
       invoice.innerHTML = invoiceHTML;
       
       // Wait for any fonts/images to load
-      await new Promise(resolve => setTimeout(resolve, 200)); // Increased wait time
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       const canvas = await html2canvas(invoice, {
         scale: 2,
         useCORS: true,
         logging: false,
-        width: pageWidthMM * 3.78, // Convert mm to pixels (96 DPI)
-        height: pageHeightMM * 3.78,
+        width: contentWidthMM * 3.78, // Convert mm to pixels (96 DPI)
+        height: contentHeightMM * 3.78,
         backgroundColor: '#ffffff',
       });
       
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]); // US Letter size
       
-      // Add the full page image (which already includes the margins)
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidthMM, pageHeightMM, undefined, 'FAST');
+      // Add the content image with proper margins
+      pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, contentHeightMM, undefined, 'FAST');
       const { number, date, paymentDate } = invoiceData.invoice;
       const { name: companyName } = invoiceData.yourCompany;
       const { name: billToName } = invoiceData.billTo;
