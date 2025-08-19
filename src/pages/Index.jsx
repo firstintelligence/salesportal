@@ -434,7 +434,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      <h1 className="text-3xl font-bold mb-8 text-center">Quote Generator</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
       <div className="fixed top-4 left-4 flex gap-2">
         <button
           onClick={clearForm}
