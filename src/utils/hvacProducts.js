@@ -84,7 +84,7 @@ export const hvacProducts = [
     id: 'navien-tankless-1-2-bath',
     name: 'Navien Tankless Water Heater (1-2 Bathrooms, 120,000 BTU)',
     description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
-    basePrice: 3800,
+    basePrice: 5800,
     category: 'Water Heating',
     btu: 120000
   },
@@ -92,7 +92,7 @@ export const hvacProducts = [
     id: 'navien-tankless-2-3-bath',
     name: 'Navien Tankless Water Heater (2-3 Bathrooms, 160,000 BTU)',
     description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
-    basePrice: 4500,
+    basePrice: 6500,
     category: 'Water Heating',
     btu: 160000
   },
@@ -100,7 +100,7 @@ export const hvacProducts = [
     id: 'navien-tankless-3-4-bath',
     name: 'Navien Tankless Water Heater (3-4 Bathrooms, 199,000 BTU)',
     description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
-    basePrice: 5200,
+    basePrice: 7200,
     category: 'Water Heating',
     btu: 199000
   },
@@ -108,7 +108,7 @@ export const hvacProducts = [
     id: 'navien-tankless-4-plus-bath',
     name: 'Navien Tankless Water Heater (4+ Bathrooms, 240,000 BTU)',
     description: 'Navien condensing tankless water heater with recirculation pump and professional installation',
-    basePrice: 6200,
+    basePrice: 8200,
     category: 'Water Heating',
     btu: 240000
   },
@@ -190,10 +190,17 @@ export const hvacProducts = [
     category: 'Service'
   },
   {
-    id: 'attic-insulation',
-    name: 'Attic Insulation',
-    description: 'Blown-in cellulose or fiberglass attic insulation (per sq ft)',
-    basePrice: 3500,
+    id: 'attic-insulation-1000',
+    name: 'Attic Insulation (up to 1000 sq ft)',
+    description: 'Blown-in cellulose or fiberglass attic insulation for homes up to 1000 square feet',
+    basePrice: 4500,
+    category: 'Energy Efficiency'
+  },
+  {
+    id: 'attic-insulation-1000-plus',
+    name: 'Attic Insulation (1000+ sq ft)',
+    description: 'Blown-in cellulose or fiberglass attic insulation for homes over 1000 square feet',
+    basePrice: 6500,
     category: 'Energy Efficiency'
   },
   {
@@ -202,6 +209,38 @@ export const hvacProducts = [
     description: '5kW lithium-ion home battery storage system with smart controls',
     basePrice: 8500,
     category: 'Energy Storage'
+  },
+  
+  // Water Filtration
+  {
+    id: 'carbon-filter',
+    name: 'Carbon Water Filter',
+    description: 'Whole house carbon filtration system with professional installation',
+    basePrice: 1200,
+    category: 'Water Filtration'
+  },
+  {
+    id: 'water-softener',
+    name: 'Water Softener System',
+    description: 'Ion exchange water softener system with salt tank and professional installation',
+    basePrice: 2800,
+    category: 'Water Filtration'
+  },
+  
+  // Air Filtration
+  {
+    id: 'hepa-filter',
+    name: 'HEPA Filter System',
+    description: 'High-efficiency particulate air filtration system for whole house air purification',
+    basePrice: 1800,
+    category: 'Air Filtration'
+  },
+  {
+    id: 'electronic-air-cleaner',
+    name: 'Electronic Air Cleaner (EAC)',
+    description: 'Electronic air cleaner with washable filters for superior air quality',
+    basePrice: 2200,
+    category: 'Air Filtration'
   }
 ];
 
