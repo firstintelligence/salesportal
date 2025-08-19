@@ -89,44 +89,12 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const contentHeightMM = pageHeightMM - (marginMM * 2);
       pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, contentHeightMM, undefined, 'FAST');
       
-      // Generate filename
-      const { number, date, paymentDate } = invoiceData.invoice;
-      const { name: companyName } = invoiceData.yourCompany;
-      const { name: billToName } = invoiceData.billTo;
-      const timestamp = new Date().getTime();
-
-      let fileName;
-      switch (templateNumber) {
-        case 1:
-          fileName = `${number}.pdf`;
-          break;
-        case 2:
-          fileName = `${companyName}_${number}.pdf`;
-          break;
-        case 3:
-          fileName = `${companyName}.pdf`;
-          break;
-        case 4:
-          fileName = `${date}.pdf`;
-          break;
-        case 5:
-          fileName = `${number}-${date}.pdf`;
-          break;
-        case 6:
-          fileName = `invoice_${timestamp}.pdf`;
-          break;
-        case 7:
-          fileName = `Invoice_${number}.pdf`;
-          break;
-        case 8:
-          fileName = `Invoice_${billToName}.pdf`;
-          break;
-        case 9:
-          fileName = `IN-${date}.pdf`;
-          break;
-        default:
-          fileName = `invoice_template_${templateNumber}.pdf`;
-      }
+      // Generate filename in format: "John Smith - 123 Main Street, Toronto, ON A1A 1A1 - GPHJS1234"
+      const { number } = invoiceData.invoice;
+      const { name: customerName, address, city, province, postalCode } = invoiceData.billTo;
+      
+      const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
+      const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
 
       pdf.save(fileName);
       
