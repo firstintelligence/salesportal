@@ -13,6 +13,27 @@ import { RefreshCw } from "lucide-react";
 import { addDays } from "date-fns";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 
+// Helper function to get province tax name
+const getProvinceTaxName = (provinceCode) => {
+  const taxNames = {
+    'AB': 'GST',      // Alberta - GST only
+    'BC': 'HST',      // British Columbia - HST
+    'MB': 'GST+PST',  // Manitoba - GST + PST
+    'NB': 'HST',      // New Brunswick - HST
+    'NL': 'HST',      // Newfoundland and Labrador - HST
+    'NS': 'HST',      // Nova Scotia - HST
+    'NT': 'GST',      // Northwest Territories - GST only
+    'NU': 'GST',      // Nunavut - GST only
+    'ON': 'HST',      // Ontario - HST
+    'PE': 'HST',      // Prince Edward Island - HST
+    'QC': 'GST+QST',  // Quebec - GST + QST
+    'SK': 'GST+PST',  // Saskatchewan - GST + PST
+    'YT': 'GST'       // Yukon - GST only
+  };
+  
+  return taxNames[provinceCode] || 'HST';
+};
+
 const generateRandomInvoiceNumber = () => {
   const length = Math.floor(Math.random() * 6) + 3;
   const alphabetCount = Math.min(Math.floor(Math.random() * 4), length);
@@ -493,6 +514,23 @@ const Index = () => {
               removeItem={removeItem}
             />
 
+            {/* Totals section moved right under products */}
+            <div className="mb-6 bg-gray-50 p-4 rounded-lg">
+              <h3 className="text-lg font-medium mb-3">Totals</h3>
+              <div className="flex justify-between mb-2">
+                <span>Sub Total:</span>
+                <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Tax Amount ({taxPercentage}% {getProvinceTaxName(billTo.province)}):</span>
+                <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg">
+                <span>Grand Total:</span>
+                <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FinancingSection 
                 financing={financing} 
@@ -504,34 +542,6 @@ const Index = () => {
                 setRebatesIncentives={setRebatesIncentives} 
                  
               />
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-lg font-medium mb-2">Totals</h3>
-              <div className="flex justify-between mb-2">
-                <span>Sub Total:</span>
-                <span>${subTotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Tax Rate (%):</span>
-                <input
-                  type="number"
-                  value={taxPercentage}
-                  onChange={(e) => handleTaxPercentageChange(e)}
-                  className="w-24 p-2 border rounded"
-                  min="0"
-                  max="28"
-                  step="1"
-                />
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Tax Amount:</span>
-                <span>${taxAmount.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between font-bold">
-                <span>Grand Total:</span>
-                <span>${grandTotal.toLocaleString()}</span>
-              </div>
             </div>
 
             <div className="mb-6">
