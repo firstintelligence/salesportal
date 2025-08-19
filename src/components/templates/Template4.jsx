@@ -138,7 +138,7 @@ const Template4 = ({ data }) => {
         </div>
 
         <div className="flex-1">
-          <div className="grid grid-cols-2 gap-4 mb-2">
+          <div className="grid grid-cols-2 gap-4 mb-1">
             <div>
               {/* Financing Section */}
               {financing && (
@@ -146,7 +146,7 @@ const Template4 = ({ data }) => {
                   <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Financing Payment Details</h3>
                   <div className="grid grid-cols-1 gap-1 text-sm">
                     <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
-                    <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (includes ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)</p>
+                    <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (incl. ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)</p>
                     <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
                     <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
                     <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
