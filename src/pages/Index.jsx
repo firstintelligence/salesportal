@@ -87,7 +87,9 @@ const Index = () => {
     address: "", 
     city: "", 
     province: "", 
-    postalCode: "" 
+    postalCode: "",
+    coApplicantName: "",
+    coApplicantPhone: ""
   });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
   const [invoice, setInvoice] = useState({
@@ -111,7 +113,8 @@ const Index = () => {
   const [yourCompany, setYourCompany] = useState({
     name: "George's Plumbing and Heating",
     address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
-    phone: "info@georgesplumbingandheating.ca",
+    phone: "(519) 555-0123",
+    email: "info@georgesplumbingandheating.ca",
   });
   const [items, setItems] = useState([]);
   const [taxPercentage, settaxPercentage] = useState(0);
@@ -139,7 +142,9 @@ const Index = () => {
         address: "", 
         city: "", 
         province: "ON", 
-        postalCode: "" 
+        postalCode: "",
+        coApplicantName: "",
+        coApplicantPhone: ""
       });
       setShipTo(parsedData.shipTo || { name: "", address: "", phone: "" });
       setInvoice(
@@ -149,7 +154,8 @@ const Index = () => {
         parsedData.yourCompany || { 
           name: "George's Plumbing and Heating",
           address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
-          phone: "info@georgesplumbingandheating.ca"
+          phone: "(519) 555-0123",
+          email: "info@georgesplumbingandheating.ca"
         }
       );
       setItems(parsedData.items || []);
@@ -400,7 +406,9 @@ const Index = () => {
       address: "", 
       city: "", 
       province: "ON", 
-      postalCode: "" 
+      postalCode: "",
+      coApplicantName: "",
+      coApplicantPhone: ""
     });
     setShipTo({ name: "", address: "", phone: "" });
     setInvoice({
@@ -411,7 +419,8 @@ const Index = () => {
     setYourCompany({
       name: "George's Plumbing and Heating",
       address: "14 Rathmine Street\nLondon, ON N5Z 1Z3",
-      phone: "info@georgesplumbingandheating.ca"
+      phone: "(519) 555-0123",
+      email: "info@georgesplumbingandheating.ca"
     });
     setItems([{ name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
     settaxPercentage(getProvincialTax("ON"));
@@ -569,7 +578,7 @@ const Index = () => {
         </div>
 
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-4">Quote Preview</h2>
+          <h2 className="text-2xl font-semibold mb-4">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
           <div 
             className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
             onClick={() => handleTemplateClick(4)}
@@ -580,7 +589,7 @@ const Index = () => {
               className="w-full h-auto object-cover rounded"
             />
           </div>
-          <p className="text-center font-medium mt-2">Click to generate quote</p>
+          <p className="text-center font-medium mt-2">Click to generate {isInvoice ? 'invoice' : 'quote'}</p>
         </div>
       </div>
     </div>

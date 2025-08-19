@@ -111,6 +111,50 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           </Button>
         </div>
       </div>
+      
+      {/* Co-Applicant Section */}
+      <div className="mt-6 p-4 border-t border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Co-Applicant (Optional)</h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const currentValue = billTo.coApplicantName || '';
+              if (currentValue) {
+                // Clear co-applicant info
+                handleInputChange({ target: { name: 'coApplicantName', value: '' } });
+                handleInputChange({ target: { name: 'coApplicantPhone', value: '' } });
+              } else {
+                // Enable co-applicant section
+                handleInputChange({ target: { name: 'coApplicantName', value: 'Co-Applicant Name' } });
+              }
+            }}
+          >
+            {billTo.coApplicantName ? 'Remove Co-Applicant' : 'Add Co-Applicant'}
+          </Button>
+        </div>
+        
+        {billTo.coApplicantName && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FloatingLabelInput
+              id="coApplicantName"
+              label="Co-Applicant Name"
+              value={billTo.coApplicantName || ''}
+              onChange={handleInputChange}
+              name="coApplicantName"
+            />
+            <FloatingLabelInput
+              id="coApplicantPhone"
+              label="Co-Applicant Phone"
+              value={billTo.coApplicantPhone || ''}
+              onChange={handleInputChange}
+              name="coApplicantPhone"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

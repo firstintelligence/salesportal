@@ -67,7 +67,7 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.82rem] mb-1 ml-auto" />
+            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.82rem] mb-4 ml-auto" />
           </div>
         </div>
 
@@ -221,21 +221,21 @@ const Template4 = ({ data }) => {
         </div>
 
         {/* Signature Section */}
-        <div className="mt-2">
+        <div className="mt-8">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
               <div className="border-b-2 border-gray-300 mb-1 h-8"></div>
-              <p className="text-xs text-gray-600">Customer Signature</p>
+              <p className="text-xs text-gray-600">{customerName}</p>
               <div className="border-b border-gray-300 mb-1 h-6 mt-2"></div>
-              <p className="text-xs text-gray-600">Date</p>
+              <p className="text-xs text-gray-600">{formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
             <div>
-              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Company Representative</h3>
+              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
               <div className="border-b-2 border-gray-300 mb-1 h-8"></div>
-              <p className="text-xs text-gray-600">Authorized Signature</p>
+              <p className="text-xs text-gray-600">{data.billTo?.coApplicantName || 'Co-Applicant Name'}</p>
               <div className="border-b border-gray-300 mb-1 h-6 mt-2"></div>
-              <p className="text-xs text-gray-600">Date</p>
+              <p className="text-xs text-gray-600">{formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
           </div>
         </div>
