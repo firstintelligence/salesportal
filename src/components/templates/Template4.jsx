@@ -138,7 +138,7 @@ const Template4 = ({ data }) => {
         </div>
 
         <div className="flex-1">
-          <div className="grid grid-cols-2 gap-4 mb-1">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               {/* Financing Section */}
               {financing && (
@@ -201,7 +201,7 @@ const Template4 = ({ data }) => {
             </div>
           </div>
           {/* Terms and Conditions and Additional Notes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 mt-1">
             <div>
               <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
               <div className="text-xs text-gray-700 leading-tight">
@@ -219,7 +219,7 @@ const Template4 = ({ data }) => {
         </div>
 
         {/* Signature Section - Always at bottom */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-1">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
