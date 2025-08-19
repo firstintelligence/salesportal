@@ -89,7 +89,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
               value={(financing.interestRate || 0).toString()} 
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-[40px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
