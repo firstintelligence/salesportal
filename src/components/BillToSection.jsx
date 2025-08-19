@@ -2,7 +2,7 @@ import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { generatePostalCode } from '../utils/postalCodeGenerator';
+import AddressLookupService from '../utils/addressLookupService';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
   const provinces = [
@@ -101,13 +101,24 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             variant="outline"
             size="sm"
             className="absolute right-1 top-1 bottom-1 px-2 text-xs"
-            onClick={() => {
-              const postalCode = generatePostalCode(billTo.city, billTo.province);
-              handleInputChange({ target: { name: 'postalCode', value: postalCode } });
+            onClick={async () => {
+              try {
+                const postalCode = await AddressLookupService.lookupPostalCode(
+                  billTo.address, 
+                  billTo.city, 
+                  billTo.province
+                );
+                handleInputChange({ target: { name: 'postalCode', value: postalCode } });
+              } catch (error) {
+                console.error('Postal code lookup failed:', error);
+                // Still generate an estimated postal code on error
+                const estimatedCode = AddressLookupService.generateEstimatedPostalCode(billTo.city, billTo.province);
+                handleInputChange({ target: { name: 'postalCode', value: estimatedCode } });
+              }
             }}
-            disabled={!billTo.city || !billTo.province}
+            disabled={!billTo.address || !billTo.city || !billTo.province}
           >
-            Generate
+            Lookup
           </Button>
         </div>
       </div>
