@@ -116,7 +116,9 @@ const Index = () => {
     phone: "(519) 555-0123",
     email: "info@georgesplumbingandheating.ca",
   });
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([
+    { quantity: 1, amount: 0, total: 0, itemName: "", description: "", hvacProduct: "" }
+  ]);
   const [taxPercentage, settaxPercentage] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
