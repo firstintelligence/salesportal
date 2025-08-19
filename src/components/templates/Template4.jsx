@@ -44,9 +44,9 @@ const Template4 = ({ data }) => {
   return (
     <BaseTemplate data={data}>
       <div className="bg-white h-full flex flex-col">
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex justify-between items-start mb-3">
           <div>
-            <h1 className="text-3xl font-bold mb-3" style={{color: '#194578'}}>
+            <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
               {isInvoice ? 'INVOICE' : 'QUOTE'}
             </h1>
             <p className="text-sm mb-1">
@@ -67,11 +67,11 @@ const Template4 = ({ data }) => {
             </p>
           </div>
           <div className="text-right">
-            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.82rem] mb-4 ml-auto" />
+            <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.82rem] mb-1 ml-auto" />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="bg-gray-100 p-3 rounded" style={{backgroundColor: '#f8f9fa'}}>
             <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>
               {isInvoice ? 'Invoice' : 'Quote'} For
@@ -101,34 +101,34 @@ const Template4 = ({ data }) => {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <table className="w-full" style={{borderCollapse: 'collapse'}}>
             <thead>
               <tr style={{backgroundColor: '#194578', color: 'white'}}>
-                <th className="p-3 text-left text-sm font-semibold">
+                <th className="py-2 px-3 text-left text-sm font-semibold">
                   Item & Description
                 </th>
-                <th className="p-3 text-right text-sm font-semibold">Qty.</th>
-                <th className="p-3 text-right text-sm font-semibold">Rate</th>
-                <th className="p-3 text-right text-sm font-semibold">Amount</th>
+                <th className="py-2 px-3 text-right text-sm font-semibold">Qty.</th>
+                <th className="py-2 px-3 text-right text-sm font-semibold">Rate</th>
+                <th className="py-2 px-3 text-right text-sm font-semibold">Amount</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, index) => (
                 <tr key={index} style={{backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#ffffff'}}>
-                  <td className="p-3">
+                  <td className="py-2 px-3">
                     <div className="font-semibold text-sm mb-1">{`${index + 1}. ${item.name || "Item Name"}`}</div>
-                    <div className="text-xs text-gray-600 whitespace-pre-line">
+                    <div className="text-xs text-gray-600 whitespace-pre-line leading-tight">
                       {getProductDescription(item.productId) || item.description || "Item Description"}
                     </div>
                   </td>
-                  <td className="p-3 text-right text-sm">
+                  <td className="py-2 px-3 text-right text-sm">
                     {item.quantity || 0}
                   </td>
-                  <td className="p-3 text-right text-sm">
+                  <td className="py-2 px-3 text-right text-sm">
                     ${(item.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </td>
-                  <td className="p-3 text-right text-sm">
+                  <td className="py-2 px-3 text-right text-sm">
                     ${((item.quantity || 0) * (item.amount || 0)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </td>
                 </tr>
