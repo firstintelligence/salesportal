@@ -65,7 +65,7 @@ const FinancingSection = ({ financing, setFinancing }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Loan Term</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
           <Select 
             value={(financing.loanTerm || 24).toString()} 
             onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
