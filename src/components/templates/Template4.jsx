@@ -43,10 +43,10 @@ const Template4 = ({ data }) => {
 
   return (
     <BaseTemplate data={data}>
-      <div className="bg-white p-3 max-w-4xl mx-auto">
-        <div className="flex justify-between items-start mb-2">
+      <div className="bg-white h-full flex flex-col">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
+            <h1 className="text-3xl font-bold mb-3" style={{color: '#194578'}}>
               {isInvoice ? 'INVOICE' : 'QUOTE'}
             </h1>
             <p className="text-sm mb-1">
@@ -71,9 +71,9 @@ const Template4 = ({ data }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-2">
-          <div className="bg-gray-100 p-1 rounded">
-            <h3 className="text-sm font-semibold mb-0.5" style={{color: '#194578'}}>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-gray-100 p-3 rounded" style={{backgroundColor: '#f8f9fa'}}>
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>
               {isInvoice ? 'Invoice' : 'Quote'} For
             </h3>
             <p className="text-sm">
@@ -88,8 +88,8 @@ const Template4 = ({ data }) => {
             <p className="text-xs">{billTo.phone || ""}</p>
             <p className="text-xs">{billTo.email || ""}</p>
           </div>
-          <div className="bg-gray-100 p-1 rounded">
-            <h3 className="text-sm font-semibold mb-0.5" style={{color: '#194578'}}>
+          <div className="bg-gray-100 p-3 rounded" style={{backgroundColor: '#f8f9fa'}}>
+            <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>
               {isInvoice ? 'Invoice' : 'Quote'} From
             </h3>
             <p className="text-sm">
@@ -101,141 +101,141 @@ const Template4 = ({ data }) => {
           </div>
         </div>
 
-        <table className="w-full mb-2 border border-gray-300">
-          <thead style={{backgroundColor: '#194578', color: 'white'}}>
-            <tr>
-              <th className="p-1 text-left border border-gray-300 text-sm">
-                Item
-              </th>
-              <th className="p-1 text-left border border-gray-300 text-sm">Description</th>
-              <th className="p-1 text-right border border-gray-300 text-sm">Qty.</th>
-              <th className="p-1 text-right border border-gray-300 text-sm">Rate</th>
-              <th className="p-1 text-right border border-gray-300 text-sm">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, index) => (
-              <tr key={index} className="bg-gray-100">
-                <td className="p-1 border border-gray-300">
-                  <div className="font-semibold text-sm">{`${index + 1}. ${item.name || "Item Name"}`}</div>
-                </td>
-                <td className="p-1 border border-gray-300">
-                  <div className="text-xs text-gray-600 whitespace-pre-line">
-                    {getProductDescription(item.productId) || item.description || "Item Description"}
-                  </div>
-                </td>
-                <td className="p-1 text-right border border-gray-300 text-sm">
-                  {item.quantity || 0}
-                </td>
-                <td className="p-1 text-right border border-gray-300 text-sm">
-                  ${(item.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </td>
-                <td className="p-1 text-right border border-gray-300 text-sm">
-                  ${((item.quantity || 0) * (item.amount || 0)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </td>
+        <div className="mb-6">
+          <table className="w-full" style={{borderCollapse: 'collapse'}}>
+            <thead>
+              <tr style={{backgroundColor: '#194578', color: 'white'}}>
+                <th className="p-3 text-left text-sm font-semibold">
+                  Item & Description
+                </th>
+                <th className="p-3 text-right text-sm font-semibold">Qty.</th>
+                <th className="p-3 text-right text-sm font-semibold">Rate</th>
+                <th className="p-3 text-right text-sm font-semibold">Amount</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((item, index) => (
+                <tr key={index} style={{backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#ffffff'}}>
+                  <td className="p-3">
+                    <div className="font-semibold text-sm mb-1">{`${index + 1}. ${item.name || "Item Name"}`}</div>
+                    <div className="text-xs text-gray-600 whitespace-pre-line">
+                      {getProductDescription(item.productId) || item.description || "Item Description"}
+                    </div>
+                  </td>
+                  <td className="p-3 text-right text-sm">
+                    {item.quantity || 0}
+                  </td>
+                  <td className="p-3 text-right text-sm">
+                    ${(item.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </td>
+                  <td className="p-3 text-right text-sm">
+                    ${((item.quantity || 0) * (item.amount || 0)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-2">
-          <div>
-            {/* Financing Section */}
-            {financing && (
-              <div className="mb-2 bg-blue-50 p-3 rounded border">
-                <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Financing Payment Details</h3>
-                <div className="grid grid-cols-1 gap-1 text-sm">
-                  <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
-                  <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  <p><strong>Admin Fee:</strong> ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
-                  <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
-                  <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
-                  <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+        <div className="flex-1">
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              {/* Financing Section */}
+              {financing && (
+                <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e3f2fd', border: '1px solid #90caf9'}}>
+                  <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Financing Payment Details</h3>
+                  <div className="grid grid-cols-1 gap-1 text-sm">
+                    <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
+                    <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p><strong>Admin Fee:</strong> ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
+                    <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
+                    <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
+                    <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-          </div>
-          <div>
-            <div className="bg-gray-50 p-3 rounded border mb-2">
-              <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
-              <div className="space-y-1">
-                <p className="flex justify-between text-sm">
-                  <span>Sub Total:</span> 
-                  <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                </p>
-                {taxPercentage > 0 && (
+            </div>
+            <div>
+              <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
+                <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
+                <div className="space-y-1">
                   <p className="flex justify-between text-sm">
-                    <span>Tax ({taxPercentage}%):</span> 
-                    <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span>Sub Total:</span> 
+                    <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                   </p>
-                )}
-                <hr className="my-2 border-gray-300" />
-                <p className="flex justify-between font-bold text-base">
-                  <span>Total:</span> 
-                  <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                </p>
+                  {taxPercentage > 0 && (
+                    <p className="flex justify-between text-sm">
+                      <span>Tax ({taxPercentage}%):</span> 
+                      <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    </p>
+                  )}
+                  <hr className="my-2" style={{borderColor: '#dee2e6'}} />
+                  <p className="flex justify-between font-bold text-base">
+                    <span>Total:</span> 
+                    <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Rebates Section */}
+              {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
+                <div className="p-3 rounded" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
+                  <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Rebates & Incentives</h3>
+                  <div className="grid grid-cols-1 gap-1 text-xs">
+                    {rebatesIncentives.federalRebate > 0 && (
+                      <p><strong>Canada Greener Homes Rebate:</strong> ${rebatesIncentives.federalRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    )}
+                    {rebatesIncentives.provincialRebate > 0 && (
+                      <p><strong>Enbridge Rebate:</strong> ${rebatesIncentives.provincialRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    )}
+                    {rebatesIncentives.utilityRebate > 0 && (
+                      <p><strong>Utility Rebate (Annual):</strong> ${(rebatesIncentives.utilityRebate * 12).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${rebatesIncentives.utilityRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} per month)</p>
+                    )}
+                    {rebatesIncentives.manufacturerRebate > 0 && (
+                      <p><strong>Manufacturer Rebate:</strong> ${rebatesIncentives.manufacturerRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Terms and Conditions and Additional Notes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
+              <div className="text-xs text-gray-700 leading-tight">
+                <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
               </div>
             </div>
-
-            {/* Rebates Section */}
-            {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
-              <div className="bg-gray-50 p-3 rounded border">
-                <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Rebates & Incentives</h3>
-                <div className="grid grid-cols-1 gap-1 text-xs">
-                  {rebatesIncentives.federalRebate > 0 && (
-                    <p><strong>Canada Greener Homes Rebate:</strong> ${rebatesIncentives.federalRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  )}
-                  {rebatesIncentives.provincialRebate > 0 && (
-                    <p><strong>Enbridge Rebate:</strong> ${rebatesIncentives.provincialRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  )}
-                  {rebatesIncentives.utilityRebate > 0 && (
-                    <p><strong>Utility Rebate (Annual):</strong> ${(rebatesIncentives.utilityRebate * 12).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${rebatesIncentives.utilityRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} per month)</p>
-                  )}
-                  {rebatesIncentives.manufacturerRebate > 0 && (
-                    <p><strong>Manufacturer Rebate:</strong> ${rebatesIncentives.manufacturerRebate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  )}
-                </div>
+            
+            {notes && (
+              <div>
+                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Additional Notes</h3>
+                <p className="text-xs">{notes}</p>
               </div>
             )}
           </div>
         </div>
 
-
-        {/* Terms and Conditions and Additional Notes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
-          <div>
-            <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Terms and Conditions</h3>
-            <div className="text-xs text-gray-700 leading-tight">
-              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
-            </div>
-          </div>
-          
-          {notes && (
+        {/* Signature Section - Always at bottom */}
+        <div className="mt-auto pt-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-xs font-semibold mb-0.5" style={{color: '#194578'}}>Additional Notes</h3>
-              <p className="text-xs">{notes}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Signature Section */}
-        <div className="mt-8">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
-              <div className="border-b-2 border-gray-300 mb-1 h-8"></div>
+              <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
+              <div className="border-b-2 border-gray-400 mb-2 h-8"></div>
               <p className="text-xs text-gray-600">{customerName}</p>
-              <div className="border-b border-gray-300 mb-1 h-6 mt-2"></div>
-              <p className="text-xs text-gray-600">{formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              <div className="border-b border-gray-400 mb-1 h-6 mt-3"></div>
+              <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
             <div>
-              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
-              <div className="border-b-2 border-gray-300 mb-1 h-8"></div>
+              <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+              <div className="border-b-2 border-gray-400 mb-2 h-8"></div>
               <p className="text-xs text-gray-600">{data.billTo?.coApplicantName || 'Co-Applicant Name'}</p>
-              <div className="border-b border-gray-300 mb-1 h-6 mt-2"></div>
-              <p className="text-xs text-gray-600">{formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              <div className="border-b border-gray-400 mb-1 h-6 mt-3"></div>
+              <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
           </div>
         </div>
