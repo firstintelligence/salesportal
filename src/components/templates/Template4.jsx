@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import BaseTemplate from './BaseTemplate';
 
 import { getProductDescription } from '../../utils/productDescriptions';
@@ -55,13 +56,13 @@ const Template4 = ({ data }) => {
             <p className="text-sm mb-1">
               <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>{" "}
               {invoice.date
-                ? format(new Date(invoice.date + 'T00:00:00'), "MMM dd, yyyy")
+                ? formatInTimeZone(new Date(invoice.date), "America/Toronto", "MMM dd, yyyy")
                 : "N/A"}
             </p>
             <p className="text-sm">
               <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>{" "}
               {invoice.paymentDate
-                ? format(new Date(invoice.paymentDate + 'T00:00:00'), "MMM dd, yyyy")
+                ? formatInTimeZone(new Date(invoice.paymentDate), "America/Toronto", "MMM dd, yyyy")
                 : "N/A"}
             </p>
           </div>
