@@ -19,12 +19,19 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
               <Select 
                 value={item.productId || ''} 
                 onValueChange={(value) => {
-                  const product = hvacProducts.find(p => p.id === value);
-                  if (product) {
-                    handleItemChange(index, 'productId', value);
-                    handleItemChange(index, 'name', product.name);
-                    handleItemChange(index, 'description', product.description);
-                    handleItemChange(index, 'amount', product.basePrice);
+                  if (value === 'custom') {
+                    handleItemChange(index, 'productId', 'custom');
+                    handleItemChange(index, 'name', '');
+                    handleItemChange(index, 'description', '');
+                    handleItemChange(index, 'amount', 0);
+                  } else {
+                    const product = hvacProducts.find(p => p.id === value);
+                    if (product) {
+                      handleItemChange(index, 'productId', value);
+                      handleItemChange(index, 'name', product.name);
+                      handleItemChange(index, 'description', product.description);
+                      handleItemChange(index, 'amount', product.basePrice);
+                    }
                   }
                 }}
               >
@@ -32,6 +39,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                   <SelectValue placeholder="Select HVAC product" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="custom">Custom Product</SelectItem>
                   {Object.entries(productCategories).map(([category, products]) => (
                     <div key={category}>
                       <div className="px-2 py-1 text-sm font-semibold text-gray-500">{category}</div>
@@ -68,11 +76,22 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
             />
           </div>
           <FloatingLabelInput
-            id={`itemDescription${index}`}
-            label="Description"
-            value={item.description}
-            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+            id={`itemName${index}`}
+            label="Item Name"
+            value={item.name || ''}
+            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
           />
+          <div className="mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              id={`itemDescription${index}`}
+              value={item.description || ''}
+              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              rows={3}
+              placeholder="Enter item description..."
+            />
+          </div>
           {index > 0 && (
             <Button
               variant="destructive"

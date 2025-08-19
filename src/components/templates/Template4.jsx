@@ -55,13 +55,13 @@ const Template4 = ({ data }) => {
             <p className="text-sm mb-1">
               <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>{" "}
               {invoice.date
-                ? format(new Date(invoice.date), "MMM dd, yyyy")
+                ? format(new Date(invoice.date + 'T00:00:00'), "MMM dd, yyyy")
                 : "N/A"}
             </p>
             <p className="text-sm">
               <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>{" "}
               {invoice.paymentDate
-                ? format(new Date(invoice.paymentDate), "MMM dd, yyyy")
+                ? format(new Date(invoice.paymentDate + 'T00:00:00'), "MMM dd, yyyy")
                 : "N/A"}
             </p>
           </div>
@@ -104,7 +104,7 @@ const Template4 = ({ data }) => {
           <thead style={{backgroundColor: '#194578', color: 'white'}}>
             <tr>
               <th className="p-1 text-left border border-gray-300 text-sm">
-                Item #/Item Description
+                Item
               </th>
               <th className="p-1 text-left border border-gray-300 text-sm">Description</th>
               <th className="p-1 text-right border border-gray-300 text-sm">Qty.</th>
@@ -141,9 +141,9 @@ const Template4 = ({ data }) => {
           <div>
             {/* Financing Section */}
             {financing && (
-              <div className="mb-2">
+              <div className="mb-2 bg-blue-50 p-3 rounded border">
                 <h3 className="text-sm font-semibold mb-1" style={{color: '#194578'}}>Financing Payment Details</h3>
-                <div className="grid grid-cols-1 gap-1 text-xs">
+                <div className="grid grid-cols-1 gap-1 text-sm">
                   <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                   <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   <p><strong>Admin Fee:</strong> ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
