@@ -513,16 +513,16 @@ const Index = () => {
               </div>
             </div>
 
+            <BillToSection
+              billTo={billTo}
+              handleInputChange={handleInputChange(setBillTo)}
+            />
+
             <ItemDetails
               items={items}
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
-            />
-
-            <BillToSection
-              billTo={billTo}
-              handleInputChange={handleInputChange(setBillTo)}
             />
 
             {/* Totals section - sleeker and low profile */}
