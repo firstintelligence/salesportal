@@ -9,8 +9,10 @@ import FinancingSection from "../components/FinancingSection";
 import InvoiceTemplate from "../components/InvoiceTemplate";
 import RebatesSection from "../components/RebatesSection";
 import { templates } from "../utils/templateRegistry";
+import { generatePDF } from "../utils/pdfGenerator";
+import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Loader2 } from "lucide-react";
 import { addDays } from "date-fns";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 
@@ -127,6 +129,8 @@ const Index = () => {
   const [notes, setNotes] = useState("Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
   const [isInvoice, setIsInvoice] = useState(false); // Toggle for invoice vs quote
   const [showContractorFees, setShowContractorFees] = useState(false); // Toggle for showing contractor fees
+  const [isDownloading, setIsDownloading] = useState(false); // For PDF download state
+  const [selectedCurrency] = useState('CAD'); // Default currency
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -445,6 +449,39 @@ const Index = () => {
     localStorage.removeItem("formData");
   };
 
+  const handleDownloadPDF = async () => {
+    if (!isDownloading) {
+      setIsDownloading(true);
+      try {
+        const formData = {
+          invoice,
+          billTo,
+          shipTo,
+          items,
+          financing,
+          rebatesIncentives,
+          yourCompany,
+          isInvoice,
+          subTotal,
+          grandTotal,
+          taxAmount,
+          taxPercentage,
+          notes,
+          selectedCurrency
+        };
+        await generatePDF(formData, 4); // Using template 4
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      } finally {
+        setIsDownloading(false);
+      }
+    }
+  };
+
+  const handlePreviewClick = () => {
+    handleDownloadPDF();
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 relative">
       <h1 className="text-3xl font-bold mb-8 text-center">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
@@ -582,19 +619,52 @@ const Index = () => {
           </form>
         </div>
 
-        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-4">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
-          <div className="border rounded-lg">
-            <InvoiceTemplate data={{
-              invoice,
-              billTo,
-              shipTo,
-              items,
-              financing,
-              rebatesIncentives,
-              yourCompany,
-              isInvoice
-            }} templateNumber={4} />
+        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
+            <Button 
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Downloading...
+                </>
+              ) : (
+                'Download PDF'
+              )}
+            </Button>
+          </div>
+          <div 
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden"
+            onClick={handlePreviewClick}
+            title="Click to download PDF"
+          >
+            <div className="transform origin-top-left" style={{ 
+              transform: 'scale(0.6)', 
+              transformOrigin: 'top left',
+              width: '166.67%', // 100% / 0.6 to maintain container bounds
+              height: 'auto'
+            }}>
+              <InvoiceTemplate data={{
+                invoice,
+                billTo,
+                shipTo,
+                items,
+                financing,
+                rebatesIncentives,
+                yourCompany,
+                isInvoice,
+                subTotal,
+                grandTotal,
+                taxAmount,
+                taxPercentage,
+                notes,
+                selectedCurrency
+              }} templateNumber={4} />
+            </div>
           </div>
         </div>
       </div>
