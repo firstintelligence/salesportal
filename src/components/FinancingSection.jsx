@@ -36,14 +36,17 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
       <h2 className="text-2xl font-semibold mb-2">Financing Payment Details</h2>
       
       <div className="flex items-center gap-2 mb-4">
-        <label htmlFor="show-contractor-fees" className="text-sm font-medium">
-          Show Contractor Fees
+        <span className={!showContractorFees ? 'text-sm font-medium' : 'text-sm'}>Hide Fees</span>
+        <label className="inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={showContractorFees}
+            onChange={(e) => setShowContractorFees(e.target.checked)}
+          />
+          <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
         </label>
-        <Switch
-          id="show-contractor-fees"
-          checked={showContractorFees}
-          onCheckedChange={setShowContractorFees}
-        />
+        <span className={showContractorFees ? 'text-sm font-medium' : 'text-sm'}>Show Contractor Fees</span>
       </div>
       
       <div className="grid grid-cols-1 gap-4">
@@ -145,20 +148,13 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
         {/* Contractor/Dealer Fee Section */}
         {showContractorFees && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Contractor Fee Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-600">Dealer Fee: </span>
-                <span className="font-medium">{dealerFee.percentage.toFixed(2)}%</span>
-              </div>
-              <div>
-                <span className="text-sm text-gray-600">Fee Amount: </span>
-                <span className="font-medium">${dealerFee.amount.toFixed(2)}</span>
-              </div>
+          <div className="mt-3 text-xs text-gray-500 bg-gray-50/30 p-2 rounded">
+            <div className="flex justify-between items-center">
+              <span>Dealer Fee: {dealerFee.percentage.toFixed(2)}%</span>
+              <span>Fee Amount: ${dealerFee.amount.toFixed(2)}</span>
             </div>
             {!isValidRateTermCombination(financing.interestRate, financing.loanTerm) && (
-              <p className="text-sm text-red-600 mt-2">
+              <p className="text-xs text-red-500 mt-1">
                 No dealer fee rate available for {financing.interestRate}% interest at {financing.loanTerm} months
               </p>
             )}

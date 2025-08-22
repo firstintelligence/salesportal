@@ -513,12 +513,6 @@ const Index = () => {
               </div>
             </div>
 
-            <BillToSection
-              billTo={billTo}
-              handleInputChange={handleInputChange(setBillTo)}
-            />
-
-
             <ItemDetails
               items={items}
               handleItemChange={handleItemChange}
@@ -526,20 +520,27 @@ const Index = () => {
               removeItem={removeItem}
             />
 
-            {/* Totals section moved right under products */}
-            <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-medium mb-3">Totals</h3>
-              <div className="flex justify-between mb-2">
-                <span>Sub Total:</span>
-                <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Tax Amount ({taxPercentage}% {getProvinceTaxName(billTo.province)}):</span>
-                <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </div>
-              <div className="flex justify-between font-bold text-lg">
-                <span>Grand Total:</span>
-                <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            <BillToSection
+              billTo={billTo}
+              handleInputChange={handleInputChange(setBillTo)}
+            />
+
+            {/* Totals section - sleeker and low profile */}
+            <div className="mb-4 bg-gray-50/50 px-3 py-2 rounded-md">
+              <h3 className="text-sm font-medium mb-2 text-gray-700">Totals</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Sub Total:</span>
+                  <span className="font-medium">${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Tax ({taxPercentage}% {getProvinceTaxName(billTo.province)}):</span>
+                  <span className="font-medium">${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div className="flex justify-between font-semibold text-base pt-1 border-t border-gray-200">
+                  <span>Grand Total:</span>
+                  <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
               </div>
             </div>
 
