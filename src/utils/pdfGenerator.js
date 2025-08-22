@@ -84,10 +84,42 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]);
       
-      // Add image with margins
+      // Calculate how many pages we need based on content height
       const contentWidthMM = pageWidthMM - (marginMM * 2);
       const contentHeightMM = pageHeightMM - (marginMM * 2);
-      pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, contentHeightMM, undefined, 'FAST');
+      const aspectRatio = canvas.width / canvas.height;
+      const requiredHeight = contentWidthMM / aspectRatio;
+      
+      if (requiredHeight <= contentHeightMM) {
+        // Content fits on one page
+        pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, requiredHeight, undefined, 'FAST');
+      } else {
+        // Content needs multiple pages
+        const numberOfPages = Math.ceil(requiredHeight / contentHeightMM);
+        const pageHeight = canvas.height / numberOfPages;
+        
+        for (let i = 0; i < numberOfPages; i++) {
+          if (i > 0) {
+            pdf.addPage();
+          }
+          
+          // Create a canvas for this page section
+          const pageCanvas = document.createElement('canvas');
+          const pageCtx = pageCanvas.getContext('2d');
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = pageHeight;
+          
+          // Draw the portion of the original canvas for this page
+          pageCtx.drawImage(
+            canvas, 
+            0, i * pageHeight, canvas.width, pageHeight,
+            0, 0, canvas.width, pageHeight
+          );
+          
+          const pageImgData = pageCanvas.toDataURL('image/png');
+          pdf.addImage(pageImgData, 'PNG', marginMM, marginMM, contentWidthMM, contentHeightMM, undefined, 'FAST');
+        }
+      }
       
       // Generate filename in format: "John Smith - 123 Main Street, Toronto, ON A1A 1A1 - GPHJS1234"
       const { number } = invoiceData.invoice;
