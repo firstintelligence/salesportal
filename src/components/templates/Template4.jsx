@@ -148,7 +148,7 @@ const Template4 = ({ data }) => {
                     <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                     <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (incl. ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)</p>
                     <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
-                    <p><strong>Loan Term:</strong> {financing.loanTerm || 24} months</p>
+                    <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
                     <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
                     <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   </div>
