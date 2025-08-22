@@ -72,48 +72,50 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
-          <Select 
-            value={(financing.amortizationPeriod || 180).toString()} 
-            onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="180">180 months (15 years)</SelectItem>
-              <SelectItem value="240">240 months (20 years)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
+            <Select 
+              value={(financing.amortizationPeriod || 180).toString()} 
+              onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="180">180 months (15 years)</SelectItem>
+                <SelectItem value="240">240 months (20 years)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
-          <Select 
-            value={(financing.loanTerm || 24).toString()} 
-            onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {availableTerms.length > 0 ? (
-                availableTerms.map(term => (
-                  <SelectItem key={term} value={term.toString()}>
-                    {term} months
-                  </SelectItem>
-                ))
-              ) : (
-                <>
-                  <SelectItem value="24">24 months</SelectItem>
-                  <SelectItem value="36">36 months</SelectItem>
-                  <SelectItem value="48">48 months</SelectItem>
-                  <SelectItem value="60">60 months</SelectItem>
-                </>
-              )}
-            </SelectContent>
-          </Select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
+            <Select 
+              value={(financing.loanTerm || 24).toString()} 
+              onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTerms.length > 0 ? (
+                  availableTerms.map(term => (
+                    <SelectItem key={term} value={term.toString()}>
+                      {term} months
+                    </SelectItem>
+                  ))
+                ) : (
+                  <>
+                    <SelectItem value="24">24 months</SelectItem>
+                    <SelectItem value="36">36 months</SelectItem>
+                    <SelectItem value="48">48 months</SelectItem>
+                    <SelectItem value="60">60 months</SelectItem>
+                  </>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
@@ -141,6 +143,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             label="Monthly Payment"
             value={`$${monthlyPayment.toFixed(2)}`}
             disabled
+            className="bg-green-50 border-green-200"
           />
         </div>
 

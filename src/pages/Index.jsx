@@ -6,6 +6,7 @@ import BillToSection from '../components/BillToSection';
 import ShipToSection from '../components/ShipToSection';
 import ItemDetails from "../components/ItemDetails";
 import FinancingSection from "../components/FinancingSection";
+import InvoiceTemplate from "../components/InvoiceTemplate";
 import RebatesSection from "../components/RebatesSection";
 import { templates } from "../utils/templateRegistry";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
@@ -525,7 +526,6 @@ const Index = () => {
             />
             {/* Totals section - sleeker and low profile */}
             <div className="mb-4 bg-gray-50/50 px-3 py-2 rounded-md">
-              <h3 className="text-sm font-medium mb-2 text-gray-700">Totals</h3>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Sub Total:</span>
@@ -584,17 +584,18 @@ const Index = () => {
 
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto">
           <h2 className="text-2xl font-semibold mb-4">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
-          <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
-            onClick={() => handleTemplateClick(4)}
-          >
-            <img
-              src="/assets/template4-preview.png"
-              alt="Template 4 Preview"
-              className="w-full h-auto object-cover rounded"
-            />
+          <div className="border rounded-lg">
+            <InvoiceTemplate data={{
+              invoice,
+              billTo,
+              shipTo,
+              items,
+              financing,
+              rebatesIncentives,
+              yourCompany,
+              isInvoice
+            }} templateNumber={4} />
           </div>
-          <p className="text-center font-medium mt-2">Click to generate {isInvoice ? 'invoice' : 'quote'}</p>
         </div>
       </div>
     </div>

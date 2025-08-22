@@ -13,8 +13,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       <h2 className="text-2xl font-semibold mb-4">Item Details</h2>
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2 items-end">
-            <div className="flex-1">
+          <div className="grid grid-cols-12 gap-4 mb-2 items-end">
+            <div className="col-span-7">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
                 value={item.productId || ''} 
@@ -53,27 +53,33 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 </SelectContent>
               </Select>
             </div>
-            <FloatingLabelInput
-              id={`itemQuantity${index}`}
-              label="Quantity"
-              type="number"
-              value={item.quantity}
-              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-            />
-            <FloatingLabelInput
-              id={`itemAmount${index}`}
-              label="Amount"
-              type="number"
-              value={item.amount}
-              onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
-            />
-            <FloatingLabelInput
-              id={`itemTotal${index}`}
-              label="Total"
-              type="number"
-              value={(item.quantity * item.amount).toFixed(2)}
-              disabled
-            />
+            <div className="col-span-2">
+              <FloatingLabelInput
+                id={`itemQuantity${index}`}
+                label="Quantity"
+                type="number"
+                value={item.quantity}
+                onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+              />
+            </div>
+            <div className="col-span-2">
+              <FloatingLabelInput
+                id={`itemAmount${index}`}
+                label="Amount"
+                type="number"
+                value={item.amount}
+                onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
+              />
+            </div>
+            <div className="col-span-1">
+              <FloatingLabelInput
+                id={`itemTotal${index}`}
+                label="Total"
+                type="number"
+                value={(item.quantity * item.amount).toFixed(2)}
+                disabled
+              />
+            </div>
           </div>
           <FloatingLabelInput
             id={`itemName${index}`}
@@ -82,7 +88,6 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
             onChange={(e) => handleItemChange(index, 'name', e.target.value)}
           />
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               id={`itemDescription${index}`}
               value={item.description || ''}
