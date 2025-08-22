@@ -125,6 +125,7 @@ const Index = () => {
   const [grandTotal, setGrandTotal] = useState(0);
   const [notes, setNotes] = useState("Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
   const [isInvoice, setIsInvoice] = useState(false); // Toggle for invoice vs quote
+  const [showContractorFees, setShowContractorFees] = useState(false); // Toggle for showing contractor fees
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -546,6 +547,9 @@ const Index = () => {
               <FinancingSection 
                 financing={financing} 
                 setFinancing={setFinancing} 
+                invoiceAmount={subTotal}
+                showContractorFees={showContractorFees}
+                setShowContractorFees={setShowContractorFees}
               />
 
               <RebatesSection 
