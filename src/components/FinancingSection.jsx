@@ -145,30 +145,23 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
         {/* Contractor/Dealer Fee Section */}
         {showContractorFees && (
-          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
-            <h3 className="text-lg font-semibold mb-2 text-yellow-800">Contractor Fee Information</h3>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Contractor Fee Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FloatingLabelInput
-                id="dealerFeePercentage"
-                label="Dealer Fee (%)"
-                value={`${dealerFee.percentage.toFixed(2)}%`}
-                disabled
-              />
-              <FloatingLabelInput
-                id="dealerFeeAmount"
-                label="Dealer Fee Amount"
-                value={`$${dealerFee.amount.toFixed(2)}`}
-                disabled
-              />
+              <div>
+                <span className="text-sm text-gray-600">Dealer Fee: </span>
+                <span className="font-medium">{dealerFee.percentage.toFixed(2)}%</span>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600">Fee Amount: </span>
+                <span className="font-medium">${dealerFee.amount.toFixed(2)}</span>
+              </div>
             </div>
             {!isValidRateTermCombination(financing.interestRate, financing.loanTerm) && (
               <p className="text-sm text-red-600 mt-2">
                 No dealer fee rate available for {financing.interestRate}% interest at {financing.loanTerm} months
               </p>
             )}
-            <p className="text-xs text-gray-600 mt-2">
-              * Dealer fees are calculated on invoice amount excluding admin fee and are for internal reference only
-            </p>
           </div>
         )}
       </div>

@@ -466,11 +466,6 @@ const Index = () => {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
           <form>
-            <BillToSection
-              billTo={billTo}
-              handleInputChange={handleInputChange(setBillTo)}
-            />
-
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">
@@ -517,6 +512,11 @@ const Index = () => {
                 />
               </div>
             </div>
+
+            <BillToSection
+              billTo={billTo}
+              handleInputChange={handleInputChange(setBillTo)}
+            />
 
 
             <ItemDetails
