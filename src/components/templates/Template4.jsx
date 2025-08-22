@@ -137,8 +137,8 @@ const Template4 = ({ data }) => {
           </table>
         </div>
 
-        <div className="flex-1">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex-1 mt-2">
+          <div className="grid grid-cols-2 gap-2">
             <div>
               {/* Financing Section */}
               {financing && (
