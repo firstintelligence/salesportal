@@ -95,7 +95,7 @@ const Template4 = ({ data }) => {
             <p className="text-sm">
               <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
             </p>
-            <p className="whitespace-pre-line text-xs">{yourCompany.address || "14 Rathmine Street\nLondon, ON N5Z 1Z3"}</p>
+            <p className="text-xs">{yourCompany.address || "14 Rathmine Street, London, ON N5Z 1Z3"}</p>
             <p className="text-xs">{yourCompany.phone || "(519) 555-0123"}</p>
             {yourCompany.email && <p className="text-xs">{yourCompany.email}</p>}
           </div>
