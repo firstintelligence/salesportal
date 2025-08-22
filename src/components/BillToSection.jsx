@@ -124,8 +124,8 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       </div>
       
       {/* Co-Applicant Section */}
-      <div className="mt-6 p-4 border-t border-gray-200">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mt-4 p-4 border-t border-gray-200">
+        <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Co-Applicant (Optional)</h3>
           <Button
             type="button"
@@ -148,7 +148,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
         </div>
         
         {billTo.coApplicantName && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <FloatingLabelInput
               id="coApplicantName"
               label="Co-Applicant Name"

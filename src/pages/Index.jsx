@@ -117,7 +117,7 @@ const Index = () => {
     email: "info@georgesplumbingandheating.ca",
   });
   const [items, setItems] = useState([
-    { quantity: 1, amount: 0, total: 0, itemName: "", description: "", hvacProduct: "" }
+    { quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
   ]);
   const [taxPercentage, settaxPercentage] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
@@ -517,14 +517,12 @@ const Index = () => {
               billTo={billTo}
               handleInputChange={handleInputChange(setBillTo)}
             />
-
             <ItemDetails
               items={items}
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
             />
-
             {/* Totals section - sleeker and low profile */}
             <div className="mb-4 bg-gray-50/50 px-3 py-2 rounded-md">
               <h3 className="text-sm font-medium mb-2 text-gray-700">Totals</h3>
