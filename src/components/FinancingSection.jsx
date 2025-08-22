@@ -33,18 +33,17 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Financing Payment Details</h2>
-        <div className="flex items-center gap-2">
-          <label htmlFor="show-contractor-fees" className="text-sm font-medium">
-            Show Contractor Fees
-          </label>
-          <Switch
-            id="show-contractor-fees"
-            checked={showContractorFees}
-            onCheckedChange={setShowContractorFees}
-          />
-        </div>
+      <h2 className="text-2xl font-semibold mb-2">Financing Payment Details</h2>
+      
+      <div className="flex items-center gap-2 mb-4">
+        <label htmlFor="show-contractor-fees" className="text-sm font-medium">
+          Show Contractor Fees
+        </label>
+        <Switch
+          id="show-contractor-fees"
+          checked={showContractorFees}
+          onCheckedChange={setShowContractorFees}
+        />
       </div>
       
       <div className="grid grid-cols-1 gap-4">

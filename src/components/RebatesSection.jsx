@@ -17,7 +17,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
     <div className="mb-6">
       <h2 className="text-2xl font-semibold mb-4">Rebates & Incentives</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <FloatingLabelInput
           id="federalRebate"
           label="Canada Greener Homes Rebate"
@@ -33,9 +33,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
           value={rebatesIncentives.provincialRebate}
           onChange={(e) => handleRebateChange('provincialRebate', e.target.value)}
         />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        
         <FloatingLabelInput
           id="utilityRebate"
           label="Utility Rebate (Monthly)"

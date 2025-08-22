@@ -129,7 +129,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           <h3 className="text-lg font-semibold">Co-Applicant (Optional)</h3>
           <Button
             type="button"
-            variant="outline"
+            className="bg-blue-600 text-white hover:bg-blue-700"
             size="sm"
             onClick={() => {
               const currentValue = billTo.coApplicantName || '';
