@@ -9,10 +9,10 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       document.body.appendChild(pdfContainer);
       
       // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
-      // Very small margins: 3mm all around
+      // Minimal margins: 1mm all around
       const pageWidthMM = 215.9;
       const pageHeightMM = 279.4;
-      const marginMM = 3; // Very small margins
+      const marginMM = 1; // Minimal margins
       const contentWidthPX = (pageWidthMM - (marginMM * 2)) * 3.78; // Convert mm to px
       const contentHeightPX = (pageHeightMM - (marginMM * 2)) * 3.78;
       
