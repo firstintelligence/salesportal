@@ -104,7 +104,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
           )}
         </div>
       ))}
-      <Button type="button" onClick={addItem} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Item</Button>
+      <Button type="button" onClick={addItem} className="bg-blue-600 text-white hover:bg-blue-700">Add Item</Button>
     </div>
   );
 };
