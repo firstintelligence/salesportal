@@ -513,12 +513,6 @@ const Index = () => {
               </div>
             </div>
 
-            <BillToSection
-              billTo={billTo}
-              handleInputChange={handleInputChange(setBillTo)}
-            />
-
-
             <ItemDetails
               items={items}
               handleItemChange={handleItemChange}
@@ -526,22 +520,31 @@ const Index = () => {
               removeItem={removeItem}
             />
 
-            {/* Totals section moved right under products */}
-            <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-medium mb-3">Totals</h3>
-              <div className="flex justify-between mb-2">
-                <span>Sub Total:</span>
-                <span>${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Tax Amount ({taxPercentage}% {getProvinceTaxName(billTo.province)}):</span>
-                <span>${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-              </div>
-              <div className="flex justify-between font-bold text-lg">
-                <span>Grand Total:</span>
-                <span>${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            {/* Totals section with improved styling */}
+            <div className="mb-6 bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-4 text-slate-700">Order Summary</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-600">Sub Total:</span>
+                  <span className="font-medium text-slate-800">${subTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-600">Tax Amount ({taxPercentage}% {getProvinceTaxName(billTo.province)}):</span>
+                  <span className="font-medium text-slate-800">${taxAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div className="border-t border-slate-300 pt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-slate-700">Grand Total:</span>
+                    <span className="text-xl font-bold text-slate-900">${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <BillToSection
+              billTo={billTo}
+              handleInputChange={handleInputChange(setBillTo)}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FinancingSection 
