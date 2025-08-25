@@ -76,11 +76,9 @@ const TemplatePage = () => {
         </h2>
       </div>
 
-      <div className="max-w-4xl mx-auto" data-template-preview>
-        <div className="w-full aspect-[8.5/11] overflow-hidden">
-          <div className="w-full h-full scale-[0.7] origin-top-left transform">
-            <InvoiceTemplate data={formData} templateNumber={currentTemplate} />
-          </div>
+      <div className="w-full max-w-4xl mx-auto" data-template-preview>
+        <div className="w-full aspect-[8.5/11] overflow-hidden bg-white">
+          <InvoiceTemplate data={formData} templateNumber={currentTemplate} />
         </div>
       </div>
     </div>
