@@ -644,7 +644,7 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full h-full flex items-center justify-center"
+            <div className="w-full h-full flex items-center justify-center">
               {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
                 // More accurate calculation: base template height + items + financing sections
