@@ -161,19 +161,19 @@ const Template4 = ({ data }) => {
                 <tbody>
                   {items.map((item, index) => (
                     <tr key={index} style={{backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#ffffff'}}>
-                      <td className="py-2 px-3">
+                      <td className="py-1 px-3">
                         <div className="font-semibold text-sm mb-0.5">{`${index + 1}. ${item.name || "Item Name"}`}</div>
                         <div className="text-xs text-gray-600 whitespace-pre-line leading-tight">
                           {getProductDescription(item.productId) || item.description || "Item Description"}
                         </div>
                       </td>
-                      <td className="py-2 px-3 text-right text-sm">
+                      <td className="py-1 px-3 text-right text-sm">
                         {item.quantity || 0}
                       </td>
-                      <td className="py-2 px-3 text-right text-sm">
+                      <td className="py-1 px-3 text-right text-sm">
                         ${(item.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                       </td>
-                      <td className="py-2 px-3 text-right text-sm">
+                      <td className="py-1 px-3 text-right text-sm">
                         ${((item.quantity || 0) * (item.amount || 0)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                       </td>
                     </tr>
