@@ -640,29 +640,36 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="space-y-4">
-              {/* Calculate if content needs multiple pages based on content height */}
+              {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
-                const baseHeight = 1123; // Standard template height
-                const contentHeight = (items.length * 50) + 800; // Approximate content height
-                const numberOfPages = Math.max(1, Math.ceil(contentHeight / baseHeight));
+                // More accurate calculation: base template height + items + financing sections
+                const baseContentHeight = 800; // Template header, footer, sections
+                const itemsHeight = items.length * 60; // Each item row ~60px
+                const financingHeight = financing?.loanAmount ? 150 : 0;
+                const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
+                const notesHeight = notes ? 100 : 0;
+                
+                const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
+                const pageHeight = 1123; // US Letter height in pixels at 72 DPI
+                const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
                 
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative">
                     <div 
                       className="transform origin-top-left" 
                       style={{ 
-                        transform: 'scale(0.6)', 
+                        transform: 'scale(0.7)', 
                         transformOrigin: 'top left',
-                        width: '166.67%', // 100% / 0.6 to maintain container bounds
+                        width: '142.86%', // 100% / 0.7 to maintain container bounds
                         height: 'auto',
-                        marginBottom: pageIndex < numberOfPages - 1 ? '100px' : '0'
+                        marginBottom: pageIndex < numberOfPages - 1 ? '50px' : '0'
                       }}
                     >
                       <InvoiceTemplate data={{
                         invoice,
                         billTo,
                         shipTo,
-                        items: pageIndex === 0 ? items : [], // Show items only on first page for preview
+                        items,
                         financing,
                         rebatesIncentives,
                         yourCompany,
@@ -671,15 +678,15 @@ const Index = () => {
                         grandTotal,
                         taxAmount,
                         taxPercentage,
-                        notes: pageIndex === 0 ? notes : "", // Show notes only on first page
+                        notes,
                         selectedCurrency,
                         pageNumber: pageIndex + 1,
                         totalPages: numberOfPages
                       }} templateNumber={4} />
                     </div>
-                    {/* Page indicator */}
+                    {/* Page indicator - only show if multiple pages */}
                     {numberOfPages > 1 && (
-                      <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
                         Page {pageIndex + 1} of {numberOfPages}
                       </div>
                     )}
