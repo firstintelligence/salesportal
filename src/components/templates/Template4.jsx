@@ -106,8 +106,8 @@ const Template4 = ({ data }) => {
                   const address = yourCompany.address;
                   // Add comma after street address if it doesn't exist
                   if (!/,/.test(address)) {
-                    // Match pattern like "14 Rathmine Street London" and add comma before city
-                    return address.replace(/^(\d+\s+[^,\d]+?)\s+([A-Z][a-z]+)/, '$1, $2');
+                    // Match "14 Rathmine Street London" and insert comma before "London"
+                    return address.replace(/(Street)\s+([A-Z][a-z]+)/, '$1, $2');
                   }
                   return address;
                 })() : "14 Rathmine Street, London, ON N5Z 1Z3"}</p>
