@@ -187,8 +187,8 @@ const Template4 = ({ data }) => {
                 <div>
                   {/* Financing Section */}
                   {financing && (
-                    <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e3f2fd', border: '1px solid #90caf9'}}>
-                      <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Financing Payment Details</h3>
+                    <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e8f5e8', border: '1px solid #90c695'}}>
+                      <h3 className="text-sm font-semibold mb-2" style={{color: '#2d5a2d'}}>Financing Payment Details</h3>
                       <div className="grid grid-cols-1 gap-1 text-sm">
                         <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                         <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (incl. ${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)</p>
