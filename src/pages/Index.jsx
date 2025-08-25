@@ -276,6 +276,22 @@ const Index = () => {
     setItems(newItems);
   };
 
+  const moveItemUp = (index) => {
+    if (index > 0) {
+      const newItems = [...items];
+      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+      setItems(newItems);
+    }
+  };
+
+  const moveItemDown = (index) => {
+    if (index < items.length - 1) {
+      const newItems = [...items];
+      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+      setItems(newItems);
+    }
+  };
+
   const calculateSubTotal = () => {
     const calculatedSubTotal = items.reduce((sum, item) => sum + (item.quantity * item.amount), 0);
     setSubTotal(calculatedSubTotal); // Store as number
@@ -557,6 +573,8 @@ const Index = () => {
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
+              moveItemUp={moveItemUp}
+              moveItemDown={moveItemDown}
             />
             {/* Totals section - sleeker and low profile */}
             <div className="mb-4 bg-gray-50/50 px-3 py-2 rounded-md">

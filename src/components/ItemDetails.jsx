@@ -1,11 +1,11 @@
 import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
-import { Trash2 } from 'lucide-react';
+import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { hvacProducts, getProductsByCategory } from '../utils/hvacProducts.js';
 
-const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
+const ItemDetails = ({ items, handleItemChange, addItem, removeItem, moveItemUp, moveItemDown }) => {
   const productCategories = getProductsByCategory();
 
   return (
@@ -13,6 +13,30 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       <h2 className="text-2xl font-semibold mb-4">Item Details</h2>
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
+          {/* Move buttons - Desktop */}
+          {items.length > 1 && (
+            <div className="hidden md:flex absolute -left-12 top-[30px] flex-col gap-1 z-10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6 p-0"
+                onClick={() => moveItemUp(index)}
+                disabled={index === 0}
+              >
+                <ChevronUp className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6 p-0"
+                onClick={() => moveItemDown(index)}
+                disabled={index === items.length - 1}
+              >
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+          
           {/* Desktop Layout */}
           <div className="hidden md:grid grid-cols-10 gap-4 mb-2 items-end relative">
             <div className="col-span-5">
@@ -95,6 +119,32 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
             )}
           </div>
 
+          {/* Move buttons - Mobile */}
+          {items.length > 1 && (
+            <div className="md:hidden flex gap-2 mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 h-8 px-2 text-xs"
+                onClick={() => moveItemUp(index)}
+                disabled={index === 0}
+              >
+                <ChevronUp className="h-3 w-3" />
+                Up
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 h-8 px-2 text-xs"
+                onClick={() => moveItemDown(index)}
+                disabled={index === items.length - 1}
+              >
+                <ChevronDown className="h-3 w-3" />
+                Down
+              </Button>
+            </div>
+          )}
+          
           {/* Mobile Layout */}
           <div className="md:hidden space-y-4 mb-4">
             <div>
