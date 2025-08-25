@@ -635,38 +635,26 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-auto bg-white hover:bg-gray-50 w-full"
-            style={{ 
-              aspectRatio: '8.5/11',
-              width: '100%',
-              height: 'auto'
-            }}
+            className="w-full cursor-pointer"
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full h-full flex items-center justify-center">
-              {/* Calculate if content needs multiple pages based on actual content */}
-              {(() => {
-                // More accurate calculation: base template height + items + financing sections
-                const baseContentHeight = 800; // Template header, footer, sections
-                const itemsHeight = items.length * 60; // Each item row ~60px
-                const financingHeight = financing?.loanAmount ? 150 : 0;
-                const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
-                const notesHeight = notes ? 100 : 0;
-                
-                const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
-                const pageHeight = 1123; // US Letter height in pixels at 72 DPI
-                const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
-                
-                return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                  <div key={pageIndex} className="relative w-full h-full">
-                     <div 
-                      className="w-full h-full flex items-center justify-center" 
-                      style={{ 
-                        transform: 'scale(0.6)', 
-                        transformOrigin: 'center',
-                      }}
-                    >
+            <div className="w-full overflow-x-auto">
+              <div className="flex min-w-max">
+                {(() => {
+                  // Calculate if content needs multiple pages based on actual content
+                  const baseContentHeight = 800; // Template header, footer, sections
+                  const itemsHeight = items.length * 60; // Each item row ~60px
+                  const financingHeight = financing?.loanAmount ? 150 : 0;
+                  const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
+                  const notesHeight = notes ? 100 : 0;
+                  
+                  const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
+                  const pageHeight = 1123; // US Letter height in pixels at 72 DPI
+                  const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
+                  
+                  return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+                    <div key={pageIndex} className="relative mr-4 last:mr-0">
                       <InvoiceTemplate data={{
                         invoice,
                         billTo,
@@ -685,16 +673,16 @@ const Index = () => {
                         pageNumber: pageIndex + 1,
                         totalPages: numberOfPages
                       }} templateNumber={4} />
+                      {/* Page indicator - only show if multiple pages */}
+                      {numberOfPages > 1 && (
+                        <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                          Page {pageIndex + 1} of {numberOfPages}
+                        </div>
+                      )}
                     </div>
-                    {/* Page indicator - only show if multiple pages */}
-                    {numberOfPages > 1 && (
-                      <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                        Page {pageIndex + 1} of {numberOfPages}
-                      </div>
-                    )}
-                  </div>
-                ));
-              })()}
+                  ));
+                })()}
+              </div>
             </div>
           </div>
         </div>
