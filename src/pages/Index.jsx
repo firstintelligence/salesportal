@@ -616,8 +616,8 @@ const Index = () => {
           </form>
         </div>
 
-        <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
-          <div className="flex justify-between items-center mb-4">
+        <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md order-2 lg:order-2">
+          <div className="flex justify-between items-center mb-4 p-6 pb-0">
             <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
             <Button 
               onClick={handleDownloadPDF}
@@ -635,7 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
+            className="cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
             style={{ 
               aspectRatio: '8.5/11',
               width: '100%',
@@ -644,7 +644,7 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full">
               {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
                 // More accurate calculation: base template height + items + financing sections
@@ -661,9 +661,8 @@ const Index = () => {
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative w-full h-full">
                      <div 
-                      className="w-full h-full flex items-center justify-center" 
+                      className="w-full h-full" 
                       style={{ 
-                        transform: 'scale(0.95)', 
                         transformOrigin: 'center',
                       }}
                     >
