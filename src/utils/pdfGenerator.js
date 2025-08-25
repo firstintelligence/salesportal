@@ -9,12 +9,11 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       document.body.appendChild(pdfContainer);
       
       // US Letter size: 8.5" x 11" = 215.9mm x 279.4mm
-      // Negative margins for maximum content expansion
       const pageWidthMM = 215.9;
       const pageHeightMM = 279.4;
-      const marginMM = -2; // Negative margins to expand content
-      const contentWidthPX = (pageWidthMM - (marginMM * 2)) * 3.78; // Convert mm to px
-      const contentHeightPX = (pageHeightMM - (marginMM * 2)) * 3.78;
+      const marginMM = 10; // Standard margins
+      const contentWidthPX = 794; // Standard invoice width
+      const contentHeightPX = 1123; // Standard invoice height
       
       // Style the container for PDF
       pdfContainer.style.cssText = `
@@ -55,17 +54,16 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         }
       });
       
-      // Scale content to fit
+      // Ensure content maintains original size
       const firstChild = pdfContainer.firstElementChild;
       if (firstChild) {
         firstChild.style.cssText += `
-          width: 100% !important;
-          height: 100% !important;
+          width: 794px !important;
+          height: auto !important;
           max-width: none !important;
           max-height: none !important;
-          transform: scale(1.0) !important;
-          transform-origin: top left !important;
-          overflow: hidden !important;
+          transform: none !important;
+          overflow: visible !important;
         `;
       }
       
