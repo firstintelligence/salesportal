@@ -639,8 +639,10 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full overflow-x-auto">
-              <div className="flex min-w-max">
+            <div className="w-full flex justify-center">
+              <div className="transform scale-50 origin-top"
+                   style={{ width: '816px' }}>
+                <div className="flex">
                 {(() => {
                   // Calculate if content needs multiple pages based on actual content
                   const baseContentHeight = 800; // Template header, footer, sections
