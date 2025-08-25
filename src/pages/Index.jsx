@@ -643,7 +643,7 @@ const Index = () => {
               <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-hidden">
                 <div className="w-full bg-white"
                      style={{ 
-                       aspectRatio: '8.5/11',
+                       height: '600px',
                        padding: '1.5%',
                        boxSizing: 'border-box',
                        fontSize: '12px'
