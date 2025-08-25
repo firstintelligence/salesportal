@@ -14,8 +14,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
           {/* Desktop Layout */}
-          <div className="hidden md:grid grid-cols-12 gap-4 mb-2 items-end">
-            <div className="col-span-7">
+          <div className="hidden md:grid grid-cols-8 gap-4 mb-2 items-end">
+            <div className="col-span-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
                 value={item.productId || ''} 
@@ -39,7 +39,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 <SelectTrigger className="h-[40px]">
                   <SelectValue placeholder="Select HVAC product" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                   <SelectItem value="custom">Custom Product</SelectItem>
                   {Object.entries(productCategories).map(([category, products]) => (
                     <div key={category}>
@@ -54,16 +54,16 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1">
               <FloatingLabelInput
                 id={`itemQuantity${index}`}
-                label="Quantity"
+                label="Qty"
                 type="number"
                 value={item.quantity}
                 onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
               />
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1">
               <FloatingLabelInput
                 id={`itemAmount${index}`}
                 label="Amount"
@@ -81,6 +81,18 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 disabled
               />
             </div>
+            {index > 0 && (
+              <div className="col-span-1 flex justify-end">
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-[40px] w-[40px]"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile Layout */}
@@ -109,7 +121,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 <SelectTrigger className="h-[48px] text-base">
                   <SelectValue placeholder="Select HVAC product" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                   <SelectItem value="custom">Custom Product</SelectItem>
                   {Object.entries(productCategories).map(([category, products]) => (
                     <div key={category}>
