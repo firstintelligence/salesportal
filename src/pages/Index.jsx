@@ -640,59 +640,59 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="w-full flex justify-center">
-              <div className="bg-gray-200 p-6 rounded-lg shadow-lg border-4 border-gray-300">
+              <div className="bg-gray-200 p-4 rounded-lg shadow-lg border-2 border-gray-300">
                 <div className="transform scale-75 origin-top bg-white shadow-sm"
                      style={{ width: '816px' }}>
-                <div className="flex">
-                  {(() => {
-                    // Calculate if content needs multiple pages based on actual content
-                    const baseContentHeight = 800; // Template header, footer, sections
-                    const itemsHeight = items.length * 60; // Each item row ~60px
-                    const financingHeight = financing?.loanAmount ? 150 : 0;
-                    const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
-                    const notesHeight = notes ? 100 : 0;
-                    
-                    const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
-                    const pageHeight = 1123; // US Letter height in pixels at 72 DPI
-                    const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
-                    
-                    return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                      <div key={pageIndex} className="relative mr-4 last:mr-0">
-                        <InvoiceTemplate data={{
-                          invoice,
-                          billTo,
-                          shipTo,
-                          items,
-                          financing,
-                          rebatesIncentives,
-                          yourCompany,
-                          isInvoice,
-                          subTotal,
-                          grandTotal,
-                          taxAmount,
-                          taxPercentage,
-                          notes,
-                          selectedCurrency,
-                          pageNumber: pageIndex + 1,
-                          totalPages: numberOfPages
-                        }} templateNumber={4} />
-                        {/* Page indicator - only show if multiple pages */}
-                        {numberOfPages > 1 && (
-                          <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                            Page {pageIndex + 1} of {numberOfPages}
-                          </div>
-                        )}
-                      </div>
-                    ));
-                  })()}
-                 </div>
+                  <div className="flex">
+                    {(() => {
+                      // Calculate if content needs multiple pages based on actual content
+                      const baseContentHeight = 800; // Template header, footer, sections
+                      const itemsHeight = items.length * 60; // Each item row ~60px
+                      const financingHeight = financing?.loanAmount ? 150 : 0;
+                      const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
+                      const notesHeight = notes ? 100 : 0;
+                      
+                      const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
+                      const pageHeight = 1123; // US Letter height in pixels at 72 DPI
+                      const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
+                      
+                      return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+                        <div key={pageIndex} className="relative mr-4 last:mr-0">
+                          <InvoiceTemplate data={{
+                            invoice,
+                            billTo,
+                            shipTo,
+                            items,
+                            financing,
+                            rebatesIncentives,
+                            yourCompany,
+                            isInvoice,
+                            subTotal,
+                            grandTotal,
+                            taxAmount,
+                            taxPercentage,
+                            notes,
+                            selectedCurrency,
+                            pageNumber: pageIndex + 1,
+                            totalPages: numberOfPages
+                          }} templateNumber={4} />
+                          {/* Page indicator - only show if multiple pages */}
+                          {numberOfPages > 1 && (
+                            <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                              Page {pageIndex + 1} of {numberOfPages}
+                            </div>
+                          )}
+                        </div>
+                      ));
+                    })()}
+                  </div>
                 </div>
               </div>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
