@@ -635,7 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50 max-h-[600px]"
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
@@ -649,40 +649,40 @@ const Index = () => {
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative">
                     <div 
-                      className="transform origin-top-left border-b-2 border-gray-200" 
+                      className="transform origin-top-left" 
                       style={{ 
-                        transform: 'scale(0.4)', 
+                        transform: 'scale(0.6)', 
                         transformOrigin: 'top left',
-                        width: '250%',
+                        width: '166.67%', // 100% / 0.6 to maintain container bounds
                         height: 'auto',
-                        marginBottom: pageIndex < numberOfPages - 1 ? '200px' : '0'
+                        marginBottom: pageIndex < numberOfPages - 1 ? '100px' : '0'
                       }}
                     >
-                      <div style={{ height: pageIndex === 0 ? 'auto' : `${baseHeight}px`, overflow: 'hidden' }}>
-                        <InvoiceTemplate data={{
-                          invoice,
-                          billTo,
-                          shipTo,
-                          items: pageIndex === 0 ? items : [], // Show items only on first page for preview
-                          financing,
-                          rebatesIncentives,
-                          yourCompany,
-                          isInvoice,
-                          subTotal,
-                          grandTotal,
-                          taxAmount,
-                          taxPercentage,
-                          notes: pageIndex === 0 ? notes : "", // Show notes only on first page
-                          selectedCurrency,
-                          pageNumber: pageIndex + 1,
-                          totalPages: numberOfPages
-                        }} templateNumber={4} />
-                      </div>
+                      <InvoiceTemplate data={{
+                        invoice,
+                        billTo,
+                        shipTo,
+                        items: pageIndex === 0 ? items : [], // Show items only on first page for preview
+                        financing,
+                        rebatesIncentives,
+                        yourCompany,
+                        isInvoice,
+                        subTotal,
+                        grandTotal,
+                        taxAmount,
+                        taxPercentage,
+                        notes: pageIndex === 0 ? notes : "", // Show notes only on first page
+                        selectedCurrency,
+                        pageNumber: pageIndex + 1,
+                        totalPages: numberOfPages
+                      }} templateNumber={4} />
                     </div>
                     {/* Page indicator */}
-                    <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
-                      Page {pageIndex + 1} of {numberOfPages}
-                    </div>
+                    {numberOfPages > 1 && (
+                      <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                        Page {pageIndex + 1} of {numberOfPages}
+                      </div>
+                    )}
                   </div>
                 ));
               })()}
