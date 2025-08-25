@@ -98,33 +98,45 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         // Content fits on one page - center it properly
         pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, requiredHeightMM, undefined, 'FAST');
       } else {
-        // Content needs multiple pages - split properly
-        const pagesNeeded = Math.ceil(requiredHeightMM / contentHeightMM);
-        const pixelsPerPage = canvas.height / pagesNeeded;
+        // Content needs multiple pages - use better page break logic
+        const maxHeightPerPagePX = (contentHeightMM / contentWidthMM) * canvas.width;
+        let currentY = 0;
+        let pageNumber = 0;
         
-        for (let i = 0; i < pagesNeeded; i++) {
-          if (i > 0) {
+        while (currentY < canvas.height) {
+          if (pageNumber > 0) {
             pdf.addPage();
           }
+          
+          // Calculate the height for this page
+          const remainingHeight = canvas.height - currentY;
+          const pageHeight = Math.min(maxHeightPerPagePX, remainingHeight);
           
           // Create a canvas for this page section
           const pageCanvas = document.createElement('canvas');
           const pageCtx = pageCanvas.getContext('2d');
           pageCanvas.width = canvas.width;
-          pageCanvas.height = pixelsPerPage;
+          pageCanvas.height = pageHeight;
+          
+          // Fill with white background
+          pageCtx.fillStyle = '#ffffff';
+          pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
           
           // Draw the portion of the original canvas for this page
           pageCtx.drawImage(
             canvas, 
-            0, i * pixelsPerPage, canvas.width, pixelsPerPage,
-            0, 0, canvas.width, pixelsPerPage
+            0, currentY, canvas.width, pageHeight,
+            0, 0, canvas.width, pageHeight
           );
           
           const pageImgData = pageCanvas.toDataURL('image/png');
           const pageAspectRatio = pageCanvas.width / pageCanvas.height;
           const pageHeightMM = contentWidthMM / pageAspectRatio;
           
-          pdf.addImage(pageImgData, 'PNG', marginMM, marginMM, contentWidthMM, Math.min(pageHeightMM, contentHeightMM), undefined, 'FAST');
+          pdf.addImage(pageImgData, 'PNG', marginMM, marginMM, contentWidthMM, pageHeightMM, undefined, 'FAST');
+          
+          currentY += pageHeight;
+          pageNumber++;
         }
       }
       
