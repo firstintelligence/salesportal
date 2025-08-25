@@ -305,6 +305,7 @@ const Template4 = ({ data }) => {
                 <p className="text-xs text-gray-600 mt-1">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
             )}
+            {!data.billTo?.coApplicantName && <div></div>}
           </div>
           
           {/* Page number - show on all pages when multi-page */}
