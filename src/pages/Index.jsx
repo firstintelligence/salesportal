@@ -116,7 +116,7 @@ const Index = () => {
   const [yourCompany, setYourCompany] = useState({
     name: "George's Plumbing and Heating",
     address: "14 Rathmine Street, London, ON N5Z 1Z3",
-    phone: "(519) 555-0123",
+    phone: "(519) 851-2704",
     email: "info@georgesplumbingandheating.ca",
   });
   const [items, setItems] = useState([
@@ -162,7 +162,7 @@ const Index = () => {
         parsedData.yourCompany || { 
           name: "George's Plumbing and Heating",
           address: "14 Rathmine Street, London, ON N5Z 1Z3",
-          phone: "(519) 555-0123",
+          phone: "(519) 851-2704",
           email: "info@georgesplumbingandheating.ca"
         }
       );
@@ -443,7 +443,7 @@ const Index = () => {
     setYourCompany({
       name: "George's Plumbing and Heating",
       address: "14 Rathmine Street, London, ON N5Z 1Z3",
-      phone: "(519) 555-0123",
+      phone: "(519) 851-2704",
       email: "info@georgesplumbingandheating.ca"
     });
     setItems([{ name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
