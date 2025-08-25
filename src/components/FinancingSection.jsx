@@ -83,6 +83,8 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="120">120 months (10 years)</SelectItem>
+                <SelectItem value="144">144 months (12 years)</SelectItem>
                 <SelectItem value="180">180 months (15 years)</SelectItem>
                 <SelectItem value="240">240 months (20 years)</SelectItem>
               </SelectContent>
