@@ -640,7 +640,7 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="w-full flex justify-center">
-              <div className="transform scale-50 origin-top"
+              <div className="transform scale-75 origin-top"
                    style={{ width: '816px' }}>
                 <div className="flex">
                   {(() => {
