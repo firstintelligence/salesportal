@@ -14,7 +14,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
           {/* Desktop Layout */}
-          <div className="hidden md:grid grid-cols-8 gap-4 mb-2 items-end">
+          <div className="hidden md:grid grid-cols-10 gap-4 mb-2 items-end">
             <div className="col-span-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
@@ -63,7 +63,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
               />
             </div>
-            <div className="col-span-1">
+            <div className="col-span-2">
               <FloatingLabelInput
                 id={`itemAmount${index}`}
                 label="Amount"
@@ -72,7 +72,7 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
               />
             </div>
-            <div className="col-span-1">
+            <div className="col-span-2">
               <FloatingLabelInput
                 id={`itemTotal${index}`}
                 label="Total"
@@ -186,14 +186,16 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
             />
           </div>
           {index > 0 && (
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-0 right-0 mt-2"
-              onClick={() => removeItem(index)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="md:hidden">
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-0 right-0 mt-2"
+                onClick={() => removeItem(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
       ))}
