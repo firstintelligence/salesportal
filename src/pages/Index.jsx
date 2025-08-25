@@ -635,7 +635,13 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50 max-h-[600px]"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50"
+            style={{ 
+              aspectRatio: '8.5/11',
+              height: 'calc(100vh - 200px)',
+              maxHeight: '800px',
+              minHeight: '600px'
+            }}
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
@@ -655,14 +661,14 @@ const Index = () => {
                 
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative">
-                    <div 
+                     <div 
                       className="transform origin-top-left" 
                       style={{ 
-                        transform: 'scale(0.7)', 
+                        transform: 'scale(0.9)', 
                         transformOrigin: 'top left',
-                        width: '142.86%', // 100% / 0.7 to maintain container bounds
+                        width: '111.11%', // 100% / 0.9 to maintain container bounds
                         height: 'auto',
-                        marginBottom: pageIndex < numberOfPages - 1 ? '50px' : '0'
+                        marginBottom: pageIndex < numberOfPages - 1 ? '30px' : '0'
                       }}
                     >
                       <InvoiceTemplate data={{
