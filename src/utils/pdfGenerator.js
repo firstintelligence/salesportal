@@ -103,8 +103,25 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         const finalHeight = Math.min(requiredHeightMM, contentHeightMM);
         pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, finalHeight, undefined, 'FAST');
       } else {
-        // Content needs multiple pages - use better page break logic
+        // Content needs multiple pages - calculate total pages first
         const maxHeightPerPagePX = (contentHeightMM / contentWidthMM) * canvas.width;
+        let totalPages = 0;
+        let tempY = 0;
+        
+        // Calculate total pages needed
+        while (tempY < canvas.height) {
+          const remainingHeight = canvas.height - tempY;
+          const pageHeight = Math.min(maxHeightPerPagePX, remainingHeight);
+          
+          if (pageHeight < 50) { // Skip pages with less than 50px of content
+            break;
+          }
+          
+          totalPages++;
+          tempY += pageHeight;
+        }
+        
+        // Now render each page with correct page numbers
         let currentY = 0;
         let pageNumber = 0;
         
@@ -122,28 +139,69 @@ export const generatePDF = async (invoiceData, templateNumber) => {
             break;
           }
           
-          // Create a canvas for this page section
-          const pageCanvas = document.createElement('canvas');
-          const pageCtx = pageCanvas.getContext('2d');
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = pageHeight;
+          // Re-render template with correct page information for this page
+          const pageData = {
+            ...invoiceData,
+            pageNumber: pageNumber + 1,
+            totalPages: totalPages
+          };
           
-          // Fill with white background
-          pageCtx.fillStyle = '#ffffff';
-          pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          // Create a fresh container for this page
+          const pageContainer = document.createElement('div');
+          document.body.appendChild(pageContainer);
+          pageContainer.style.cssText = pdfContainer.style.cssText;
           
-          // Draw the portion of the original canvas for this page
-          pageCtx.drawImage(
-            canvas, 
-            0, currentY, canvas.width, pageHeight,
-            0, 0, canvas.width, pageHeight
-          );
+          const pageRoot = createRoot(pageContainer);
+          await new Promise((resolve) => {
+            pageRoot.render(React.createElement(Template, { data: pageData }));
+            setTimeout(resolve, 300);
+          });
+          
+          // Apply same styling fixes
+          const allPageElements = pageContainer.querySelectorAll('*');
+          allPageElements.forEach(el => {
+            const computed = window.getComputedStyle(el);
+            if (computed.position === 'fixed' || computed.position === 'absolute') {
+              el.style.position = 'relative';
+            }
+            if (computed.transform && computed.transform !== 'none') {
+              el.style.transform = 'none';
+            }
+          });
+          
+          const pageFirstChild = pageContainer.firstElementChild;
+          if (pageFirstChild) {
+            pageFirstChild.style.cssText += `
+              width: 794px !important;
+              height: auto !important;
+              max-width: none !important;
+              max-height: none !important;
+              transform: none !important;
+              overflow: visible !important;
+            `;
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          // Create canvas for this specific page
+          const pageCanvas = await html2canvas(pageContainer, {
+            scale: 1.5,
+            useCORS: true,
+            logging: false,
+            width: contentWidthPX,
+            height: pageHeight,
+            backgroundColor: '#ffffff',
+          });
           
           const pageImgData = pageCanvas.toDataURL('image/png');
           const pageAspectRatio = pageCanvas.width / pageCanvas.height;
           const pageHeightMM = contentWidthMM / pageAspectRatio;
           
           pdf.addImage(pageImgData, 'PNG', marginMM, marginMM, contentWidthMM, pageHeightMM, undefined, 'FAST');
+          
+          // Cleanup page container
+          pageRoot.unmount();
+          document.body.removeChild(pageContainer);
           
           currentY += pageHeight;
           pageNumber++;
