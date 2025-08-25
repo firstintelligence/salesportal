@@ -113,12 +113,12 @@ const Template4 = ({ data }) => {
               <table className="w-full" style={{borderCollapse: 'collapse'}}>
                 <thead>
                   <tr style={{backgroundColor: '#194578', color: 'white'}}>
-                    <th className="py-2 px-3 text-left text-sm font-semibold">
+                    <th className="py-2 px-3 text-left text-sm font-semibold" style={{width: '50%'}}>
                       Item & Description
                     </th>
-                    <th className="py-2 px-3 text-right text-sm font-semibold">Qty.</th>
-                    <th className="py-2 px-3 text-right text-sm font-semibold">Rate</th>
-                    <th className="py-2 px-3 text-right text-sm font-semibold">Amount</th>
+                    <th className="py-2 px-3 text-right text-sm font-semibold" style={{width: '16.67%'}}>Qty.</th>
+                    <th className="py-2 px-3 text-right text-sm font-semibold" style={{width: '16.67%'}}>Rate</th>
+                    <th className="py-2 px-3 text-right text-sm font-semibold" style={{width: '16.67%'}}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
