@@ -102,15 +102,14 @@ const Template4 = ({ data }) => {
                 <p className="text-sm">
                   <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
                 </p>
-                <p className="text-xs">{yourCompany.address ? (() => {
-                  const address = yourCompany.address;
-                  // Add comma after street address if it doesn't exist
-                  if (!/,/.test(address)) {
-                    // Match "14 Rathmine Street London" and insert comma before "London"
-                    return address.replace(/(Street)\s+([A-Z][a-z]+)/, '$1, $2');
+                <p className="text-xs">
+                  {yourCompany.address 
+                    ? yourCompany.address.includes(',') 
+                      ? yourCompany.address 
+                      : yourCompany.address.replace(/(\d+\s+.*?Street)\s+/, '$1, ')
+                    : "14 Rathmine Street, London, ON N5Z 1Z3"
                   }
-                  return address;
-                })() : "14 Rathmine Street, London, ON N5Z 1Z3"}</p>
+                </p>
                 <p className="text-xs">{yourCompany.phone || "(519) 555-0123"}</p>
                 {yourCompany.email && <p className="text-xs">{yourCompany.email}</p>}
               </div>
