@@ -104,9 +104,9 @@ const Template4 = ({ data }) => {
                 </p>
                 <p className="text-xs">
                   {yourCompany.address 
-                    ? yourCompany.address.includes(',') 
-                      ? yourCompany.address 
-                      : yourCompany.address.replace(/(\d+\s+.*?Street)\s+/, '$1, ')
+                    ? (yourCompany.address.includes(',') 
+                        ? yourCompany.address 
+                        : yourCompany.address.replace(/(Street|Ave|Avenue|Rd|Road|Blvd|Boulevard)\s+([A-Z])/i, '$1, $2'))
                     : "14 Rathmine Street, London, ON N5Z 1Z3"
                   }
                 </p>
