@@ -640,14 +640,12 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="w-full">
-              <div className="bg-gray-100 rounded border border-gray-400 w-full max-w-full">
-                <div className="transform scale-[0.47] origin-top-left bg-white"
+              <div className="bg-gray-100 rounded border border-gray-400 w-full">
+                <div className="w-full bg-white"
                      style={{ 
-                       width: '794px', 
-                       minHeight: '1123px',
-                       padding: '24px',
-                       boxSizing: 'border-box',
-                       overflow: 'visible'
+                       aspectRatio: '794/1123',
+                       padding: '3%',
+                       boxSizing: 'border-box'
                      }}>
                   <div className="flex">
                     {(() => {
