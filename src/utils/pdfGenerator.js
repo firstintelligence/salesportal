@@ -74,12 +74,16 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       // Get actual rendered height to determine if we need multiple pages
       const actualHeight = firstChild ? firstChild.scrollHeight : contentHeightPX;
       
+      // Only create multiple pages if content actually exceeds standard page height significantly
+      const pageBreakThreshold = contentHeightPX * 1.1; // 10% buffer
+      const needsMultiplePages = actualHeight > pageBreakThreshold;
+      
       const canvas = await html2canvas(pdfContainer, {
         scale: 1.5,
         useCORS: true,
         logging: false,
         width: contentWidthPX,
-        height: actualHeight,
+        height: needsMultiplePages ? actualHeight : contentHeightPX,
         backgroundColor: '#ffffff',
       });
       
@@ -94,9 +98,10 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const imageAspectRatio = canvas.width / canvas.height;
       const requiredHeightMM = contentWidthMM / imageAspectRatio;
       
-      if (requiredHeightMM <= contentHeightMM) {
+      if (!needsMultiplePages || requiredHeightMM <= contentHeightMM) {
         // Content fits on one page - center it properly
-        pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, requiredHeightMM, undefined, 'FAST');
+        const finalHeight = Math.min(requiredHeightMM, contentHeightMM);
+        pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, finalHeight, undefined, 'FAST');
       } else {
         // Content needs multiple pages - use better page break logic
         const maxHeightPerPagePX = (contentHeightMM / contentWidthMM) * canvas.width;
@@ -111,6 +116,11 @@ export const generatePDF = async (invoiceData, templateNumber) => {
           // Calculate the height for this page
           const remainingHeight = canvas.height - currentY;
           const pageHeight = Math.min(maxHeightPerPagePX, remainingHeight);
+          
+          // Only add page if there's meaningful content
+          if (pageHeight < 50) { // Skip pages with less than 50px of content
+            break;
+          }
           
           // Create a canvas for this page section
           const pageCanvas = document.createElement('canvas');
