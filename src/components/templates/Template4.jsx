@@ -63,13 +63,13 @@ const Template4 = ({ data }) => {
                 <p className="text-sm mb-1">
                   <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>{" "}
                   {invoice.date
-                    ? formatInTimeZone(new Date(invoice.date), "America/Toronto", "MMM dd, yyyy")
+                    ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy")
                     : "N/A"}
                 </p>
                 <p className="text-sm">
                   <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>{" "}
                   {invoice.paymentDate
-                    ? formatInTimeZone(new Date(invoice.paymentDate), "America/Toronto", "MMM dd, yyyy")
+                    ? formatInTimeZone(new Date(invoice.paymentDate + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy")
                     : "N/A"}
                 </p>
               </div>

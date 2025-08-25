@@ -74,8 +74,8 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       // Get actual rendered height to determine if we need multiple pages
       const actualHeight = firstChild ? firstChild.scrollHeight : contentHeightPX;
       
-      // Only create multiple pages if content actually exceeds standard page height significantly
-      const pageBreakThreshold = contentHeightPX * 1.1; // 10% buffer
+      // Always ensure signature section fits by creating pages that prevent cutoffs
+      const pageBreakThreshold = contentHeightPX * 0.95; // 5% buffer to prevent cutoffs
       const needsMultiplePages = actualHeight > pageBreakThreshold;
       
       const canvas = await html2canvas(pdfContainer, {
@@ -98,13 +98,13 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       const imageAspectRatio = canvas.width / canvas.height;
       const requiredHeightMM = contentWidthMM / imageAspectRatio;
       
-      if (!needsMultiplePages || requiredHeightMM <= contentHeightMM) {
-        // Content fits on one page - center it properly
-        const finalHeight = Math.min(requiredHeightMM, contentHeightMM);
+      if (!needsMultiplePages || requiredHeightMM <= contentHeightMM * 0.9) {
+        // Content fits on one page with signature section - ensure bottom isn't cut off
+        const finalHeight = Math.min(requiredHeightMM, contentHeightMM * 0.9);
         pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, finalHeight, undefined, 'FAST');
       } else {
-        // Content needs multiple pages - calculate total pages first
-        const maxHeightPerPagePX = (contentHeightMM / contentWidthMM) * canvas.width;
+        // Content needs multiple pages - calculate total pages with signature space reserved
+        const maxHeightPerPagePX = (contentHeightMM * 0.85 / contentWidthMM) * canvas.width; // Reserve 15% for signature
         let totalPages = 0;
         let tempY = 0;
         
@@ -113,7 +113,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
           const remainingHeight = canvas.height - tempY;
           const pageHeight = Math.min(maxHeightPerPagePX, remainingHeight);
           
-          if (pageHeight < 50) { // Skip pages with less than 50px of content
+          if (pageHeight < 100) { // Skip pages with less than 100px of content
             break;
           }
           
@@ -134,8 +134,8 @@ export const generatePDF = async (invoiceData, templateNumber) => {
           const remainingHeight = canvas.height - currentY;
           const pageHeight = Math.min(maxHeightPerPagePX, remainingHeight);
           
-          // Only add page if there's meaningful content
-          if (pageHeight < 50) { // Skip pages with less than 50px of content
+          // Only add page if there's meaningful content, ensure signature space
+          if (pageHeight < 100) { // Skip pages with less than 100px of content
             break;
           }
           

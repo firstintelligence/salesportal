@@ -116,42 +116,49 @@ export const hvacProducts = [
     id: 'cv40',
     name: 'CV40 - 40 Gallon Conventional Water Heater',
     description: '40-gallon natural gas conventional water heater',
-    basePrice: 1800,
+    basePrice: 3800,
     category: 'Water Heating'
   },
   {
     id: 'cv50',
     name: 'CV50 - 50 Gallon Conventional Water Heater',
     description: '50-gallon natural gas conventional water heater',
-    basePrice: 2100,
+    basePrice: 4100,
     category: 'Water Heating'
   },
   {
     id: 'pv40',
     name: 'PV40 - 40 Gallon Power Vent Water Heater',
     description: '40-gallon natural gas power vent water heater',
-    basePrice: 2400,
+    basePrice: 4400,
     category: 'Water Heating'
   },
   {
     id: 'pv50',
     name: 'PV50 - 50 Gallon Power Vent Water Heater',
     description: '50-gallon natural gas power vent water heater',
-    basePrice: 2700,
+    basePrice: 4700,
     category: 'Water Heating'
   },
   {
-    id: 'hot-water-tank-40',
-    name: '40 Gallon Hot Water Tank',
-    description: '40-gallon conventional hot water tank',
+    id: 'hot-water-tank-40-electric',
+    name: '40 Gallon Electric Hot Water Tank',
+    description: '40-gallon electric hot water tank',
     basePrice: 1800,
     category: 'Water Heating'
   },
   {
-    id: 'hot-water-tank-60',
-    name: '60 Gallon Hot Water Tank',
-    description: '60-gallon conventional hot water tank',
+    id: 'hot-water-tank-60-electric',
+    name: '60 Gallon Electric Hot Water Tank',
+    description: '60-gallon electric hot water tank',
     basePrice: 2200,
+    category: 'Water Heating'
+  },
+  {
+    id: 'rheem-proterra-heat-pump',
+    name: 'Rheem ProTerra Heat Pump Water Heater',
+    description: 'High-efficiency heat pump water heater with professional installation',
+    basePrice: 7200,
     category: 'Water Heating'
   },
   {
