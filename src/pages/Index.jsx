@@ -639,9 +639,9 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full flex justify-center">
+            <div className="w-full flex justify-start">
               <div className="bg-gray-100 rounded border border-gray-400 overflow-hidden">
-                <div className="transform scale-75 origin-top bg-white shadow-sm"
+                <div className="transform scale-75 origin-top-left bg-white shadow-sm"
                      style={{ width: '816px' }}>
                   <div className="flex">
                     {(() => {
