@@ -638,32 +638,57 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white"
             onClick={handlePreviewClick}
             title="Click to download PDF"
           >
-            <div className="transform origin-top-left" style={{ 
-              transform: 'scale(0.6)', 
-              transformOrigin: 'top left',
-              width: '166.67%', // 100% / 0.6 to maintain container bounds
-              height: 'auto'
-            }}>
-              <InvoiceTemplate data={{
-                invoice,
-                billTo,
-                shipTo,
-                items,
-                financing,
-                rebatesIncentives,
-                yourCompany,
-                isInvoice,
-                subTotal,
-                grandTotal,
-                taxAmount,
-                taxPercentage,
-                notes,
-                selectedCurrency
-              }} templateNumber={4} />
+            <div className="space-y-4">
+              {/* Calculate if content needs multiple pages based on content height */}
+              {(() => {
+                const baseHeight = 1123; // Standard template height
+                const contentHeight = (items.length * 50) + 800; // Approximate content height
+                const numberOfPages = Math.max(1, Math.ceil(contentHeight / baseHeight));
+                
+                return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+                  <div key={pageIndex} className="relative">
+                    <div 
+                      className="transform origin-top-left border-b-2 border-gray-200" 
+                      style={{ 
+                        transform: 'scale(0.4)', 
+                        transformOrigin: 'top left',
+                        width: '250%',
+                        height: 'auto',
+                        marginBottom: pageIndex < numberOfPages - 1 ? '200px' : '0'
+                      }}
+                    >
+                      <div style={{ height: pageIndex === 0 ? 'auto' : `${baseHeight}px`, overflow: 'hidden' }}>
+                        <InvoiceTemplate data={{
+                          invoice,
+                          billTo,
+                          shipTo,
+                          items: pageIndex === 0 ? items : [], // Show items only on first page for preview
+                          financing,
+                          rebatesIncentives,
+                          yourCompany,
+                          isInvoice,
+                          subTotal,
+                          grandTotal,
+                          taxAmount,
+                          taxPercentage,
+                          notes: pageIndex === 0 ? notes : "", // Show notes only on first page
+                          selectedCurrency,
+                          pageNumber: pageIndex + 1,
+                          totalPages: numberOfPages
+                        }} templateNumber={4} />
+                      </div>
+                    </div>
+                    {/* Page indicator */}
+                    <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                      Page {pageIndex + 1} of {numberOfPages}
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         </div>
