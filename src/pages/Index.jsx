@@ -635,12 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50"
-            style={{ 
-              maxHeight: '70vh', 
-              aspectRatio: '8.5 / 11',
-              height: 'auto'
-            }}
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50 max-h-[600px]"
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
