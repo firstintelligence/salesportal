@@ -14,8 +14,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
           {/* Desktop Layout */}
-          <div className="hidden md:grid grid-cols-10 gap-4 mb-2 items-end">
-            <div className="col-span-4">
+          <div className="hidden md:grid grid-cols-10 gap-4 mb-2 items-end relative">
+            <div className="col-span-5">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
                 value={item.productId || ''} 
