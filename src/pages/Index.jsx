@@ -639,10 +639,10 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full flex justify-start">
-              <div className="bg-gray-100 rounded border border-gray-400 overflow-hidden">
+            <div className="w-full">
+              <div className="bg-gray-100 rounded border border-gray-400 overflow-hidden w-fit">
                 <div className="transform scale-75 origin-top-left bg-white shadow-sm"
-                     style={{ width: '816px' }}>
+                     style={{ width: '612px' }}>
                   <div className="flex">
                     {(() => {
                       // Calculate if content needs multiple pages based on actual content
