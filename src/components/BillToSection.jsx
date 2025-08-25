@@ -124,31 +124,29 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       </div>
       
       {/* Co-Applicant Section */}
-      <div className="mt-4 p-4 border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Co-Applicant (Optional)</h3>
-          <Button
-            type="button"
-            className="bg-blue-600 text-white hover:bg-blue-700"
-            size="sm"
-            onClick={() => {
-              const currentValue = billTo.coApplicantName || '';
-              if (currentValue) {
-                // Clear co-applicant info
-                handleInputChange({ target: { name: 'coApplicantName', value: '' } });
-                handleInputChange({ target: { name: 'coApplicantPhone', value: '' } });
-              } else {
-                // Enable co-applicant section
-                handleInputChange({ target: { name: 'coApplicantName', value: 'Co-Applicant Name' } });
-              }
-            }}
-          >
-            {billTo.coApplicantName ? 'Remove Co-Applicant' : 'Add Co-Applicant'}
-          </Button>
-        </div>
+      <div className="mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() => {
+            const currentValue = billTo.coApplicantName || '';
+            if (currentValue) {
+              // Clear co-applicant info
+              handleInputChange({ target: { name: 'coApplicantName', value: '' } });
+              handleInputChange({ target: { name: 'coApplicantPhone', value: '' } });
+            } else {
+              // Enable co-applicant section
+              handleInputChange({ target: { name: 'coApplicantName', value: 'Co-Applicant Name' } });
+            }
+          }}
+        >
+          {billTo.coApplicantName ? 'Remove Co-Applicant' : '+ Add Co-Applicant'}
+        </Button>
         
         {billTo.coApplicantName && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-lg">
             <FloatingLabelInput
               id="coApplicantName"
               label="Co-Applicant Name"

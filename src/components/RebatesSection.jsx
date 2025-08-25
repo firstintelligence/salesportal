@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
+import { Button } from "@/components/ui/button";
 const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
+  const [useCGHG, setUseCGHG] = useState(false);
+  
   const handleRebateChange = (field, value) => {
     setRebatesIncentives(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
+  };
+
+  const handleCGHGToggle = () => {
+    const newValue = !useCGHG;
+    setUseCGHG(newValue);
+    
+    if (newValue) {
+      // Set default CGHG/CGHL values
+      setRebatesIncentives(prev => ({
+        ...prev,
+        federalRebate: 5000,
+        provincialRebate: 5000
+      }));
+    } else {
+      // Clear values when toggled off
+      setRebatesIncentives(prev => ({
+        ...prev,
+        federalRebate: 0,
+        provincialRebate: 0
+      }));
+    }
   };
 
   // Calculate total rebates with utility rebate multiplied by 12 (annual)
@@ -15,7 +39,17 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Rebates & Incentives</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-semibold">Rebates & Incentives</h2>
+        <Button
+          type="button"
+          variant={useCGHG ? "default" : "outline"}
+          size="sm"
+          onClick={handleCGHGToggle}
+        >
+          Use CGHG/CGHL
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 gap-4">
         <FloatingLabelInput

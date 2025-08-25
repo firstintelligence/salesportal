@@ -635,7 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-y-auto bg-white hover:bg-gray-50"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
             style={{ 
               aspectRatio: '8.5/11',
               height: 'calc(100vh - 200px)',
@@ -645,7 +645,7 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="space-y-4">
+            <div className="w-full h-full flex items-center justify-center p-4">
               {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
                 // More accurate calculation: base template height + items + financing sections
@@ -660,15 +660,12 @@ const Index = () => {
                 const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
                 
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                  <div key={pageIndex} className="relative">
+                  <div key={pageIndex} className="relative w-full h-full">
                      <div 
-                      className="transform origin-top-left" 
+                      className="transform origin-center w-full h-full flex items-center justify-center" 
                       style={{ 
-                        transform: 'scale(0.9)', 
-                        transformOrigin: 'top left',
-                        width: '111.11%', // 100% / 0.9 to maintain container bounds
-                        height: 'auto',
-                        marginBottom: pageIndex < numberOfPages - 1 ? '30px' : '0'
+                        transform: 'scale(0.7)', 
+                        transformOrigin: 'center',
                       }}
                     >
                       <InvoiceTemplate data={{

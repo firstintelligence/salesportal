@@ -13,7 +13,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
       <h2 className="text-2xl font-semibold mb-4">Item Details</h2>
       {items.map((item, index) => (
         <div key={index} className="mb-4 relative">
-          <div className="grid grid-cols-12 gap-4 mb-2 items-end">
+          {/* Desktop Layout */}
+          <div className="hidden md:grid grid-cols-12 gap-4 mb-2 items-end">
             <div className="col-span-7">
               <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
               <Select 
@@ -79,6 +80,81 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem }) => {
                 value={(item.quantity * item.amount).toFixed(2)}
                 disabled
               />
+            </div>
+          </div>
+
+          {/* Mobile Layout */}
+          <div className="md:hidden space-y-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
+              <Select 
+                value={item.productId || ''} 
+                onValueChange={(value) => {
+                  if (value === 'custom') {
+                    handleItemChange(index, 'productId', 'custom');
+                    handleItemChange(index, 'name', '');
+                    handleItemChange(index, 'description', '');
+                    handleItemChange(index, 'amount', 0);
+                  } else {
+                    const product = hvacProducts.find(p => p.id === value);
+                    if (product) {
+                      handleItemChange(index, 'productId', value);
+                      handleItemChange(index, 'name', product.name);
+                      handleItemChange(index, 'description', product.description);
+                      handleItemChange(index, 'amount', product.basePrice);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="h-[48px] text-base">
+                  <SelectValue placeholder="Select HVAC product" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">Custom Product</SelectItem>
+                  {Object.entries(productCategories).map(([category, products]) => (
+                    <div key={category}>
+                      <div className="px-2 py-1 text-sm font-semibold text-gray-500">{category}</div>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id}>
+                          {product.name} - ${product.basePrice.toLocaleString()}
+                        </SelectItem>
+                      ))}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <FloatingLabelInput
+                  id={`itemQuantity${index}-mobile`}
+                  label="Qty"
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                  className="h-[48px] text-base"
+                />
+              </div>
+              <div>
+                <FloatingLabelInput
+                  id={`itemAmount${index}-mobile`}
+                  label="Amount"
+                  type="number"
+                  value={item.amount}
+                  onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
+                  className="h-[48px] text-base"
+                />
+              </div>
+              <div>
+                <FloatingLabelInput
+                  id={`itemTotal${index}-mobile`}
+                  label="Total"
+                  type="number"
+                  value={(item.quantity * item.amount).toFixed(2)}
+                  disabled
+                  className="h-[48px] text-base"
+                />
+              </div>
             </div>
           </div>
           <FloatingLabelInput
