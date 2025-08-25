@@ -140,8 +140,8 @@ const Template4 = ({ data }) => {
                     : "14 Rathmine Street, London, ON N5Z 1Z3"
                   }
                 </p>
-                <p className="text-xs">{yourCompany.phone || "(519) 672-2704"}</p>
-                {yourCompany.email && <p className="text-xs">{yourCompany.email}</p>}
+                <p className="text-xs">{yourCompany.phone || "(519) 851-2704"}</p>
+                <p className="text-xs">{yourCompany.email || "info@georgesplumbingandheating.ca"}</p>
               </div>
             </div>
 
