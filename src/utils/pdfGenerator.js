@@ -43,7 +43,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         setTimeout(resolve, 500); // Wait for rendering
       });
       
-      // Override any problematic styles
+      // Override any problematic styles and ensure table spacing consistency
       const allElements = pdfContainer.querySelectorAll('*');
       allElements.forEach(el => {
         const computed = window.getComputedStyle(el);
@@ -52,6 +52,22 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         }
         if (computed.transform && computed.transform !== 'none') {
           el.style.transform = 'none';
+        }
+      });
+      
+      // Ensure table cells maintain exact spacing for PDF consistency
+      const tableCells = pdfContainer.querySelectorAll('td');
+      tableCells.forEach(cell => {
+        const currentClasses = cell.className;
+        if (currentClasses.includes('pt-0.5')) {
+          cell.style.paddingTop = '2px !important';
+        }
+        if (currentClasses.includes('pb-2')) {
+          cell.style.paddingBottom = '8px !important';
+        }
+        if (currentClasses.includes('px-3')) {
+          cell.style.paddingLeft = '12px !important';
+          cell.style.paddingRight = '12px !important';
         }
       });
       
