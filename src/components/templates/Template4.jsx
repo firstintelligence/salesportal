@@ -104,9 +104,39 @@ const Template4 = ({ data }) => {
                 </p>
                 <p className="text-xs">
                   {yourCompany.address 
-                    ? (yourCompany.address.includes(',') 
-                        ? yourCompany.address 
-                        : yourCompany.address.replace(/(Street|Ave|Avenue|Rd|Road|Blvd|Boulevard)\s+([A-Z])/i, '$1, $2'))
+                    ? (() => {
+                        const address = yourCompany.address;
+                        // If address already has commas, use as is
+                        if (address.includes(',')) {
+                          return address;
+                        }
+                        // Find street number and name, then add comma before city
+                        const parts = address.split(' ');
+                        let streetEndIndex = -1;
+                        
+                        // Look for common street suffixes
+                        for (let i = 0; i < parts.length; i++) {
+                          const part = parts[i].toLowerCase();
+                          if (part.includes('street') || part.includes('st') || 
+                              part.includes('avenue') || part.includes('ave') ||
+                              part.includes('road') || part.includes('rd') ||
+                              part.includes('boulevard') || part.includes('blvd') ||
+                              part.includes('drive') || part.includes('dr') ||
+                              part.includes('lane') || part.includes('ln')) {
+                            streetEndIndex = i;
+                            break;
+                          }
+                        }
+                        
+                        if (streetEndIndex !== -1 && streetEndIndex < parts.length - 1) {
+                          // Insert comma after street name
+                          const streetPart = parts.slice(0, streetEndIndex + 1).join(' ');
+                          const cityPart = parts.slice(streetEndIndex + 1).join(' ');
+                          return `${streetPart}, ${cityPart}`;
+                        }
+                        
+                        return address;
+                      })()
                     : "14 Rathmine Street, London, ON N5Z 1Z3"
                   }
                 </p>
