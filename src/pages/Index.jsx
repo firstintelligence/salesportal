@@ -478,9 +478,6 @@ const Index = () => {
     }
   };
 
-  const handlePreviewClick = () => {
-    handleDownloadPDF();
-  };
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
@@ -638,8 +635,8 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white"
-            onClick={handlePreviewClick}
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50"
+            onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
             <div className="space-y-4">
