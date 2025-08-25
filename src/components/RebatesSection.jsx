@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
-import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   const [useCGHG, setUseCGHG] = useState(false);
   
@@ -39,16 +39,18 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
 
   return (
     <div className="mb-6">
+      <h2 className="text-2xl font-semibold mb-2">Rebates & Incentives</h2>
+      
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold">Rebates & Incentives</h2>
-        <Button
-          type="button"
-          variant={useCGHG ? "default" : "outline"}
-          size="sm"
-          onClick={handleCGHGToggle}
-        >
-          Use CGHG/CGHL
-        </Button>
+        <span className="text-sm font-medium">Use CGHG/CGHL</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">{useCGHG ? 'ON' : 'OFF'}</span>
+          <Switch
+            checked={useCGHG}
+            onCheckedChange={handleCGHGToggle}
+            className="data-[state=checked]:bg-green-600"
+          />
+        </div>
       </div>
       
       <div className="grid grid-cols-1 gap-4">
