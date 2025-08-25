@@ -640,8 +640,9 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="w-full flex justify-center">
-              <div className="transform scale-75 origin-top"
-                   style={{ width: '816px' }}>
+              <div className="bg-gray-200 p-6 rounded-lg shadow-lg border-4 border-gray-300">
+                <div className="transform scale-75 origin-top bg-white shadow-sm"
+                     style={{ width: '816px' }}>
                 <div className="flex">
                   {(() => {
                     // Calculate if content needs multiple pages based on actual content
@@ -684,11 +685,11 @@ const Index = () => {
                       </div>
                     ));
                   })()}
+                 </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );
