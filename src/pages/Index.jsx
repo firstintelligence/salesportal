@@ -642,7 +642,7 @@ const Index = () => {
             <div className="w-full flex justify-center">
               <div className="bg-gray-100 rounded border border-gray-400">
                 <div className="transform scale-75 origin-top bg-white shadow-sm"
-                     style={{ width: '816px' }}>
+                     style={{ width: '816px', marginLeft: '0', marginRight: '0' }}>
                   <div className="flex">
                     {(() => {
                       // Calculate if content needs multiple pages based on actual content
