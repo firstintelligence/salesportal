@@ -290,7 +290,7 @@ const Template4 = ({ data }) => {
 
         {/* Signature Section - Always at bottom of every page */}
         <div className="mt-auto pt-4">
-          <div className={`grid gap-4 ${data.billTo?.coApplicantName ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
               <div className="border-b-2 border-gray-400 mb-2 h-8"></div>
