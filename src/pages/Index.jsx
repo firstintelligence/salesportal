@@ -641,12 +641,12 @@ const Index = () => {
           >
             <div className="w-full">
               <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-hidden">
-                <div className="transform scale-[0.48] origin-top-left bg-white"
+                <div className="w-full bg-white"
                      style={{ 
-                       width: '794px',
-                       minHeight: '1123px',
-                       padding: '24px',
-                       boxSizing: 'border-box'
+                       aspectRatio: '8.5/11',
+                       padding: '1.5%',
+                       boxSizing: 'border-box',
+                       fontSize: '12px'
                      }}>
                   <div className="flex">
                     {(() => {
