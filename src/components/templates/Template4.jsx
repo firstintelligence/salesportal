@@ -162,7 +162,7 @@ const Template4 = ({ data }) => {
                   {items.map((item, index) => (
                     <tr key={index} style={{backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#ffffff'}}>
                       <td className="py-2 px-3">
-                        <div className="font-semibold text-sm mb-1">{`${index + 1}. ${item.name || "Item Name"}`}</div>
+                        <div className="font-semibold text-sm mb-0.5">{`${index + 1}. ${item.name || "Item Name"}`}</div>
                         <div className="text-xs text-gray-600 whitespace-pre-line leading-tight">
                           {getProductDescription(item.productId) || item.description || "Item Description"}
                         </div>
