@@ -498,8 +498,8 @@ const Index = () => {
           <FiEdit size={24} />
         </button>
       </div>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-1 lg:order-1">
           <form>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
@@ -616,7 +616,7 @@ const Index = () => {
           </form>
         </div>
 
-        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+        <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
             <Button 
@@ -638,14 +638,13 @@ const Index = () => {
             className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
             style={{ 
               aspectRatio: '8.5/11',
-              height: 'calc(100vh - 200px)',
-              maxHeight: '800px',
-              minHeight: '600px'
+              width: '100%',
+              height: 'auto'
             }}
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="w-full h-full flex items-center justify-center">
               {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
                 // More accurate calculation: base template height + items + financing sections
@@ -662,9 +661,9 @@ const Index = () => {
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative w-full h-full">
                      <div 
-                      className="transform origin-center w-full h-full flex items-center justify-center" 
+                      className="w-full h-full flex items-center justify-center" 
                       style={{ 
-                        transform: 'scale(0.7)', 
+                        transform: 'scale(0.95)', 
                         transformOrigin: 'center',
                       }}
                     >
