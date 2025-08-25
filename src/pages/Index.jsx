@@ -635,7 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-auto bg-white hover:bg-gray-50 w-full"
             style={{ 
               aspectRatio: '8.5/11',
               width: '100%',
@@ -663,7 +663,7 @@ const Index = () => {
                      <div 
                       className="w-full h-full flex items-center justify-center" 
                       style={{ 
-                        transform: 'scale(0.95)', 
+                        transform: 'scale(0.6)', 
                         transformOrigin: 'center',
                       }}
                     >
