@@ -640,7 +640,7 @@ const Index = () => {
             title="Click to download PDF"
           >
             <div className="w-full">
-              <div className="bg-red-100 rounded border border-gray-400 w-full overflow-hidden">
+              <div className="bg-red-100 w-full overflow-hidden">
                 <div className="transform scale-75 origin-top-left bg-white"
                      style={{ 
                        width: '794px',
