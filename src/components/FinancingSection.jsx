@@ -32,7 +32,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 bg-green-50 p-4 rounded-lg">
       <h2 className="text-2xl font-semibold mb-2">Financing Payment Details</h2>
       
       <div className="flex items-center justify-between mb-4">
