@@ -269,22 +269,21 @@ const Template4 = ({ data }) => {
 
         {/* Continuation page header */}
         {!isFirstPage && (
-          <div className="mb-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-xl font-bold" style={{color: '#194578'}}>
-                  {isInvoice ? 'INVOICE' : 'QUOTE'} - CONTINUED
-                </h2>
-                <p className="text-sm">
-                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span> {invoice.number || "N/A"}
-                </p>
-                <p className="text-sm">
-                  <span className="font-semibold">Customer:</span> {customerName}
-                </p>
-              </div>
-              <div className="text-right">
-                <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[6rem] mb-1 ml-auto" />
-              </div>
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
+                {isInvoice ? 'INVOICE' : 'QUOTE'} - CONTINUED
+              </h1>
+              <p className="text-sm mb-1">
+                <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>{" "}
+                {invoice.number || "N/A"}
+              </p>
+              <p className="text-sm mb-1">
+                <span className="font-semibold">Customer:</span> {customerName}
+              </p>
+            </div>
+            <div className="text-right">
+              <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.56rem] mb-1 ml-auto" />
             </div>
           </div>
         )}
