@@ -635,7 +635,7 @@ const Index = () => {
             </Button>
           </div>
           <div 
-            className="cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
+            className="border rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 overflow-hidden bg-white hover:bg-gray-50 w-full"
             style={{ 
               aspectRatio: '8.5/11',
               width: '100%',
@@ -644,7 +644,7 @@ const Index = () => {
             onClick={handleDownloadPDF}
             title="Click to download PDF"
           >
-            <div className="w-full h-full">
+            <div className="w-full h-full flex items-center justify-center">
               {/* Calculate if content needs multiple pages based on actual content */}
               {(() => {
                 // More accurate calculation: base template height + items + financing sections
@@ -660,8 +660,14 @@ const Index = () => {
                 
                 return Array.from({ length: numberOfPages }, (_, pageIndex) => (
                   <div key={pageIndex} className="relative w-full h-full">
-                     <div className="w-full h-full">
-                       <InvoiceTemplate data={{
+                     <div 
+                      className="w-full h-full flex items-center justify-center" 
+                      style={{ 
+                        transform: 'scale(0.95)', 
+                        transformOrigin: 'center',
+                      }}
+                    >
+                      <InvoiceTemplate data={{
                         invoice,
                         billTo,
                         shipTo,
