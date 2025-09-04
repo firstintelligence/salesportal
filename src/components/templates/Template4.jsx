@@ -271,7 +271,7 @@ const Template4 = ({ data }) => {
         {!isFirstPage && (
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
+              <h1 className="text-2xl font-bold mb-2" style={{color: '#194578'}}>
                 {isInvoice ? 'INVOICE' : 'QUOTE'} - CONTINUED
               </h1>
               <p className="text-sm mb-1">
@@ -283,26 +283,26 @@ const Template4 = ({ data }) => {
               </p>
             </div>
             <div className="text-right">
-              <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.56rem] mb-1 ml-auto" />
+              <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-16 mb-1 ml-auto" />
             </div>
           </div>
         )}
 
         {/* Signature Section - Always at bottom of every page */}
-        <div className="mt-auto pt-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
+          <div className="grid grid-cols-2 gap-4 mb-2">
             <div>
-              <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
-              <div className="border-b-2 border-gray-400 mb-2 h-8"></div>
+              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
+              <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
               <p className="text-xs text-gray-600">{customerName}</p>
-              <p className="text-xs text-gray-600 mt-1">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
             {data.billTo?.coApplicantName && (
               <div>
-                <h3 className="text-xs font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
-                <div className="border-b-2 border-gray-400 mb-2 h-8"></div>
+                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
                 <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
-                <p className="text-xs text-gray-600 mt-1">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
             )}
             {!data.billTo?.coApplicantName && <div></div>}
@@ -310,7 +310,7 @@ const Template4 = ({ data }) => {
           
           {/* Page number - show on all pages when multi-page */}
           {isMultiPage && (
-            <div className="text-center mt-4 pt-2 border-t border-gray-200">
+            <div className="text-center pt-1 border-t border-gray-200">
               <p className="text-xs text-gray-500">Page {data.pageNumber || 1} of {data.totalPages || 1}</p>
             </div>
           )}
