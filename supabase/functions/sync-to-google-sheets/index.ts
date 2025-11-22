@@ -156,25 +156,38 @@ serve(async (req) => {
       throw new Error('Supabase credentials not configured');
     }
 
-    // Parse request body to check if specific record ID is provided
-    let specificRecordId = null;
+    // Parse request body to require a specific record ID
+    let specificRecordId: string | null = null;
     try {
       const body = await req.json();
-      specificRecordId = body?.recordId;
+      specificRecordId = body?.recordId ?? null;
     } catch {
-      // No body or invalid JSON - sync all records
+      // No body or invalid JSON
+    }
+
+    if (!specificRecordId) {
+      console.log('No specific recordId provided; aborting Google Sheets sync to avoid unintended bulk updates.');
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'recordId is required when calling sync-to-google-sheets',
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
     }
 
     // Create Supabase client with service role
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch TPV requests from database
+    // Fetch only the specific TPV request from database
     let query = supabase
       .from('tpv_requests')
       .select('*')
       .order('created_at', { ascending: false });
     
-    // If specific record ID provided, only fetch that record
     if (specificRecordId) {
       query = query.eq('id', specificRecordId);
       console.log(`Fetching specific record: ${specificRecordId}`);
