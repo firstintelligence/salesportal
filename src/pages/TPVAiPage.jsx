@@ -1,16 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import TPVRequest from "@/components/tpv/TPVRequest";
 
 const TPVAiPage = () => {
   const navigate = useNavigate();
+  const [showRequest, setShowRequest] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
       navigate("/");
     }
   }, [navigate]);
+
+  if (showRequest) {
+    return <TPVRequest onBack={() => setShowRequest(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,11 +30,16 @@ const TPVAiPage = () => {
           Back to Tools
         </Button>
       </div>
-      <div className="max-w-6xl mx-auto p-8">
-        <h1 className="text-3xl font-bold mb-4 text-foreground">TPV AI</h1>
-        <p className="text-muted-foreground">
-          TPV AI content will be added here.
-        </p>
+      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center">
+        <div className="text-center">
+          <h1 className="mb-4 text-4xl font-bold">TPV Request System</h1>
+          <p className="mb-8 text-xl text-muted-foreground">
+            Submit verification calls for payment details
+          </p>
+          <Button size="lg" onClick={() => setShowRequest(true)}>
+            Create TPV Request
+          </Button>
+        </div>
       </div>
     </div>
   );
