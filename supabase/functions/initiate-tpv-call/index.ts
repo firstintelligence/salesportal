@@ -110,7 +110,7 @@ serve(async (req) => {
       try {
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
         
-        const { error: insertError } = await supabase
+        const { data: insertData, error: insertError } = await supabase
           .from('tpv_requests')
           .insert({
             agent_id: formData.agentId,
@@ -133,7 +133,9 @@ serve(async (req) => {
             monthly_payment: formData.monthlyPayment,
             vapi_call_id: callData.id,
             status: 'initiated',
-          });
+          })
+          .select()
+          .single();
 
         if (insertError) {
           console.error('Failed to log TPV request to database:', insertError);
