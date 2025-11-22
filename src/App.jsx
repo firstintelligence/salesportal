@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage";
 import InvoiceGeneratorPage from "./pages/InvoiceGeneratorPage";
 import SavingsCalculatorPage from "./pages/SavingsCalculatorPage";
 import TPVAiPage from "./pages/TPVAiPage";
+import TPVRequestPage from "./pages/TPVRequestPage";
 import TemplatePage from "./pages/TemplatePage";
 import ReceiptPage from "./pages/ReceiptPage";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
           <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
           <Route path="/tpv-ai" element={<TPVAiPage />} />
+          <Route path="/tpv-request" element={<TPVRequestPage />} />
           <Route path="/template" element={<TemplatePage />} />
           <Route path="/receipt" element={<ReceiptPage />} />
         </Routes>
