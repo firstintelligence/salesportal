@@ -156,7 +156,6 @@ const TpvRequestPage = () => {
       toast.success("Call Initiated Successfully", {
         description: `TPV verification call has been started. Call ID: ${callResult.callId}`,
       });
-      form.reset();
     } catch (error) {
       console.error('Error initiating TPV call:', error);
       toast.error("Error", {
@@ -283,7 +282,7 @@ const TpvRequestPage = () => {
                                 <SelectValue placeholder="Select province" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent position="popper" sideOffset={5} className="z-50">
                               {canadianProvinces.map((province) => (
                                 <SelectItem key={province} value={province}>
                                   {province}
