@@ -75,6 +75,7 @@ const LoanApplicationPage = () => {
     timeAtJob: "",
     employmentStatus: "",
     employerCity: "",
+    employerProvince: "",
     
     // Consents
     privacyConsent: false,
@@ -97,6 +98,43 @@ const LoanApplicationPage = () => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
+  // Helper functions for formatting
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
+  const capitalizeFirst = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const formatIdType = (type) => {
+    if (!type) return '';
+    const typeMap = {
+      'drivers_license': "Driver's License",
+      'passport': 'Canadian Passport',
+      'citizenship': 'Canadian Citizenship Card',
+      'pr_card': 'Permanent Resident Card',
+      'status_card': 'Certificate of Indian Status',
+      'provincial_id': 'Provincial Photo ID',
+      'health_card': 'Health Card',
+      'nexus': 'Nexus Card'
+    };
+    return typeMap[type] || capitalizeFirst(type);
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return '';
+    const num = parseFloat(amount);
+    if (isNaN(num)) return amount;
+    return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  };
+
   const generatePDF = async () => {
     try {
       // Load the PDF template
@@ -115,9 +153,9 @@ const LoanApplicationPage = () => {
         if (formData.firstName) form.getTextField('First Name').setText(formData.firstName);
         if (formData.lastName) form.getTextField('Last Name').setText(formData.lastName);
         if (formData.middleName) form.getTextField('Middle Name').setText(formData.middleName);
-        if (formData.birthdate) form.getTextField('Birthdate').setText(formData.birthdate);
+        if (formData.birthdate) form.getTextField('Birthdate').setText(formatDate(formData.birthdate));
         if (formData.homePhone) form.getTextField('Phone Number').setText(formData.homePhone);
-        if (formData.maritalStatus) form.getTextField('Marital Status').setText(formData.maritalStatus);
+        if (formData.maritalStatus) form.getTextField('Marital Status').setText(capitalizeFirst(formData.maritalStatus));
         if (formData.mobilePhone) form.getTextField('Mobile Number').setText(formData.mobilePhone);
         if (formData.email) form.getTextField('Email').setText(formData.email);
         
@@ -128,22 +166,25 @@ const LoanApplicationPage = () => {
         if (formData.province) form.getTextField('Province').setText(formData.province);
         if (formData.postalCode) form.getTextField('Postal Code').setText(formData.postalCode);
         if (formData.yearsAtAddress) form.getTextField('Years at Residence').setText(formData.yearsAtAddress);
-        if (formData.monthlyHousingCosts) form.getTextField('Mortgage Amount').setText(formData.monthlyHousingCosts);
-        if (formData.housingStatus) form.getTextField('Housing Status').setText(formData.housingStatus);
+        if (formData.monthlyHousingCosts) form.getTextField('Mortgage Amount').setText(formatCurrency(formData.monthlyHousingCosts));
+        if (formData.housingStatus) form.getTextField('Housing Status').setText(capitalizeFirst(formData.housingStatus));
         
         // Employment
         if (formData.businessName) form.getTextField('Employer Name').setText(formData.businessName);
         if (formData.positionTitle) form.getTextField('Position Title').setText(formData.positionTitle);
-        if (formData.grossMonthlyIncome) form.getTextField('Gross Monthly Income').setText(formData.grossMonthlyIncome);
+        if (formData.grossMonthlyIncome) form.getTextField('Gross Monthly Income').setText(formatCurrency(formData.grossMonthlyIncome));
         if (formData.employerAddress) form.getTextField('Employer Address').setText(formData.employerAddress);
         if (formData.timeAtJob) form.getTextField('Time at Job').setText(formData.timeAtJob);
-        if (formData.employerCity) form.getTextField('Employer CIty, Province').setText(formData.employerCity);
+        
+        // Employer City and Province combined
+        const employerCityProvince = [formData.employerCity, formData.employerProvince].filter(Boolean).join(', ');
+        if (employerCityProvince) form.getTextField('Employer CIty, Province').setText(employerCityProvince);
         
         // Borrower ID
-        if (formData.photoIdType) form.getTextField('Photo ID Card Type').setText(formData.photoIdType);
+        if (formData.photoIdType) form.getTextField('Photo ID Card Type').setText(formatIdType(formData.photoIdType));
         if (formData.photoIdProvince) form.getTextField('Photo ID Province').setText(formData.photoIdProvince);
         if (formData.photoIdNumber) form.getTextField('Photo ID Number').setText(formData.photoIdNumber);
-        if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formData.photoIdExpiry);
+        if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry));
         
       } catch (error) {
         console.error('Error filling form fields:', error);
@@ -580,6 +621,44 @@ const LoanApplicationPage = () => {
                     value={formData.timeAtJob}
                     onChange={handleInputChange}
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="employerCity">Employer City</Label>
+                  <Input
+                    id="employerCity"
+                    name="employerCity"
+                    value={formData.employerCity}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="employerProvince">Employer Province</Label>
+                  <Select
+                    value={formData.employerProvince}
+                    onValueChange={(value) => handleSelectChange("employerProvince", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select province" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ON">Ontario</SelectItem>
+                      <SelectItem value="QC">Quebec</SelectItem>
+                      <SelectItem value="BC">British Columbia</SelectItem>
+                      <SelectItem value="AB">Alberta</SelectItem>
+                      <SelectItem value="MB">Manitoba</SelectItem>
+                      <SelectItem value="SK">Saskatchewan</SelectItem>
+                      <SelectItem value="NS">Nova Scotia</SelectItem>
+                      <SelectItem value="NB">New Brunswick</SelectItem>
+                      <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
+                      <SelectItem value="PE">Prince Edward Island</SelectItem>
+                      <SelectItem value="NT">Northwest Territories</SelectItem>
+                      <SelectItem value="YT">Yukon</SelectItem>
+                      <SelectItem value="NU">Nunavut</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
