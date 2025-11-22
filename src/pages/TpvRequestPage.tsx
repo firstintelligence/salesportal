@@ -133,8 +133,7 @@ const TpvRequestPage = () => {
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to initiate call");
+        throw new Error(`Failed to initiate call (status ${response.status})`);
       }
 
       const callResult = await response.json();
