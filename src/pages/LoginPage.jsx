@@ -25,26 +25,28 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-background p-4">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-center mb-8 text-foreground">
-            Georges Plumbing & Heating
-          </h1>
+        <div className="bg-card border border-border rounded-lg shadow-xl p-10">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-primary mb-2">
+              Sales Portal
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Enter your password to continue
+            </p>
+          </div>
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-foreground">
-                Enter Password
-              </label>
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                className="w-full"
+                placeholder="Password"
+                className="w-full h-12 text-center text-lg tracking-wider"
                 autoFocus
               />
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full h-12 text-lg">
+              Access Portal
             </Button>
           </form>
         </div>
