@@ -156,14 +156,31 @@ serve(async (req) => {
       throw new Error('Supabase credentials not configured');
     }
 
+    // Parse request body to check if specific record ID is provided
+    let specificRecordId = null;
+    try {
+      const body = await req.json();
+      specificRecordId = body?.recordId;
+    } catch {
+      // No body or invalid JSON - sync all records
+    }
+
     // Create Supabase client with service role
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch all TPV requests from database
-    const { data: tpvRequests, error: dbError } = await supabase
+    // Fetch TPV requests from database
+    let query = supabase
       .from('tpv_requests')
       .select('*')
       .order('created_at', { ascending: false });
+    
+    // If specific record ID provided, only fetch that record
+    if (specificRecordId) {
+      query = query.eq('id', specificRecordId);
+      console.log(`Fetching specific record: ${specificRecordId}`);
+    }
+
+    const { data: tpvRequests, error: dbError } = await query;
 
     if (dbError) {
       console.error('Database error:', dbError);
@@ -189,6 +206,22 @@ serve(async (req) => {
     // Get access token
     const accessToken = await getAccessToken(sheetsAuth);
 
+    // Function to format date in Toronto timezone
+    const formatTorontoTime = (dateString: string | null) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', { 
+        timeZone: 'America/Toronto',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    };
+
     // Prepare data for Google Sheets
     const headers = [
       'Date',
@@ -209,12 +242,12 @@ serve(async (req) => {
       'Status',
       'Call Duration (seconds)',
       'Ended Reason',
-      'VAPI Call ID',
+      'Call ID',
       'Recording URL'
     ];
 
     const rows = tpvRequests?.map(request => [
-      new Date(request.created_at).toLocaleString(),
+      formatTorontoTime(request.created_at),
       request.agent_id,
       request.customer_name,
       request.customer_phone,
@@ -230,37 +263,55 @@ serve(async (req) => {
       request.amortization || '',
       request.monthly_payment || '',
       request.status,
-      request.call_duration_seconds?.toString() || '',
+      request.call_duration_seconds !== null ? request.call_duration_seconds.toString() : '0',
       request.ended_reason || '',
       request.vapi_call_id || '',
       request.recording_url || ''
     ]) || [];
 
-    // Clear existing data and write new data
-    const values = [headers, ...rows];
+    // Check if headers exist in the sheet
+    const checkResponse = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A1:T1`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-    // Clear the sheet first
-    await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1:clear`,
+    const checkData = await checkResponse.json();
+    const hasHeaders = checkData.values && checkData.values.length > 0;
+
+    // If no headers exist, write them first
+    if (!hasHeaders) {
+      await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A1?valueInputOption=RAW`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            values: [headers],
+          }),
+        }
+      );
+    }
+
+    // Append new rows instead of clearing
+    const response = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A:T:append?valueInputOption=RAW`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-      }
-    );
-
-    // Write new data
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1?valueInputOption=RAW`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ values }),
+        body: JSON.stringify({
+          values: rows,
+        }),
       }
     );
 
@@ -277,7 +328,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         message: 'TPV requests synced to Google Sheets',
-        rowsWritten: values.length,
+        rowsWritten: rows.length,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

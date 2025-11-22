@@ -140,7 +140,7 @@ serve(async (req) => {
         } else {
           console.log('TPV request logged to database successfully');
           
-          // Trigger Google Sheets sync
+          // Trigger Google Sheets sync with the new record ID
           try {
             const syncResponse = await fetch(`${SUPABASE_URL}/functions/v1/sync-to-google-sheets`, {
               method: 'POST',
@@ -148,6 +148,9 @@ serve(async (req) => {
                 'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
                 'Content-Type': 'application/json',
               },
+              body: JSON.stringify({
+                recordId: insertData.id,
+              }),
             });
             
             if (!syncResponse.ok) {

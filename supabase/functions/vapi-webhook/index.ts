@@ -70,7 +70,7 @@ serve(async (req) => {
         try {
           const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           
-          const { error: updateError } = await supabase
+          const { data: updateData, error: updateError } = await supabase
             .from('tpv_requests')
             .update({
               status: callSuccessful ? 'completed' : 'failed',
@@ -78,14 +78,16 @@ serve(async (req) => {
               call_duration_seconds: Math.floor(callDuration),
               recording_url: recordingUrl,
             })
-            .eq('vapi_call_id', vapiCallId);
+            .eq('vapi_call_id', vapiCallId)
+            .select('id')
+            .single();
 
           if (updateError) {
             console.error('Failed to update TPV request in database:', updateError);
           } else {
             console.log('TPV request updated in database successfully');
             
-            // Trigger Google Sheets sync
+            // Trigger Google Sheets sync with the updated record ID
             try {
               const syncResponse = await fetch(`${SUPABASE_URL}/functions/v1/sync-to-google-sheets`, {
                 method: 'POST',
@@ -93,6 +95,9 @@ serve(async (req) => {
                   'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
                   'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                  recordId: updateData?.id,
+                }),
               });
               
               if (!syncResponse.ok) {
