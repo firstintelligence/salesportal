@@ -106,49 +106,44 @@ const LoanApplicationPage = () => {
       // Get the form
       const form = pdfDoc.getForm();
       
-      // Fill form fields - note: field names must match the exact names in the PDF
-      // You may need to inspect the actual PDF field names and adjust these
+      // Fill form fields using the actual field names from the PDF
       try {
         const fields = form.getFields();
         console.log('Available PDF fields:', fields.map(f => f.getName()));
         
         // Personal Details
-        if (formData.firstName) form.getTextField('Photo ID First Name')?.setText(formData.firstName);
-        if (formData.lastName) form.getTextField('Photo ID Last Name')?.setText(formData.lastName);
-        if (formData.middleName) form.getTextField('Photo ID Middle Name')?.setText(formData.middleName);
-        if (formData.birthdate) form.getTextField('Birthdate')?.setText(formData.birthdate);
-        if (formData.homePhone) form.getTextField('Home Phone Number')?.setText(formData.homePhone);
-        if (formData.maritalStatus) form.getTextField('Marital Status')?.setText(formData.maritalStatus);
-        if (formData.mobilePhone) form.getTextField('Mobile Phone Number')?.setText(formData.mobilePhone);
-        if (formData.email) form.getTextField('Email')?.setText(formData.email);
-        if (formData.sin) form.getTextField('Social Insurance Number')?.setText(formData.sin);
+        if (formData.firstName) form.getTextField('First Name').setText(formData.firstName);
+        if (formData.lastName) form.getTextField('Last Name').setText(formData.lastName);
+        if (formData.middleName) form.getTextField('Middle Name').setText(formData.middleName);
+        if (formData.birthdate) form.getTextField('Birthdate').setText(formData.birthdate);
+        if (formData.homePhone) form.getTextField('Phone Number').setText(formData.homePhone);
+        if (formData.maritalStatus) form.getTextField('Marital Status').setText(formData.maritalStatus);
+        if (formData.mobilePhone) form.getTextField('Mobile Number').setText(formData.mobilePhone);
+        if (formData.email) form.getTextField('Email').setText(formData.email);
         
         // Housing
-        if (formData.address) form.getTextField('Address')?.setText(formData.address);
-        if (formData.unitNo) form.getTextField('Unit No')?.setText(formData.unitNo);
-        if (formData.city) form.getTextField('City')?.setText(formData.city);
-        if (formData.province) form.getTextField('Province')?.setText(formData.province);
-        if (formData.postalCode) form.getTextField('Postal Code')?.setText(formData.postalCode);
-        if (formData.yearsAtAddress) form.getTextField('No Years at this Address')?.setText(formData.yearsAtAddress);
-        if (formData.monthlyHousingCosts) form.getTextField('Monthly Housing Costs')?.setText(formData.monthlyHousingCosts);
+        if (formData.address) form.getTextField('Address').setText(formData.address);
+        if (formData.unitNo) form.getTextField('Unit Number').setText(formData.unitNo);
+        if (formData.city) form.getTextField('City').setText(formData.city);
+        if (formData.province) form.getTextField('Province').setText(formData.province);
+        if (formData.postalCode) form.getTextField('Postal Code').setText(formData.postalCode);
+        if (formData.yearsAtAddress) form.getTextField('Years at Residence').setText(formData.yearsAtAddress);
+        if (formData.monthlyHousingCosts) form.getTextField('Mortgage Amount').setText(formData.monthlyHousingCosts);
+        if (formData.housingStatus) form.getTextField('Housing Status').setText(formData.housingStatus);
         
         // Employment
-        if (formData.businessName) form.getTextField('Business Name')?.setText(formData.businessName);
-        if (formData.employerPhone) form.getTextField('Employers Phone Number')?.setText(formData.employerPhone);
-        if (formData.positionTitle) form.getTextField('Position Title')?.setText(formData.positionTitle);
-        if (formData.grossMonthlyIncome) form.getTextField('Gross Monthly Income')?.setText(formData.grossMonthlyIncome);
-        if (formData.employerAddress) form.getTextField('Employer Address')?.setText(formData.employerAddress);
-        if (formData.timeAtJob) form.getTextField('Time at Job Years')?.setText(formData.timeAtJob);
+        if (formData.businessName) form.getTextField('Employer Name').setText(formData.businessName);
+        if (formData.positionTitle) form.getTextField('Position Title').setText(formData.positionTitle);
+        if (formData.grossMonthlyIncome) form.getTextField('Gross Monthly Income').setText(formData.grossMonthlyIncome);
+        if (formData.employerAddress) form.getTextField('Employer Address').setText(formData.employerAddress);
+        if (formData.timeAtJob) form.getTextField('Time at Job').setText(formData.timeAtJob);
+        if (formData.employerCity) form.getTextField('Employer CIty, Province').setText(formData.employerCity);
         
         // Borrower ID
-        if (formData.photoIdType) form.getTextField('Photo ID Card Type')?.setText(formData.photoIdType);
-        if (formData.photoIdProvince) form.getTextField('Photo ID Province')?.setText(formData.photoIdProvince);
-        if (formData.photoIdNumber) form.getTextField('Photo ID Number')?.setText(formData.photoIdNumber);
-        if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry')?.setText(formData.photoIdExpiry);
-        
-        // Signature
-        if (formData.signature) form.getTextField('Signature')?.setText(formData.signature);
-        if (formData.signatureDate) form.getTextField('Date MMDDYYYY')?.setText(formData.signatureDate);
+        if (formData.photoIdType) form.getTextField('Photo ID Card Type').setText(formData.photoIdType);
+        if (formData.photoIdProvince) form.getTextField('Photo ID Province').setText(formData.photoIdProvince);
+        if (formData.photoIdNumber) form.getTextField('Photo ID Number').setText(formData.photoIdNumber);
+        if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formData.photoIdExpiry);
         
       } catch (error) {
         console.error('Error filling form fields:', error);
