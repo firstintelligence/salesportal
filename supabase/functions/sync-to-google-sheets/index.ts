@@ -313,29 +313,79 @@ serve(async (req) => {
       );
     }
 
-    // Append new rows instead of clearing
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A:T:append?valueInputOption=RAW`,
+    // Get all existing rows to check if this Call ID already exists
+    const allRowsResponse = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A2:T`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          values: rows,
-        }),
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Google Sheets API error:', errorText);
-      throw new Error(`Failed to update Google Sheets: ${errorText}`);
-    }
+    let result;
+    const allRowsData = await allRowsResponse.json();
+    const existingRows = allRowsData.values || [];
+    
+    // Find the row index for this Call ID (column S = index 18 for Call ID)
+    const callIdToSync = rows[0]?.[18]; // Call ID is at index 18
+    const existingRowIndex = existingRows.findIndex(row => row[18] === callIdToSync);
 
-    const result = await response.json();
-    console.log('Successfully synced to Google Sheets:', result);
+    if (existingRowIndex !== -1 && callIdToSync) {
+      // Update existing row (add 2 because: 1 for header row + 1 for 1-based indexing)
+      const rowNumber = existingRowIndex + 2;
+      console.log(`Updating existing row ${rowNumber} for Call ID: ${callIdToSync}`);
+      
+      const response = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A${rowNumber}:T${rowNumber}?valueInputOption=RAW`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            values: rows,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
+        throw new Error(`Failed to update Google Sheets: ${errorText}`);
+      }
+
+      result = await response.json();
+      console.log('Successfully updated row in Google Sheets:', result);
+    } else {
+      // Append new row if Call ID doesn't exist
+      console.log(`Appending new row for Call ID: ${callIdToSync}`);
+      
+      const response = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A:T:append?valueInputOption=RAW`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            values: rows,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
+        throw new Error(`Failed to update Google Sheets: ${errorText}`);
+      }
+
+      result = await response.json();
+      console.log('Successfully appended row to Google Sheets:', result);
+    }
 
     return new Response(
       JSON.stringify({
