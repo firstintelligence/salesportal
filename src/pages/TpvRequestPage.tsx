@@ -123,7 +123,6 @@ const TpvRequestPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
             ...data,
@@ -133,9 +132,14 @@ const TpvRequestPage = () => {
         }
       );
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to initiate call");
+      }
+
       const callResult = await response.json();
 
-      if (!response.ok || !callResult?.success) {
+      if (!callResult?.success) {
         throw new Error(callResult?.error || "Failed to initiate call");
       }
 
