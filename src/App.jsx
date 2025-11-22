@@ -2,10 +2,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { navItems } from "./nav-items";
+import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
+import InvoiceGeneratorPage from "./pages/InvoiceGeneratorPage";
+import SavingsCalculatorPage from "./pages/SavingsCalculatorPage";
+import TPVAiPage from "./pages/TPVAiPage";
 import TemplatePage from "./pages/TemplatePage";
 import ReceiptPage from "./pages/ReceiptPage";
-import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -15,10 +18,11 @@ const App = () => (
       <Toaster />
       <BrowserRouter>
         <Routes>
-          {navItems.map(({ to, page }) => (
-            <Route key={to} path={to} element={page} />
-          ))}
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
+          <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
+          <Route path="/tpv-ai" element={<TPVAiPage />} />
           <Route path="/template" element={<TemplatePage />} />
           <Route path="/receipt" element={<ReceiptPage />} />
         </Routes>
