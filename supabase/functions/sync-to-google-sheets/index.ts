@@ -313,26 +313,6 @@ serve(async (req) => {
       );
     }
 
-    // CRITICAL FIX: First, completely clear all existing data rows from the sheet
-    // This ensures no old/stale data can persist
-    console.log('Clearing all existing data rows from sheet...');
-    const clearResponse = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A2:T:clear`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    
-    if (!clearResponse.ok) {
-      console.error('Failed to clear sheet:', await clearResponse.text());
-    } else {
-      console.log('Sheet data cleared successfully');
-    }
-
     // Get all existing rows to check if this Call ID already exists
     console.log('Fetching existing sheet data to find Call ID...');
     const allRowsResponse = await fetch(
@@ -349,6 +329,10 @@ serve(async (req) => {
     const allRowsData = await allRowsResponse.json();
     const existingRows = allRowsData.values || [];
     console.log(`Found ${existingRows.length} existing rows in sheet`);
+    
+    // Log all existing Call IDs for debugging
+    const existingCallIds = existingRows.map(row => row[18]).filter(Boolean);
+    console.log(`Existing Call IDs in sheet: ${JSON.stringify(existingCallIds)}`);
     
     // Find the row index for this Call ID (column S = index 18 for Call ID)
     const callIdToSync = rows[0]?.[18]; // Call ID is at index 18
