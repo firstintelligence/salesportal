@@ -6,7 +6,7 @@ import * as z from "zod";
 import InputMask from "react-input-mask";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+// Supabase client not needed here; calling edge function directly
 import {
   Form,
   FormControl,
@@ -117,26 +117,32 @@ const TpvRequestPage = () => {
 
       const fullName = `${data.firstName} ${data.lastName}`;
 
-      const { data: callResult, error } = await supabase.functions.invoke('initiate-tpv-call', {
-        body: {
-          ...data,
-          customerName: fullName,
-          assistantId: '33a8b0b6-2fc0-4f1f-9f01-02712d52a676',
-        },
+      const response = await fetch(
+        "https://donhxrgrqeqnsmhtnazb.functions.supabase.co/initiate-tpv-call",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            ...data,
+            customerName: fullName,
+            assistantId: "33a8b0b6-2fc0-4f1f-9f01-02712d52a676",
+          }),
+        }
+      );
+
+      const callResult = await response.json();
+
+      if (!response.ok || !callResult?.success) {
+        throw new Error(callResult?.error || "Failed to initiate call");
+      }
+
+      toast.success("Call Initiated Successfully", {
+        description: `TPV verification call has been started. Call ID: ${callResult.callId}`,
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (callResult?.success) {
-        toast.success("Call Initiated Successfully", {
-          description: `TPV verification call has been started. Call ID: ${callResult.callId}`,
-        });
-        form.reset();
-      } else {
-        throw new Error(callResult?.error || 'Failed to initiate call');
-      }
+      form.reset();
     } catch (error) {
       console.error('Error initiating TPV call:', error);
       toast.error("Error", {
