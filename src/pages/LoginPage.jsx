@@ -6,9 +6,8 @@ import { toast } from "sonner";
 
 // Map agent IDs to their associated phone numbers
 const AGENT_CREDENTIALS = [
-  { id: "77535dc7-ac4a-4f8e-811f-1d6013399133", phone: "" },
-  { id: "e14d6b0c-9a54-40df-bc6f-a03aaac9bd7e", phone: "" },
-  { id: "1f7ca8b1-e1d1-458f-b878-bcb07d8c74be", phone: "" },
+  { id: "MM23", phone: "+1 (905) 904-3544" },
+  { id: "TB0195", phone: "+1 (416) 875-0195" },
 ];
 
 const LoginPage = () => {
