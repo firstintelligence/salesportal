@@ -142,24 +142,18 @@ serve(async (req) => {
   }
 
   try {
-    const GOOGLE_SHEETS_CREDENTIALS = Deno.env.get('GOOGLE_SHEETS_CREDENTIALS');
+    const GOOGLE_SHEETS_PRIVATE_KEY = Deno.env.get('GOOGLE_SHEETS_PRIVATE_KEY');
+    const GOOGLE_SHEETS_CLIENT_EMAIL = Deno.env.get('GOOGLE_SHEETS_CLIENT_EMAIL');
+    const GOOGLE_SHEETS_SPREADSHEET_ID = Deno.env.get('GOOGLE_SHEETS_SPREADSHEET_ID');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!GOOGLE_SHEETS_CREDENTIALS) {
-      throw new Error('Google Sheets credentials not configured');
+    if (!GOOGLE_SHEETS_PRIVATE_KEY || !GOOGLE_SHEETS_CLIENT_EMAIL || !GOOGLE_SHEETS_SPREADSHEET_ID) {
+      throw new Error('Google Sheets credentials not configured. Required: GOOGLE_SHEETS_PRIVATE_KEY, GOOGLE_SHEETS_CLIENT_EMAIL, GOOGLE_SHEETS_SPREADSHEET_ID');
     }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Supabase credentials not configured');
-    }
-
-    // Parse Google Sheets credentials JSON
-    const credentials = JSON.parse(GOOGLE_SHEETS_CREDENTIALS);
-    const SPREADSHEET_ID = credentials.spreadsheet_id;
-    
-    if (!SPREADSHEET_ID) {
-      throw new Error('Spreadsheet ID not found in credentials');
     }
 
     // Create Supabase client with service role
@@ -180,16 +174,16 @@ serve(async (req) => {
 
     // Prepare Google Sheets auth object
     const sheetsAuth: GoogleSheetsAuth = {
-      type: credentials.type || 'service_account',
-      project_id: credentials.project_id || 'tpv-sheets-sync',
-      private_key_id: credentials.private_key_id || '',
-      private_key: credentials.private_key,
-      client_email: credentials.client_email,
-      client_id: credentials.client_id || '',
-      auth_uri: credentials.auth_uri || 'https://accounts.google.com/o/oauth2/auth',
-      token_uri: credentials.token_uri || 'https://oauth2.googleapis.com/token',
-      auth_provider_x509_cert_url: credentials.auth_provider_x509_cert_url || 'https://www.googleapis.com/oauth2/v1/certs',
-      client_x509_cert_url: credentials.client_x509_cert_url || '',
+      type: 'service_account',
+      project_id: 'workify-477500',
+      private_key_id: '',
+      private_key: GOOGLE_SHEETS_PRIVATE_KEY,
+      client_email: GOOGLE_SHEETS_CLIENT_EMAIL,
+      client_id: '',
+      auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+      token_uri: 'https://oauth2.googleapis.com/token',
+      auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+      client_x509_cert_url: '',
     };
 
     // Get access token
@@ -247,7 +241,7 @@ serve(async (req) => {
 
     // Clear the sheet first
     await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1:clear`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1:clear`,
       {
         method: 'POST',
         headers: {
@@ -259,7 +253,7 @@ serve(async (req) => {
 
     // Write new data
     const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?valueInputOption=RAW`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1?valueInputOption=RAW`,
       {
         method: 'PUT',
         headers: {
