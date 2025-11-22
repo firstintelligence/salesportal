@@ -4,21 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-const VALID_PASSWORDS = ["1111", "2222", "3333"];
+// Map agent IDs to their associated phone numbers
+const AGENT_CREDENTIALS = [
+  { id: "77535dc7-ac4a-4f8e-811f-1d6013399133", phone: "" },
+  { id: "e14d6b0c-9a54-40df-bc6f-a03aaac9bd7e", phone: "" },
+  { id: "1f7ca8b1-e1d1-458f-b878-bcb07d8c74be", phone: "" },
+];
 
 const LoginPage = () => {
-  const [password, setPassword] = useState("");
+  const [agentId, setAgentId] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (VALID_PASSWORDS.includes(password)) {
+    const agent = AGENT_CREDENTIALS.find((a) => a.id === agentId);
+    if (agent) {
       localStorage.setItem("authenticated", "true");
+      localStorage.setItem("agentId", agent.id);
+      if (agent.phone) {
+        localStorage.setItem("agentPhone", agent.phone);
+      }
       toast.success("Access granted");
       navigate("/landing");
     } else {
-      toast.error("Invalid password");
-      setPassword("");
+      toast.error("Invalid Agent ID");
+      setAgentId("");
     }
   };
 
@@ -37,11 +47,11 @@ const LoginPage = () => {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full h-12 text-center text-lg tracking-wider"
+                type="text"
+                value={agentId}
+                onChange={(e) => setAgentId(e.target.value)}
+                placeholder="Agent ID"
+                className="w-full h-12 text-center text-sm"
                 autoFocus
               />
             </div>

@@ -27,7 +27,6 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
-  agentId: z.string().min(1, "Agent ID is required"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   address: z.string().min(1, "Address is required"),
@@ -59,7 +58,6 @@ const TpvRequestPage = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      agentId: "",
       firstName: "",
       lastName: "",
       address: "",
@@ -108,6 +106,18 @@ const TpvRequestPage = () => {
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
+    
+    // Get agent ID from localStorage
+    const agentId = localStorage.getItem("agentId");
+    if (!agentId) {
+      toast.error("Error", {
+        description: "Agent ID not found. Please log in again.",
+      });
+      setIsSubmitting(false);
+      navigate("/");
+      return;
+    }
+    
     console.log("TPV Request Data:", data);
     
     try {
@@ -126,6 +136,7 @@ const TpvRequestPage = () => {
           },
           body: JSON.stringify({
             ...data,
+            agentId,
             customerName: fullName,
             assistantId: "33a8b0b6-2fc0-4f1f-9f01-02712d52a676",
           }),
@@ -522,20 +533,6 @@ const TpvRequestPage = () => {
                       />
                     </div>
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="agentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Agent ID</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="Enter your agent ID" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
                   <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
                     {isSubmitting ? "Submitting..." : "Submit TPV Request"}
