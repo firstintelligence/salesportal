@@ -314,6 +314,7 @@ serve(async (req) => {
     }
 
     // Get all existing rows to check if this Call ID already exists
+    console.log('Fetching existing sheet data to find Call ID...');
     const allRowsResponse = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A2:T`,
       {
@@ -327,10 +328,13 @@ serve(async (req) => {
     let result;
     const allRowsData = await allRowsResponse.json();
     const existingRows = allRowsData.values || [];
+    console.log(`Found ${existingRows.length} existing rows in sheet`);
     
     // Find the row index for this Call ID (column S = index 18 for Call ID)
     const callIdToSync = rows[0]?.[18]; // Call ID is at index 18
+    console.log(`Looking for Call ID: ${callIdToSync}`);
     const existingRowIndex = existingRows.findIndex(row => row[18] === callIdToSync);
+    console.log(`Existing row index: ${existingRowIndex}`);
 
     if (existingRowIndex !== -1 && callIdToSync) {
       // Update existing row (add 2 because: 1 for header row + 1 for 1-based indexing)
