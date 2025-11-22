@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Calculator, Phone } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -14,19 +14,25 @@ const LandingPage = () => {
 
   const tools = [
     {
-      title: "Invoice Generator",
-      icon: FileText,
-      description: "Create professional invoices and quotes",
-      path: "/invoice-generator",
-    },
-    {
       title: "Savings Calculator",
       icon: Calculator,
       description: "Calculate potential savings",
       path: "/savings-calculator",
     },
     {
-      title: "TPV Request System",
+      title: "Invoice Generator",
+      icon: FileText,
+      description: "Create professional invoices and quotes",
+      path: "/invoice-generator",
+    },
+    {
+      title: "Loan Application Form",
+      icon: CreditCard,
+      description: "Complete financing application form",
+      path: "/loan-application",
+    },
+    {
+      title: "TPV AI",
       icon: Phone,
       description: "Submit third-party verification calls for payment details",
       path: "/tpv-request",
@@ -45,7 +51,7 @@ const LandingPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {tools.map((tool) => (
             <div
               key={tool.path}
