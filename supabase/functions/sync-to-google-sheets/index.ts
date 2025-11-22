@@ -313,6 +313,26 @@ serve(async (req) => {
       );
     }
 
+    // CRITICAL FIX: First, completely clear all existing data rows from the sheet
+    // This ensures no old/stale data can persist
+    console.log('Clearing all existing data rows from sheet...');
+    const clearResponse = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A2:T:clear`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    if (!clearResponse.ok) {
+      console.error('Failed to clear sheet:', await clearResponse.text());
+    } else {
+      console.log('Sheet data cleared successfully');
+    }
+
     // Get all existing rows to check if this Call ID already exists
     console.log('Fetching existing sheet data to find Call ID...');
     const allRowsResponse = await fetch(
