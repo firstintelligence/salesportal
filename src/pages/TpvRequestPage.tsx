@@ -1,0 +1,544 @@
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import InputMask from "react-input-mask";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
+
+const formSchema = z.object({
+  agentId: z.string().min(1, "Agent ID is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  province: z.string().min(1, "Province is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  phoneNumber: z.string().min(10, "Valid phone number is required"),
+  email: z.string().email("Valid email is required").optional().or(z.literal("")),
+  products: z.array(z.string()).min(1, "At least one product is required"),
+  salesPrice: z.string().min(1, "Sales price is required"),
+  interestRate: z.string().optional(),
+  promotionalTerm: z.string().optional(),
+  amortization: z.string().optional(),
+  monthlyPayment: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+const TpvRequestPage = () => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("authenticated")) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      agentId: "",
+      firstName: "",
+      lastName: "",
+      address: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      phoneNumber: "",
+      email: "",
+      products: [],
+      salesPrice: "",
+      interestRate: "",
+      promotionalTerm: "",
+      amortization: "",
+      monthlyPayment: "",
+    },
+  });
+
+  const salesPrice = form.watch("salesPrice");
+  const interestRate = form.watch("interestRate");
+  const amortization = form.watch("amortization");
+
+  useEffect(() => {
+    if (salesPrice && interestRate && amortization) {
+      const price = parseFloat(salesPrice);
+      const rate = parseFloat(interestRate) / 100;
+      const months = parseInt(amortization);
+
+      if (!isNaN(price) && !isNaN(rate) && !isNaN(months)) {
+        const adminFee = Math.min(price * 0.0149, 149);
+        const totalAmount = price + adminFee;
+
+        let monthly;
+        if (rate === 0) {
+          monthly = totalAmount / months;
+        } else {
+          const monthlyRate = rate / 12;
+          monthly =
+            (totalAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+            (Math.pow(1 + monthlyRate, months) - 1);
+        }
+
+        form.setValue("monthlyPayment", monthly.toFixed(2));
+      }
+    }
+  }, [salesPrice, interestRate, amortization, form]);
+
+  const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
+    console.log("TPV Request Data:", data);
+    
+    try {
+      toast.info("Initiating Call", {
+        description: "Starting TPV verification call...",
+      });
+
+      const fullName = `${data.firstName} ${data.lastName}`;
+
+      const { data: callResult, error } = await supabase.functions.invoke('initiate-tpv-call', {
+        body: {
+          ...data,
+          customerName: fullName,
+          assistantId: '33a8b0b6-2fc0-4f1f-9f01-02712d52a676',
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (callResult?.success) {
+        toast.success("Call Initiated Successfully", {
+          description: `TPV verification call has been started. Call ID: ${callResult.callId}`,
+        });
+        form.reset();
+      } else {
+        throw new Error(callResult?.error || 'Failed to initiate call');
+      }
+    } catch (error) {
+      console.error('Error initiating TPV call:', error);
+      toast.error("Error", {
+        description: error instanceof Error ? error.message : 'Failed to initiate verification call',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const canadianProvinces = [
+    "Alberta", "British Columbia", "Manitoba", "New Brunswick",
+    "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia",
+    "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon",
+  ];
+
+  const hvacProducts = [
+    "Heat Pump", "Tankless Water Heater", "High-Efficiency Furnace", "Air Conditioner",
+    "Boiler", "Ductless Mini-Split", "Heat Recovery Ventilator (HRV)", "Smart Thermostat",
+    "Air Purification System", "Humidifier/Dehumidifier", "Geothermal Heat Pump",
+    "Solar Water Heater", "Hybrid Water Heater", "Insulation", "Windows and Doors",
+    "Programmable Thermostat", "Carbon Filter", "Water Softener", "HEPA Filter",
+    "UV Air Filter", "UV Water Filter",
+  ];
+
+  const interestRates = [
+    "0", "2.99", "3.99", "4.99", "5.99", "6.99", "7.99", "8.99", 
+    "9.99", "10.99", "11.99", "12.99", "13.99", "14.99", "15.99", "16.99"
+  ];
+
+  const promotionalTerms = ["12", "24", "36", "48", "60"];
+
+  const amortizationPeriods = [
+    ...Array.from({ length: 15 }, (_, i) => ((i + 1) * 12).toString()),
+    "240"
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="bg-card border-b border-border p-4">
+        <Button variant="ghost" onClick={() => navigate("/landing")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Tools
+        </Button>
+      </div>
+
+      <div className="p-4 md:p-8">
+        <div className="mx-auto max-w-4xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">TPV Call Request Form</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter first name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter last name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter city" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="province"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Province</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select province" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {canadianProvinces.map((province) => (
+                                <SelectItem key={province} value={province}>
+                                  {province}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Postal Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter postal code" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <InputMask
+                              mask="(999) 999-9999"
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                            >
+                              {(inputProps: any) => (
+                                <Input
+                                  {...inputProps}
+                                  type="tel"
+                                  placeholder="(416) 500-5000"
+                                />
+                              )}
+                            </InputMask>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="products"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Products</FormLabel>
+                        <div className="space-y-2">
+                          <Select
+                            onValueChange={(value) => {
+                              const currentProducts = field.value || [];
+                              if (!currentProducts.includes(value)) {
+                                field.onChange([...currentProducts, value]);
+                              }
+                            }}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select products" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {hvacProducts.map((product) => (
+                                <SelectItem key={product} value={product}>
+                                  {product}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {field.value && field.value.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {field.value.map((product) => (
+                                <div
+                                  key={product}
+                                  className="flex items-center gap-2 bg-secondary text-secondary-foreground px-3 py-1 rounded-md"
+                                >
+                                  <span className="text-sm">{product}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      field.onChange(
+                                        field.value.filter((p) => p !== product)
+                                      );
+                                    }}
+                                    className="text-muted-foreground hover:text-foreground"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="salesPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sales Price (including taxes)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="Enter sales price"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-4 rounded-lg border border-border bg-muted/50 p-4">
+                    <h3 className="font-semibold text-lg">Finance Details</h3>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="interestRate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Interest Rate</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select interest rate" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {interestRates.map((rate) => (
+                                  <SelectItem key={rate} value={rate}>
+                                    {rate}%
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="promotionalTerm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Promotional Term</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select term" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {promotionalTerms.map((term) => (
+                                  <SelectItem key={term} value={term}>
+                                    {term} months
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="amortization"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Amortization</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select amortization" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {amortizationPeriods.map((period) => (
+                                  <SelectItem key={period} value={period}>
+                                    {period} months
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="monthlyPayment"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Monthly Payment</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Auto-calculated"
+                                readOnly
+                                className="bg-muted"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="agentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Agent ID</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Enter your agent ID" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting..." : "Submit TPV Request"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TpvRequestPage;
