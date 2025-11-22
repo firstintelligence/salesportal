@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Calculator, Bot } from "lucide-react";
+import { FileText, Calculator, Phone } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -26,10 +26,10 @@ const LandingPage = () => {
       path: "/savings-calculator",
     },
     {
-      title: "TPV AI",
-      icon: Bot,
-      description: "AI-powered third-party verification",
-      path: "/tpv-ai",
+      title: "TPV Request System",
+      icon: Phone,
+      description: "Submit third-party verification calls for payment details",
+      path: "/tpv-request",
     },
   ];
 
