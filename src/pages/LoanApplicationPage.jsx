@@ -461,9 +461,9 @@ const LoanApplicationPage = () => {
                     ref={addressRef}
                     id="address"
                     name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    defaultValue={formData.address}
                     autoComplete="off"
+                    placeholder="Start typing your address..."
                   />
                 </div>
                 <div>
@@ -717,9 +717,9 @@ const LoanApplicationPage = () => {
                     ref={employerAddressRef}
                     id="employerAddress"
                     name="employerAddress"
-                    value={formData.employerAddress}
-                    onChange={handleInputChange}
+                    defaultValue={formData.employerAddress}
                     autoComplete="off"
+                    placeholder="Start typing employer address..."
                   />
                 </div>
                 <div>
