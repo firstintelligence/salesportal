@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { ArrowLeft, Download, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, Download, Trash2 } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
 import financeitLogo from "@/assets/financeit-logo.svg";
@@ -16,10 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
@@ -358,37 +354,14 @@ const LoanApplicationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="birthdate">Birthdate</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-between text-left font-normal",
-                          !formData.birthdate && "text-muted-foreground"
-                        )}
-                      >
-                        {formData.birthdate ? (
-                          new Date(formData.birthdate).toLocaleDateString("en-CA")
-                        ) : (
-                          <span>mm/dd/yyyy</span>
-                        )}
-                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.birthdate ? new Date(formData.birthdate) : undefined}
-                        onSelect={(date) => {
-                          if (!date) return;
-                          const iso = formatLocalDate(date);
-                          setFormData((prev) => ({ ...prev, birthdate: iso }));
-                        }}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Input
+                    id="birthdate"
+                    name="birthdate"
+                    type="date"
+                    value={formData.birthdate}
+                    onChange={handleInputChange}
+                    className="w-full"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="maritalStatus">Marital Status</Label>
@@ -646,37 +619,14 @@ const LoanApplicationPage = () => {
                 </div>
                 <div className="w-full">
                   <Label htmlFor="photoIdExpiry">ID Expiry Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-between text-left font-normal",
-                          !formData.photoIdExpiry && "text-muted-foreground"
-                        )}
-                      >
-                        {formData.photoIdExpiry ? (
-                          new Date(formData.photoIdExpiry).toLocaleDateString("en-CA")
-                        ) : (
-                          <span>mm/dd/yyyy</span>
-                        )}
-                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.photoIdExpiry ? new Date(formData.photoIdExpiry) : undefined}
-                        onSelect={(date) => {
-                          if (!date) return;
-                          const iso = formatLocalDate(date);
-                          setFormData((prev) => ({ ...prev, photoIdExpiry: iso }));
-                        }}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Input
+                    id="photoIdExpiry"
+                    name="photoIdExpiry"
+                    type="date"
+                    value={formData.photoIdExpiry}
+                    onChange={handleInputChange}
+                    className="w-full"
+                  />
                 </div>
               </div>
             </div>
@@ -887,37 +837,14 @@ const LoanApplicationPage = () => {
                 </div>
                 <div className="w-full">
                   <Label htmlFor="signatureDate">Date *</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-between text-left font-normal",
-                          !formData.signatureDate && "text-muted-foreground"
-                        )}
-                      >
-                        {formData.signatureDate ? (
-                          new Date(formData.signatureDate).toLocaleDateString("en-CA")
-                        ) : (
-                          <span>mm/dd/yyyy</span>
-                        )}
-                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.signatureDate ? new Date(formData.signatureDate) : undefined}
-                        onSelect={(date) => {
-                          if (!date) return;
-                          const iso = formatLocalDate(date);
-                          setFormData((prev) => ({ ...prev, signatureDate: iso }));
-                        }}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Input
+                    id="signatureDate"
+                    name="signatureDate"
+                    type="date"
+                    value={formData.signatureDate}
+                    onChange={handleInputChange}
+                    className="w-full"
+                  />
                 </div>
               </div>
             </div>
