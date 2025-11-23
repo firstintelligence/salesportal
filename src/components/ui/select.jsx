@@ -65,23 +65,19 @@ const SelectContent = React.forwardRef(
   ({ className, children, position = "popper", ...props }, ref) => (
     <SelectPrimitive.Portal>
       <>
-        {/* Invisible fullscreen overlay that sits above the form but below the dropdown.
-            It only exists while the dropdown is open and absorbs touches/clicks so
-            they don't leak through to underlying fields. */}
-        <div className="fixed inset-0 z-40">
-          <SelectPrimitive.Close asChild>
-            <button
-              type="button"
-              className="block h-full w-full bg-transparent"
-              onPointerDown={(e) => {
-                e.stopPropagation()
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          </SelectPrimitive.Close>
-        </div>
+        {/* Invisible fullscreen overlay that blocks touches to form underneath */}
+        <div 
+          className="fixed inset-0 z-40 bg-transparent"
+          onPointerDown={(e) => {
+            e.stopPropagation()
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation()
+          }}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        />
 
         <SelectPrimitive.Content
           ref={ref}
