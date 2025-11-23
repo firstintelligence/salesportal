@@ -258,14 +258,23 @@ const LoanApplicationPage = () => {
         useObjectStreams: false
       });
       
-      // Download the PDF
+      // Open the PDF in browser instead of downloading
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
+      
+      // Open in new tab/window on mobile and desktop
+      const newWindow = window.open(url, '_blank');
+      if (newWindow) {
+        // Clean up after a delay to ensure PDF loads
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      } else {
+        // Fallback to download if popup blocked
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
       
       toast.success('PDF generated successfully!');
     } catch (error) {
