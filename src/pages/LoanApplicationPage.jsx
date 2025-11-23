@@ -312,13 +312,37 @@ const LoanApplicationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="birthdate">Birthdate</Label>
-                  <Input
-                    id="birthdate"
-                    name="birthdate"
-                    type="date"
-                    value={formData.birthdate}
-                    onChange={handleInputChange}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-between text-left font-normal",
+                          !formData.birthdate && "text-muted-foreground"
+                        )}
+                      >
+                        {formData.birthdate ? (
+                          new Date(formData.birthdate).toLocaleDateString("en-CA")
+                        ) : (
+                          <span>mm/dd/yyyy</span>
+                        )}
+                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.birthdate ? new Date(formData.birthdate) : undefined}
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const iso = date.toISOString().split("T")[0];
+                          setFormData((prev) => ({ ...prev, birthdate: iso }));
+                        }}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div>
                   <Label htmlFor="maritalStatus">Marital Status</Label>
@@ -547,14 +571,37 @@ const LoanApplicationPage = () => {
                 </div>
                 <div className="w-full">
                   <Label htmlFor="photoIdExpiry">ID Expiry Date</Label>
-                  <Input
-                    id="photoIdExpiry"
-                    name="photoIdExpiry"
-                    type="date"
-                    value={formData.photoIdExpiry}
-                    onChange={handleInputChange}
-                    className="w-full"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-between text-left font-normal",
+                          !formData.photoIdExpiry && "text-muted-foreground"
+                        )}
+                      >
+                        {formData.photoIdExpiry ? (
+                          new Date(formData.photoIdExpiry).toLocaleDateString("en-CA")
+                        ) : (
+                          <span>mm/dd/yyyy</span>
+                        )}
+                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.photoIdExpiry ? new Date(formData.photoIdExpiry) : undefined}
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const iso = date.toISOString().split("T")[0];
+                          setFormData((prev) => ({ ...prev, photoIdExpiry: iso }));
+                        }}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
@@ -763,15 +810,37 @@ const LoanApplicationPage = () => {
                 </div>
                 <div className="w-full">
                   <Label htmlFor="signatureDate">Date *</Label>
-                  <Input
-                    id="signatureDate"
-                    name="signatureDate"
-                    type="date"
-                    value={formData.signatureDate}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-between text-left font-normal",
+                          !formData.signatureDate && "text-muted-foreground"
+                        )}
+                      >
+                        {formData.signatureDate ? (
+                          new Date(formData.signatureDate).toLocaleDateString("en-CA")
+                        ) : (
+                          <span>mm/dd/yyyy</span>
+                        )}
+                        <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.signatureDate ? new Date(formData.signatureDate) : undefined}
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const iso = date.toISOString().split("T")[0];
+                          setFormData((prev) => ({ ...prev, signatureDate: iso }));
+                        }}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
