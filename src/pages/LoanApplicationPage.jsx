@@ -291,6 +291,7 @@ const LoanApplicationPage = () => {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
+                    autoComplete="given-name"
                   />
                 </div>
                 <div>
@@ -300,6 +301,7 @@ const LoanApplicationPage = () => {
                     name="middleName"
                     value={formData.middleName}
                     onChange={handleInputChange}
+                    autoComplete="additional-name"
                   />
                 </div>
                 <div>
@@ -310,6 +312,7 @@ const LoanApplicationPage = () => {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
+                    autoComplete="family-name"
                   />
                 </div>
               </div>
@@ -375,6 +378,7 @@ const LoanApplicationPage = () => {
                     type="tel"
                     value={formData.homePhone}
                     onChange={handleInputChange}
+                    autoComplete="tel-national"
                   />
                 </div>
               </div>
@@ -389,6 +393,7 @@ const LoanApplicationPage = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
+                    autoComplete="email"
                   />
                 </div>
                 <div>
@@ -399,6 +404,7 @@ const LoanApplicationPage = () => {
                     type="tel"
                     value={formData.mobilePhone}
                     onChange={handleInputChange}
+                    autoComplete="tel-national"
                   />
                 </div>
                 <div>
@@ -429,6 +435,7 @@ const LoanApplicationPage = () => {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
+                    autoComplete="street-address"
                   />
                 </div>
                 <div>
@@ -438,6 +445,7 @@ const LoanApplicationPage = () => {
                     name="unitNo"
                     value={formData.unitNo}
                     onChange={handleInputChange}
+                    autoComplete="address-line2"
                   />
                 </div>
               </div>
@@ -450,6 +458,7 @@ const LoanApplicationPage = () => {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
+                    autoComplete="address-level2"
                   />
                 </div>
                 <div>
@@ -485,6 +494,7 @@ const LoanApplicationPage = () => {
                     name="postalCode"
                     value={formData.postalCode}
                     onChange={handleInputChange}
+                    autoComplete="postal-code"
                   />
                 </div>
               </div>
@@ -680,6 +690,7 @@ const LoanApplicationPage = () => {
                     name="employerAddress"
                     value={formData.employerAddress}
                     onChange={handleInputChange}
+                    autoComplete="work street-address"
                   />
                 </div>
                 <div>
@@ -702,6 +713,7 @@ const LoanApplicationPage = () => {
                     name="employerCity"
                     value={formData.employerCity}
                     onChange={handleInputChange}
+                    autoComplete="work address-level2"
                   />
                 </div>
                 <div>
