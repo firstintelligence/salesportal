@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import GooglePlacesAutocomplete from "../components/GooglePlacesAutocomplete";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
@@ -450,14 +450,13 @@ const LoanApplicationPage = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <GooglePlacesAutocomplete
+                  <AddressAutocomplete
                     id="address"
                     name="address"
                     label="Address"
                     value={formData.address}
                     onChange={handleInputChange}
                     onAddressSelect={handleAddressSelect}
-                    required
                   />
                 </div>
                 <div>
@@ -706,7 +705,7 @@ const LoanApplicationPage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <GooglePlacesAutocomplete
+                  <AddressAutocomplete
                     id="employerAddress"
                     name="employerAddress"
                     label="Employer Address"
