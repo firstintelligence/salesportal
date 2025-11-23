@@ -15,25 +15,39 @@ const GooglePlacesAutocomplete = ({
 
   useEffect(() => {
     // Load Google Maps Places library
-    const loadGooglePlaces = async () => {
-      if (window.google?.maps?.places) {
-        setIsLoaded(true);
-        return;
-      }
-
+    const loadGooglePlaces = () => {
       const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
       if (!apiKey) {
         console.error('Google Places API key not found');
+        setIsLoaded(true); // Still show fallback input
         return;
       }
 
-      // Load the Places library
+      // Check if already loaded
+      if (window.google?.maps?.places?.Autocomplete) {
+        setIsLoaded(true);
+        return;
+      }
+
+      // Check if script is already loading
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => setIsLoaded(true));
+        return;
+      }
+
+      // Load the Places library with callback
+      window.initGooglePlaces = () => {
+        setIsLoaded(true);
+      };
+
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGooglePlaces`;
       script.async = true;
       script.defer = true;
-      script.onload = () => {
-        setIsLoaded(true);
+      script.onerror = () => {
+        console.error('Failed to load Google Places API');
+        setIsLoaded(true); // Show fallback input
       };
       document.head.appendChild(script);
     };
@@ -42,32 +56,31 @@ const GooglePlacesAutocomplete = ({
   }, []);
 
   useEffect(() => {
-    if (!isLoaded || !containerRef.current) return;
+    if (!isLoaded || !containerRef.current || !window.google?.maps?.places) return;
 
-    // Create the PlaceAutocompleteElement
-    const createAutocomplete = async () => {
-      await window.google.maps.importLibrary('places');
+    // Create standard input with Autocomplete
+    const createAutocomplete = () => {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = id;
+      input.name = name;
+      input.placeholder = 'Start typing address...';
+      input.className = 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+      input.value = value || '';
       
-      const autocompleteElement = document.createElement('gmp-place-autocomplete');
-      autocompleteElement.setAttribute('id', `${id}-autocomplete`);
-      autocompleteElement.setAttribute('placeholder', 'Start typing address...');
-      
-      // Style the component
-      autocompleteElement.style.width = '100%';
-      autocompleteElement.style.height = '40px';
-      
-      // Restrict to Canadian addresses
-      const autocompleteWidget = autocompleteElement;
-      autocompleteWidget.componentRestrictions = { country: 'ca' };
-      autocompleteWidget.fields = ['address_components', 'formatted_address'];
-
-      // Clear container and add element
+      // Clear container and add input
       containerRef.current.innerHTML = '';
-      containerRef.current.appendChild(autocompleteElement);
+      containerRef.current.appendChild(input);
+
+      // Create Autocomplete
+      const autocomplete = new window.google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: 'ca' },
+        fields: ['address_components', 'formatted_address']
+      });
 
       // Listen for place selection
-      autocompleteElement.addEventListener('gmp-placeselect', async (event) => {
-        const place = event.detail.place;
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
         
         if (!place.address_components) {
           return;
@@ -114,10 +127,15 @@ const GooglePlacesAutocomplete = ({
           onAddressSelect(addressData);
         }
       });
+
+      // Keep input value in sync
+      input.addEventListener('input', (e) => {
+        onChange({ target: { name, value: e.target.value } });
+      });
     };
 
     createAutocomplete();
-  }, [isLoaded, id, name, onChange, onAddressSelect]);
+  }, [isLoaded, id, name, value, onChange, onAddressSelect]);
 
   return (
     <div>
