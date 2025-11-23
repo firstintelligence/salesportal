@@ -60,16 +60,18 @@ SelectScrollDownButton.displayName =
 
 const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => (
   <SelectPrimitive.Portal>
-    <>
-      {/* Fullscreen invisible backdrop to capture touches and block the form behind */}
-      <div className="fixed inset-0 z-40 pointer-events-auto" />
-      <SelectPrimitive.Content
+    <SelectPrimitive.Content
       ref={ref}
       onOpenAutoFocus={(e) => {
         e.preventDefault();
       }}
       onPointerDownOutside={(e) => {
-        // Let Radix handle closing, but block the event from reaching the page behind
+        // Block the event from reaching the page behind
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onInteractOutside={(e) => {
+        // Additional guard to prevent interaction passthrough
         e.preventDefault();
       }}
       className={cn(
@@ -92,8 +94,7 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
         {children}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
-      </SelectPrimitive.Content>
-    </>
+    </SelectPrimitive.Content>
   </SelectPrimitive.Portal>
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName
