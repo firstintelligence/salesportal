@@ -384,7 +384,18 @@ const LoanApplicationPage = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
+                <div className="md:col-start-3 md:row-start-1">
+                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
+                  <Input
+                    id="mobilePhone"
+                    name="mobilePhone"
+                    type="tel"
+                    value={formData.mobilePhone}
+                    onChange={handleInputChange}
+                    autoComplete="tel-national"
+                  />
+                </div>
+                <div className="md:col-start-1 md:row-start-1">
                   <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
@@ -396,7 +407,7 @@ const LoanApplicationPage = () => {
                     autoComplete="email"
                   />
                 </div>
-                <div>
+                <div className="md:col-start-2 md:row-start-1">
                   <Label htmlFor="sin">SIN Number</Label>
                   <Input
                     id="sin"
@@ -406,17 +417,6 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                     maxLength={11}
                     placeholder="XXX-XXX-XXX"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
-                  <Input
-                    id="mobilePhone"
-                    name="mobilePhone"
-                    type="tel"
-                    value={formData.mobilePhone}
-                    onChange={handleInputChange}
-                    autoComplete="tel-national"
                   />
                 </div>
               </div>
