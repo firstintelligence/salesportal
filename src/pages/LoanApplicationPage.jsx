@@ -28,7 +28,6 @@ const LoanApplicationPage = () => {
     birthdate: "",
     homePhone: "",
     maritalStatus: "",
-    mobilePhone: "",
     email: "",
     
     // Housing
@@ -310,19 +309,17 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
               
-              <div className="w-full max-w-full">
-                <Label htmlFor="birthdate">Birthdate</Label>
-                <Input
-                  id="birthdate"
-                  name="birthdate"
-                  type="date"
-                  value={formData.birthdate}
-                  onChange={handleInputChange}
-                  className="w-full max-w-full"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="birthdate">Birthdate</Label>
+                  <Input
+                    id="birthdate"
+                    name="birthdate"
+                    type="date"
+                    value={formData.birthdate}
+                    onChange={handleInputChange}
+                  />
+                </div>
                 <div>
                   <Label htmlFor="maritalStatus">Marital Status</Label>
                   <Select
@@ -341,26 +338,13 @@ const LoanApplicationPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="homePhone">Home Phone Number</Label>
+                  <Label htmlFor="homePhone">Phone Number</Label>
                   <Input
                     id="homePhone"
                     name="homePhone"
                     type="tel"
                     value={formData.homePhone}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
-                  <Input
-                    id="mobilePhone"
-                    name="mobilePhone"
-                    type="tel"
-                    value={formData.mobilePhone}
                     onChange={handleInputChange}
                   />
                 </div>
