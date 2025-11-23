@@ -147,9 +147,13 @@ const LoanApplicationPage = () => {
 
   const generatePDF = async () => {
     try {
-      // Load the PDF template
-      const existingPdfBytes = await fetch('/templates/Financeit_Loan_Application_Form_Fillable.pdf').then(res => res.arrayBuffer());
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+      // Load the PDF template with no-cache to ensure fresh copy
+      const existingPdfBytes = await fetch('/templates/Financeit_Loan_Application_Form_Fillable.pdf', {
+        cache: 'no-store'
+      }).then(res => res.arrayBuffer());
+      const pdfDoc = await PDFDocument.load(existingPdfBytes, { 
+        ignoreEncryption: true 
+      });
       
       // Get the form
       const form = pdfDoc.getForm();
@@ -227,11 +231,17 @@ const LoanApplicationPage = () => {
         console.error('Error filling form fields:', error);
       }
       
-      // Flatten form to make it non-editable
-      form.flatten();
+      // Flatten form to prevent editing and remove old data
+      try {
+        form.flatten();
+      } catch (flattenError) {
+        console.warn('Error flattening form, continuing without flattening:', flattenError);
+      }
       
       // Save the PDF
-      const pdfBytes = await pdfDoc.save();
+      const pdfBytes = await pdfDoc.save({
+        useObjectStreams: false
+      });
       
       // Download the PDF
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
