@@ -98,46 +98,52 @@ const SelectLabel = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
-const SelectItem = React.forwardRef(({ className, children, onClick, onPointerDown, onPointerUp, ...props }, ref) => {
-  const handleClick = (event) => {
-    // Prevent the "ghost click" from reaching elements behind the dropdown
-    event.stopPropagation();
-    if (onClick) onClick(event);
-  };
+const SelectItem = React.forwardRef(
+  ({ className, children, onClick, onPointerDown, onPointerUp, ...props }, ref) => {
+    const handleClick = (event) => {
+      // Fully consume the click so it cannot trigger elements behind the dropdown
+      event.preventDefault();
+      event.stopPropagation();
+      if (onClick) onClick(event);
+    };
 
-  const handlePointerDown = (event) => {
-    // Block pointer events from bubbling to elements underneath the dropdown
-    event.stopPropagation();
-    if (onPointerDown) onPointerDown(event);
-  };
+    const handlePointerDown = (event) => {
+      // Block pointer events from bubbling to elements underneath the dropdown
+      event.preventDefault();
+      event.stopPropagation();
+      if (onPointerDown) onPointerDown(event);
+    };
 
-  const handlePointerUp = (event) => {
-    // Also stop pointerup bubbling which can trigger focus/click on underlying fields
-    event.stopPropagation();
-    if (onPointerUp) onPointerUp(event);
-  };
+    const handlePointerUp = (event) => {
+      // Also stop pointerup bubbling which can trigger focus/click on underlying fields
+      event.preventDefault();
+      event.stopPropagation();
+      if (onPointerUp) onPointerUp(event);
+    };
 
-  return (
-    <SelectPrimitive.Item
-      ref={ref}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        className
-      )}
-      {...props}>
-      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <Check className="h-4 w-4" />
-        </SelectPrimitive.ItemIndicator>
-      </span>
+    return (
+      <SelectPrimitive.Item
+        ref={ref}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className={cn(
+          "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+          className
+        )}
+        {...props}
+      >
+        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+          <SelectPrimitive.ItemIndicator>
+            <Check className="h-4 w-4" />
+          </SelectPrimitive.ItemIndicator>
+        </span>
 
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-    </SelectPrimitive.Item>
-  );
-})
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      </SelectPrimitive.Item>
+    );
+  }
+)
 SelectItem.displayName = SelectPrimitive.Item.displayName
 
 const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => (
