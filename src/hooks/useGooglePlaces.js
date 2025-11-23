@@ -80,6 +80,11 @@ export const useGooglePlacesAutocomplete = (inputRef, onPlaceSelected) => {
         }
       });
 
+      // Update the input value with the formatted address
+      if (inputRef.current) {
+        inputRef.current.value = addressData.address;
+      }
+
       onPlaceSelected(addressData);
     });
 
