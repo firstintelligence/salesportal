@@ -376,7 +376,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.birthdate ? (
-                          parseLocalDate(formData.birthdate)?.toLocaleDateString("en-CA")
+                          parseLocalDate(formData.birthdate)?.toLocaleDateString("en-US")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
@@ -664,7 +664,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.photoIdExpiry ? (
-                          parseLocalDate(formData.photoIdExpiry)?.toLocaleDateString("en-CA")
+                          parseLocalDate(formData.photoIdExpiry)?.toLocaleDateString("en-US")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
@@ -905,7 +905,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.signatureDate ? (
-                          parseLocalDate(formData.signatureDate)?.toLocaleDateString("en-CA")
+                          parseLocalDate(formData.signatureDate)?.toLocaleDateString("en-US")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
