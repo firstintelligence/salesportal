@@ -41,6 +41,17 @@ function Calendar({
     setMonth(newDate);
     setShowMonthYearPicker(false);
   };
+  
+  React.useEffect(() => {
+    if (showMonthYearPicker) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showMonthYearPicker]);
 
   return (
     <DayPicker
@@ -53,7 +64,10 @@ function Calendar({
           <div className="flex justify-center pt-1 relative items-center mb-4">
             <button
               type="button"
-              onClick={() => setShowMonthYearPicker(!showMonthYearPicker)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMonthYearPicker(!showMonthYearPicker);
+              }}
               className="text-sm font-medium flex items-center gap-1 hover:bg-accent px-3 py-1 rounded-md transition-colors"
             >
               {months[displayMonth.getMonth()]} {displayMonth.getFullYear()}
@@ -61,33 +75,50 @@ function Calendar({
             </button>
             
             {showMonthYearPicker && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-background border border-border rounded-lg shadow-lg p-3 z-50 flex gap-2">
-                <Select value={displayMonth.getMonth().toString()} onValueChange={handleMonthChange}>
-                  <SelectTrigger className="w-[130px] bg-background">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background z-50">
-                    {months.map((month, idx) => (
-                      <SelectItem key={idx} value={idx.toString()}>
-                        {month}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={displayMonth.getFullYear().toString()} onValueChange={handleYearChange}>
-                  <SelectTrigger className="w-[100px] bg-background">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background z-50 max-h-[200px]">
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMonthYearPicker(false);
+                  }}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation();
+                    setShowMonthYearPicker(false);
+                  }}
+                />
+                <div 
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-background border border-border rounded-lg shadow-lg p-3 z-50 flex gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
+                >
+                  <Select value={displayMonth.getMonth().toString()} onValueChange={handleMonthChange}>
+                    <SelectTrigger className="w-[130px] bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      {months.map((month, idx) => (
+                        <SelectItem key={idx} value={idx.toString()}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={displayMonth.getFullYear().toString()} onValueChange={handleYearChange}>
+                    <SelectTrigger className="w-[100px] bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50 max-h-[200px]">
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
             )}
           </div>
         ),
