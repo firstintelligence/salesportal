@@ -30,6 +30,7 @@ const LoanApplicationPage = () => {
     middleName: "",
     birthdate: "",
     homePhone: "",
+    mobilePhone: "",
     maritalStatus: "",
     email: "",
     
@@ -387,6 +388,16 @@ const LoanApplicationPage = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
+                  <Input
+                    id="mobilePhone"
+                    name="mobilePhone"
+                    type="tel"
+                    value={formData.mobilePhone}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
