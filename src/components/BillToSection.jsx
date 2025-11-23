@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import AddressLookupService from '../utils/addressLookupService';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
+  const [provinceOpen, setProvinceOpen] = useState(false);
+
   const provinces = [
     { code: 'AB', name: 'Alberta', tax: 5 },
     { code: 'BC', name: 'British Columbia', tax: 12 },
@@ -74,12 +76,31 @@ const BillToSection = ({ billTo, handleInputChange }) => {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div>
-          <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
-            <SelectTrigger className="h-[40px]">
+        <div className="relative">
+          {/* Invisible wall only while dropdown is open, above form but below menu */}
+          {provinceOpen && (
+            <div
+              className="fixed inset-0 z-40"
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                setProvinceOpen(false);
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setProvinceOpen(false);
+              }}
+            />
+          )}
+          <Select
+            value={billTo.province || ''}
+            open={provinceOpen}
+            onOpenChange={setProvinceOpen}
+            onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}
+          >
+            <SelectTrigger className="h-[40px] relative z-50">
               <SelectValue placeholder="Select province" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-50">
               {provinces.map((prov) => (
                 <SelectItem key={prov.code} value={prov.code}>
                   {prov.name}
