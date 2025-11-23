@@ -60,9 +60,10 @@ SelectScrollDownButton.displayName =
 
 const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => (
   <SelectPrimitive.Portal>
-    {/* Fullscreen invisible backdrop to capture touches and block the form behind */}
-    <div className="fixed inset-0 z-40 pointer-events-auto" />
-    <SelectPrimitive.Content
+    <>
+      {/* Fullscreen invisible backdrop to capture touches and block the form behind */}
+      <div className="fixed inset-0 z-40 pointer-events-auto" />
+      <SelectPrimitive.Content
       ref={ref}
       onOpenAutoFocus={(e) => {
         e.preventDefault();
@@ -91,7 +92,8 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
         {children}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
-    </SelectPrimitive.Content>
+      </SelectPrimitive.Content>
+    </>
   </SelectPrimitive.Portal>
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName
