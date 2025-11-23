@@ -43,7 +43,7 @@ export const useGooglePlacesScript = () => {
     if (existingScript) {
       console.log('Google Places API script already present, attaching onload listener');
       // If it's already finished loading, mark immediately
-      if ((existingScript as HTMLScriptElement).readyState === 'complete') {
+      if (existingScript.readyState === 'complete') {
         handleScriptLoad();
       } else {
         existingScript.addEventListener('load', handleScriptLoad);
