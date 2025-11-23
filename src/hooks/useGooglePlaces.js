@@ -122,6 +122,7 @@ export const useGooglePlacesAutocomplete = (inputRef, onPlaceSelected) => {
 
     const handleInput = (event) => {
       const value = event.target.value;
+      console.log('[Places] input event:', inputRef.current?.id, value);
 
       if (!value || value.length < 3) {
         clearDropdown();
@@ -139,6 +140,7 @@ export const useGooglePlacesAutocomplete = (inputRef, onPlaceSelected) => {
             types: ['address'],
           },
           (predictions, status) => {
+            console.log('[Places] prediction status:', status, predictions);
             if (status !== window.google.maps.places.PlacesServiceStatus.OK || !predictions?.length) {
               clearDropdown();
               return;
@@ -175,7 +177,6 @@ export const useGooglePlacesAutocomplete = (inputRef, onPlaceSelected) => {
         );
       }, 250);
     };
-
     const handleClickOutside = (event) => {
       if (event.target !== inputRef.current && !dropdown.contains(event.target)) {
         clearDropdown();
