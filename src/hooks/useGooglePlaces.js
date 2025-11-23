@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const GOOGLE_PLACES_API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+const GOOGLE_PLACES_API_KEY = "AIzaSyAHKtdY7NwgxelISC-bek6hgjww3XyJRnQ";
 
 export const useGooglePlacesScript = () => {
   const isLoaded = useRef(false);
