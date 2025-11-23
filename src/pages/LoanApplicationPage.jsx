@@ -19,16 +19,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useGooglePlacesScript, useGooglePlacesAutocomplete } from "@/hooks/useGooglePlaces";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
   const signatureRef = useRef(null);
-  const addressRef = useRef(null);
-  const employerAddressRef = useRef(null);
-  
-  // Load Google Places API once
-  useGooglePlacesScript();
   
   const [formData, setFormData] = useState({
     // Personal Details
@@ -91,7 +86,7 @@ const LoanApplicationPage = () => {
   const handleAddressSelect = (addressData) => {
     setFormData((prev) => ({
       ...prev,
-      address: addressData.address,
+      address: addressData.street,
       city: addressData.city,
       province: addressData.province,
       postalCode: addressData.postalCode,
@@ -101,15 +96,11 @@ const LoanApplicationPage = () => {
   const handleEmployerAddressSelect = (addressData) => {
     setFormData((prev) => ({
       ...prev,
-      employerAddress: addressData.address,
+      employerAddress: addressData.street,
       employerCity: addressData.city,
       employerProvince: addressData.province,
     }));
   };
-
-  // Initialize autocomplete for both address fields
-  useGooglePlacesAutocomplete(addressRef, handleAddressSelect);
-  useGooglePlacesAutocomplete(employerAddressRef, handleEmployerAddressSelect);
 
   // Helper functions for formatting
   const formatDate = (dateString) => {
@@ -460,12 +451,13 @@ const LoanApplicationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <Label htmlFor="address">Address *</Label>
-                  <Input
-                    ref={addressRef}
+                  <AddressAutocomplete
                     id="address"
                     name="address"
-                    autoComplete="off"
-                    placeholder="Start typing to search..."
+                    label=""
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    onAddressSelect={handleAddressSelect}
                   />
                 </div>
                 <div>
@@ -715,12 +707,13 @@ const LoanApplicationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="employerAddress">Employer Address</Label>
-                  <Input
-                    ref={employerAddressRef}
+                  <AddressAutocomplete
                     id="employerAddress"
                     name="employerAddress"
-                    autoComplete="off"
-                    placeholder="Start typing to search..."
+                    label=""
+                    value={formData.employerAddress}
+                    onChange={handleInputChange}
+                    onAddressSelect={handleEmployerAddressSelect}
                   />
                 </div>
                 <div>
