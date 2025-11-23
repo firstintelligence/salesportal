@@ -311,7 +311,7 @@ const LoanApplicationPage = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div className="w-full">
                   <Label htmlFor="birthdate">Birthdate</Label>
                   <Input
                     id="birthdate"
@@ -319,6 +319,7 @@ const LoanApplicationPage = () => {
                     type="date"
                     value={formData.birthdate}
                     onChange={handleInputChange}
+                    className="w-full"
                   />
                 </div>
                 <div>
@@ -559,7 +560,7 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div>
+                <div className="w-full">
                   <Label htmlFor="photoIdExpiry">ID Expiry Date</Label>
                   <Input
                     id="photoIdExpiry"
@@ -567,6 +568,7 @@ const LoanApplicationPage = () => {
                     type="date"
                     value={formData.photoIdExpiry}
                     onChange={handleInputChange}
+                    className="w-full"
                   />
                 </div>
               </div>
@@ -774,7 +776,7 @@ const LoanApplicationPage = () => {
                     Clear Signature
                   </Button>
                 </div>
-                <div>
+                <div className="w-full">
                   <Label htmlFor="signatureDate">Date *</Label>
                   <Input
                     id="signatureDate"
@@ -783,6 +785,7 @@ const LoanApplicationPage = () => {
                     value={formData.signatureDate}
                     onChange={handleInputChange}
                     required
+                    className="w-full"
                   />
                 </div>
               </div>
