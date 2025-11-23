@@ -19,10 +19,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useGooglePlacesScript, useGooglePlacesAutocomplete } from "@/hooks/useGooglePlaces";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
   const signatureRef = useRef(null);
+  const addressRef = useRef(null);
+  const employerAddressRef = useRef(null);
+  
+  // Load Google Places API once
+  useGooglePlacesScript();
   
   const [formData, setFormData] = useState({
     // Personal Details
@@ -100,6 +106,10 @@ const LoanApplicationPage = () => {
       employerProvince: addressData.province,
     }));
   };
+
+  // Initialize autocomplete for both address fields
+  useGooglePlacesAutocomplete(addressRef, handleAddressSelect);
+  useGooglePlacesAutocomplete(employerAddressRef, handleEmployerAddressSelect);
 
   // Helper functions for formatting
   const formatDate = (dateString) => {
@@ -449,13 +459,13 @@ const LoanApplicationPage = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="address">Address *</Label>
                   <Input
+                    ref={addressRef}
                     id="address"
                     name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
                     autoComplete="off"
+                    placeholder="Start typing to search..."
                   />
                 </div>
                 <div>
@@ -706,11 +716,11 @@ const LoanApplicationPage = () => {
                 <div>
                   <Label htmlFor="employerAddress">Employer Address</Label>
                   <Input
+                    ref={employerAddressRef}
                     id="employerAddress"
                     name="employerAddress"
-                    value={formData.employerAddress}
-                    onChange={handleInputChange}
                     autoComplete="off"
+                    placeholder="Start typing to search..."
                   />
                 </div>
                 <div>
