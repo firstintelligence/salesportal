@@ -33,6 +33,7 @@ const LoanApplicationPage = () => {
     mobilePhone: "",
     maritalStatus: "",
     email: "",
+    sin: "",
     
     // Housing
     address: "",
@@ -378,7 +379,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="email">Email *</Label>
                   <Input
@@ -398,6 +399,18 @@ const LoanApplicationPage = () => {
                     type="tel"
                     value={formData.mobilePhone}
                     onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sin">SIN Number</Label>
+                  <Input
+                    id="sin"
+                    name="sin"
+                    type="text"
+                    value={formData.sin}
+                    onChange={handleInputChange}
+                    maxLength={11}
+                    placeholder="XXX-XXX-XXX"
                   />
                 </div>
               </div>
