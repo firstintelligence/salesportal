@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import AddressLookupService from '../utils/addressLookupService';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
-  const [provinceOpen, setProvinceOpen] = useState(false);
-  const [provinceWallActive, setProvinceWallActive] = useState(false);
-  const provinceWallTimeoutRef = React.useRef(null);
-
   const provinces = [
     { code: 'AB', name: 'Alberta', tax: 5 },
     { code: 'BC', name: 'British Columbia', tax: 12 },
@@ -78,50 +74,12 @@ const BillToSection = ({ billTo, handleInputChange }) => {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div className="relative">
-          {/* Invisible wall only while province dropdown is active or shortly after close */}
-          {provinceWallActive && (
-            <div
-              className="fixed inset-0 z-40"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (provinceOpen) {
-                  setProvinceOpen(false);
-                }
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-            />
-          )}
-          <Select
-            value={billTo.province || ''}
-            open={provinceOpen}
-            onOpenChange={(open) => {
-              if (open) {
-                setProvinceOpen(true);
-                setProvinceWallActive(true);
-                if (provinceWallTimeoutRef.current) {
-                  clearTimeout(provinceWallTimeoutRef.current);
-                }
-              } else {
-                setProvinceOpen(false);
-                if (provinceWallTimeoutRef.current) {
-                  clearTimeout(provinceWallTimeoutRef.current);
-                }
-                provinceWallTimeoutRef.current = setTimeout(() => {
-                  setProvinceWallActive(false);
-                }, 200);
-              }
-            }}
-            onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}
-          >
-            <SelectTrigger className="h-[40px] relative z-50">
+        <div>
+          <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
+            <SelectTrigger className="h-[40px]">
               <SelectValue placeholder="Select province" />
             </SelectTrigger>
-            <SelectContent className="z-50">
+            <SelectContent>
               {provinces.map((prov) => (
                 <SelectItem key={prov.code} value={prov.code}>
                   {prov.name}

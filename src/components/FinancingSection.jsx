@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { calculateMonthlyPayment } from '../utils/financingCalculations';
 import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombination } from '../utils/dealerFeeCalculations';
-
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
-  const [openSelect, setOpenSelect] = useState(null); // 'amortization' | 'term' | 'rate' | null
-  const [wallActive, setWallActive] = useState(false);
-  const wallTimeoutRef = React.useRef(null);
-
   const interestRates = [
     0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
   ];
@@ -78,51 +73,16 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            {/* Invisible wall while any financing dropdown is active or shortly after close */}
-            {wallActive && (
-              <div
-                className="fixed inset-0 z-40"
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (openSelect) {
-                    setOpenSelect(null);
-                  }
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              />
-            )}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
             <Select 
               value={(financing.amortizationPeriod || 180).toString()} 
-              open={openSelect === 'amortization'}
-              onOpenChange={(open) => {
-                if (open) {
-                  setOpenSelect('amortization');
-                  setWallActive(true);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                } else {
-                  setOpenSelect(null);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                  wallTimeoutRef.current = setTimeout(() => {
-                    setWallActive(false);
-                  }, 200);
-                }
-              }}
               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="z-50">
+              <SelectContent>
                 <SelectItem value="120">120 months (10 years)</SelectItem>
                 <SelectItem value="144">144 months (12 years)</SelectItem>
                 <SelectItem value="180">180 months (15 years)</SelectItem>
@@ -131,34 +91,16 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             </Select>
           </div>
 
-          <div className="relative">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
             <Select 
               value={(financing.loanTerm || 24).toString()} 
-              open={openSelect === 'term'}
-              onOpenChange={(open) => {
-                if (open) {
-                  setOpenSelect('term');
-                  setWallActive(true);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                } else {
-                  setOpenSelect(null);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                  wallTimeoutRef.current = setTimeout(() => {
-                    setWallActive(false);
-                  }, 200);
-                }
-              }}
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="z-50">
+              <SelectContent>
                 {availableTerms.length > 0 ? (
                   availableTerms.map(term => (
                     <SelectItem key={term} value={term.toString()}>
@@ -179,34 +121,16 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-          <div className="relative">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
               value={(financing.interestRate || 0).toString()} 
-              open={openSelect === 'rate'}
-              onOpenChange={(open) => {
-                if (open) {
-                  setOpenSelect('rate');
-                  setWallActive(true);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                } else {
-                  setOpenSelect(null);
-                  if (wallTimeoutRef.current) {
-                    clearTimeout(wallTimeoutRef.current);
-                  }
-                  wallTimeoutRef.current = setTimeout(() => {
-                    setWallActive(false);
-                  }, 200);
-                }
-              }}
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
             >
               <SelectTrigger className="h-[40px]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="z-50">
+              <SelectContent>
                 {interestRates.map(rate => (
                   <SelectItem key={rate} value={rate.toString()}>
                     {rate}%
