@@ -98,19 +98,31 @@ const SelectLabel = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
-const SelectItem = React.forwardRef(({ className, children, onClick, ...props }, ref) => {
+const SelectItem = React.forwardRef(({ className, children, onClick, onPointerDown, onPointerUp, ...props }, ref) => {
   const handleClick = (event) => {
     // Prevent the "ghost click" from reaching elements behind the dropdown
     event.stopPropagation();
-    if (onClick) {
-      onClick(event);
-    }
+    if (onClick) onClick(event);
+  };
+
+  const handlePointerDown = (event) => {
+    // Block pointer events from bubbling to elements underneath the dropdown
+    event.stopPropagation();
+    if (onPointerDown) onPointerDown(event);
+  };
+
+  const handlePointerUp = (event) => {
+    // Also stop pointerup bubbling which can trigger focus/click on underlying fields
+    event.stopPropagation();
+    if (onPointerUp) onPointerUp(event);
   };
 
   return (
     <SelectPrimitive.Item
       ref={ref}
       onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       className={cn(
         "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
