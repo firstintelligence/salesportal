@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Trash2 } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
+import SignatureCanvas from "react-signature-canvas";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
+  const signatureRef = useRef(null);
   const [formData, setFormData] = useState({
     // Personal Details
     firstName: "",
@@ -81,7 +83,6 @@ const LoanApplicationPage = () => {
     privacyConsent: false,
     electronicConsent: false,
     creditConsent: false,
-    signature: "",
     signatureDate: "",
   });
 
@@ -133,6 +134,12 @@ const LoanApplicationPage = () => {
     const num = parseFloat(amount);
     if (isNaN(num)) return amount;
     return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  };
+
+  const clearSignature = () => {
+    if (signatureRef.current) {
+      signatureRef.current.clear();
+    }
   };
 
   const generatePDF = async () => {
@@ -188,7 +195,29 @@ const LoanApplicationPage = () => {
         if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry));
         
         // Signature and Date
-        if (formData.signature) form.getTextField('Signature').setText(formData.signature);
+        // Embed signature image if available
+        if (signatureRef.current && !signatureRef.current.isEmpty()) {
+          const signatureDataUrl = signatureRef.current.toDataURL('image/png');
+          const signatureImageBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
+          const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
+          
+          // Get the signature field and embed the image
+          const signatureField = form.getTextField('Signature');
+          const widgets = signatureField.acroField.getWidgets();
+          if (widgets.length > 0) {
+            const widget = widgets[0];
+            const rect = widget.getRectangle();
+            const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
+            
+            // Draw the signature image in the signature field location
+            page.drawImage(signatureImage, {
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+            });
+          }
+        }
         if (formData.signatureDate) form.getTextField('Date').setText(formatDate(formData.signatureDate));
         
       } catch (error) {
@@ -231,8 +260,13 @@ const LoanApplicationPage = () => {
       return;
     }
     
-    if (!formData.signature || !formData.signatureDate) {
-      toast.error('Signature and date are required');
+    if (!signatureRef.current || signatureRef.current.isEmpty()) {
+      toast.error('Signature is required');
+      return;
+    }
+    
+    if (!formData.signatureDate) {
+      toast.error('Signature date is required');
       return;
     }
     
@@ -696,10 +730,61 @@ const LoanApplicationPage = () => {
             {/* Consents Section */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-foreground border-b pb-2">
-                Consents & Authorization
+                Consent and Authorization
               </h2>
               
-              <div className="space-y-4">
+              <div className="bg-muted p-4 rounded-lg text-sm space-y-4 max-h-96 overflow-y-auto">
+                <div>
+                  <h3 className="font-semibold mb-2">PRIVACY POLICY CONSENT</h3>
+                  <p className="leading-relaxed">
+                    I acknowledge that I have read and understood Financeit's Privacy Policy, which describes how Financeit 
+                    collects, uses, discloses, and safeguards my personal information. I consent to the collection, use, 
+                    and disclosure of my personal information in accordance with the Privacy Policy. I understand that I 
+                    may withdraw my consent at any time, subject to legal or contractual restrictions and reasonable notice.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">CREDIT AUTHORIZATION</h3>
+                  <p className="leading-relaxed">
+                    I authorize Financeit Canada Inc. and its affiliates, agents, service providers, and assigns to obtain, 
+                    verify, and exchange credit and related information (including a consumer report) about me from any 
+                    credit reporting agency, credit bureau, financial institution, employer, or other source as may be 
+                    necessary in connection with my application for financing. I understand that this authorization will 
+                    remain valid during the term of any credit or loan agreement I may enter into with Financeit.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">APPLICATION ACCURACY</h3>
+                  <p className="leading-relaxed">
+                    I confirm that all information provided in this application is true, accurate, and complete to the best 
+                    of my knowledge. I understand that Financeit will rely on this information in making its credit decision. 
+                    I acknowledge that providing false or misleading information may result in the rejection of my application 
+                    or termination of any credit agreement.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">NO DIRECTED FINANCING</h3>
+                  <p className="leading-relaxed">
+                    I confirm that there is no person or company directing me to apply for financing with Financeit. I am 
+                    making this application of my own free will and have not been coerced or unduly influenced by any third party.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">ELECTRONIC DISCLOSURE CONSENT (OPTIONAL)</h3>
+                  <p className="leading-relaxed">
+                    I consent to receive all disclosures, notices, agreements, and other communications ("Disclosures") 
+                    electronically, including by email or through Financeit's online portal. I understand that I have the 
+                    right to receive paper copies of Disclosures upon request and may withdraw this consent at any time by 
+                    contacting Financeit.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4 mt-6">
                 <div className="flex items-start space-x-3">
                   <Checkbox
                     id="privacyConsent"
@@ -735,17 +820,28 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div>
-                  <Label htmlFor="signature">Signature (Type Full Name) *</Label>
-                  <Input
-                    id="signature"
-                    name="signature"
-                    value={formData.signature}
-                    onChange={handleInputChange}
-                    placeholder="Type your full name"
-                    required
-                  />
+                  <Label htmlFor="signature">Signature *</Label>
+                  <div className="border border-border rounded-md bg-background">
+                    <SignatureCanvas
+                      ref={signatureRef}
+                      canvasProps={{
+                        className: 'w-full h-32 rounded-md',
+                      }}
+                      backgroundColor="rgb(255, 255, 255)"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={clearSignature}
+                    className="mt-2"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Clear Signature
+                  </Button>
                 </div>
                 <div>
                   <Label htmlFor="signatureDate">Date *</Label>
