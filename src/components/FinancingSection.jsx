@@ -7,6 +7,8 @@ import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombinatio
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const [openSelect, setOpenSelect] = useState(null); // 'amortization' | 'term' | 'rate' | null
+  const [wallActive, setWallActive] = useState(false);
+  const wallTimeoutRef = React.useRef(null);
 
   const interestRates = [
     0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
@@ -77,17 +79,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
-            {/* Invisible wall while amortization dropdown is open */}
-            {openSelect && (
+            {/* Invisible wall while any financing dropdown is active or shortly after close */}
+            {wallActive && (
               <div
                 className="fixed inset-0 z-40"
                 onPointerDown={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
-                  setOpenSelect(null);
+                  if (openSelect) {
+                    setOpenSelect(null);
+                  }
                 }}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
-                  setOpenSelect(null);
                 }}
               />
             )}
@@ -95,7 +100,23 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             <Select 
               value={(financing.amortizationPeriod || 180).toString()} 
               open={openSelect === 'amortization'}
-              onOpenChange={(open) => setOpenSelect(open ? 'amortization' : null)}
+              onOpenChange={(open) => {
+                if (open) {
+                  setOpenSelect('amortization');
+                  setWallActive(true);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                } else {
+                  setOpenSelect(null);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                  wallTimeoutRef.current = setTimeout(() => {
+                    setWallActive(false);
+                  }, 200);
+                }
+              }}
               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
             >
               <SelectTrigger>
@@ -115,7 +136,23 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             <Select 
               value={(financing.loanTerm || 24).toString()} 
               open={openSelect === 'term'}
-              onOpenChange={(open) => setOpenSelect(open ? 'term' : null)}
+              onOpenChange={(open) => {
+                if (open) {
+                  setOpenSelect('term');
+                  setWallActive(true);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                } else {
+                  setOpenSelect(null);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                  wallTimeoutRef.current = setTimeout(() => {
+                    setWallActive(false);
+                  }, 200);
+                }
+              }}
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
             >
               <SelectTrigger>
@@ -147,7 +184,23 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             <Select 
               value={(financing.interestRate || 0).toString()} 
               open={openSelect === 'rate'}
-              onOpenChange={(open) => setOpenSelect(open ? 'rate' : null)}
+              onOpenChange={(open) => {
+                if (open) {
+                  setOpenSelect('rate');
+                  setWallActive(true);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                } else {
+                  setOpenSelect(null);
+                  if (wallTimeoutRef.current) {
+                    clearTimeout(wallTimeoutRef.current);
+                  }
+                  wallTimeoutRef.current = setTimeout(() => {
+                    setWallActive(false);
+                  }, 200);
+                }
+              }}
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
             >
               <SelectTrigger className="h-[40px]">
