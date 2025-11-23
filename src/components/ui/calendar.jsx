@@ -19,7 +19,7 @@ function Calendar({
   ...props
 }) {
   const [showMonthYearPicker, setShowMonthYearPicker] = React.useState(false);
-  const currentMonth = props.month || new Date();
+  const [month, setMonth] = React.useState(props.month || new Date());
   
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -29,22 +29,24 @@ function Calendar({
   const years = Array.from({ length: 151 }, (_, i) => 1900 + i);
   
   const handleMonthChange = (monthIndex) => {
-    const newDate = new Date(currentMonth);
+    const newDate = new Date(month);
     newDate.setMonth(parseInt(monthIndex));
-    props.onMonthChange?.(newDate);
+    setMonth(newDate);
     setShowMonthYearPicker(false);
   };
   
   const handleYearChange = (year) => {
-    const newDate = new Date(currentMonth);
+    const newDate = new Date(month);
     newDate.setFullYear(parseInt(year));
-    props.onMonthChange?.(newDate);
+    setMonth(newDate);
     setShowMonthYearPicker(false);
   };
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      month={month}
+      onMonthChange={setMonth}
       className={cn("p-3 pointer-events-auto", className)}
       components={{
         Caption: ({ displayMonth }) => (
