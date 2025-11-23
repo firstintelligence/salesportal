@@ -310,18 +310,18 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
               
+              <div>
+                <Label htmlFor="birthdate">Birthdate</Label>
+                <Input
+                  id="birthdate"
+                  name="birthdate"
+                  type="date"
+                  value={formData.birthdate}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="w-full">
-                  <Label htmlFor="birthdate">Birthdate</Label>
-                  <Input
-                    id="birthdate"
-                    name="birthdate"
-                    type="date"
-                    value={formData.birthdate}
-                    onChange={handleInputChange}
-                    className="w-full"
-                  />
-                </div>
                 <div>
                   <Label htmlFor="maritalStatus">Marital Status</Label>
                   <Select
