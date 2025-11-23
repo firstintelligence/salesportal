@@ -450,13 +450,13 @@ const LoanApplicationPage = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <AddressAutocomplete
+                  <Label htmlFor="address">Address *</Label>
+                  <Input
                     id="address"
                     name="address"
-                    label="Address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    onAddressSelect={handleAddressSelect}
+                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -705,13 +705,13 @@ const LoanApplicationPage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <AddressAutocomplete
+                  <Label htmlFor="employerAddress">Employer Address</Label>
+                  <Input
                     id="employerAddress"
                     name="employerAddress"
-                    label="Employer Address"
                     value={formData.employerAddress}
                     onChange={handleInputChange}
-                    onAddressSelect={handleEmployerAddressSelect}
+                    autoComplete="off"
                   />
                 </div>
                 <div>
