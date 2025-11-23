@@ -6,6 +6,8 @@ import AddressLookupService from '../utils/addressLookupService';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
   const [provinceOpen, setProvinceOpen] = useState(false);
+  const [provinceWallActive, setProvinceWallActive] = useState(false);
+  const provinceWallTimeoutRef = React.useRef(null);
 
   const provinces = [
     { code: 'AB', name: 'Alberta', tax: 5 },
@@ -77,24 +79,43 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div className="relative">
-          {/* Invisible wall only while dropdown is open, above form but below menu */}
-          {provinceOpen && (
+          {/* Invisible wall only while province dropdown is active or shortly after close */}
+          {provinceWallActive && (
             <div
               className="fixed inset-0 z-40"
               onPointerDown={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                setProvinceOpen(false);
+                if (provinceOpen) {
+                  setProvinceOpen(false);
+                }
               }}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                setProvinceOpen(false);
               }}
             />
           )}
           <Select
             value={billTo.province || ''}
             open={provinceOpen}
-            onOpenChange={setProvinceOpen}
+            onOpenChange={(open) => {
+              if (open) {
+                setProvinceOpen(true);
+                setProvinceWallActive(true);
+                if (provinceWallTimeoutRef.current) {
+                  clearTimeout(provinceWallTimeoutRef.current);
+                }
+              } else {
+                setProvinceOpen(false);
+                if (provinceWallTimeoutRef.current) {
+                  clearTimeout(provinceWallTimeoutRef.current);
+                }
+                provinceWallTimeoutRef.current = setTimeout(() => {
+                  setProvinceWallActive(false);
+                }, 200);
+              }
+            }}
             onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}
           >
             <SelectTrigger className="h-[40px] relative z-50">
