@@ -33,6 +33,13 @@ const LoanApplicationPage = () => {
     return `${year}-${month}-${day}`;
   };
   
+  const parseLocalDate = (value) => {
+    if (!value) return null;
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  };
+  
   const [formData, setFormData] = useState({
     // Personal Details
     firstName: "",
@@ -112,7 +119,8 @@ const LoanApplicationPage = () => {
   // Helper functions for formatting
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    const date = parseLocalDate(dateString);
+    if (!date) return '';
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const year = date.getFullYear();
@@ -368,7 +376,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.birthdate ? (
-                          new Date(formData.birthdate).toLocaleDateString("en-CA")
+                          parseLocalDate(formData.birthdate)?.toLocaleDateString("en-CA")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
@@ -378,7 +386,7 @@ const LoanApplicationPage = () => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={formData.birthdate ? new Date(formData.birthdate) : undefined}
+                        selected={formData.birthdate ? parseLocalDate(formData.birthdate) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
                           const iso = formatLocalDate(date);
@@ -656,7 +664,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.photoIdExpiry ? (
-                          new Date(formData.photoIdExpiry).toLocaleDateString("en-CA")
+                          parseLocalDate(formData.photoIdExpiry)?.toLocaleDateString("en-CA")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
@@ -666,7 +674,7 @@ const LoanApplicationPage = () => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={formData.photoIdExpiry ? new Date(formData.photoIdExpiry) : undefined}
+                        selected={formData.photoIdExpiry ? parseLocalDate(formData.photoIdExpiry) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
                           const iso = formatLocalDate(date);
@@ -897,7 +905,7 @@ const LoanApplicationPage = () => {
                         )}
                       >
                         {formData.signatureDate ? (
-                          new Date(formData.signatureDate).toLocaleDateString("en-CA")
+                          parseLocalDate(formData.signatureDate)?.toLocaleDateString("en-CA")
                         ) : (
                           <span>mm/dd/yyyy</span>
                         )}
@@ -907,7 +915,7 @@ const LoanApplicationPage = () => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={formData.signatureDate ? new Date(formData.signatureDate) : undefined}
+                        selected={formData.signatureDate ? parseLocalDate(formData.signatureDate) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
                           const iso = formatLocalDate(date);
