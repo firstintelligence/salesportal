@@ -14,9 +14,6 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      captionLayout="dropdown"
-      fromYear={1920}
-      toYear={new Date().getFullYear() + 10}
       className={cn("p-3 pointer-events-auto", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
