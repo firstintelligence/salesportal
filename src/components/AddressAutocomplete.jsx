@@ -65,6 +65,16 @@ const AddressAutocomplete = ({
     }, 300);
   };
 
+  const formatAddressDisplay = (suggestion) => {
+    const addr = suggestion.address;
+    const street = [addr.house_number, addr.road].filter(Boolean).join(' ');
+    const city = addr.city || addr.town || addr.village || '';
+    const province = addr.state || '';
+    const postalCode = addr.postcode || '';
+    
+    return [street, city, province, postalCode].filter(Boolean).join(', ');
+  };
+
   const handleSelectSuggestion = (suggestion) => {
     const address = suggestion.address;
     const selectedAddress = {
@@ -111,7 +121,7 @@ const AddressAutocomplete = ({
               className="px-4 py-3 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
               onClick={() => handleSelectSuggestion(suggestion)}
             >
-              <div className="text-sm text-gray-900">{suggestion.display_name}</div>
+              <div className="text-sm text-gray-900">{formatAddressDisplay(suggestion)}</div>
             </div>
           ))}
         </div>
