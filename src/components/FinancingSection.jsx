@@ -7,6 +7,8 @@ import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombinatio
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const [openSelect, setOpenSelect] = useState(null); // 'amortization' | 'term' | 'rate' | null
+  const [selectShield, setSelectShield] = useState(false);
+  const [selectShield, setSelectShield] = useState(false);
 
   const interestRates = [
     0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
@@ -93,11 +95,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             )}
             <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
             <Select 
-              value={(financing.amortizationPeriod || 180).toString()} 
-              open={openSelect === 'amortization'}
-              onOpenChange={(open) => setOpenSelect(open ? 'amortization' : null)}
-              onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
-            >
+               value={(financing.amortizationPeriod || 180).toString()} 
+               open={openSelect === 'amortization'}
+               onOpenChange={(open) => {
+                 if (open) {
+                   setOpenSelect('amortization');
+                   setSelectShield(false);
+                 } else {
+                   setOpenSelect(null);
+                   setSelectShield(true);
+                   setTimeout(() => setSelectShield(false), 250);
+                 }
+               }}
+               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
+             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -113,11 +124,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
             <Select 
-              value={(financing.loanTerm || 24).toString()} 
-              open={openSelect === 'term'}
-              onOpenChange={(open) => setOpenSelect(open ? 'term' : null)}
-              onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
-            >
+               value={(financing.loanTerm || 24).toString()} 
+               open={openSelect === 'term'}
+               onOpenChange={(open) => {
+                 if (open) {
+                   setOpenSelect('term');
+                   setSelectShield(false);
+                 } else {
+                   setOpenSelect(null);
+                   setSelectShield(true);
+                   setTimeout(() => setSelectShield(false), 250);
+                 }
+               }}
+               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
+             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -145,11 +165,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
-              value={(financing.interestRate || 0).toString()} 
-              open={openSelect === 'rate'}
-              onOpenChange={(open) => setOpenSelect(open ? 'rate' : null)}
-              onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
-            >
+               value={(financing.interestRate || 0).toString()} 
+               open={openSelect === 'rate'}
+               onOpenChange={(open) => {
+                 if (open) {
+                   setOpenSelect('rate');
+                   setSelectShield(false);
+                 } else {
+                   setOpenSelect(null);
+                   setSelectShield(true);
+                   setTimeout(() => setSelectShield(false), 250);
+                 }
+               }}
+               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
+             >
               <SelectTrigger className="h-[40px]">
                 <SelectValue />
               </SelectTrigger>
