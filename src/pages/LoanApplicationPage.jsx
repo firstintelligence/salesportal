@@ -176,15 +176,20 @@ const LoanApplicationPage = () => {
         if (formData.employerAddress) form.getTextField('Employer Address').setText(formData.employerAddress);
         if (formData.timeAtJob) form.getTextField('Time at Job').setText(formData.timeAtJob);
         
-        // Employer City and Province combined
-        const employerCityProvince = [formData.employerCity, formData.employerProvince].filter(Boolean).join(', ');
-        if (employerCityProvince) form.getTextField('Employer CIty, Province').setText(employerCityProvince);
+        // Employer City and Province (now separate in new PDF)
+        if (formData.employerCity) form.getTextField('City').setText(formData.employerCity);
+        if (formData.employerProvince) form.getTextField('Province').setText(formData.employerProvince);
+        if (formData.employmentStatus) form.getTextField('Employment Status').setText(capitalizeFirst(formData.employmentStatus.replace('_', ' ')));
         
         // Borrower ID
         if (formData.photoIdType) form.getTextField('Photo ID Card Type').setText(formatIdType(formData.photoIdType));
         if (formData.photoIdProvince) form.getTextField('Photo ID Province').setText(formData.photoIdProvince);
         if (formData.photoIdNumber) form.getTextField('Photo ID Number').setText(formData.photoIdNumber);
         if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry));
+        
+        // Signature and Date
+        if (formData.signature) form.getTextField('Signature').setText(formData.signature);
+        if (formData.signatureDate) form.getTextField('Date').setText(formatDate(formData.signatureDate));
         
       } catch (error) {
         console.error('Error filling form fields:', error);
@@ -223,6 +228,11 @@ const LoanApplicationPage = () => {
     
     if (!formData.privacyConsent || !formData.creditConsent) {
       toast.error('You must agree to the Privacy Policy and Credit Authorization');
+      return;
+    }
+    
+    if (!formData.signature || !formData.signatureDate) {
+      toast.error('Signature and date are required');
       return;
     }
     
@@ -674,7 +684,10 @@ const LoanApplicationPage = () => {
                   <SelectContent>
                     <SelectItem value="employed">Employed</SelectItem>
                     <SelectItem value="self_employed">Self Employed</SelectItem>
-                    <SelectItem value="other">Other Income Source</SelectItem>
+                    <SelectItem value="unemployed">Unemployed</SelectItem>
+                    <SelectItem value="retired">Retired</SelectItem>
+                    <SelectItem value="disability">Disability</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -724,23 +737,25 @@ const LoanApplicationPage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
-                  <Label htmlFor="signature">Signature (Type Full Name)</Label>
+                  <Label htmlFor="signature">Signature (Type Full Name) *</Label>
                   <Input
                     id="signature"
                     name="signature"
                     value={formData.signature}
                     onChange={handleInputChange}
                     placeholder="Type your full name"
+                    required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="signatureDate">Date</Label>
+                  <Label htmlFor="signatureDate">Date *</Label>
                   <Input
                     id="signatureDate"
                     name="signatureDate"
                     type="date"
                     value={formData.signatureDate}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
