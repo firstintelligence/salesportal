@@ -6,12 +6,20 @@ export const useGooglePlacesScript = () => {
   const isLoaded = useRef(false);
 
   useEffect(() => {
-    if (isLoaded.current || !GOOGLE_PLACES_API_KEY) return;
+    if (isLoaded.current) return;
+    
+    if (!GOOGLE_PLACES_API_KEY) {
+      console.error('Google Places API key is missing');
+      return;
+    }
 
+    console.log('Loading Google Places API...');
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_API_KEY}&libraries=places`;
     script.async = true;
     script.defer = true;
+    script.onload = () => console.log('Google Places API loaded successfully');
+    script.onerror = () => console.error('Failed to load Google Places API');
     document.head.appendChild(script);
     
     isLoaded.current = true;
@@ -24,8 +32,17 @@ export const useGooglePlacesScript = () => {
 
 export const useGooglePlacesAutocomplete = (inputRef, onPlaceSelected) => {
   useEffect(() => {
-    if (!inputRef.current || !window.google || !GOOGLE_PLACES_API_KEY) return;
+    if (!inputRef.current) {
+      console.warn('Input ref not available');
+      return;
+    }
+    
+    if (!window.google?.maps?.places) {
+      console.warn('Google Places API not loaded yet');
+      return;
+    }
 
+    console.log('Initializing autocomplete for:', inputRef.current.id);
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: 'ca' },
       fields: ['address_components', 'formatted_address'],
