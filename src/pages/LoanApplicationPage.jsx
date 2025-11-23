@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Download, Trash2 } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
+import financeitLogo from "@/assets/financeit-logo.svg";
 import {
   Select,
   SelectContent,
@@ -29,7 +30,6 @@ const LoanApplicationPage = () => {
     maritalStatus: "",
     mobilePhone: "",
     email: "",
-    sin: "",
     
     // Housing
     address: "",
@@ -41,27 +41,6 @@ const LoanApplicationPage = () => {
     yearsAtAddress: "",
     monthlyHousingCosts: "",
     
-    // Mailing Address
-    mailingAddress: "",
-    mailingUnit: "",
-    mailingCity: "",
-    mailingProvince: "",
-    mailingPostalCode: "",
-    
-    // Previous Address
-    previousAddress: "",
-    previousUnit: "",
-    previousCity: "",
-    previousProvince: "",
-    previousPostalCode: "",
-    
-    // Work-site Address
-    worksiteAddress: "",
-    worksiteUnit: "",
-    worksiteCity: "",
-    worksiteProvince: "",
-    worksitePostalCode: "",
-    
     // Borrower ID
     photoIdType: "",
     photoIdProvince: "",
@@ -70,7 +49,6 @@ const LoanApplicationPage = () => {
     
     // Employment
     businessName: "",
-    employerPhone: "",
     positionTitle: "",
     grossMonthlyIncome: "",
     employerAddress: "",
@@ -290,7 +268,7 @@ const LoanApplicationPage = () => {
             <h1 className="text-2xl font-bold text-foreground">
               Loan Application
             </h1>
-            <div className="text-green-600 font-bold text-xl">Financeit</div>
+            <img src={financeitLogo} alt="Financeit" className="h-8" />
           </div>
           <div className="border-t-2 border-green-600 mb-6"></div>
 
@@ -396,15 +374,6 @@ const LoanApplicationPage = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="sin">Social Insurance Number (Optional)</Label>
-                  <Input
-                    id="sin"
-                    name="sin"
-                    value={formData.sin}
-                    onChange={handleInputChange}
                   />
                 </div>
               </div>
@@ -523,225 +492,6 @@ const LoanApplicationPage = () => {
               </div>
             </div>
 
-            {/* Mailing Address */}
-            <div className="space-y-3">
-              <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
-                MAILING ADDRESS - if different from above
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="mailingAddress">Mailing Address</Label>
-                  <Input
-                    id="mailingAddress"
-                    name="mailingAddress"
-                    value={formData.mailingAddress}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mailingUnit">Apt. or Unit Number</Label>
-                  <Input
-                    id="mailingUnit"
-                    name="mailingUnit"
-                    value={formData.mailingUnit}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="mailingCity">City</Label>
-                  <Input
-                    id="mailingCity"
-                    name="mailingCity"
-                    value={formData.mailingCity}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mailingProvince">Province</Label>
-                  <Select
-                    value={formData.mailingProvince}
-                    onValueChange={(value) => handleSelectChange("mailingProvince", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ON">Ontario</SelectItem>
-                      <SelectItem value="QC">Quebec</SelectItem>
-                      <SelectItem value="BC">British Columbia</SelectItem>
-                      <SelectItem value="AB">Alberta</SelectItem>
-                      <SelectItem value="MB">Manitoba</SelectItem>
-                      <SelectItem value="SK">Saskatchewan</SelectItem>
-                      <SelectItem value="NS">Nova Scotia</SelectItem>
-                      <SelectItem value="NB">New Brunswick</SelectItem>
-                      <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                      <SelectItem value="PE">Prince Edward Island</SelectItem>
-                      <SelectItem value="NT">Northwest Territories</SelectItem>
-                      <SelectItem value="YT">Yukon</SelectItem>
-                      <SelectItem value="NU">Nunavut</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="mailingPostalCode">Postal Code</Label>
-                  <Input
-                    id="mailingPostalCode"
-                    name="mailingPostalCode"
-                    value={formData.mailingPostalCode}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Previous Address */}
-            <div className="space-y-3">
-              <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
-                PREVIOUS ADDRESS - if you have moved within 2 years
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="previousAddress">Previous Address</Label>
-                  <Input
-                    id="previousAddress"
-                    name="previousAddress"
-                    value={formData.previousAddress}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="previousUnit">Apt. or Unit Number</Label>
-                  <Input
-                    id="previousUnit"
-                    name="previousUnit"
-                    value={formData.previousUnit}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="previousCity">City</Label>
-                  <Input
-                    id="previousCity"
-                    name="previousCity"
-                    value={formData.previousCity}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="previousProvince">Province</Label>
-                  <Select
-                    value={formData.previousProvince}
-                    onValueChange={(value) => handleSelectChange("previousProvince", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ON">Ontario</SelectItem>
-                      <SelectItem value="QC">Quebec</SelectItem>
-                      <SelectItem value="BC">British Columbia</SelectItem>
-                      <SelectItem value="AB">Alberta</SelectItem>
-                      <SelectItem value="MB">Manitoba</SelectItem>
-                      <SelectItem value="SK">Saskatchewan</SelectItem>
-                      <SelectItem value="NS">Nova Scotia</SelectItem>
-                      <SelectItem value="NB">New Brunswick</SelectItem>
-                      <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                      <SelectItem value="PE">Prince Edward Island</SelectItem>
-                      <SelectItem value="NT">Northwest Territories</SelectItem>
-                      <SelectItem value="YT">Yukon</SelectItem>
-                      <SelectItem value="NU">Nunavut</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="previousPostalCode">Postal Code</Label>
-                  <Input
-                    id="previousPostalCode"
-                    name="previousPostalCode"
-                    value={formData.previousPostalCode}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Work-site Address */}
-            <div className="space-y-3">
-              <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
-                WORK-SITE ADDRESS - if address where product is being installed or delivered to is different from home address
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="worksiteAddress">Address</Label>
-                  <Input
-                    id="worksiteAddress"
-                    name="worksiteAddress"
-                    value={formData.worksiteAddress}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="worksiteUnit">Apt. or Unit Number</Label>
-                  <Input
-                    id="worksiteUnit"
-                    name="worksiteUnit"
-                    value={formData.worksiteUnit}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="worksiteCity">City</Label>
-                  <Input
-                    id="worksiteCity"
-                    name="worksiteCity"
-                    value={formData.worksiteCity}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="worksiteProvince">Province</Label>
-                  <Select
-                    value={formData.worksiteProvince}
-                    onValueChange={(value) => handleSelectChange("worksiteProvince", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ON">Ontario</SelectItem>
-                      <SelectItem value="QC">Quebec</SelectItem>
-                      <SelectItem value="BC">British Columbia</SelectItem>
-                      <SelectItem value="AB">Alberta</SelectItem>
-                      <SelectItem value="MB">Manitoba</SelectItem>
-                      <SelectItem value="SK">Saskatchewan</SelectItem>
-                      <SelectItem value="NS">Nova Scotia</SelectItem>
-                      <SelectItem value="NB">New Brunswick</SelectItem>
-                      <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                      <SelectItem value="PE">Prince Edward Island</SelectItem>
-                      <SelectItem value="NT">Northwest Territories</SelectItem>
-                      <SelectItem value="YT">Yukon</SelectItem>
-                      <SelectItem value="NU">Nunavut</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="worksitePostalCode">Postal Code</Label>
-                  <Input
-                    id="worksitePostalCode"
-                    name="worksitePostalCode"
-                    value={formData.worksitePostalCode}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Borrower Identification Section */}
             <div className="space-y-3">
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
@@ -838,19 +588,6 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="employerPhone">Employer Phone</Label>
-                  <Input
-                    id="employerPhone"
-                    name="employerPhone"
-                    type="tel"
-                    value={formData.employerPhone}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
                   <Label htmlFor="positionTitle">Position Title</Label>
                   <Input
                     id="positionTitle"
@@ -859,6 +596,9 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="grossMonthlyIncome">Gross Monthly Income</Label>
                   <Input
