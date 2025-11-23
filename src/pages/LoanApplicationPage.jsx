@@ -408,7 +408,7 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div className="md:col-start-2 md:row-start-1">
-                  <Label htmlFor="sin">SIN Number</Label>
+                  <Label htmlFor="sin">SIN Number (Optional)</Label>
                   <Input
                     id="sin"
                     name="sin"
