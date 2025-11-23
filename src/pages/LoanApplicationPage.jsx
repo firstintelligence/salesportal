@@ -733,53 +733,25 @@ const LoanApplicationPage = () => {
                 Consent and Authorization
               </h2>
               
-              <div className="bg-muted p-4 rounded-lg text-sm space-y-4 max-h-96 overflow-y-auto">
+              <div className="bg-muted p-4 rounded-lg text-sm space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">PRIVACY POLICY CONSENT</h3>
+                  <h3 className="font-semibold mb-2">CONSENT TO FINANCEIT CANADA INC. PRIVACY POLICY AND THIRD-PARTY DETERMINATION</h3>
                   <p className="leading-relaxed">
-                    I acknowledge that I have read and understood Financeit's Privacy Policy, which describes how Financeit 
-                    collects, uses, discloses, and safeguards my personal information. I consent to the collection, use, 
-                    and disclosure of my personal information in accordance with the Privacy Policy. I understand that I 
-                    may withdraw my consent at any time, subject to legal or contractual restrictions and reasonable notice.
+                    I accept the Financeit Canada Privacy Policy, located at https://www.financeit.io/privacy-policy. I also confirm that there is no person or company directing me to apply for financing and use this loan on their direction or behalf.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">CONSENT TO ELECTRONIC DISCLOSURES* (OPTIONAL)</h3>
+                  <p className="leading-relaxed">
+                    I consent to receive Disclosures (including the Loan Agreement, Amendments, Statements and Renewals, notices and other associated documents) electronically. For more information, please visit https://www.financeit.io/electronic-consent-agreement/
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold mb-2">CREDIT AUTHORIZATION</h3>
                   <p className="leading-relaxed">
-                    I authorize Financeit Canada Inc. and its affiliates, agents, service providers, and assigns to obtain, 
-                    verify, and exchange credit and related information (including a consumer report) about me from any 
-                    credit reporting agency, credit bureau, financial institution, employer, or other source as may be 
-                    necessary in connection with my application for financing. I understand that this authorization will 
-                    remain valid during the term of any credit or loan agreement I may enter into with Financeit.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">APPLICATION ACCURACY</h3>
-                  <p className="leading-relaxed">
-                    I confirm that all information provided in this application is true, accurate, and complete to the best 
-                    of my knowledge. I understand that Financeit will rely on this information in making its credit decision. 
-                    I acknowledge that providing false or misleading information may result in the rejection of my application 
-                    or termination of any credit agreement.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">NO DIRECTED FINANCING</h3>
-                  <p className="leading-relaxed">
-                    I confirm that there is no person or company directing me to apply for financing with Financeit. I am 
-                    making this application of my own free will and have not been coerced or unduly influenced by any third party.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">ELECTRONIC DISCLOSURE CONSENT (OPTIONAL)</h3>
-                  <p className="leading-relaxed">
-                    I consent to receive all disclosures, notices, agreements, and other communications ("Disclosures") 
-                    electronically, including by email or through Financeit's online portal. I understand that I have the 
-                    right to receive paper copies of Disclosures upon request and may withdraw this consent at any time by 
-                    contacting Financeit.
+                    I agree, acknowledge and represent, that by personally submitting this application Financeit is authorized to obtain my credit report from one or more consumer credit reporting agencies, to verify the information in my credit report with third parties as necessary, and to periodically update my credit information with credit reporting agencies.
                   </p>
                 </div>
               </div>
