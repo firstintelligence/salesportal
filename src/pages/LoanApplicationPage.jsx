@@ -728,67 +728,64 @@ const LoanApplicationPage = () => {
             </div>
 
             {/* Consents Section */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h2 className="text-xl font-semibold text-foreground border-b pb-2">
                 Consent and Authorization
               </h2>
               
-              <div className="bg-muted p-4 rounded-lg text-sm space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-2">CONSENT TO FINANCEIT CANADA INC. PRIVACY POLICY AND THIRD-PARTY DETERMINATION</h3>
-                  <p className="leading-relaxed">
-                    I accept the Financeit Canada Privacy Policy, located at https://www.financeit.io/privacy-policy. I also confirm that there is no person or company directing me to apply for financing and use this loan on their direction or behalf.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">CONSENT TO ELECTRONIC DISCLOSURES* (OPTIONAL)</h3>
-                  <p className="leading-relaxed">
-                    I consent to receive Disclosures (including the Loan Agreement, Amendments, Statements and Renewals, notices and other associated documents) electronically. For more information, please visit https://www.financeit.io/electronic-consent-agreement/
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">CREDIT AUTHORIZATION</h3>
-                  <p className="leading-relaxed">
-                    I agree, acknowledge and represent, that by personally submitting this application Financeit is authorized to obtain my credit report from one or more consumer credit reporting agencies, to verify the information in my credit report with third parties as necessary, and to periodically update my credit information with credit reporting agencies.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="space-y-4 mt-6">
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="privacyConsent"
-                    checked={formData.privacyConsent}
-                    onCheckedChange={(checked) => handleCheckboxChange("privacyConsent", checked)}
-                  />
-                  <Label htmlFor="privacyConsent" className="text-sm leading-relaxed cursor-pointer">
-                    I accept the Financeit Canada Privacy Policy and confirm there is no person or 
-                    company directing me to apply for financing *
-                  </Label>
+              <div className="space-y-3">
+                {/* Privacy Policy Consent */}
+                <div className="space-y-2">
+                  <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
+                    CONSENT TO FINANCEIT CANADA INC. PRIVACY POLICY AND THIRD-PARTY DETERMINATION
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="privacyConsent"
+                      checked={formData.privacyConsent}
+                      onCheckedChange={(checked) => handleCheckboxChange("privacyConsent", checked)}
+                      className="mt-1"
+                    />
+                    <Label htmlFor="privacyConsent" className="text-xs leading-relaxed cursor-pointer flex-1">
+                      I accept the Financeit Canada Privacy Policy, located at <span className="text-blue-600">https://www.financeit.io/privacy-policy</span>. I also confirm that there is no person or company directing me to apply for financing and use this loan on their direction or behalf.
+                    </Label>
+                  </div>
                 </div>
 
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="electronicConsent"
-                    checked={formData.electronicConsent}
-                    onCheckedChange={(checked) => handleCheckboxChange("electronicConsent", checked)}
-                  />
-                  <Label htmlFor="electronicConsent" className="text-sm leading-relaxed cursor-pointer">
-                    I consent to receive Disclosures electronically (Optional)
-                  </Label>
+                {/* Electronic Disclosures Consent */}
+                <div className="space-y-2">
+                  <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
+                    CONSENT TO ELECTRONIC DISCLOSURES* (OPTIONAL)
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="electronicConsent"
+                      checked={formData.electronicConsent}
+                      onCheckedChange={(checked) => handleCheckboxChange("electronicConsent", checked)}
+                      className="mt-1"
+                    />
+                    <Label htmlFor="electronicConsent" className="text-xs leading-relaxed cursor-pointer flex-1">
+                      I consent to receive Disclosures (including the Loan Agreement, Amendments, Statements and Renewals, notices and other associated documents) electronically. For more information, please visit <span className="text-blue-600">https://www.financeit.io/electronic-consent-agreement/</span>
+                    </Label>
+                  </div>
                 </div>
 
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="creditConsent"
-                    checked={formData.creditConsent}
-                    onCheckedChange={(checked) => handleCheckboxChange("creditConsent", checked)}
-                  />
-                  <Label htmlFor="creditConsent" className="text-sm leading-relaxed cursor-pointer">
-                    I authorize Financeit to obtain my credit report and verify information *
-                  </Label>
+                {/* Credit Authorization */}
+                <div className="space-y-2">
+                  <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
+                    CREDIT AUTHORIZATION
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="creditConsent"
+                      checked={formData.creditConsent}
+                      onCheckedChange={(checked) => handleCheckboxChange("creditConsent", checked)}
+                      className="mt-1"
+                    />
+                    <Label htmlFor="creditConsent" className="text-xs leading-relaxed cursor-pointer flex-1">
+                      I agree, acknowledge and represent, that by personally submitting this application Financeit is authorized to obtain my credit report from one or more consumer credit reporting agencies, to verify the information in my credit report with third parties as necessary, and to periodically update my credit information with credit reporting agencies.
+                    </Label>
+                  </div>
                 </div>
               </div>
 
