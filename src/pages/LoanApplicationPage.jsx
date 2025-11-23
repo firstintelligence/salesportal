@@ -25,6 +25,14 @@ const LoanApplicationPage = () => {
   const navigate = useNavigate();
   const signatureRef = useRef(null);
   
+  const formatLocalDate = (date) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  
   const [formData, setFormData] = useState({
     // Personal Details
     firstName: "",
@@ -69,20 +77,19 @@ const LoanApplicationPage = () => {
     creditConsent: false,
     signatureDate: "",
   });
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
+  
   const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
+  
   const handleCheckboxChange = (name, checked) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
-
   const handleAddressSelect = (addressData) => {
     setFormData((prev) => ({
       ...prev,
@@ -374,7 +381,7 @@ const LoanApplicationPage = () => {
                         selected={formData.birthdate ? new Date(formData.birthdate) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
-                          const iso = date.toISOString().split("T")[0];
+                          const iso = formatLocalDate(date);
                           setFormData((prev) => ({ ...prev, birthdate: iso }));
                         }}
                         initialFocus
@@ -662,7 +669,7 @@ const LoanApplicationPage = () => {
                         selected={formData.photoIdExpiry ? new Date(formData.photoIdExpiry) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
-                          const iso = date.toISOString().split("T")[0];
+                          const iso = formatLocalDate(date);
                           setFormData((prev) => ({ ...prev, photoIdExpiry: iso }));
                         }}
                         initialFocus
@@ -903,7 +910,7 @@ const LoanApplicationPage = () => {
                         selected={formData.signatureDate ? new Date(formData.signatureDate) : undefined}
                         onSelect={(date) => {
                           if (!date) return;
-                          const iso = date.toISOString().split("T")[0];
+                          const iso = formatLocalDate(date);
                           setFormData((prev) => ({ ...prev, signatureDate: iso }));
                         }}
                         initialFocus
