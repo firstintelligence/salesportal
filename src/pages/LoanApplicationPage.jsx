@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
 import financeitLogo from "@/assets/financeit-logo.svg";
@@ -16,6 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
