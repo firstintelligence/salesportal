@@ -6,6 +6,8 @@ import AddressLookupService from '../utils/addressLookupService';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
   const [provinceOpen, setProvinceOpen] = useState(false);
+  const [provinceShield, setProvinceShield] = useState(false);
+  const [provinceShield, setProvinceShield] = useState(false);
 
   const provinces = [
     { code: 'AB', name: 'Alberta', tax: 5 },
@@ -92,11 +94,20 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             />
           )}
           <Select
-            value={billTo.province || ''}
-            open={provinceOpen}
-            onOpenChange={setProvinceOpen}
-            onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}
-          >
+             value={billTo.province || ''}
+             open={provinceOpen}
+             onOpenChange={(open) => {
+               if (open) {
+                 setProvinceOpen(true);
+                 setProvinceShield(false);
+               } else {
+                 setProvinceOpen(false);
+                 setProvinceShield(true);
+                 setTimeout(() => setProvinceShield(false), 250);
+               }
+             }}
+             onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}
+           >
             <SelectTrigger className="h-[40px] relative z-50">
               <SelectValue placeholder="Select province" />
             </SelectTrigger>
