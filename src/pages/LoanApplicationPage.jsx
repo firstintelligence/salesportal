@@ -19,10 +19,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useGooglePlacesScript, useGooglePlacesAutocomplete } from "@/hooks/useGooglePlaces";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
   const signatureRef = useRef(null);
+  const addressRef = useRef(null);
+  const employerAddressRef = useRef(null);
+  
+  useGooglePlacesScript();
   const [formData, setFormData] = useState({
     // Personal Details
     firstName: "",
@@ -80,6 +85,28 @@ const LoanApplicationPage = () => {
   const handleCheckboxChange = (name, checked) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
+
+  const handleAddressSelect = (addressData) => {
+    setFormData((prev) => ({
+      ...prev,
+      address: addressData.address,
+      city: addressData.city,
+      province: addressData.province,
+      postalCode: addressData.postalCode,
+    }));
+  };
+
+  const handleEmployerAddressSelect = (addressData) => {
+    setFormData((prev) => ({
+      ...prev,
+      employerAddress: addressData.address,
+      employerCity: addressData.city,
+      employerProvince: addressData.province,
+    }));
+  };
+
+  useGooglePlacesAutocomplete(addressRef, handleAddressSelect);
+  useGooglePlacesAutocomplete(employerAddressRef, handleEmployerAddressSelect);
 
   // Helper functions for formatting
   const formatDate = (dateString) => {
@@ -431,11 +458,12 @@ const LoanApplicationPage = () => {
                 <div className="md:col-span-2">
                   <Label htmlFor="address">Address</Label>
                   <Input
+                    ref={addressRef}
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    autoComplete="street-address"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -686,11 +714,12 @@ const LoanApplicationPage = () => {
                 <div>
                   <Label htmlFor="employerAddress">Employer Address</Label>
                   <Input
+                    ref={employerAddressRef}
                     id="employerAddress"
                     name="employerAddress"
                     value={formData.employerAddress}
                     onChange={handleInputChange}
-                    autoComplete="work street-address"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
