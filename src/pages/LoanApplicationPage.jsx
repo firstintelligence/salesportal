@@ -310,7 +310,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
               
-              <div>
+              <div className="w-full max-w-full">
                 <Label htmlFor="birthdate">Birthdate</Label>
                 <Input
                   id="birthdate"
@@ -318,6 +318,7 @@ const LoanApplicationPage = () => {
                   type="date"
                   value={formData.birthdate}
                   onChange={handleInputChange}
+                  className="w-full max-w-full"
                 />
               </div>
               
