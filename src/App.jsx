@@ -11,6 +11,7 @@ import TpvRequestPage from "./pages/TpvRequestPage";
 import TemplatePage from "./pages/TemplatePage";
 import ReceiptPage from "./pages/ReceiptPage";
 import LoanApplicationPage from "./pages/LoanApplicationPage";
+import PaymentCalculatorPage from "./pages/PaymentCalculatorPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
           <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
           <Route path="/loan-application" element={<LoanApplicationPage />} />
+          <Route path="/payment-calculator" element={<PaymentCalculatorPage />} />
           <Route path="/tpv-ai" element={<TPVAiPage />} />
           <Route path="/tpv-request" element={<TpvRequestPage />} />
           <Route path="/template" element={<TemplatePage />} />

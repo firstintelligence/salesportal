@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Calculator, Phone, CreditCard } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -36,6 +36,12 @@ const LandingPage = () => {
       icon: Phone,
       description: "Submit third-party verification calls for payment details",
       path: "/tpv-request",
+    },
+    {
+      title: "Payment Calculator",
+      icon: DollarSign,
+      description: "Calculate installment loan estimates",
+      path: "/payment-calculator",
     },
   ];
 
