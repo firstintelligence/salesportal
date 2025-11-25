@@ -11,7 +11,11 @@ const AGENT_MAPPING: Record<string, string> = {
   'MM23': '+19059043544',
   'WK8448': '+16476258448',
   'TB0195': '+14168750195',
+  'AA9097': '+16477169097',
 };
+
+// Admin agent who receives all notifications
+const ADMIN_AGENT_ID = 'MM23';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -114,43 +118,61 @@ serve(async (req) => {
         }
       }
 
+      // Build list of phone numbers to notify
+      const phoneNumbersToNotify: Set<string> = new Set();
+      
+      // Always add admin (MM23)
+      const adminPhone = AGENT_MAPPING[ADMIN_AGENT_ID];
+      if (adminPhone) {
+        phoneNumbersToNotify.add(adminPhone);
+      }
+      
+      // Add the requesting agent if they exist and are different from admin
       if (agentId && AGENT_MAPPING[agentId]) {
-        const agentPhone = AGENT_MAPPING[agentId];
+        phoneNumbersToNotify.add(AGENT_MAPPING[agentId]);
+      }
+
+      if (phoneNumbersToNotify.size > 0) {
         const statusText = callSuccessful ? 'TPV Completed' : 'TPV Failed';
         const message = `${statusText}\n\nCustomer: ${customerName}\nAddress: ${address}`;
 
-        console.log('Sending SMS to agent:', agentPhone);
-
-        // Send SMS via Twilio
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
         const twilioAuth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
 
-        const smsResponse = await fetch(twilioUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${twilioAuth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            To: agentPhone,
-            From: TWILIO_PHONE_NUMBER,
-            Body: message,
-          }),
-        });
+        // Send SMS to all recipients
+        for (const phoneNumber of phoneNumbersToNotify) {
+          console.log('Sending SMS to:', phoneNumber);
 
-        if (!smsResponse.ok) {
-          const errorText = await smsResponse.text();
-          console.error('Twilio SMS error:', errorText);
-          throw new Error(`Failed to send SMS: ${errorText}`);
+          try {
+            const smsResponse = await fetch(twilioUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Basic ${twilioAuth}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                To: phoneNumber,
+                From: TWILIO_PHONE_NUMBER,
+                Body: message,
+              }),
+            });
+
+            if (!smsResponse.ok) {
+              const errorText = await smsResponse.text();
+              console.error(`Twilio SMS error for ${phoneNumber}:`, errorText);
+            } else {
+              const smsResult = await smsResponse.json();
+              console.log(`SMS sent successfully to ${phoneNumber}:`, smsResult);
+            }
+          } catch (smsError) {
+            console.error(`Error sending SMS to ${phoneNumber}:`, smsError);
+          }
         }
-
-        const smsResult = await smsResponse.json();
-        console.log('SMS sent successfully:', smsResult);
 
         return new Response(
           JSON.stringify({
             success: true,
-            message: 'Notification sent to agent',
+            message: `Notifications sent to ${phoneNumbersToNotify.size} recipient(s)`,
           }),
           {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
