@@ -12,6 +12,7 @@ const AGENT_MAPPING: Record<string, string> = {
   'WK8448': '+16476258448',
   'TB0195': '+14168750195',
   'AA9097': '+16477169097',
+  'HB6400': '+16473776400',
 };
 
 // Admin agent who receives all notifications
