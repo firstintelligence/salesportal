@@ -1,19 +1,272 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun } from "lucide-react";
+import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown } from "lucide-react";
 
 const CATEGORIES = [
-  { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500" },
-  { id: "insulation", name: "Insulation", icon: Home, color: "from-[#FF69B4] to-[#FF1493]" },
-  { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-blue-500 to-cyan-500" },
-  { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-300 to-yellow-500" },
-  { id: "battery", name: "Home Battery", icon: Battery, color: "from-green-500 to-emerald-500" },
+  { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500", bgColor: "bg-red-500", borderColor: "border-red-500" },
+  { id: "insulation", name: "Insulation", icon: Home, color: "from-[#FF69B4] to-[#FF1493]", bgColor: "bg-[#FF69B4]", borderColor: "border-[#FF69B4]" },
+  { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-blue-500 to-cyan-500", bgColor: "bg-blue-500", borderColor: "border-blue-500" },
+  { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-300 to-yellow-500", bgColor: "bg-yellow-400", borderColor: "border-yellow-400" },
+  { id: "battery", name: "Home Battery", icon: Battery, color: "from-green-500 to-emerald-500", bgColor: "bg-green-500", borderColor: "border-green-500" },
 ];
+
+// Calculate monthly payment with 2.99% interest over 240 months
+const calculateMonthlyPayment = (principal) => {
+  const annualRate = 0.0299;
+  const monthlyRate = annualRate / 12;
+  const numPayments = 240;
+  
+  if (principal <= 0) return 0;
+  
+  const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+  return Math.round(payment * 100) / 100;
+};
+
+// Visual illustration components for each category
+const HVACIllustration = ({ savings }) => (
+  <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 overflow-hidden">
+    <div className="flex items-center justify-between">
+      {/* Old System */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center mb-2 relative">
+          <Flame className="w-10 h-10 text-orange-500 animate-pulse" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75" />
+        </div>
+        <p className="text-xs text-slate-500 font-medium">Gas Furnace</p>
+        <p className="text-sm font-bold text-red-500">High Cost</p>
+      </div>
+      
+      {/* Arrow */}
+      <div className="flex flex-col items-center px-4">
+        <ArrowRight className="w-8 h-8 text-emerald-500" />
+        <span className="text-xs text-emerald-600 font-bold mt-1">UPGRADE</span>
+      </div>
+      
+      {/* New System */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-2 relative">
+          <div className="relative">
+            <Snowflake className="w-6 h-6 text-blue-500 absolute -top-2 -left-2 animate-spin" style={{ animationDuration: '3s' }} />
+            <Wind className="w-10 h-10 text-emerald-500" />
+            <Flame className="w-5 h-5 text-orange-400 absolute -bottom-1 -right-1" />
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 font-medium">Heat Pump</p>
+        <p className="text-sm font-bold text-emerald-500">-${savings}/mo</p>
+      </div>
+    </div>
+    
+    {/* Energy flow animation */}
+    <div className="mt-4 h-2 bg-slate-300 dark:bg-slate-600 rounded-full overflow-hidden">
+      <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full animate-pulse" style={{ width: '70%' }} />
+    </div>
+    <p className="text-xs text-center mt-2 text-slate-500">Energy efficiency: 300-400% vs 95%</p>
+  </div>
+);
+
+const InsulationIllustration = ({ savings }) => (
+  <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 overflow-hidden">
+    <div className="flex items-center justify-between">
+      {/* Poor Insulation */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center mb-2 relative">
+          <Home className="w-10 h-10 text-slate-400" />
+          {/* Heat escaping */}
+          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+            <ArrowDown className="w-4 h-4 text-red-500 rotate-180 animate-bounce" />
+          </div>
+          <div className="absolute -left-2 top-1/2 transform -translate-y-1/2">
+            <ArrowRight className="w-4 h-4 text-red-500 rotate-180 animate-pulse" />
+          </div>
+          <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
+            <ArrowRight className="w-4 h-4 text-red-500 animate-pulse" />
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 font-medium">Heat Loss</p>
+        <p className="text-sm font-bold text-red-500">Wasted $</p>
+      </div>
+      
+      {/* Arrow */}
+      <div className="flex flex-col items-center px-4">
+        <ArrowRight className="w-8 h-8 text-[#FF69B4]" />
+        <span className="text-xs text-[#FF69B4] font-bold mt-1">INSULATE</span>
+      </div>
+      
+      {/* Good Insulation */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-[#FFE4EC] dark:bg-pink-900/30 rounded-xl flex items-center justify-center mb-2 relative border-4 border-[#FF69B4] border-dashed">
+          <Home className="w-10 h-10 text-[#FF69B4]" />
+          <div className="absolute inset-0 rounded-lg bg-[#FF69B4]/10 animate-pulse" />
+        </div>
+        <p className="text-xs text-slate-500 font-medium">Sealed Home</p>
+        <p className="text-sm font-bold text-[#FF69B4]">-${savings}/mo</p>
+      </div>
+    </div>
+    
+    {/* R-Value indicator */}
+    <div className="mt-4 flex items-center gap-2">
+      <span className="text-xs text-slate-500">R-Value:</span>
+      <div className="flex-1 h-3 bg-slate-300 dark:bg-slate-600 rounded-full overflow-hidden">
+        <div className="h-full bg-gradient-to-r from-[#FF69B4] to-[#FF1493] rounded-full" style={{ width: '85%' }} />
+      </div>
+      <span className="text-xs font-bold text-[#FF69B4]">R-60</span>
+    </div>
+  </div>
+);
+
+const HotWaterIllustration = ({ savings }) => (
+  <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 overflow-hidden">
+    <div className="flex items-center justify-between">
+      {/* Old Tank */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center mb-2 relative">
+          <div className="w-12 h-14 bg-slate-400 rounded-lg relative">
+            <Flame className="w-6 h-6 text-orange-500 absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-pulse" />
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 font-medium">Gas Tank</p>
+        <p className="text-sm font-bold text-red-500">Always On</p>
+      </div>
+      
+      {/* Arrow */}
+      <div className="flex flex-col items-center px-4">
+        <ArrowRight className="w-8 h-8 text-blue-500" />
+        <span className="text-xs text-blue-600 font-bold mt-1">UPGRADE</span>
+      </div>
+      
+      {/* Heat Pump Water Heater */}
+      <div className="text-center">
+        <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-2 relative">
+          <div className="w-12 h-14 bg-blue-400 rounded-lg relative">
+            <Droplet className="w-6 h-6 text-white absolute top-1 left-1/2 transform -translate-x-1/2" />
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-cyan-400 rounded-t-lg flex items-center justify-center">
+              <Wind className="w-4 h-4 text-white" />
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 font-medium">HP Water Heater</p>
+        <p className="text-sm font-bold text-blue-500">-${savings}/mo</p>
+      </div>
+    </div>
+    
+    {/* Efficiency comparison */}
+    <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+      <div className="bg-slate-200 dark:bg-slate-700 rounded-lg p-2">
+        <p className="text-xs text-slate-500">Old Efficiency</p>
+        <p className="text-lg font-bold text-slate-600 dark:text-slate-300">60%</p>
+      </div>
+      <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-2">
+        <p className="text-xs text-blue-500">New Efficiency</p>
+        <p className="text-lg font-bold text-blue-600">300%+</p>
+      </div>
+    </div>
+  </div>
+);
+
+const SolarIllustration = ({ savings }) => (
+  <div className="relative bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 overflow-hidden">
+    {/* Sun */}
+    <div className="absolute top-2 right-4">
+      <Sun className="w-12 h-12 text-yellow-400 animate-spin" style={{ animationDuration: '10s' }} />
+      <div className="absolute inset-0 w-12 h-12 bg-yellow-400/30 rounded-full animate-ping" />
+    </div>
+    
+    <div className="flex items-center gap-4">
+      {/* House with panels */}
+      <div className="relative">
+        <div className="w-24 h-16 bg-slate-300 dark:bg-slate-600 rounded-t-lg relative">
+          {/* Roof */}
+          <div className="absolute -top-6 left-0 right-0 h-8 bg-slate-400 dark:bg-slate-500" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}>
+            {/* Solar panels */}
+            <div className="absolute top-2 left-3 right-3 grid grid-cols-3 gap-0.5">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-2 bg-blue-900 rounded-sm border border-blue-700" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Energy flow */}
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-2">
+          <Zap className="w-5 h-5 text-yellow-500 animate-pulse" />
+          <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full animate-pulse" style={{ width: '80%' }} />
+          </div>
+        </div>
+        <p className="text-xs text-slate-600 dark:text-slate-400">Free electricity from the sun</p>
+        <p className="text-lg font-bold text-yellow-600 mt-1">-${savings}/mo</p>
+      </div>
+    </div>
+    
+    {/* Production stats */}
+    <div className="mt-4 flex gap-2">
+      <div className="flex-1 bg-white/60 dark:bg-slate-700/60 rounded-lg p-2 text-center">
+        <p className="text-xs text-slate-500">Daily Production</p>
+        <p className="text-sm font-bold text-yellow-600">~25 kWh</p>
+      </div>
+      <div className="flex-1 bg-white/60 dark:bg-slate-700/60 rounded-lg p-2 text-center">
+        <p className="text-xs text-slate-500">CO₂ Avoided</p>
+        <p className="text-sm font-bold text-green-600">8 tons/yr</p>
+      </div>
+    </div>
+  </div>
+);
+
+const BatteryIllustration = ({ savings }) => (
+  <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 overflow-hidden">
+    <div className="flex items-center gap-4">
+      {/* Battery visualization */}
+      <div className="relative">
+        <div className="w-16 h-24 bg-slate-300 dark:bg-slate-600 rounded-lg border-4 border-slate-400 dark:border-slate-500 relative overflow-hidden">
+          {/* Battery cap */}
+          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-slate-400 dark:bg-slate-500 rounded-t-lg" />
+          {/* Charge level */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-green-500 to-green-400 transition-all duration-1000" style={{ height: '75%' }}>
+            <div className="absolute inset-0 bg-white/20 animate-pulse" />
+          </div>
+          {/* Charge indicator */}
+          <Zap className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-white drop-shadow-lg" />
+        </div>
+        <p className="text-xs text-center mt-1 text-slate-500">75% Full</p>
+      </div>
+      
+      {/* Benefits */}
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center gap-2 bg-green-100 dark:bg-green-900/30 rounded-lg p-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <span className="text-xs text-green-700 dark:text-green-400">Store solar energy</span>
+        </div>
+        <div className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg p-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+          <span className="text-xs text-blue-700 dark:text-blue-400">Use during peak rates</span>
+        </div>
+        <div className="flex items-center gap-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg p-2">
+          <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+          <span className="text-xs text-amber-700 dark:text-amber-400">Backup power</span>
+        </div>
+      </div>
+    </div>
+    
+    <div className="mt-4 text-center">
+      <p className="text-xs text-slate-500">Estimated monthly savings</p>
+      <p className="text-xl font-bold text-green-600">-${savings}/mo</p>
+    </div>
+  </div>
+);
+
+const illustrations = {
+  hvac: HVACIllustration,
+  insulation: InsulationIllustration,
+  hotwater: HotWaterIllustration,
+  solar: SolarIllustration,
+  battery: BatteryIllustration,
+};
 
 export function Calculator() {
   const [data, setData] = useState({
@@ -31,42 +284,75 @@ export function Calculator() {
 
   const [activeTab, setActiveTab] = useState("hvac");
 
+  // Equipment costs for each category
+  const equipmentCosts = {
+    hvac: 15000,
+    insulation: 8000,
+    hotwater: 5000,
+    solar: 25000,
+    battery: 12000,
+  };
+
   // Calculate savings for each category
   const calculateCategorySavings = (categoryId) => {
     const { gasBill, electricityBill, insulation, heatingSource } = data;
+    const cost = equipmentCosts[categoryId];
+    const monthlyPayment = calculateMonthlyPayment(cost);
+    
+    let monthlySavings = 0;
+    let description = "";
     
     switch (categoryId) {
       case "hvac":
         if (heatingSource === "electricity") {
-          return { monthly: Math.round(electricityBill * 0.4), yearly: Math.round(electricityBill * 0.4 * 12), cost: 15000, description: "Heat pump efficiency savings" };
+          monthlySavings = Math.round(electricityBill * 0.4);
+          description = "Heat pump efficiency savings";
+        } else {
+          monthlySavings = Math.round(gasBill * 0.8);
+          description = "Switch from gas to efficient heat pump";
         }
-        return { monthly: Math.round(gasBill * 0.8), yearly: Math.round(gasBill * 0.8 * 12), cost: 15000, description: "Switch from gas to efficient heat pump" };
+        break;
       
       case "insulation":
         const insulationFactor = (5 - insulation) * 0.08;
-        const insulationSavings = (gasBill + electricityBill) * insulationFactor;
-        return { monthly: Math.round(insulationSavings), yearly: Math.round(insulationSavings * 12), cost: 8000, description: "Better insulation reduces heating/cooling loss" };
+        monthlySavings = Math.round((gasBill + electricityBill) * insulationFactor);
+        description = "Better insulation reduces heating/cooling loss";
+        break;
       
       case "hotwater":
-        const hotWaterSavings = heatingSource !== "electricity" ? gasBill * 0.3 : electricityBill * 0.2;
-        return { monthly: Math.round(hotWaterSavings), yearly: Math.round(hotWaterSavings * 12), cost: 5000, description: "Heat pump water heater efficiency" };
+        monthlySavings = heatingSource !== "electricity" ? Math.round(gasBill * 0.3) : Math.round(electricityBill * 0.2);
+        description = "Heat pump water heater efficiency";
+        break;
       
       case "solar":
-        return { monthly: Math.round(electricityBill * 0.7), yearly: Math.round(electricityBill * 0.7 * 12), cost: 25000, description: "Generate your own clean electricity" };
+        monthlySavings = Math.round(electricityBill * 0.7);
+        description = "Generate your own clean electricity";
+        break;
       
       case "battery":
-        return { monthly: Math.round(electricityBill * 0.15), yearly: Math.round(electricityBill * 0.15 * 12), cost: 12000, description: "Store solar energy & backup power" };
+        monthlySavings = Math.round(electricityBill * 0.15);
+        description = "Store solar energy & backup power";
+        break;
       
       default:
-        return { monthly: 0, yearly: 0, cost: 0, description: "" };
+        break;
     }
+    
+    const netMonthlySavings = monthlySavings - monthlyPayment;
+    
+    return { 
+      monthly: monthlySavings, 
+      yearly: monthlySavings * 12, 
+      cost, 
+      monthlyPayment,
+      netMonthly: netMonthlySavings,
+      description 
+    };
   };
 
-  const currentSavings = calculateCategorySavings(activeTab);
   const currentCategory = CATEGORIES.find(c => c.id === activeTab);
-
-  // Calculate percentage for visual
-  const savingsPercentage = Math.min(100, Math.round((currentSavings.monthly / (data.gasBill + data.electricityBill)) * 100));
+  const currentSavings = calculateCategorySavings(activeTab);
+  const IllustrationComponent = illustrations[activeTab];
 
   return (
     <div className="space-y-6">
@@ -203,199 +489,177 @@ export function Calculator() {
         </CardContent>
       </Card>
 
-      {/* Category Tabs */}
-      <Card className="border-0 shadow-xl overflow-hidden">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="bg-slate-100 dark:bg-slate-800 p-2">
-            <TabsList className="w-full h-auto flex flex-wrap gap-2 bg-transparent">
-              {CATEGORIES.map((category) => {
-                const Icon = category.icon;
-                const isActive = activeTab === category.id;
-                return (
-                  <TabsTrigger
-                    key={category.id}
-                    value={category.id}
-                    className={`flex-1 min-w-[120px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all ${
-                      isActive 
-                        ? `bg-gradient-to-r ${category.color} text-white shadow-lg` 
-                        : "bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium hidden sm:inline">{category.name}</span>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+      {/* Category Tabs - Connected Design */}
+      <div className="relative">
+        {/* Tab Headers */}
+        <div className="flex overflow-x-auto gap-0 bg-slate-200 dark:bg-slate-800 rounded-t-2xl p-1 pb-0">
+          {CATEGORIES.map((category, index) => {
+            const Icon = category.icon;
+            const isActive = activeTab === category.id;
+            return (
+              <button
+                key={category.id}
+                onClick={() => setActiveTab(category.id)}
+                className={`flex-1 min-w-[100px] flex flex-col items-center justify-center gap-1 py-3 px-2 transition-all relative ${
+                  isActive 
+                    ? `bg-gradient-to-r ${category.color} text-white rounded-t-xl shadow-lg z-10` 
+                    : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-t-lg"
+                } ${index === 0 ? 'rounded-tl-xl' : ''} ${index === CATEGORIES.length - 1 ? 'rounded-tr-xl' : ''}`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium whitespace-nowrap">{category.name}</span>
+                {isActive && (
+                  <div className={`absolute -bottom-1 left-0 right-0 h-2 bg-gradient-to-r ${category.color}`} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content - Connected to header */}
+        <Card className={`border-0 shadow-xl rounded-t-none overflow-hidden`}>
+          {/* Colored header bar */}
+          <div className={`bg-gradient-to-r ${currentCategory.color} p-6 md:p-8`}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  {(() => { const Icon = currentCategory.icon; return <Icon className="w-8 h-8" />; })()}
+                  <h3 className="text-2xl font-bold">{currentCategory.name}</h3>
+                </div>
+                <p className="text-white/80 text-sm max-w-md">{currentSavings.description}</p>
+              </div>
+              
+              <div className="flex gap-4">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
+                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Energy Savings</p>
+                  <p className="text-3xl font-bold text-white">${currentSavings.monthly}</p>
+                  <p className="text-white/60 text-xs">/month</p>
+                </div>
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
+                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Equipment</p>
+                  <p className="text-3xl font-bold text-white">${currentSavings.monthlyPayment}</p>
+                  <p className="text-white/60 text-xs">/month</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const savings = calculateCategorySavings(category.id);
-            const percentage = Math.min(100, Math.round((savings.monthly / (data.gasBill + data.electricityBill)) * 100));
-            
-            return (
-              <TabsContent key={category.id} value={category.id} className="mt-0">
-                <div className={`bg-gradient-to-br ${category.color} p-6 md:p-8`}>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="text-white">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Icon className="w-8 h-8" />
-                        <h3 className="text-2xl font-bold">{category.name}</h3>
-                      </div>
-                      <p className="text-white/80 text-sm max-w-md">{savings.description}</p>
-                    </div>
-                    
-                    <div className="flex gap-4">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
-                        <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Monthly</p>
-                        <p className="text-3xl font-bold text-white">${savings.monthly}</p>
-                      </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
-                        <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Yearly</p>
-                        <p className="text-3xl font-bold text-white">${savings.yearly}</p>
-                      </div>
+          <CardContent className="p-6 space-y-6">
+            {/* Visual Illustration */}
+            <IllustrationComponent savings={currentSavings.monthly} />
+
+            {/* Financial Breakdown */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Monthly Breakdown */}
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
+                <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Monthly Breakdown
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Energy Savings</span>
+                    <span className="text-lg font-bold text-emerald-500">+${currentSavings.monthly}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Equipment Payment</span>
+                    <span className="text-lg font-bold text-slate-700 dark:text-slate-300">-${currentSavings.monthlyPayment}</span>
+                  </div>
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-700 dark:text-slate-300 font-medium">Net Monthly</span>
+                      <span className={`text-xl font-bold ${currentSavings.netMonthly >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                        {currentSavings.netMonthly >= 0 ? '+' : ''}${currentSavings.netMonthly}
+                      </span>
                     </div>
                   </div>
                 </div>
+                <p className="text-xs text-slate-500 mt-3">*2.99% APR over 240 months</p>
+              </div>
 
-                <CardContent className="p-6 space-y-6">
-                  {/* Visual Savings Display */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Savings Meter */}
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
-                      <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
-                        <TrendingDown className="w-4 h-4" />
-                        Bill Reduction
-                      </h4>
-                      <div className="relative pt-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                            Current: ${data.gasBill + data.electricityBill}/mo
-                          </span>
-                          <span className="text-xs font-semibold text-emerald-600">
-                            Save {percentage}%
-                          </span>
-                        </div>
-                        <div className="overflow-hidden h-4 text-xs flex rounded-full bg-slate-200 dark:bg-slate-700">
-                          <div
-                            style={{ width: `${percentage}%` }}
-                            className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r ${category.color} transition-all duration-500`}
-                          />
-                        </div>
-                        <div className="flex justify-between mt-3">
-                          <div className="text-center">
-                            <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">
-                              ${data.gasBill + data.electricityBill - savings.monthly}
-                            </p>
-                            <p className="text-xs text-slate-500">New Monthly Bill</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-2xl font-bold text-emerald-500">
-                              +${savings.yearly}
-                            </p>
-                            <p className="text-xs text-slate-500">Yearly Savings</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Investment & ROI */}
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
-                      <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
-                        <Leaf className="w-4 h-4" />
-                        Investment & Return
-                      </h4>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-600 dark:text-slate-400">Estimated Cost</span>
-                          <span className="text-xl font-bold text-slate-700 dark:text-slate-200">
-                            ${savings.cost.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-600 dark:text-slate-400">Payback Period</span>
-                          <span className="text-xl font-bold text-slate-700 dark:text-slate-200">
-                            {savings.yearly > 0 ? `${(savings.cost / savings.yearly).toFixed(1)} years` : 'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-600 dark:text-slate-400">10-Year Savings</span>
-                          <span className="text-xl font-bold text-emerald-500">
-                            ${((savings.yearly * 10) - savings.cost).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-                          <div className="flex items-center gap-2 text-emerald-600">
-                            <ThermometerSun className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                              {savings.yearly > 0 
-                                ? `${Math.round((savings.yearly * 10 - savings.cost) / savings.cost * 100)}% return on investment`
-                                : 'Backup power & peace of mind'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {/* Long-term Value */}
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
+                <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
+                  <Leaf className="w-4 h-4" />
+                  Long-term Value
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Equipment Cost</span>
+                    <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
+                      ${currentSavings.cost.toLocaleString()}
+                    </span>
                   </div>
-
-                  {/* Category-specific inputs */}
-                  {category.id === "hvac" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                      <div className="space-y-2">
-                        <Label className="text-sm text-slate-600 dark:text-slate-400">
-                          {data.heatingSystem === "furnace" ? "Furnace" : data.heatingSystem === "boiler" ? "Boiler" : "Heating System"} Age (years)
-                        </Label>
-                        <Input
-                          type="number"
-                          value={data.heatingSystemAge}
-                          onChange={(e) => setData({ ...data, heatingSystemAge: Number(e.target.value) })}
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm text-slate-600 dark:text-slate-400">AC Age (years)</Label>
-                        <Input
-                          type="number"
-                          value={data.acAge}
-                          onChange={(e) => setData({ ...data, acAge: Number(e.target.value) })}
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {category.id === "hotwater" && (
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                      <div className="space-y-2 max-w-xs">
-                        <Label className="text-sm text-slate-600 dark:text-slate-400">Water Heater Age (years)</Label>
-                        <Input
-                          type="number"
-                          value={data.waterHeaterAge}
-                          onChange={(e) => setData({ ...data, waterHeaterAge: Number(e.target.value) })}
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Incentives */}
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                    <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Available Incentives</h4>
-                    <p className="text-sm text-amber-700 dark:text-amber-500">
-                      {category.id === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
-                      {category.id === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
-                      {category.id === "hotwater" && "Up to $5,000 Greener Homes Grant for heat pump water heaters"}
-                      {category.id === "solar" && "Federal grants + Ontario rebates available for solar installations"}
-                      {category.id === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">20-Year Savings</span>
+                    <span className="text-lg font-bold text-emerald-500">
+                      ${(currentSavings.yearly * 20).toLocaleString()}
+                    </span>
                   </div>
-                </CardContent>
-              </TabsContent>
-            );
-          })}
-        </Tabs>
-      </Card>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Net Benefit (20yr)</span>
+                    <span className="text-lg font-bold text-emerald-500">
+                      ${((currentSavings.yearly * 20) - (currentSavings.monthlyPayment * 240)).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category-specific inputs */}
+            {activeTab === "hvac" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                <div className="space-y-2">
+                  <Label className="text-sm text-slate-600 dark:text-slate-400">
+                    {data.heatingSystem === "furnace" ? "Furnace" : data.heatingSystem === "boiler" ? "Boiler" : "Heating System"} Age (years)
+                  </Label>
+                  <Input
+                    type="number"
+                    value={data.heatingSystemAge}
+                    onChange={(e) => setData({ ...data, heatingSystemAge: Number(e.target.value) })}
+                    className="h-11 rounded-xl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm text-slate-600 dark:text-slate-400">AC Age (years)</Label>
+                  <Input
+                    type="number"
+                    value={data.acAge}
+                    onChange={(e) => setData({ ...data, acAge: Number(e.target.value) })}
+                    className="h-11 rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTab === "hotwater" && (
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                <div className="space-y-2 max-w-xs">
+                  <Label className="text-sm text-slate-600 dark:text-slate-400">Water Heater Age (years)</Label>
+                  <Input
+                    type="number"
+                    value={data.waterHeaterAge}
+                    onChange={(e) => setData({ ...data, waterHeaterAge: Number(e.target.value) })}
+                    className="h-11 rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Incentives */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+              <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Available Incentives</h4>
+              <p className="text-sm text-amber-700 dark:text-amber-500">
+                {activeTab === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
+                {activeTab === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
+                {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for heat pump water heaters"}
+                {activeTab === "solar" && "Federal grants + Ontario rebates available for solar installations"}
+                {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
