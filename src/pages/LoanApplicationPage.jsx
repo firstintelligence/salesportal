@@ -8,6 +8,8 @@ import { ArrowLeft, Download, Trash2, Calendar as CalendarIcon } from "lucide-re
 import { PDFDocument } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
 import financeitLogo from "@/assets/financeit-logo.svg";
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import {
   Select,
   SelectContent,
@@ -160,8 +162,60 @@ const LoanApplicationPage = () => {
     }
   };
 
+  // Get user's location using geolocation API
+  const getUserLocation = () => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            // Reverse geocode to get address
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+            );
+            const data = await response.json();
+            
+            if (data && data.address) {
+              const { house_number, road, city, town, village, state, postcode, country } = data.address;
+              const streetAddress = [house_number, road].filter(Boolean).join(' ');
+              const locality = city || town || village || '';
+              const locationString = [streetAddress, locality, state, postcode, country].filter(Boolean).join(', ');
+              resolve(locationString);
+            } else {
+              resolve(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+            }
+          } catch {
+            resolve(`${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`);
+          }
+        },
+        () => resolve(null),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
   const generatePDF = async () => {
     try {
+      // Get location first (this may prompt user for permission)
+      toast.info('Getting your location for signing certificate...');
+      const location = await getUserLocation();
+      
+      // Get current date/time in Toronto timezone
+      const now = new Date();
+      const torontoTime = toZonedTime(now, 'America/Toronto');
+      const formattedDateTime = format(torontoTime, "MMMM d, yyyy 'at' h:mm:ss a 'EST'");
+      
+      // Build signing certificate text
+      let signingCertificate = `Signed on ${formattedDateTime}`;
+      if (location) {
+        signingCertificate += ` at ${location}`;
+      }
+      
       // Load the PDF template with no-cache to ensure fresh copy
       const existingPdfBytes = await fetch('/templates/Financeit_Loan_Application_Form_Fillable.pdf', {
         cache: 'no-store'
@@ -178,43 +232,103 @@ const LoanApplicationPage = () => {
         const fields = form.getFields();
         console.log('Available PDF fields:', fields.map(f => f.getName()));
         
-        // Personal Details
-        if (formData.firstName) form.getTextField('First Name').setText(formData.firstName);
-        if (formData.lastName) form.getTextField('Last Name').setText(formData.lastName);
-        if (formData.middleName) form.getTextField('Middle Name').setText(formData.middleName);
-        if (formData.birthdate) form.getTextField('Birthdate').setText(formatDate(formData.birthdate));
-        if (formData.homePhone) form.getTextField('Phone Number').setText(formData.homePhone);
-        if (formData.maritalStatus) form.getTextField('Marital Status').setText(capitalizeFirst(formData.maritalStatus));
-        if (formData.mobilePhone) form.getTextField('Mobile Number').setText(formData.mobilePhone);
-        if (formData.email) form.getTextField('Email').setText(formData.email);
+        // Personal Details - using new PDF field names
+        if (formData.firstName) {
+          try { form.getTextField('Photo ID First Name').setText(formData.firstName); } catch {}
+        }
+        if (formData.lastName) {
+          try { form.getTextField('Photo ID Last Name').setText(formData.lastName); } catch {}
+        }
+        if (formData.middleName) {
+          try { form.getTextField('Photo ID Middle Name').setText(formData.middleName); } catch {}
+        }
+        if (formData.birthdate) {
+          try { form.getTextField('Birthdate').setText(formatDate(formData.birthdate)); } catch {}
+        }
+        if (formData.homePhone) {
+          try { form.getTextField('Home Phone Number').setText(formData.homePhone); } catch {}
+        }
+        if (formData.maritalStatus) {
+          try { form.getTextField('Marital Status').setText(capitalizeFirst(formData.maritalStatus)); } catch {}
+        }
+        if (formData.mobilePhone) {
+          try { form.getTextField('Mobile Phone Number').setText(formData.mobilePhone); } catch {}
+        }
+        if (formData.email) {
+          try { form.getTextField('Email').setText(formData.email); } catch {}
+        }
+        if (formData.sin) {
+          try { form.getTextField('Social Insurance Number').setText(formData.sin); } catch {}
+        }
         
         // Housing
-        if (formData.address) form.getTextField('Address').setText(formData.address);
-        if (formData.unitNo) form.getTextField('Unit Number').setText(formData.unitNo);
-        if (formData.city) form.getTextField('City').setText(formData.city);
-        if (formData.province) form.getTextField('Province').setText(formData.province);
-        if (formData.postalCode) form.getTextField('Postal Code').setText(formData.postalCode);
-        if (formData.yearsAtAddress) form.getTextField('Years at Residence').setText(formData.yearsAtAddress);
-        if (formData.monthlyHousingCosts) form.getTextField('Mortgage Amount').setText(formatCurrency(formData.monthlyHousingCosts));
-        if (formData.housingStatus) form.getTextField('Housing Status').setText(capitalizeFirst(formData.housingStatus));
+        if (formData.address) {
+          try { form.getTextField('Address').setText(formData.address); } catch {}
+        }
+        if (formData.unitNo) {
+          try { form.getTextField('Unit No.').setText(formData.unitNo); } catch {}
+        }
+        if (formData.city) {
+          try { form.getTextField('City').setText(formData.city); } catch {}
+        }
+        if (formData.province) {
+          try { form.getTextField('Province').setText(formData.province); } catch {}
+        }
+        if (formData.postalCode) {
+          try { form.getTextField('Postal Code').setText(formData.postalCode); } catch {}
+        }
+        if (formData.yearsAtAddress) {
+          try { form.getTextField('No. Years at this Address').setText(formData.yearsAtAddress); } catch {}
+        }
+        if (formData.monthlyHousingCosts) {
+          try { form.getTextField('Monthly Housing Costs').setText(formatCurrency(formData.monthlyHousingCosts)); } catch {}
+        }
+        if (formData.housingStatus) {
+          try { form.getTextField('Housing Status').setText(capitalizeFirst(formData.housingStatus)); } catch {}
+        }
         
         // Employment
-        if (formData.businessName) form.getTextField('Employer Name').setText(formData.businessName);
-        if (formData.positionTitle) form.getTextField('Position Title').setText(formData.positionTitle);
-        if (formData.grossMonthlyIncome) form.getTextField('Gross Monthly Income').setText(formatCurrency(formData.grossMonthlyIncome));
-        if (formData.employerAddress) form.getTextField('Employer Address').setText(formData.employerAddress);
-        if (formData.timeAtJob) form.getTextField('Time at Job').setText(formData.timeAtJob);
-        
-        // Employer City and Province (now separate in new PDF)
-        if (formData.employerCity) form.getTextField('City').setText(formData.employerCity);
-        if (formData.employerProvince) form.getTextField('Province').setText(formData.employerProvince);
-        if (formData.employmentStatus) form.getTextField('Employment Status').setText(capitalizeFirst(formData.employmentStatus.replace('_', ' ')));
+        if (formData.businessName) {
+          try { form.getTextField('Business Name').setText(formData.businessName); } catch {}
+        }
+        if (formData.positionTitle) {
+          try { form.getTextField('Position Title').setText(formData.positionTitle); } catch {}
+        }
+        if (formData.grossMonthlyIncome) {
+          try { form.getTextField('Gross Monthly Income').setText(formatCurrency(formData.grossMonthlyIncome)); } catch {}
+        }
+        if (formData.employerAddress) {
+          try { form.getTextField('Employer Address').setText(formData.employerAddress); } catch {}
+        }
+        if (formData.timeAtJob) {
+          try { form.getTextField('Time at Job (Years)').setText(formData.timeAtJob); } catch {}
+        }
+        if (formData.employerCity) {
+          try { form.getTextField('City_2').setText(formData.employerCity); } catch {}
+        }
+        if (formData.employerProvince) {
+          try { form.getTextField('Province_2').setText(formData.employerProvince); } catch {}
+        }
+        if (formData.employmentStatus) {
+          try { form.getTextField('Employment Status').setText(capitalizeFirst(formData.employmentStatus.replace('_', ' '))); } catch {}
+        }
         
         // Borrower ID
-        if (formData.photoIdType) form.getTextField('Photo ID Card Type').setText(formatIdType(formData.photoIdType));
-        if (formData.photoIdProvince) form.getTextField('Photo ID Province').setText(formData.photoIdProvince);
-        if (formData.photoIdNumber) form.getTextField('Photo ID Number').setText(formData.photoIdNumber);
-        if (formData.photoIdExpiry) form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry));
+        if (formData.photoIdType) {
+          try { form.getTextField('Photo ID Card Type').setText(formatIdType(formData.photoIdType)); } catch {}
+        }
+        if (formData.photoIdProvince) {
+          try { form.getTextField('Photo ID Province').setText(formData.photoIdProvince); } catch {}
+        }
+        if (formData.photoIdNumber) {
+          try { form.getTextField('Photo ID Number').setText(formData.photoIdNumber); } catch {}
+        }
+        if (formData.photoIdExpiry) {
+          try { form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry)); } catch {}
+        }
+        
+        // Signing Certificate - add date, time, and location
+        try { form.getTextField('Signing Certificate').setText(signingCertificate); } catch {}
         
         // Signature and Date
         // Embed signature image if available
@@ -224,23 +338,27 @@ const LoanApplicationPage = () => {
           const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
           
           // Get the signature field and embed the image
-          const signatureField = form.getTextField('Signature');
-          const widgets = signatureField.acroField.getWidgets();
-          if (widgets.length > 0) {
-            const widget = widgets[0];
-            const rect = widget.getRectangle();
-            const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
-            
-            // Draw the signature image in the signature field location
-            page.drawImage(signatureImage, {
-              x: rect.x,
-              y: rect.y,
-              width: rect.width,
-              height: rect.height,
-            });
-          }
+          try {
+            const signatureField = form.getTextField('Signature');
+            const widgets = signatureField.acroField.getWidgets();
+            if (widgets.length > 0) {
+              const widget = widgets[0];
+              const rect = widget.getRectangle();
+              const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
+              
+              // Draw the signature image in the signature field location
+              page.drawImage(signatureImage, {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+              });
+            }
+          } catch {}
         }
-        if (formData.signatureDate) form.getTextField('Date').setText(formatDate(formData.signatureDate));
+        if (formData.signatureDate) {
+          try { form.getTextField('Date').setText(formatDate(formData.signatureDate)); } catch {}
+        }
         
       } catch (error) {
         console.error('Error filling form fields:', error);
