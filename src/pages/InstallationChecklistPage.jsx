@@ -73,8 +73,10 @@ const InstallationChecklistPage = () => {
   };
 
   const getChecklistStatus = (customer) => {
-    const checklist = customer.installation_checklists?.[0];
-    console.log('Customer:', customer.first_name, customer.last_name, 'Checklists:', customer.installation_checklists, 'Status:', checklist?.status);
+    // Supabase returns object for one-to-one, array for one-to-many
+    const checklist = Array.isArray(customer.installation_checklists) 
+      ? customer.installation_checklists[0] 
+      : customer.installation_checklists;
     if (!checklist) return "not_started";
     return checklist.status;
   };
