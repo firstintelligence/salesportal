@@ -230,134 +230,101 @@ const LoanApplicationPage = () => {
       // Fill form fields using the actual field names from the PDF
       try {
         const fields = form.getFields();
-        console.log('Available PDF fields:', fields.map(f => f.getName()));
+        const fieldNames = fields.map(f => f.getName());
+        console.log('=== AVAILABLE PDF FIELDS ===');
+        fieldNames.forEach((name, i) => console.log(`${i + 1}. "${name}"`));
         
-        // Personal Details - using new PDF field names
-        if (formData.firstName) {
-          try { form.getTextField('Photo ID First Name').setText(formData.firstName); } catch {}
-        }
-        if (formData.lastName) {
-          try { form.getTextField('Photo ID Last Name').setText(formData.lastName); } catch {}
-        }
-        if (formData.middleName) {
-          try { form.getTextField('Photo ID Middle Name').setText(formData.middleName); } catch {}
-        }
-        if (formData.birthdate) {
-          try { form.getTextField('Birthdate').setText(formatDate(formData.birthdate)); } catch {}
-        }
-        if (formData.homePhone) {
-          try { form.getTextField('Home Phone Number').setText(formData.homePhone); } catch {}
-        }
-        if (formData.maritalStatus) {
-          try { form.getTextField('Marital Status').setText(capitalizeFirst(formData.maritalStatus)); } catch {}
-        }
-        if (formData.mobilePhone) {
-          try { form.getTextField('Mobile Phone Number').setText(formData.mobilePhone); } catch {}
-        }
-        if (formData.email) {
-          try { form.getTextField('Email').setText(formData.email); } catch {}
-        }
-        if (formData.sin) {
-          try { form.getTextField('Social Insurance Number').setText(formData.sin); } catch {}
-        }
+        // Helper function to try setting a field with multiple possible names
+        const setField = (possibleNames, value) => {
+          if (!value) return false;
+          for (const name of possibleNames) {
+            try {
+              const field = form.getTextField(name);
+              if (field) {
+                field.setText(String(value));
+                console.log(`✓ Filled "${name}" with "${value}"`);
+                return true;
+              }
+            } catch (e) {
+              // Field doesn't exist with this name, try next
+            }
+          }
+          console.log(`✗ Could not find field for: ${possibleNames[0]} (tried: ${possibleNames.join(', ')})`);
+          return false;
+        };
+        
+        // Personal Details
+        setField(['Photo ID First Name', 'First Name', 'FirstName'], formData.firstName);
+        setField(['Photo ID Last Name', 'Last Name', 'LastName'], formData.lastName);
+        setField(['Photo ID Middle Name', 'Middle Name', 'MiddleName'], formData.middleName);
+        setField(['Birthdate', 'Birth Date', 'DOB', 'Date of Birth'], formatDate(formData.birthdate));
+        setField(['Home Phone Number', 'Phone Number', 'Home Phone', 'HomePhone'], formData.homePhone);
+        setField(['Marital Status', 'MaritalStatus'], capitalizeFirst(formData.maritalStatus));
+        setField(['Mobile Phone Number', 'Mobile Number', 'Mobile Phone', 'Cell Phone'], formData.mobilePhone);
+        setField(['Email', 'Email Address', 'EmailAddress'], formData.email);
+        setField(['Social Insurance Number', 'SIN', 'SIN Number'], formData.sin);
         
         // Housing
-        if (formData.address) {
-          try { form.getTextField('Address').setText(formData.address); } catch {}
-        }
-        if (formData.unitNo) {
-          try { form.getTextField('Unit No.').setText(formData.unitNo); } catch {}
-        }
-        if (formData.city) {
-          try { form.getTextField('City').setText(formData.city); } catch {}
-        }
-        if (formData.province) {
-          try { form.getTextField('Province').setText(formData.province); } catch {}
-        }
-        if (formData.postalCode) {
-          try { form.getTextField('Postal Code').setText(formData.postalCode); } catch {}
-        }
-        if (formData.yearsAtAddress) {
-          try { form.getTextField('No. Years at this Address').setText(formData.yearsAtAddress); } catch {}
-        }
-        if (formData.monthlyHousingCosts) {
-          try { form.getTextField('Monthly Housing Costs').setText(formatCurrency(formData.monthlyHousingCosts)); } catch {}
-        }
-        if (formData.housingStatus) {
-          try { form.getTextField('Housing Status').setText(capitalizeFirst(formData.housingStatus)); } catch {}
-        }
+        setField(['Address', 'Street Address', 'Home Address'], formData.address);
+        setField(['Unit No', 'Unit No.', 'Unit Number', 'Apt', 'Apt.'], formData.unitNo);
+        setField(['City', 'City_1'], formData.city);
+        setField(['Province', 'Province_1', 'State'], formData.province);
+        setField(['Postal Code', 'PostalCode', 'Zip Code'], formData.postalCode);
+        setField(['No Years at this Address', 'No. Years at this Address', 'Years at Address', 'Years at Residence'], formData.yearsAtAddress);
+        setField(['Monthly Housing Costs', 'Housing Costs', 'Mortgage Amount', 'Monthly Rent'], formatCurrency(formData.monthlyHousingCosts));
+        setField(['Housing Status', 'HousingStatus', 'Residence Type'], capitalizeFirst(formData.housingStatus));
         
         // Employment
-        if (formData.businessName) {
-          try { form.getTextField('Business Name').setText(formData.businessName); } catch {}
-        }
-        if (formData.positionTitle) {
-          try { form.getTextField('Position Title').setText(formData.positionTitle); } catch {}
-        }
-        if (formData.grossMonthlyIncome) {
-          try { form.getTextField('Gross Monthly Income').setText(formatCurrency(formData.grossMonthlyIncome)); } catch {}
-        }
-        if (formData.employerAddress) {
-          try { form.getTextField('Employer Address').setText(formData.employerAddress); } catch {}
-        }
-        if (formData.timeAtJob) {
-          try { form.getTextField('Time at Job (Years)').setText(formData.timeAtJob); } catch {}
-        }
-        if (formData.employerCity) {
-          try { form.getTextField('City_2').setText(formData.employerCity); } catch {}
-        }
-        if (formData.employerProvince) {
-          try { form.getTextField('Province_2').setText(formData.employerProvince); } catch {}
-        }
-        if (formData.employmentStatus) {
-          try { form.getTextField('Employment Status').setText(capitalizeFirst(formData.employmentStatus.replace('_', ' '))); } catch {}
-        }
+        setField(['Business Name', 'Employer Name', 'Company Name', 'Employer'], formData.businessName);
+        setField(['Position Title', 'Job Title', 'Position', 'Title'], formData.positionTitle);
+        setField(['Gross Monthly Income', 'Monthly Income', 'Income', 'GrossIncome'], formatCurrency(formData.grossMonthlyIncome));
+        setField(['Employer Address', 'Work Address', 'Business Address'], formData.employerAddress);
+        setField(['Time at Job', 'Time at Job (Years)', 'Years at Job', 'Time at Employer'], formData.timeAtJob);
+        setField(['City_2', 'Employer City', 'Work City'], formData.employerCity);
+        setField(['Province_2', 'Employer Province', 'Work Province'], formData.employerProvince);
+        setField(['Employment Status', 'EmploymentStatus', 'Work Status'], capitalizeFirst(formData.employmentStatus?.replace('_', ' ')));
         
         // Borrower ID
-        if (formData.photoIdType) {
-          try { form.getTextField('Photo ID Card Type').setText(formatIdType(formData.photoIdType)); } catch {}
-        }
-        if (formData.photoIdProvince) {
-          try { form.getTextField('Photo ID Province').setText(formData.photoIdProvince); } catch {}
-        }
-        if (formData.photoIdNumber) {
-          try { form.getTextField('Photo ID Number').setText(formData.photoIdNumber); } catch {}
-        }
-        if (formData.photoIdExpiry) {
-          try { form.getTextField('Photo ID Expiry').setText(formatDate(formData.photoIdExpiry)); } catch {}
-        }
+        setField(['Photo ID Card Type', 'ID Type', 'Photo ID Type'], formatIdType(formData.photoIdType));
+        setField(['Photo ID Province', 'ID Province', 'Province of Issue'], formData.photoIdProvince);
+        setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
+        setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
         // Signing Certificate - add date, time, and location
-        try { form.getTextField('Signing Certificate').setText(signingCertificate); } catch {}
+        setField(['Signing Certificate', 'Certificate', 'Sign Certificate'], signingCertificate);
         
         // Signature and Date
+        setField(['Date', 'Signature Date', 'Sign Date'], formatDate(formData.signatureDate));
+        
         // Embed signature image if available
         if (signatureRef.current && !signatureRef.current.isEmpty()) {
           const signatureDataUrl = signatureRef.current.toDataURL('image/png');
           const signatureImageBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
           const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
           
-          // Get the signature field and embed the image
-          try {
-            const signatureField = form.getTextField('Signature');
-            const widgets = signatureField.acroField.getWidgets();
-            if (widgets.length > 0) {
-              const widget = widgets[0];
-              const rect = widget.getRectangle();
-              const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
-              
-              // Draw the signature image in the signature field location
-              page.drawImage(signatureImage, {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height,
-              });
-            }
-          } catch {}
-        }
-        if (formData.signatureDate) {
-          try { form.getTextField('Date').setText(formatDate(formData.signatureDate)); } catch {}
+          // Try to find signature field with different names
+          const signatureFieldNames = ['Signature', 'Sign', 'Customer Signature', 'Applicant Signature'];
+          for (const fieldName of signatureFieldNames) {
+            try {
+              const signatureField = form.getTextField(fieldName);
+              const widgets = signatureField.acroField.getWidgets();
+              if (widgets.length > 0) {
+                const widget = widgets[0];
+                const rect = widget.getRectangle();
+                const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
+                
+                // Draw the signature image in the signature field location
+                page.drawImage(signatureImage, {
+                  x: rect.x,
+                  y: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                });
+                console.log(`✓ Signature embedded in field "${fieldName}"`);
+                break;
+              }
+            } catch {}
+          }
         }
         
       } catch (error) {
