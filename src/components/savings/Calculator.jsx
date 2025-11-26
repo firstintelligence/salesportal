@@ -492,7 +492,7 @@ export function Calculator() {
       {/* Category Tabs - Connected Design */}
       <div className="relative">
         {/* Tab Headers */}
-        <div className="flex overflow-x-auto gap-0 bg-slate-200 dark:bg-slate-800 rounded-t-2xl p-1 pb-0">
+        <div className="flex gap-0 bg-slate-200 dark:bg-slate-800 rounded-t-2xl p-1 pb-0">
           {CATEGORIES.map((category, index) => {
             const Icon = category.icon;
             const isActive = activeTab === category.id;
@@ -500,7 +500,7 @@ export function Calculator() {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-1 min-w-[100px] flex flex-col items-center justify-center gap-1 py-3 px-2 transition-all relative ${
+                className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 transition-all relative ${
                   isActive 
                     ? `bg-gradient-to-r ${category.color} text-white rounded-t-xl shadow-lg z-10` 
                     : "bg-slate-100 dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-t-lg"
