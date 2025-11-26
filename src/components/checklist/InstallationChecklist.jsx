@@ -18,6 +18,7 @@ import {
   ChevronRight,
   FileText,
   CreditCard,
+  Maximize2,
 } from "lucide-react";
 
 // Product-specific job site photo requirements
@@ -115,7 +116,7 @@ const PRODUCT_PHOTO_REQUIREMENTS = {
   ],
 };
 
-// Base categories (Void Cheque and Photo ID are always required)
+// Base categories - Void Cheque is optional, Photo ID is required
 const BASE_CATEGORIES = {
   "Void Cheque": {
     icon: FileText,
@@ -123,6 +124,7 @@ const BASE_CATEGORIES = {
     bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
     borderColor: "border-emerald-200 dark:border-emerald-800",
     items: ["Void Cheque"],
+    optional: true, // Mark as optional
   },
   "Photo ID": {
     icon: CreditCard,
@@ -130,6 +132,7 @@ const BASE_CATEGORIES = {
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
     borderColor: "border-amber-200 dark:border-amber-800",
     items: ["Photo ID"],
+    optional: false,
   },
 };
 
@@ -139,6 +142,35 @@ const JOB_SITE_CATEGORY = {
   gradient: "from-blue-500 to-indigo-500",
   bgLight: "bg-blue-50 dark:bg-blue-950/30",
   borderColor: "border-blue-200 dark:border-blue-800",
+  optional: false,
+};
+
+// Fullscreen Image Viewer Component
+const FullscreenImageViewer = ({ imageUrl, itemName, onClose }) => {
+  return (
+    <div 
+      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+      onClick={onClose}
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 right-4 text-white hover:bg-white/20 z-10"
+        onClick={onClose}
+      >
+        <X className="w-6 h-6" />
+      </Button>
+      <div className="absolute top-4 left-4 text-white text-lg font-medium">
+        {itemName}
+      </div>
+      <img
+        src={imageUrl}
+        alt={itemName}
+        className="max-w-full max-h-full object-contain p-4"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
 };
 
 // Circular Progress Component
@@ -186,6 +218,7 @@ const InstallationChecklist = ({ customer, onBack }) => {
   const [checklistId, setChecklistId] = useState(null);
   const [checklistStatus, setChecklistStatus] = useState("pending");
   const [submitting, setSubmitting] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
   const fileInputRefs = useRef({});
   const agentId = localStorage.getItem("agentId");
 
@@ -386,11 +419,28 @@ const InstallationChecklist = ({ customer, onBack }) => {
     return { uploaded: totalUploaded, total: totalItems };
   };
 
-  const handleSubmitChecklist = async () => {
-    const { uploaded, total } = getTotalProgress();
+  // Check if required items are complete (excludes optional categories like Void Cheque)
+  const getRequiredProgress = () => {
+    let requiredItems = 0;
+    let requiredUploaded = 0;
 
-    if (uploaded < total) {
-      toast.error(`Please complete all ${total - uploaded} remaining photos before submitting`);
+    applicableCategories.forEach((category) => {
+      const categoryData = CHECKLIST_CATEGORIES[category];
+      if (!categoryData.optional) {
+        const { uploaded, total } = getCategoryProgress(category);
+        requiredItems += total;
+        requiredUploaded += uploaded;
+      }
+    });
+
+    return { uploaded: requiredUploaded, total: requiredItems };
+  };
+
+  const handleSubmitChecklist = async () => {
+    const { uploaded: requiredUploaded, total: requiredTotal } = getRequiredProgress();
+
+    if (requiredUploaded < requiredTotal) {
+      toast.error(`Please complete all required photos (${requiredTotal - requiredUploaded} remaining). Void cheque is optional.`);
       return;
     }
 
@@ -407,8 +457,26 @@ const InstallationChecklist = ({ customer, onBack }) => {
 
       if (error) throw error;
 
+      // Send SMS notification to admin MM23
+      try {
+        const { error: notifyError } = await supabase.functions.invoke('send-checklist-notification', {
+          body: {
+            customerName: `${customer.first_name} ${customer.last_name}`,
+            customerAddress: `${customer.customer_address}, ${customer.city}`,
+            agentId: agentId,
+            products: customer.products,
+          },
+        });
+
+        if (notifyError) {
+          console.error('Failed to send notification:', notifyError);
+        }
+      } catch (notifyErr) {
+        console.error('Notification error:', notifyErr);
+      }
+
       setChecklistStatus("completed");
-      toast.success("Checklist submitted successfully!");
+      toast.success("Checklist submitted successfully! Admin has been notified.");
       onBack();
     } catch (error) {
       console.error("Submit error:", error);
@@ -428,6 +496,15 @@ const InstallationChecklist = ({ customer, onBack }) => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        {/* Fullscreen Image Viewer */}
+        {fullscreenImage && (
+          <FullscreenImageViewer
+            imageUrl={fullscreenImage.url}
+            itemName={fullscreenImage.name}
+            onClose={() => setFullscreenImage(null)}
+          />
+        )}
+
         {/* Header */}
         <div className={`bg-gradient-to-r ${categoryData.gradient} p-6 pb-12`}>
           <div className="max-w-2xl mx-auto">
@@ -445,7 +522,14 @@ const InstallationChecklist = ({ customer, onBack }) => {
                 <CategoryIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">{selectedCategory}</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-white">{selectedCategory}</h2>
+                  {categoryData.optional && (
+                    <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                      Optional
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-white/80 text-sm">{uploaded} of {total} photos completed</p>
               </div>
             </div>
@@ -486,9 +570,21 @@ const InstallationChecklist = ({ customer, onBack }) => {
                       <img
                         src={photoUrl}
                         alt={item}
-                        className="w-full h-48 object-cover"
+                        className="w-full h-48 object-cover cursor-pointer"
+                        onClick={() => setFullscreenImage({ url: photoUrl, name: item })}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Fullscreen button */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 bg-black/40 text-white hover:bg-black/60"
+                        onClick={() => setFullscreenImage({ url: photoUrl, name: item })}
+                      >
+                        <Maximize2 className="w-4 h-4" />
+                      </Button>
+
                       <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="w-5 h-5 text-emerald-400" />
@@ -514,7 +610,9 @@ const InstallationChecklist = ({ customer, onBack }) => {
                           </div>
                           <span className="font-medium text-foreground">{item}</span>
                         </div>
-                        <Badge variant="outline" className="text-muted-foreground">Required</Badge>
+                        <Badge variant="outline" className="text-muted-foreground">
+                          {categoryData.optional ? "Optional" : "Required"}
+                        </Badge>
                       </div>
 
                       <input
@@ -585,10 +683,21 @@ const InstallationChecklist = ({ customer, onBack }) => {
 
   // Main category selection view
   const { uploaded: totalUploaded, total: totalItems } = getTotalProgress();
+  const { uploaded: requiredUploaded, total: requiredTotal } = getRequiredProgress();
   const overallProgress = totalItems > 0 ? (totalUploaded / totalItems) * 100 : 0;
+  const canSubmit = requiredUploaded >= requiredTotal;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      {/* Fullscreen Image Viewer */}
+      {fullscreenImage && (
+        <FullscreenImageViewer
+          imageUrl={fullscreenImage.url}
+          itemName={fullscreenImage.name}
+          onClose={() => setFullscreenImage(null)}
+        />
+      )}
+
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary/80 p-6 pb-20">
         <div className="max-w-2xl mx-auto">
@@ -634,7 +743,7 @@ const InstallationChecklist = ({ customer, onBack }) => {
                   <span className="line-clamp-1">{customer.products || "No products"}</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  {totalUploaded} of {totalItems} photos completed
+                  {requiredUploaded} of {requiredTotal} required photos
                 </p>
               </div>
             </div>
@@ -672,7 +781,12 @@ const InstallationChecklist = ({ customer, onBack }) => {
                       <CategoryIcon className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm truncate">{category}</h3>
+                      <div className="flex items-center gap-1">
+                        <h3 className="font-semibold text-white text-sm truncate">{category}</h3>
+                        {categoryData.optional && (
+                          <span className="text-white/60 text-xs">(opt)</span>
+                        )}
+                      </div>
                       <p className="text-white/80 text-xs">{uploaded}/{total} photos</p>
                     </div>
                     <ChevronRight className="w-5 h-5 text-white/60" />
@@ -698,28 +812,35 @@ const InstallationChecklist = ({ customer, onBack }) => {
       {/* Submit Section */}
       <div className="max-w-2xl mx-auto p-4 pb-8">
         {checklistStatus !== "completed" ? (
-          <Button
-            className="w-full h-14 text-lg font-semibold shadow-lg"
-            variant={totalUploaded >= totalItems ? "default" : "secondary"}
-            size="lg"
-            onClick={handleSubmitChecklist}
-            disabled={submitting || totalUploaded < totalItems}
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-5 h-5 mr-2" />
-                {totalUploaded >= totalItems 
-                  ? "Submit Checklist" 
-                  : `${totalItems - totalUploaded} photos remaining`
-                }
-              </>
+          <>
+            <Button
+              className="w-full h-14 text-lg font-semibold shadow-lg"
+              variant={canSubmit ? "default" : "secondary"}
+              size="lg"
+              onClick={handleSubmitChecklist}
+              disabled={submitting || !canSubmit}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  {canSubmit
+                    ? "Submit Checklist" 
+                    : `${requiredTotal - requiredUploaded} required photos remaining`
+                  }
+                </>
+              )}
+            </Button>
+            {canSubmit && totalUploaded < totalItems && (
+              <p className="text-center text-xs text-muted-foreground mt-2">
+                Void cheque is optional - you can submit without it
+              </p>
             )}
-          </Button>
+          </>
         ) : (
           <Card className="bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800">
             <CardContent className="p-6 text-center">
