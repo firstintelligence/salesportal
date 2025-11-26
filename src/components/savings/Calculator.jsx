@@ -9,7 +9,7 @@ import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf,
 
 const CATEGORIES = [
   { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500" },
-  { id: "insulation", name: "Insulation", icon: Home, color: "from-[#f8b4b4] to-[#e57373]" },
+  { id: "insulation", name: "Insulation", icon: Home, color: "from-[#FF69B4] to-[#FF1493]" },
   { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-blue-500 to-cyan-500" },
   { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-300 to-yellow-500" },
   { id: "battery", name: "Home Battery", icon: Battery, color: "from-green-500 to-emerald-500" },
