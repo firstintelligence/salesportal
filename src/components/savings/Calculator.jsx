@@ -493,6 +493,7 @@ export function Calculator() {
               <Switch
                 checked={data.oesp}
                 onCheckedChange={(checked) => setData({ ...data, oesp: checked })}
+                className="data-[state=checked]:bg-emerald-500"
               />
             </div>
             {data.oesp && (
