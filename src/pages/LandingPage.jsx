@@ -52,7 +52,7 @@ const LandingPage = () => {
       title: "TPV AI",
       icon: Phone,
       description: "Third-party verification calls",
-      path: "/tpv-request",
+      path: "/tpv-ai",
       gradient: "from-orange-500/20 to-amber-500/20",
       iconBg: "bg-orange-500/10",
       iconColor: "text-orange-600",
