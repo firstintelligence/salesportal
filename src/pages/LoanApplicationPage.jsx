@@ -312,12 +312,30 @@ const LoanApplicationPage = () => {
         setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
         setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
-        // Consent fields - mark with "X" if consented
+        // Consent fields - mark with centered "x" if consented
+        const setCenteredX = async (possibleNames) => {
+          for (const name of possibleNames) {
+            try {
+              const field = form.getTextField(name);
+              if (field) {
+                // Set the text with center alignment
+                field.setAlignment(1); // 1 = center alignment
+                field.setText('x');
+                console.log(`✓ Set centered "x" in "${name}"`);
+                return true;
+              }
+            } catch (e) {
+              // Not a text field, continue
+            }
+          }
+          return false;
+        };
+        
         if (formData.privacyConsent) {
-          setField(['Consent 1', 'Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1', 'Checkbox1'], 'X');
+          await setCenteredX(['Consent 1', 'Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1', 'Checkbox1']);
         }
         if (formData.electronicConsent) {
-          setField(['Consent 2', 'Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2', 'Checkbox2'], 'X');
+          await setCenteredX(['Consent 2', 'Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2', 'Checkbox2']);
         }
         
         // Signing Certificate - draw centered text directly on page
