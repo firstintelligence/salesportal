@@ -1,5 +1,8 @@
 project_id = "donhxrgrqeqnsmhtnazb"
 
+[functions.send-checklist-notification]
+verify_jwt = false
+
 [functions.initiate-tpv-call]
 verify_jwt = false
 
