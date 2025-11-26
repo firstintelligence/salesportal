@@ -963,8 +963,17 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              {/* Row 2: Monthly Income, Time at Job */}
+              {/* Row 2: Position Title, Gross Monthly Income */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="positionTitle">Position Title</Label>
+                  <Input
+                    id="positionTitle"
+                    name="positionTitle"
+                    value={formData.positionTitle}
+                    onChange={handleInputChange}
+                  />
+                </div>
                 <div>
                   <Label htmlFor="grossMonthlyIncome">Gross Monthly Income</Label>
                   <Input
@@ -975,6 +984,10 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
+              </div>
+
+              {/* Row 3: Time at Job, Employer Address */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="timeAtJob">Time at Job (Years)</Label>
                   <Input
@@ -982,19 +995,6 @@ const LoanApplicationPage = () => {
                     name="timeAtJob"
                     type="number"
                     value={formData.timeAtJob}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              {/* Row 3: Position Title, Employer Address */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="positionTitle">Position Title</Label>
-                  <Input
-                    id="positionTitle"
-                    name="positionTitle"
-                    value={formData.positionTitle}
                     onChange={handleInputChange}
                   />
                 </div>
