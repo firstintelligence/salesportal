@@ -253,6 +253,28 @@ const LoanApplicationPage = () => {
           return false;
         };
         
+        // Helper function to set checkbox fields
+        const setCheckbox = (possibleNames, checked) => {
+          for (const name of possibleNames) {
+            try {
+              const field = form.getCheckBox(name);
+              if (field) {
+                if (checked) {
+                  field.check();
+                } else {
+                  field.uncheck();
+                }
+                console.log(`✓ Checkbox "${name}" set to ${checked}`);
+                return true;
+              }
+            } catch (e) {
+              // Not a checkbox or doesn't exist, try next
+            }
+          }
+          console.log(`✗ Could not find checkbox for: ${possibleNames[0]}`);
+          return false;
+        };
+        
         // Personal Details
         setField(['Photo ID First Name', 'First Name', 'FirstName'], formData.firstName);
         setField(['Photo ID Last Name', 'Last Name', 'LastName'], formData.lastName);
@@ -280,8 +302,8 @@ const LoanApplicationPage = () => {
         setField(['Gross Monthly Income', 'Monthly Income', 'Income', 'GrossIncome'], formatCurrency(formData.grossMonthlyIncome));
         setField(['Employer Address', 'Work Address', 'Business Address'], formData.employerAddress);
         setField(['Time at Job', 'Time at Job (Years)', 'Years at Job', 'Time at Employer'], formData.timeAtJob);
-        setField(['City_2', 'Employer City', 'Work City'], formData.employerCity);
-        setField(['Province_2', 'Employer Province', 'Work Province'], formData.employerProvince);
+        setField(['City_2', 'Employer City', 'Work City', 'Job City'], formData.employerCity);
+        setField(['Province_2', 'Employer Province', 'Work Province', 'Job Province'], formData.employerProvince);
         setField(['Employment Status', 'EmploymentStatus', 'Work Status'], capitalizeFirst(formData.employmentStatus?.replace('_', ' ')));
         
         // Borrower ID
@@ -290,19 +312,50 @@ const LoanApplicationPage = () => {
         setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
         setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
-        // Signing Certificate - add date, time, and location with smaller font
+        // Consent Checkboxes
+        setCheckbox(['Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1'], formData.privacyConsent);
+        setCheckbox(['Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2'], formData.electronicConsent);
+        setCheckbox(['Credit Consent', 'CreditConsent', 'Credit Authorization', 'Check Box 3', 'Check Box3', 'checkbox3'], formData.creditConsent);
+        
+        // Signing Certificate - draw centered text directly on page
         const signingCertFieldNames = ['Signing Certificate', 'Certificate', 'Sign Certificate'];
+        const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
         for (const fieldName of signingCertFieldNames) {
           try {
             const certField = form.getTextField(fieldName);
             if (certField) {
-              // Set smaller font size and center alignment
-              certField.setFontSize(7);
-              certField.setText(signingCertificate);
-              console.log(`✓ Signing certificate filled in "${fieldName}"`);
-              break;
+              const widgets = certField.acroField.getWidgets();
+              if (widgets.length > 0) {
+                const widget = widgets[0];
+                const rect = widget.getRectangle();
+                const pages = pdfDoc.getPages();
+                const page = pages[0];
+                
+                // Clear the field
+                certField.setText('');
+                
+                // Calculate text width to center it
+                const fontSize = 6;
+                const textWidth = helveticaFont.widthOfTextAtSize(signingCertificate, fontSize);
+                const xPos = rect.x + (rect.width - textWidth) / 2;
+                const yPos = rect.y + (rect.height - fontSize) / 2;
+                
+                // Draw centered text
+                page.drawText(signingCertificate, {
+                  x: xPos,
+                  y: yPos,
+                  size: fontSize,
+                  font: helveticaFont,
+                  color: rgb(0, 0, 0),
+                });
+                
+                console.log(`✓ Signing certificate centered in "${fieldName}"`);
+                break;
+              }
             }
-          } catch {}
+          } catch (e) {
+            console.log(`Could not set signing certificate in "${fieldName}":`, e.message);
+          }
         }
         
         // Signature and Date
@@ -328,7 +381,7 @@ const LoanApplicationPage = () => {
                   const widget = widgets[0];
                   const rect = widget.getRectangle();
                   
-                  // Get the page - widgets are on page 0 (first page) for this PDF
+                  // Get the page
                   const pages = pdfDoc.getPages();
                   const page = pages[0];
                   
