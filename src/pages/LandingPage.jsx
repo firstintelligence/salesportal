@@ -22,6 +22,15 @@ const LandingPage = () => {
       iconColor: "text-emerald-600",
     },
     {
+      title: "Payment Calculator",
+      icon: DollarSign,
+      description: "Calculate installment estimates",
+      path: "/payment-calculator",
+      gradient: "from-pink-500/20 to-rose-500/20",
+      iconBg: "bg-pink-500/10",
+      iconColor: "text-pink-600",
+    },
+    {
       title: "Invoice Generator",
       icon: FileText,
       description: "Create professional invoices and quotes",
@@ -47,15 +56,6 @@ const LandingPage = () => {
       gradient: "from-orange-500/20 to-amber-500/20",
       iconBg: "bg-orange-500/10",
       iconColor: "text-orange-600",
-    },
-    {
-      title: "Payment Calculator",
-      icon: DollarSign,
-      description: "Calculate installment estimates",
-      path: "/payment-calculator",
-      gradient: "from-pink-500/20 to-rose-500/20",
-      iconBg: "bg-pink-500/10",
-      iconColor: "text-pink-600",
     },
   ];
 
