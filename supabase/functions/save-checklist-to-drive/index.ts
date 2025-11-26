@@ -175,7 +175,7 @@ serve(async (req) => {
   }
 
   try {
-    const { checklistId, customerName, customerAddress, province, postalCode, photos } = await req.json();
+    const { checklistId, customerName, customerAddress, city, province, postalCode, photos } = await req.json();
     console.log('Saving checklist to Drive for:', customerName);
 
     const GOOGLE_CLIENT_EMAIL = Deno.env.get('GOOGLE_SHEETS_CLIENT_EMAIL');
@@ -190,8 +190,8 @@ serve(async (req) => {
     const accessToken = await getAccessToken(GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY);
     console.log('Got access token');
 
-    // Create folder with customer name, address, province, and postal code
-    const locationParts = [customerAddress, province, postalCode].filter(Boolean).join(', ');
+    // Create folder with customer name, address, city, province, and postal code
+    const locationParts = [customerAddress, city, province, postalCode].filter(Boolean).join(', ');
     const folderName = `${customerName} - ${locationParts}`;
     const folderId = await createFolder(accessToken, folderName, PARENT_FOLDER_ID || undefined);
 
