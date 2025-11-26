@@ -471,12 +471,52 @@ const InstallationChecklist = ({ customer, onBack }) => {
 
       if (error) throw error;
 
+      const customerName = `${customer.first_name} ${customer.last_name}`;
+      const customerAddress = `${customer.customer_address}, ${customer.city}`;
+
+      // Collect all photos for Google Drive upload
+      const allPhotos = [];
+      applicableCategories.forEach((category) => {
+        const categoryItems = CHECKLIST_CATEGORIES[category].items;
+        categoryItems.forEach((item) => {
+          const photoUrl = photos[category]?.[item];
+          if (photoUrl) {
+            allPhotos.push({
+              category,
+              itemName: item,
+              photoUrl,
+            });
+          }
+        });
+      });
+
+      // Save photos to Google Drive
+      try {
+        const { error: driveError } = await supabase.functions.invoke('save-checklist-to-drive', {
+          body: {
+            checklistId,
+            customerName,
+            customerAddress,
+            photos: allPhotos,
+          },
+        });
+
+        if (driveError) {
+          console.error('Failed to save to Google Drive:', driveError);
+          toast.warning("Checklist submitted but failed to save to Google Drive");
+        } else {
+          console.log('Successfully saved to Google Drive');
+        }
+      } catch (driveErr) {
+        console.error('Google Drive error:', driveErr);
+      }
+
       // Send SMS notification to admin MM23
       try {
         const { error: notifyError } = await supabase.functions.invoke('send-checklist-notification', {
           body: {
-            customerName: `${customer.first_name} ${customer.last_name}`,
-            customerAddress: `${customer.customer_address}, ${customer.city}`,
+            customerName,
+            customerAddress,
             agentId: agentId,
             products: customer.products,
           },
@@ -490,7 +530,7 @@ const InstallationChecklist = ({ customer, onBack }) => {
       }
 
       setChecklistStatus("completed");
-      toast.success("Checklist submitted successfully! Admin has been notified.");
+      toast.success("Checklist submitted and saved to Google Drive! Admin has been notified.");
       onBack();
     } catch (error) {
       console.error("Submit error:", error);

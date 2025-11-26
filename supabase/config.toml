@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.sync-to-google-sheets]
 verify_jwt = false
+
+[functions.save-checklist-to-drive]
+verify_jwt = false
