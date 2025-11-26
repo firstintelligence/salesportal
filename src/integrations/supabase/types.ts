@@ -14,6 +14,79 @@ export type Database = {
   }
   public: {
     Tables: {
+      checklist_photos: {
+        Row: {
+          category: string
+          checklist_id: string
+          created_at: string
+          id: string
+          item_name: string
+          photo_url: string
+        }
+        Insert: {
+          category: string
+          checklist_id: string
+          created_at?: string
+          id?: string
+          item_name: string
+          photo_url: string
+        }
+        Update: {
+          category?: string
+          checklist_id?: string
+          created_at?: string
+          id?: string
+          item_name?: string
+          photo_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_photos_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "installation_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      installation_checklists: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          status: string
+          submitted_at: string | null
+          tpv_request_id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          status?: string
+          submitted_at?: string | null
+          tpv_request_id: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          status?: string
+          submitted_at?: string | null
+          tpv_request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installation_checklists_tpv_request_id_fkey"
+            columns: ["tpv_request_id"]
+            isOneToOne: true
+            referencedRelation: "tpv_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tpv_requests: {
         Row: {
           agent_id: string
@@ -100,7 +173,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin_agent: { Args: { agent_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
