@@ -181,10 +181,10 @@ const LoanApplicationPage = () => {
             const data = await response.json();
             
             if (data && data.address) {
-              const { house_number, road, city, town, village, state, postcode, country } = data.address;
+              const { house_number, road, city, town, village, state, postcode } = data.address;
               const streetAddress = [house_number, road].filter(Boolean).join(' ');
               const locality = city || town || village || '';
-              const locationString = [streetAddress, locality, state, postcode, country].filter(Boolean).join(', ');
+              const locationString = [streetAddress, locality, state, postcode].filter(Boolean).join(', ');
               resolve(locationString);
             } else {
               resolve(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
