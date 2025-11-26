@@ -17,7 +17,7 @@ import {
   Image,
   ChevronRight,
   FileText,
-  IdCard,
+  CreditCard,
 } from "lucide-react";
 
 // Define checklist items for each category
@@ -44,7 +44,7 @@ const CHECKLIST_CATEGORIES = {
     ],
   },
   "Photo ID": {
-    icon: IdCard,
+    icon: CreditCard,
     gradient: "from-amber-500 to-orange-500",
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
     borderColor: "border-amber-200 dark:border-amber-800",
