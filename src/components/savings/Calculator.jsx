@@ -508,9 +508,6 @@ export function Calculator() {
               >
                 <Icon className="w-5 h-5" />
                 <span className="text-xs font-medium whitespace-nowrap">{category.name}</span>
-                {isActive && (
-                  <div className={`absolute -bottom-1 left-0 right-0 h-2 bg-gradient-to-r ${category.color}`} />
-                )}
               </button>
             );
           })}
