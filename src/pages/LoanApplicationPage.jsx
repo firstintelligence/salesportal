@@ -165,40 +165,63 @@ const LoanApplicationPage = () => {
     setSavedSignatureDataUrl(dataUrl);
   };
 
-  // Get user's location using geolocation API
+  // Get user's location using geolocation API with IP fallback
   const getUserLocation = () => {
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) {
-        resolve(null);
-        return;
-      }
-      
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            // Reverse geocode to get address
-            const { latitude, longitude } = position.coords;
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-            );
-            const data = await response.json();
-            
-            if (data && data.address) {
-              const { house_number, road, city, town, village, state, postcode } = data.address;
-              const streetAddress = [house_number, road].filter(Boolean).join(' ');
-              const locality = city || town || village || '';
-              const locationString = [streetAddress, locality, state, postcode].filter(Boolean).join(', ');
-              resolve(locationString);
-            } else {
-              resolve(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-            }
-          } catch {
-            resolve(`${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`);
+    return new Promise(async (resolve) => {
+      // Helper to get IP-based location as fallback
+      const getIpLocation = async () => {
+        try {
+          const response = await fetch('https://ipapi.co/json/');
+          const data = await response.json();
+          if (data && data.city) {
+            return [data.city, data.region, data.postal].filter(Boolean).join(', ');
           }
-        },
-        () => resolve(null),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+          return null;
+        } catch {
+          return null;
+        }
+      };
+
+      // Helper to reverse geocode coordinates
+      const reverseGeocode = async (latitude, longitude) => {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+          );
+          const data = await response.json();
+          
+          if (data && data.address) {
+            const { house_number, road, city, town, village, state, postcode } = data.address;
+            const streetAddress = [house_number, road].filter(Boolean).join(' ');
+            const locality = city || town || village || '';
+            return [streetAddress, locality, state, postcode].filter(Boolean).join(', ');
+          }
+          return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        } catch {
+          return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        }
+      };
+
+      // Try browser geolocation first
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            const location = await reverseGeocode(latitude, longitude);
+            resolve(location);
+          },
+          async () => {
+            // Browser geolocation failed, try IP-based fallback
+            const ipLocation = await getIpLocation();
+            resolve(ipLocation || 'Location unavailable');
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      } else {
+        // No geolocation support, try IP-based fallback
+        const ipLocation = await getIpLocation();
+        resolve(ipLocation || 'Location unavailable');
+      }
     });
   };
 
@@ -213,11 +236,8 @@ const LoanApplicationPage = () => {
       const torontoTime = toZonedTime(now, 'America/Toronto');
       const formattedDateTime = format(torontoTime, "MMMM d, yyyy 'at' h:mm:ss a 'EST'");
       
-      // Build signing certificate text
-      let signingCertificate = `Signed on ${formattedDateTime}`;
-      if (location) {
-        signingCertificate += ` at ${location}`;
-      }
+      // Build signing certificate text (location will always have a value now)
+      const signingCertificate = `Signed on ${formattedDateTime} at ${location}`;
       
       // Load the PDF template with no-cache to ensure fresh copy
       const existingPdfBytes = await fetch('/templates/Financeit_Loan_Application_Form_Fillable.pdf', {
