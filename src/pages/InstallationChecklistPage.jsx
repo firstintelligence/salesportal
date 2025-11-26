@@ -1,11 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, Clock, User, MapPin, Package } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, User, MapPin, DollarSign, Flame, Home, Sun } from "lucide-react";
 import InstallationChecklist from "@/components/checklist/InstallationChecklist";
+
+// Product category groupings
+const PRODUCT_CATEGORIES = {
+  HVAC: [
+    "heat pump", "furnace", "air conditioner", "ac", "hvac", "ductless", 
+    "mini split", "boiler", "air handler", "thermostat", "air filter", 
+    "air purifier", "humidifier", "dehumidifier", "water heater", 
+    "tankless", "hot water"
+  ],
+  Insulation: [
+    "insulation", "attic insulation", "wall insulation", "spray foam", 
+    "blown-in", "batt insulation", "weatherization"
+  ],
+  "Solar/Battery": [
+    "solar", "solar panel", "battery", "battery storage", "powerwall", 
+    "energy storage", "inverter"
+  ],
+};
 
 const InstallationChecklistPage = () => {
   const navigate = useNavigate();
@@ -63,17 +81,103 @@ const InstallationChecklistPage = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-emerald-500 hover:bg-emerald-600"><CheckCircle className="w-3 h-3 mr-1" /> Completed</Badge>;
+        return (
+          <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">
+            <CheckCircle className="w-3 h-3 mr-1" /> Submitted
+          </Badge>
+        );
       case "pending":
-        return <Badge className="bg-amber-500 hover:bg-amber-600"><Clock className="w-3 h-3 mr-1" /> In Progress</Badge>;
+        return (
+          <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Clock className="w-3 h-3 mr-1" /> Started
+          </Badge>
+        );
       default:
-        return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" /> Not Started</Badge>;
+        return (
+          <Badge variant="outline" className="text-muted-foreground">
+            <Clock className="w-3 h-3 mr-1" /> Not Started
+          </Badge>
+        );
     }
   };
 
-  const parseProducts = (productsString) => {
-    if (!productsString) return [];
-    return productsString.split(",").map(p => p.trim());
+  // Group products by category
+  const groupProductsByCategory = (productsString) => {
+    if (!productsString) return {};
+    
+    const products = productsString.split(",").map(p => p.trim().toLowerCase());
+    const grouped = {
+      HVAC: [],
+      Insulation: [],
+      "Solar/Battery": [],
+    };
+
+    products.forEach((product) => {
+      let categorized = false;
+      
+      for (const [category, keywords] of Object.entries(PRODUCT_CATEGORIES)) {
+        if (keywords.some(keyword => product.includes(keyword))) {
+          // Use original case from the products string
+          const originalProduct = productsString.split(",").find(
+            p => p.trim().toLowerCase() === product
+          );
+          grouped[category].push(originalProduct?.trim() || product);
+          categorized = true;
+          break;
+        }
+      }
+      
+      // If not categorized, put in HVAC by default
+      if (!categorized) {
+        const originalProduct = productsString.split(",").find(
+          p => p.trim().toLowerCase() === product
+        );
+        grouped.HVAC.push(originalProduct?.trim() || product);
+      }
+    });
+
+    // Remove empty categories
+    return Object.fromEntries(
+      Object.entries(grouped).filter(([_, items]) => items.length > 0)
+    );
+  };
+
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case "HVAC":
+        return <Flame className="w-3 h-3" />;
+      case "Insulation":
+        return <Home className="w-3 h-3" />;
+      case "Solar/Battery":
+        return <Sun className="w-3 h-3" />;
+      default:
+        return null;
+    }
+  };
+
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case "HVAC":
+        return "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300";
+      case "Insulation":
+        return "bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300";
+      case "Solar/Battery":
+        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300";
+      default:
+        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return null;
+    const num = parseFloat(amount.replace(/[^0-9.-]+/g, ""));
+    if (isNaN(num)) return amount;
+    return new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: 'CAD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(num);
   };
 
   if (selectedCustomer) {
@@ -118,45 +222,84 @@ const InstallationChecklistPage = () => {
           </Card>
         ) : (
           <div className="grid gap-4">
-            {customers.map((customer) => (
-              <Card
-                key={customer.id}
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.01]"
-                onClick={() => setSelectedCustomer(customer)}
-              >
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold text-foreground">
-                          {customer.first_name} {customer.last_name}
-                        </span>
-                        {isAdmin && (
-                          <Badge variant="outline" className="text-xs">
-                            Agent: {customer.agent_id}
-                          </Badge>
+            {customers.map((customer) => {
+              const status = getChecklistStatus(customer);
+              const groupedProducts = groupProductsByCategory(customer.products);
+              const isSubmitted = status === "completed";
+
+              return (
+                <Card
+                  key={customer.id}
+                  className={`cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.01] ${
+                    isSubmitted ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20" : ""
+                  }`}
+                  onClick={() => setSelectedCustomer(customer)}
+                >
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="space-y-3 flex-1">
+                        {/* Customer Name & Agent */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-semibold text-foreground">
+                            {customer.first_name} {customer.last_name}
+                          </span>
+                          {isAdmin && (
+                            <Badge variant="outline" className="text-xs">
+                              Agent: {customer.agent_id}
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Address */}
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="w-4 h-4 flex-shrink-0" />
+                          <span>{customer.customer_address}, {customer.city}, {customer.province}</span>
+                        </div>
+
+                        {/* Deal Size */}
+                        {customer.sales_price && (
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="font-semibold text-emerald-700 dark:text-emerald-300 text-lg">
+                              {formatCurrency(customer.sales_price)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">(incl. tax)</span>
+                          </div>
                         )}
+
+                        {/* Products grouped by category */}
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(groupedProducts).map(([category, products]) => (
+                            <div key={category} className="flex items-center gap-1">
+                              <Badge 
+                                variant="secondary" 
+                                className={`${getCategoryColor(category)} text-xs`}
+                              >
+                                {getCategoryIcon(category)}
+                                <span className="ml-1">{category}:</span>
+                                <span className="ml-1 font-normal">{products.join(", ")}</span>
+                              </Badge>
+                            </div>
+                          ))}
+                          {Object.keys(groupedProducts).length === 0 && (
+                            <span className="text-sm text-muted-foreground">No products specified</span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                        <span>{customer.customer_address}, {customer.city}, {customer.province}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Package className="w-4 h-4" />
-                        <span>{customer.products || "No products specified"}</span>
+
+                      {/* Status & Date */}
+                      <div className="flex flex-col items-end gap-2">
+                        {getStatusBadge(status)}
+                        <span className="text-xs text-muted-foreground">
+                          TPV: {new Date(customer.created_at).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      {getStatusBadge(getChecklistStatus(customer))}
-                      <span className="text-xs text-muted-foreground">
-                        TPV: {new Date(customer.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
