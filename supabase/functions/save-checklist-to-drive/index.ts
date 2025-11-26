@@ -175,7 +175,7 @@ serve(async (req) => {
   }
 
   try {
-    const { checklistId, customerName, customerAddress, photos } = await req.json();
+    const { checklistId, customerName, customerAddress, province, postalCode, photos } = await req.json();
     console.log('Saving checklist to Drive for:', customerName);
 
     const GOOGLE_CLIENT_EMAIL = Deno.env.get('GOOGLE_SHEETS_CLIENT_EMAIL');
@@ -190,14 +190,15 @@ serve(async (req) => {
     const accessToken = await getAccessToken(GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY);
     console.log('Got access token');
 
-    // Create folder with customer name and address
-    const folderName = `${customerName} - ${customerAddress}`;
+    // Create folder with customer name, address, province, and postal code
+    const locationParts = [customerAddress, province, postalCode].filter(Boolean).join(', ');
+    const folderName = `${customerName} - ${locationParts}`;
     const folderId = await createFolder(accessToken, folderName, PARENT_FOLDER_ID || undefined);
 
     // Upload each photo
     const uploadedFiles = [];
     for (const photo of photos) {
-      const fileName = `${customerName} - ${photo.itemName}`;
+      const fileName = `${customerName} - ${locationParts} - ${photo.itemName}`;
       // Get file extension from URL or default to jpg
       const extension = photo.photoUrl.split('.').pop()?.split('?')[0] || 'jpg';
       const fullFileName = `${fileName}.${extension}`;
