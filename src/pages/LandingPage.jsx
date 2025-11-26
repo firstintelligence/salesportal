@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -56,6 +56,15 @@ const LandingPage = () => {
       gradient: "from-orange-500/20 to-amber-500/20",
       iconBg: "bg-orange-500/10",
       iconColor: "text-orange-600",
+    },
+    {
+      title: "Installation Checklist",
+      icon: ClipboardCheck,
+      description: "Photo documentation for installations",
+      path: "/installation-checklist",
+      gradient: "from-cyan-500/20 to-sky-500/20",
+      iconBg: "bg-cyan-500/10",
+      iconColor: "text-cyan-600",
     },
   ];
 

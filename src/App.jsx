@@ -11,6 +11,7 @@ import TemplatePage from "./pages/TemplatePage";
 import ReceiptPage from "./pages/ReceiptPage";
 import LoanApplicationPage from "./pages/LoanApplicationPage";
 import PaymentCalculatorPage from "./pages/PaymentCalculatorPage";
+import InstallationChecklistPage from "./pages/InstallationChecklistPage";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/tpv-ai" element={<TPVAiPage />} />
           <Route path="/template" element={<TemplatePage />} />
           <Route path="/receipt" element={<ReceiptPage />} />
+          <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
