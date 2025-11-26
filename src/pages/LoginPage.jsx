@@ -22,7 +22,6 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Small delay for visual feedback
     await new Promise(resolve => setTimeout(resolve, 300));
     
     const agent = AGENT_CREDENTIALS.find((a) => a.id === agentId);
@@ -43,21 +42,14 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Animated gradient background */}
+      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-600/20 via-transparent to-transparent" />
-      
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/30 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-600/30 via-transparent to-transparent" />
 
       <div className="w-full max-w-md px-4 relative z-10">
-        {/* Card with glassmorphism */}
-        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-2xl p-8 md:p-10">
+        {/* Solid white card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
@@ -67,10 +59,10 @@ const LoginPage = () => {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
               Sales Portal
             </h1>
-            <p className="text-slate-300 text-sm">
+            <p className="text-slate-600 text-sm">
               Enter your credentials to continue
             </p>
           </div>
@@ -78,7 +70,7 @@ const LoginPage = () => {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm text-white font-medium">
+              <label className="text-sm text-slate-700 font-medium">
                 Agent ID
               </label>
               <Input
@@ -86,7 +78,7 @@ const LoginPage = () => {
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value)}
                 placeholder="Enter your agent ID"
-                className="w-full h-12 bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 rounded-xl"
+                className="w-full h-12 bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                 autoFocus
               />
             </div>
@@ -94,7 +86,7 @@ const LoginPage = () => {
             <Button 
               type="submit" 
               disabled={isLoading || !agentId}
-              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border-0 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -108,7 +100,7 @@ const LoginPage = () => {
           </form>
 
           {/* Footer */}
-          <p className="text-center text-slate-400 text-xs mt-8">
+          <p className="text-center text-slate-500 text-xs mt-8">
             Secure access for authorized personnel only
           </p>
         </div>
