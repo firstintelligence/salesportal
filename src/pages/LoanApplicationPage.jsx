@@ -302,8 +302,8 @@ const LoanApplicationPage = () => {
         setField(['Gross Monthly Income', 'Monthly Income', 'Income', 'GrossIncome'], formatCurrency(formData.grossMonthlyIncome));
         setField(['Employer Address', 'Work Address', 'Business Address'], formData.employerAddress);
         setField(['Time at Job', 'Time at Job (Years)', 'Years at Job', 'Time at Employer'], formData.timeAtJob);
-        setField(['City_2', 'Employer City', 'Work City', 'Job City'], formData.employerCity);
-        setField(['Province_2', 'Employer Province', 'Work Province', 'Job Province'], formData.employerProvince);
+        setField(['City_2', 'Employer City', 'Work City', 'Job City', 'City 2', 'EmployerCity'], formData.employerCity);
+        setField(['Province_2', 'Employer Province', 'Work Province', 'Job Province', 'Province 2', 'EmployerProvince'], formData.employerProvince);
         setField(['Employment Status', 'EmploymentStatus', 'Work Status'], capitalizeFirst(formData.employmentStatus?.replace('_', ' ')));
         
         // Borrower ID
@@ -312,10 +312,13 @@ const LoanApplicationPage = () => {
         setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
         setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
-        // Consent Checkboxes
-        setCheckbox(['Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1'], formData.privacyConsent);
-        setCheckbox(['Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2'], formData.electronicConsent);
-        setCheckbox(['Credit Consent', 'CreditConsent', 'Credit Authorization', 'Check Box 3', 'Check Box3', 'checkbox3'], formData.creditConsent);
+        // Consent fields - mark with "X" if consented
+        if (formData.privacyConsent) {
+          setField(['Consent 1', 'Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1', 'Checkbox1'], 'X');
+        }
+        if (formData.electronicConsent) {
+          setField(['Consent 2', 'Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2', 'Checkbox2'], 'X');
+        }
         
         // Signing Certificate - draw centered text directly on page
         const signingCertFieldNames = ['Signing Certificate', 'Certificate', 'Sign Certificate'];
