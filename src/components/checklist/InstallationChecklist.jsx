@@ -20,42 +20,126 @@ import {
   CreditCard,
 } from "lucide-react";
 
-// Define checklist items for each category
-const CHECKLIST_CATEGORIES = {
-  "Job Site Pictures": {
-    icon: Camera,
-    gradient: "from-blue-500 to-indigo-500",
-    bgLight: "bg-blue-50 dark:bg-blue-950/30",
-    borderColor: "border-blue-200 dark:border-blue-800",
-    items: [
-      "Front of House",
-      "Installation Area",
-      "Equipment Installed",
-      "Work Completed",
-    ],
-  },
+// Product-specific job site photo requirements
+const PRODUCT_PHOTO_REQUIREMENTS = {
+  "Heat Pump": [
+    "Existing Unit",
+    "Electrical Panel",
+    "Ductwork",
+    "Thermostat Location",
+    "Installation Area",
+  ],
+  "Furnace": [
+    "Existing Furnace",
+    "Electrical Panel",
+    "Ductwork",
+    "Gas Line",
+    "Venting",
+    "Thermostat Location",
+  ],
+  "Air Conditioner": [
+    "Existing AC Unit",
+    "Electrical Panel",
+    "Ductwork",
+    "Thermostat Location",
+    "Outdoor Unit Location",
+  ],
+  "HVAC": [
+    "Existing Unit",
+    "Electrical Panel",
+    "Ductwork",
+    "Thermostat Location",
+    "Installation Area",
+  ],
+  "Water Heater": [
+    "Existing Water Heater",
+    "Gas/Electric Connection",
+    "Venting",
+    "Water Connections",
+    "Installation Area",
+  ],
+  "Tankless Water Heater": [
+    "Existing Water Heater",
+    "Gas/Electric Connection",
+    "Venting",
+    "Water Connections",
+    "Installation Area",
+  ],
+  "Water Filter": [
+    "Installation Area",
+    "Plumbing Connections",
+    "Existing System",
+  ],
+  "Water Softener": [
+    "Installation Area",
+    "Plumbing Connections",
+    "Drain Connection",
+    "Existing System",
+  ],
+  "Reverse Osmosis": [
+    "Installation Area",
+    "Plumbing Connections",
+    "Under Sink Area",
+  ],
+  "Air Filter": [
+    "Existing HVAC System",
+    "Ductwork Connection",
+    "Installation Location",
+  ],
+  "Air Purifier": [
+    "Existing HVAC System",
+    "Ductwork Connection",
+    "Installation Location",
+  ],
+  "Solar": [
+    "Roof Area",
+    "Electrical Panel",
+    "Meter Location",
+    "Attic Access",
+  ],
+  "Solar Panels": [
+    "Roof Area",
+    "Electrical Panel",
+    "Meter Location",
+    "Attic Access",
+  ],
+  "Battery": [
+    "Installation Area",
+    "Electrical Panel",
+    "Existing Solar Setup",
+  ],
+  "Battery Storage": [
+    "Installation Area",
+    "Electrical Panel",
+    "Existing Solar Setup",
+  ],
+};
+
+// Base categories (Void Cheque and Photo ID are always required)
+const BASE_CATEGORIES = {
   "Void Cheque": {
     icon: FileText,
     gradient: "from-emerald-500 to-teal-500",
     bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
     borderColor: "border-emerald-200 dark:border-emerald-800",
-    items: [
-      "Void Cheque",
-    ],
+    items: ["Void Cheque"],
   },
   "Photo ID": {
     icon: CreditCard,
     gradient: "from-amber-500 to-orange-500",
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
     borderColor: "border-amber-200 dark:border-amber-800",
-    items: [
-      "Photo ID",
-    ],
+    items: ["Photo ID"],
   },
 };
 
-// All customers get all categories
-const getDefaultCategories = () => Object.keys(CHECKLIST_CATEGORIES);
+// Job Site Pictures category template
+const JOB_SITE_CATEGORY = {
+  icon: Camera,
+  gradient: "from-blue-500 to-indigo-500",
+  bgLight: "bg-blue-50 dark:bg-blue-950/30",
+  borderColor: "border-blue-200 dark:border-blue-800",
+};
 
 // Circular Progress Component
 const CircularProgress = ({ value, size = 120, strokeWidth = 8 }) => {
@@ -105,8 +189,39 @@ const InstallationChecklist = ({ customer, onBack }) => {
   const fileInputRefs = useRef({});
   const agentId = localStorage.getItem("agentId");
 
-  // All customers get all categories
-  const applicableCategories = getDefaultCategories();
+  // Build dynamic categories based on customer products
+  const buildCategories = () => {
+    const categories = {};
+    const products = customer.products?.split(",").map((p) => p.trim()) || [];
+    
+    // Build Job Site Pictures based on products
+    const jobSiteItems = new Set();
+    products.forEach((product) => {
+      Object.entries(PRODUCT_PHOTO_REQUIREMENTS).forEach(([key, items]) => {
+        if (product.toLowerCase().includes(key.toLowerCase())) {
+          items.forEach(item => jobSiteItems.add(item));
+        }
+      });
+    });
+
+    // If we found product-specific items, add Job Site Pictures category
+    if (jobSiteItems.size > 0) {
+      categories["Job Site Pictures"] = {
+        ...JOB_SITE_CATEGORY,
+        items: Array.from(jobSiteItems),
+      };
+    }
+
+    // Always add base categories (Void Cheque, Photo ID)
+    Object.entries(BASE_CATEGORIES).forEach(([name, config]) => {
+      categories[name] = config;
+    });
+
+    return categories;
+  };
+
+  const CHECKLIST_CATEGORIES = buildCategories();
+  const applicableCategories = Object.keys(CHECKLIST_CATEGORIES);
 
   useEffect(() => {
     loadExistingChecklist();
