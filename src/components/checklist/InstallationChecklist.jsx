@@ -376,6 +376,20 @@ const InstallationChecklist = ({ customer, onBack }) => {
           .eq("checklist_id", checklistId)
           .eq("category", category)
           .eq("item_name", itemName);
+
+        // If checklist was completed, revert to pending status
+        if (checklistStatus === "completed") {
+          await supabase
+            .from("installation_checklists")
+            .update({
+              status: "pending",
+              submitted_at: null,
+            })
+            .eq("id", checklistId);
+          
+          setChecklistStatus("pending");
+          toast.info("Checklist reopened - please resubmit after changes");
+        }
       }
 
       setPhotos((prev) => {

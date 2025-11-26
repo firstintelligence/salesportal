@@ -257,17 +257,6 @@ const InstallationChecklistPage = () => {
                           <span>{customer.customer_address}, {customer.city}, {customer.province}</span>
                         </div>
 
-                        {/* Deal Size */}
-                        {customer.sales_price && (
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                            <span className="font-semibold text-emerald-700 dark:text-emerald-300 text-lg">
-                              {formatCurrency(customer.sales_price)}
-                            </span>
-                            <span className="text-xs text-muted-foreground">(incl. tax)</span>
-                          </div>
-                        )}
-
                         {/* Products grouped by category */}
                         <div className="flex flex-wrap gap-2">
                           {Object.entries(groupedProducts).map(([category, products]) => (
@@ -288,12 +277,26 @@ const InstallationChecklistPage = () => {
                         </div>
                       </div>
 
-                      {/* Status & Date */}
-                      <div className="flex flex-col items-end gap-2">
+                      {/* Status - Middle */}
+                      <div className="flex flex-col items-center gap-2 sm:min-w-[120px]">
                         {getStatusBadge(status)}
                         <span className="text-xs text-muted-foreground">
                           TPV: {new Date(customer.created_at).toLocaleDateString()}
                         </span>
+                      </div>
+
+                      {/* Deal Size - Right */}
+                      <div className="flex flex-col items-end gap-1 sm:min-w-[100px]">
+                        {customer.sales_price ? (
+                          <>
+                            <span className="font-bold text-emerald-700 dark:text-emerald-300 text-lg">
+                              {formatCurrency(customer.sales_price)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">(incl. tax)</span>
+                          </>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">No price</span>
+                        )}
                       </div>
                     </div>
                   </CardContent>
