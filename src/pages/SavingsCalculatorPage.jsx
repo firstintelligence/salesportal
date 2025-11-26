@@ -29,8 +29,8 @@ const SavingsCalculatorPage = () => {
       </div>
       
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent leading-tight pb-1">
             Energy Savings Calculator
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
