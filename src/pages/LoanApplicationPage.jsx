@@ -388,7 +388,6 @@ const LoanApplicationPage = () => {
         // Embed signature image if available
         if (savedSignatureDataUrl) {
           const signatureImageBytes = await fetch(savedSignatureDataUrl).then(res => res.arrayBuffer());
-          const signatureImageBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
           const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
           
           // Try to find signature field with different names and draw image directly on page
