@@ -1,13 +1,13 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, Download, Calendar as CalendarIcon, Pen } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import SignatureCanvas from "react-signature-canvas";
 import financeitLogo from "@/assets/financeit-logo.svg";
+import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import {
@@ -25,7 +25,8 @@ import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
-  const signatureRef = useRef(null);
+  const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
+  const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   
   const formatLocalDate = (date) => {
     if (!date) return "";
@@ -157,9 +158,11 @@ const LoanApplicationPage = () => {
   };
 
   const clearSignature = () => {
-    if (signatureRef.current) {
-      signatureRef.current.clear();
-    }
+    setSavedSignatureDataUrl(null);
+  };
+
+  const handleSignatureSave = (dataUrl) => {
+    setSavedSignatureDataUrl(dataUrl);
   };
 
   // Get user's location using geolocation API
@@ -383,8 +386,8 @@ const LoanApplicationPage = () => {
         setField(['Date', 'Signature Date', 'Sign Date'], formatDate(formData.signatureDate));
         
         // Embed signature image if available
-        if (signatureRef.current && !signatureRef.current.isEmpty()) {
-          const signatureDataUrl = signatureRef.current.toDataURL('image/png');
+        if (savedSignatureDataUrl) {
+          const signatureImageBytes = await fetch(savedSignatureDataUrl).then(res => res.arrayBuffer());
           const signatureImageBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
           const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
           
@@ -503,7 +506,7 @@ const LoanApplicationPage = () => {
       return;
     }
     
-    if (!signatureRef.current || signatureRef.current.isEmpty()) {
+    if (!savedSignatureDataUrl) {
       toast.error('Signature is required');
       return;
     }
@@ -1088,25 +1091,26 @@ const LoanApplicationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div>
                   <Label htmlFor="signature">Signature *</Label>
-                  <div className="border border-border rounded-md bg-background">
-                    <SignatureCanvas
-                      ref={signatureRef}
-                      canvasProps={{
-                        className: 'w-full h-32 rounded-md',
-                      }}
-                      backgroundColor="rgb(255, 255, 255)"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={clearSignature}
-                    className="mt-2"
+                  <div 
+                    className="border border-border rounded-md bg-white cursor-pointer hover:border-primary transition-colors min-h-32 flex items-center justify-center relative overflow-hidden"
+                    onClick={() => setIsSignaturePadOpen(true)}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Clear Signature
-                  </Button>
+                    {savedSignatureDataUrl ? (
+                      <img 
+                        src={savedSignatureDataUrl} 
+                        alt="Signature" 
+                        className="max-w-full max-h-28 object-contain"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center text-muted-foreground">
+                        <Pen className="h-8 w-8 mb-2" />
+                        <span className="text-sm">Tap to sign</span>
+                      </div>
+                    )}
+                  </div>
+                  {savedSignatureDataUrl && (
+                    <p className="text-xs text-muted-foreground mt-1">Tap to edit signature</p>
+                  )}
                 </div>
                 <div className="w-full">
                   <Label htmlFor="signatureDate">Date *</Label>
@@ -1154,6 +1158,14 @@ const LoanApplicationPage = () => {
           </form>
         </div>
       </div>
+
+      {/* Fullscreen Signature Pad */}
+      <FullscreenSignaturePad
+        isOpen={isSignaturePadOpen}
+        onClose={() => setIsSignaturePadOpen(false)}
+        onSave={handleSignatureSave}
+        initialSignature={savedSignatureDataUrl}
+      />
     </div>
   );
 };
