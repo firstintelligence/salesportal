@@ -146,7 +146,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
           <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-primary/50" />
 
           {/* Canvas container */}
-          <div className="border-2 border-border rounded-lg bg-white overflow-hidden shadow-inner">
+          <div className="border-2 border-border rounded-lg bg-white overflow-hidden shadow-inner flex justify-center">
             {canvasSize.width > 0 && (
               <SignatureCanvas
                 ref={signatureRef}
@@ -155,7 +155,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
                   height: Math.min(canvasSize.height, 300),
                   className: 'touch-none',
                   style: { 
-                    width: '100%', 
+                    width: canvasSize.width,
                     height: Math.min(canvasSize.height, 300),
                     touchAction: 'none'
                   }
