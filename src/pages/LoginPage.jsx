@@ -70,7 +70,7 @@ const LoginPage = () => {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
               Sales Portal
             </h1>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-300 text-sm">
               Enter your credentials to continue
             </p>
           </div>
@@ -78,7 +78,7 @@ const LoginPage = () => {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm text-slate-300 font-medium">
+              <label className="text-sm text-white font-medium">
                 Agent ID
               </label>
               <Input
@@ -86,7 +86,7 @@ const LoginPage = () => {
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value)}
                 placeholder="Enter your agent ID"
-                className="w-full h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-xl"
+                className="w-full h-12 bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 rounded-xl"
                 autoFocus
               />
             </div>
@@ -108,7 +108,7 @@ const LoginPage = () => {
           </form>
 
           {/* Footer */}
-          <p className="text-center text-slate-500 text-xs mt-8">
+          <p className="text-center text-slate-400 text-xs mt-8">
             Secure access for authorized personnel only
           </p>
         </div>
