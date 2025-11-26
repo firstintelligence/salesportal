@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Shield, ArrowRight } from "lucide-react";
 
 // Map agent IDs to their associated phone numbers
 const AGENT_CREDENTIALS = [
@@ -14,10 +15,16 @@ const AGENT_CREDENTIALS = [
 
 const LoginPage = () => {
   const [agentId, setAgentId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    
+    // Small delay for visual feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     const agent = AGENT_CREDENTIALS.find((a) => a.id === agentId);
     if (agent) {
       localStorage.setItem("authenticated", "true");
@@ -31,35 +38,79 @@ const LoginPage = () => {
       toast.error("Invalid Agent ID");
       setAgentId("");
     }
+    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-background p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg shadow-xl p-10">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-600/20 via-transparent to-transparent" />
+      
+      {/* Floating orbs */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+
+      <div className="w-full max-w-md px-4 relative z-10">
+        {/* Card with glassmorphism */}
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-2xl p-8 md:p-10">
+          {/* Icon */}
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
+          </div>
+
+          {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
               Sales Portal
             </h1>
-            <p className="text-muted-foreground text-sm">
-              Enter your password to continue
+            <p className="text-slate-400 text-sm">
+              Enter your credentials to continue
             </p>
           </div>
+
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6">
-            <div>
+            <div className="space-y-2">
+              <label className="text-sm text-slate-300 font-medium">
+                Agent ID
+              </label>
               <Input
                 type="text"
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value)}
-                placeholder="Agent ID"
-                className="w-full h-12 text-center text-sm"
+                placeholder="Enter your agent ID"
+                className="w-full h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-xl"
                 autoFocus
               />
             </div>
-            <Button type="submit" className="w-full h-12 text-lg">
-              Access Portal
+            
+            <Button 
+              type="submit" 
+              disabled={isLoading || !agentId}
+              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Access Portal
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </>
+              )}
             </Button>
           </form>
+
+          {/* Footer */}
+          <p className="text-center text-slate-500 text-xs mt-8">
+            Secure access for authorized personnel only
+          </p>
         </div>
       </div>
     </div>
