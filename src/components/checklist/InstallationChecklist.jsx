@@ -497,6 +497,8 @@ const InstallationChecklist = ({ customer, onBack }) => {
             checklistId,
             customerName,
             customerAddress,
+            province: customer.province,
+            postalCode: customer.postal_code,
             photos: allPhotos,
           },
         });
