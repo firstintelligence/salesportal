@@ -8,11 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun } from "lucide-react";
 
 const CATEGORIES = [
-  { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-blue-500 to-cyan-500" },
-  { id: "insulation", name: "Insulation", icon: Home, color: "from-amber-500 to-orange-500" },
-  { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-teal-500 to-emerald-500" },
-  { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-500 to-orange-500" },
-  { id: "battery", name: "Home Battery", icon: Battery, color: "from-purple-500 to-pink-500" },
+  { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500" },
+  { id: "insulation", name: "Insulation", icon: Home, color: "from-pink-500 to-fuchsia-500" },
+  { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-blue-500 to-cyan-500" },
+  { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-400 to-amber-500" },
+  { id: "battery", name: "Home Battery", icon: Battery, color: "from-green-500 to-emerald-500" },
 ];
 
 export function Calculator() {
