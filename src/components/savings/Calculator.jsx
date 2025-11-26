@@ -293,9 +293,12 @@ export function Calculator() {
     battery: 12000,
   };
 
+  // OESP rebate amount
+  const OESP_REBATE = 55;
+
   // Calculate savings for each category
   const calculateCategorySavings = (categoryId) => {
-    const { gasBill, electricityBill, insulation, heatingSource } = data;
+    const { gasBill, electricityBill, insulation, heatingSource, oesp } = data;
     const cost = equipmentCosts[categoryId];
     const monthlyPayment = calculateMonthlyPayment(cost);
     
@@ -338,11 +341,16 @@ export function Calculator() {
         break;
     }
     
-    const netMonthlySavings = monthlySavings - monthlyPayment;
+    // Add OESP rebate if enabled
+    const oespRebate = oesp ? OESP_REBATE : 0;
+    const totalMonthlySavings = monthlySavings + oespRebate;
+    const netMonthlySavings = totalMonthlySavings - monthlyPayment;
     
     return { 
       monthly: monthlySavings, 
-      yearly: monthlySavings * 12, 
+      oespRebate,
+      totalMonthly: totalMonthlySavings,
+      yearly: totalMonthlySavings * 12, 
       cost, 
       monthlyPayment,
       netMonthly: netMonthlySavings,
@@ -472,19 +480,31 @@ export function Calculator() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-            <div>
-              <Label className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                Ontario Electricity Support Program (OESP)
-              </Label>
-              <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
-                Monthly bill credits for eligible households
-              </p>
+          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                  Ontario Electricity Support Program (OESP)
+                </Label>
+                <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
+                  Monthly bill credits for eligible households
+                </p>
+              </div>
+              <Switch
+                checked={data.oesp}
+                onCheckedChange={(checked) => setData({ ...data, oesp: checked })}
+              />
             </div>
-            <Switch
-              checked={data.oesp}
-              onCheckedChange={(checked) => setData({ ...data, oesp: checked })}
-            />
+            {data.oesp && (
+              <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-700">
+                <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                  <span className="font-semibold">+$55/month rebate applied.</span>
+                </p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1 italic">
+                  *This is an average amount. The actual rebate ranges from $35/month to $75/month depending on income level and number of people living in the home.
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -528,8 +548,8 @@ export function Calculator() {
               
               <div className="flex gap-4">
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
-                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Energy Savings</p>
-                  <p className="text-3xl font-bold text-white">${currentSavings.monthly}</p>
+                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Total Savings</p>
+                  <p className="text-3xl font-bold text-white">${currentSavings.totalMonthly}</p>
                   <p className="text-white/60 text-xs">/month</p>
                 </div>
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
@@ -558,6 +578,12 @@ export function Calculator() {
                     <span className="text-slate-600 dark:text-slate-400">Energy Savings</span>
                     <span className="text-lg font-bold text-emerald-500">+${currentSavings.monthly}</span>
                   </div>
+                  {currentSavings.oespRebate > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 dark:text-slate-400">OESP Rebate</span>
+                      <span className="text-lg font-bold text-emerald-500">+${currentSavings.oespRebate}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">Equipment Payment</span>
                     <span className="text-lg font-bold text-slate-700 dark:text-slate-300">-${currentSavings.monthlyPayment}</span>
