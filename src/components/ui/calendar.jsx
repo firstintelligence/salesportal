@@ -19,16 +19,7 @@ function Calendar({
   ...props
 }) {
   const [showMonthYearPicker, setShowMonthYearPicker] = React.useState(false);
-  // Initialize month from selected date, then props.month, then current date
-  const initialMonth = props.selected || props.month || new Date();
-  const [month, setMonth] = React.useState(initialMonth);
-  
-  // Sync month state when selected date changes
-  React.useEffect(() => {
-    if (props.selected) {
-      setMonth(props.selected);
-    }
-  }, [props.selected]);
+  const [month, setMonth] = React.useState(props.month || new Date());
   
   const months = [
     "January", "February", "March", "April", "May", "June",

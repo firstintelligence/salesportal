@@ -312,50 +312,12 @@ const LoanApplicationPage = () => {
         setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
         setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
-        // Consent fields - draw centered "X" directly on page
-        const drawCenteredX = async (fieldNames) => {
-          for (const fieldName of fieldNames) {
-            try {
-              const field = form.getTextField(fieldName);
-              if (field) {
-                const widgets = field.acroField.getWidgets();
-                if (widgets.length > 0) {
-                  const widget = widgets[0];
-                  const rect = widget.getRectangle();
-                  const pages = pdfDoc.getPages();
-                  const page = pages[0];
-                  
-                  field.setText('');
-                  
-                  const fontSize = 10;
-                  const xText = 'X';
-                  const textWidth = helveticaFont.widthOfTextAtSize(xText, fontSize);
-                  const xPos = rect.x + (rect.width - textWidth) / 2;
-                  const yPos = rect.y + (rect.height - fontSize) / 2;
-                  
-                  page.drawText(xText, {
-                    x: xPos,
-                    y: yPos,
-                    size: fontSize,
-                    font: helveticaFont,
-                    color: rgb(0, 0, 0),
-                  });
-                  
-                  console.log(`✓ Centered X in "${fieldName}"`);
-                  return;
-                }
-              }
-            } catch (e) {
-              console.log(`Could not set X in "${fieldName}":`, e.message);
-            }
-          }
-        };
-        
+        // Consent fields - mark with "X" if consented
         if (formData.privacyConsent) {
-          await drawCenteredX(['Consent 1', 'Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1', 'Checkbox1']);
+          setField(['Consent 1', 'Privacy Consent', 'PrivacyConsent', 'Privacy', 'Check Box 1', 'Check Box1', 'checkbox1', 'Checkbox1'], 'X');
         }
         if (formData.electronicConsent) {
-          await drawCenteredX(['Consent 2', 'Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2', 'Checkbox2']);
+          setField(['Consent 2', 'Electronic Consent', 'ElectronicConsent', 'Electronic', 'Check Box 2', 'Check Box2', 'checkbox2', 'Checkbox2'], 'X');
         }
         
         // Signing Certificate - draw centered text directly on page
