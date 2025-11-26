@@ -12,127 +12,51 @@ import {
   X,
   CheckCircle,
   Loader2,
-  Thermometer,
-  Wind,
-  Droplets,
-  Filter,
-  Sun,
-  Battery,
   MapPin,
   Package,
   Image,
   ChevronRight,
+  FileText,
+  IdCard,
 } from "lucide-react";
 
 // Define checklist items for each category
 const CHECKLIST_CATEGORIES = {
-  HVAC: {
-    icon: Thermometer,
-    gradient: "from-rose-500 to-orange-500",
-    bgLight: "bg-rose-50 dark:bg-rose-950/30",
-    borderColor: "border-rose-200 dark:border-rose-800",
-    items: [
-      "Indoor Unit",
-      "Outdoor Unit",
-      "Venting",
-      "Electrical Panel",
-      "Ductwork",
-      "Thermostat",
-      "Gas Line Connection",
-      "Condensate Drain",
-    ],
-  },
-  "Air Filters": {
-    icon: Wind,
-    gradient: "from-blue-500 to-cyan-500",
+  "Job Site Pictures": {
+    icon: Camera,
+    gradient: "from-blue-500 to-indigo-500",
     bgLight: "bg-blue-50 dark:bg-blue-950/30",
     borderColor: "border-blue-200 dark:border-blue-800",
     items: [
-      "Filter Unit",
-      "Filter Media",
-      "Installation Location",
-      "Ductwork Connection",
-      "Control Panel",
-    ],
-  },
-  "Water Heater": {
-    icon: Droplets,
-    gradient: "from-cyan-500 to-teal-500",
-    bgLight: "bg-cyan-50 dark:bg-cyan-950/30",
-    borderColor: "border-cyan-200 dark:border-cyan-800",
-    items: [
-      "Water Heater Unit",
-      "Venting System",
-      "Gas/Electrical Connection",
-      "Water Connections",
-      "Expansion Tank",
-      "Pressure Relief Valve",
+      "Front of House",
       "Installation Area",
+      "Equipment Installed",
+      "Work Completed",
     ],
   },
-  "Water Filters": {
-    icon: Filter,
-    gradient: "from-teal-500 to-emerald-500",
-    bgLight: "bg-teal-50 dark:bg-teal-950/30",
-    borderColor: "border-teal-200 dark:border-teal-800",
-    items: [
-      "Filter System",
-      "Water Line Connections",
-      "Bypass Valve",
-      "Drain Connection",
-      "Control Head",
-      "Installation Location",
-    ],
-  },
-  Solar: {
-    icon: Sun,
-    gradient: "from-amber-500 to-yellow-500",
-    bgLight: "bg-amber-50 dark:bg-amber-950/30",
-    borderColor: "border-amber-200 dark:border-amber-800",
-    items: [
-      "Solar Panels",
-      "Roof Mounting",
-      "Inverter",
-      "Electrical Panel Connection",
-      "Wiring/Conduit",
-      "Monitoring System",
-      "Meter Connection",
-    ],
-  },
-  Battery: {
-    icon: Battery,
-    gradient: "from-emerald-500 to-green-500",
+  "Void Cheque": {
+    icon: FileText,
+    gradient: "from-emerald-500 to-teal-500",
     bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
     borderColor: "border-emerald-200 dark:border-emerald-800",
     items: [
-      "Battery Unit",
-      "Mounting Location",
-      "Electrical Connections",
-      "Inverter Connection",
-      "Ventilation",
-      "Control Panel",
+      "Void Cheque",
+    ],
+  },
+  "Photo ID": {
+    icon: IdCard,
+    gradient: "from-amber-500 to-orange-500",
+    bgLight: "bg-amber-50 dark:bg-amber-950/30",
+    borderColor: "border-amber-200 dark:border-amber-800",
+    items: [
+      "Photo ID (Front)",
+      "Photo ID (Back)",
     ],
   },
 };
 
-// Map product names to categories
-const PRODUCT_CATEGORY_MAP = {
-  "Furnace": "HVAC",
-  "Air Conditioner": "HVAC",
-  "Heat Pump": "HVAC",
-  "HVAC": "HVAC",
-  "Air Filter": "Air Filters",
-  "Air Purifier": "Air Filters",
-  "Water Heater": "Water Heater",
-  "Tankless Water Heater": "Water Heater",
-  "Water Filter": "Water Filters",
-  "Water Softener": "Water Filters",
-  "Reverse Osmosis": "Water Filters",
-  "Solar": "Solar",
-  "Solar Panels": "Solar",
-  "Battery": "Battery",
-  "Battery Storage": "Battery",
-};
+// All customers get all categories
+const getDefaultCategories = () => Object.keys(CHECKLIST_CATEGORIES);
 
 // Circular Progress Component
 const CircularProgress = ({ value, size = 120, strokeWidth = 8 }) => {
@@ -182,27 +106,8 @@ const InstallationChecklist = ({ customer, onBack }) => {
   const fileInputRefs = useRef({});
   const agentId = localStorage.getItem("agentId");
 
-  // Determine which categories apply based on products
-  const getApplicableCategories = () => {
-    const products = customer.products?.split(",").map((p) => p.trim()) || [];
-    const categories = new Set();
-
-    products.forEach((product) => {
-      Object.entries(PRODUCT_CATEGORY_MAP).forEach(([key, category]) => {
-        if (product.toLowerCase().includes(key.toLowerCase())) {
-          categories.add(category);
-        }
-      });
-    });
-
-    if (categories.size === 0) {
-      return Object.keys(CHECKLIST_CATEGORIES);
-    }
-
-    return Array.from(categories);
-  };
-
-  const applicableCategories = getApplicableCategories();
+  // All customers get all categories
+  const applicableCategories = getDefaultCategories();
 
   useEffect(() => {
     loadExistingChecklist();
