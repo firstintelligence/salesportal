@@ -6,6 +6,11 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Reset scroll position to top when landing page loads
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
     if (!localStorage.getItem("authenticated")) {
       navigate("/");
     }
