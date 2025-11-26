@@ -49,8 +49,7 @@ const CHECKLIST_CATEGORIES = {
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
     borderColor: "border-amber-200 dark:border-amber-800",
     items: [
-      "Photo ID (Front)",
-      "Photo ID (Back)",
+      "Photo ID",
     ],
   },
 };
