@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Trash2, Calendar as CalendarIcon } from "lucide-react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
 import financeitLogo from "@/assets/financeit-logo.svg";
 import { format } from "date-fns";
@@ -290,8 +290,20 @@ const LoanApplicationPage = () => {
         setField(['Photo ID Number', 'ID Number', 'License Number'], formData.photoIdNumber);
         setField(['Photo ID Expiry', 'ID Expiry', 'Expiry Date', 'Expiration Date'], formatDate(formData.photoIdExpiry));
         
-        // Signing Certificate - add date, time, and location
-        setField(['Signing Certificate', 'Certificate', 'Sign Certificate'], signingCertificate);
+        // Signing Certificate - add date, time, and location with smaller font
+        const signingCertFieldNames = ['Signing Certificate', 'Certificate', 'Sign Certificate'];
+        for (const fieldName of signingCertFieldNames) {
+          try {
+            const certField = form.getTextField(fieldName);
+            if (certField) {
+              // Set smaller font size and center alignment
+              certField.setFontSize(7);
+              certField.setText(signingCertificate);
+              console.log(`✓ Signing certificate filled in "${fieldName}"`);
+              break;
+            }
+          } catch {}
+        }
         
         // Signature and Date
         setField(['Date', 'Signature Date', 'Sign Date'], formatDate(formData.signatureDate));
@@ -302,28 +314,63 @@ const LoanApplicationPage = () => {
           const signatureImageBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
           const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
           
-          // Try to find signature field with different names
+          // Try to find signature field with different names and draw image directly on page
           const signatureFieldNames = ['Signature', 'Sign', 'Customer Signature', 'Applicant Signature'];
+          let signatureEmbedded = false;
+          
           for (const fieldName of signatureFieldNames) {
+            if (signatureEmbedded) break;
             try {
               const signatureField = form.getTextField(fieldName);
-              const widgets = signatureField.acroField.getWidgets();
-              if (widgets.length > 0) {
-                const widget = widgets[0];
-                const rect = widget.getRectangle();
-                const page = pdfDoc.getPages()[widget.P()?.toString() ? parseInt(widget.P().toString()) : 0];
-                
-                // Draw the signature image in the signature field location
-                page.drawImage(signatureImage, {
-                  x: rect.x,
-                  y: rect.y,
-                  width: rect.width,
-                  height: rect.height,
-                });
-                console.log(`✓ Signature embedded in field "${fieldName}"`);
-                break;
+              if (signatureField) {
+                const widgets = signatureField.acroField.getWidgets();
+                if (widgets.length > 0) {
+                  const widget = widgets[0];
+                  const rect = widget.getRectangle();
+                  
+                  // Get the page - widgets are on page 0 (first page) for this PDF
+                  const pages = pdfDoc.getPages();
+                  const page = pages[0];
+                  
+                  // Clear the text field
+                  signatureField.setText('');
+                  
+                  // Calculate dimensions to fit signature while maintaining aspect ratio
+                  const imgWidth = signatureImage.width;
+                  const imgHeight = signatureImage.height;
+                  const aspectRatio = imgWidth / imgHeight;
+                  
+                  let drawWidth = rect.width;
+                  let drawHeight = drawWidth / aspectRatio;
+                  
+                  if (drawHeight > rect.height) {
+                    drawHeight = rect.height;
+                    drawWidth = drawHeight * aspectRatio;
+                  }
+                  
+                  // Center the signature in the field
+                  const xOffset = (rect.width - drawWidth) / 2;
+                  const yOffset = (rect.height - drawHeight) / 2;
+                  
+                  // Draw the signature image
+                  page.drawImage(signatureImage, {
+                    x: rect.x + xOffset,
+                    y: rect.y + yOffset,
+                    width: drawWidth,
+                    height: drawHeight,
+                  });
+                  
+                  console.log(`✓ Signature embedded in field "${fieldName}" at x:${rect.x}, y:${rect.y}, w:${rect.width}, h:${rect.height}`);
+                  signatureEmbedded = true;
+                }
               }
-            } catch {}
+            } catch (e) {
+              console.log(`Could not embed signature in "${fieldName}":`, e.message);
+            }
+          }
+          
+          if (!signatureEmbedded) {
+            console.log('✗ Could not find signature field to embed image');
           }
         }
         
