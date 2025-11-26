@@ -74,6 +74,7 @@ const InstallationChecklistPage = () => {
 
   const getChecklistStatus = (customer) => {
     const checklist = customer.installation_checklists?.[0];
+    console.log('Customer:', customer.first_name, customer.last_name, 'Checklists:', customer.installation_checklists, 'Status:', checklist?.status);
     if (!checklist) return "not_started";
     return checklist.status;
   };
