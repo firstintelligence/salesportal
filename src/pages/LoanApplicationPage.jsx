@@ -931,7 +931,27 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 EMPLOYMENT & INCOME INFORMATION
               </div>
+              {/* Row 1: Employment Status, Business Name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="employmentStatus">Employment Status</Label>
+                  <Select
+                    value={formData.employmentStatus}
+                    onValueChange={(value) => handleSelectChange("employmentStatus", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="employed">Employed</SelectItem>
+                      <SelectItem value="self_employed">Self Employed</SelectItem>
+                      <SelectItem value="unemployed">Unemployed</SelectItem>
+                      <SelectItem value="retired">Retired</SelectItem>
+                      <SelectItem value="disability">Disability</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label htmlFor="businessName">Business Name</Label>
                   <Input
@@ -941,17 +961,9 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="positionTitle">Position Title</Label>
-                  <Input
-                    id="positionTitle"
-                    name="positionTitle"
-                    value={formData.positionTitle}
-                    onChange={handleInputChange}
-                  />
-                </div>
               </div>
 
+              {/* Row 2: Monthly Income, Time at Job */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="grossMonthlyIncome">Gross Monthly Income</Label>
@@ -961,19 +973,6 @@ const LoanApplicationPage = () => {
                     type="number"
                     value={formData.grossMonthlyIncome}
                     onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="employerAddress">Employer Address</Label>
-                  <Input
-                    id="employerAddress"
-                    name="employerAddress"
-                    value={formData.employerAddress}
-                    onChange={handleInputChange}
-                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -988,6 +987,30 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
+              {/* Row 3: Position Title, Employer Address */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="positionTitle">Position Title</Label>
+                  <Input
+                    id="positionTitle"
+                    name="positionTitle"
+                    value={formData.positionTitle}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="employerAddress">Employer Address</Label>
+                  <Input
+                    id="employerAddress"
+                    name="employerAddress"
+                    value={formData.employerAddress}
+                    onChange={handleInputChange}
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: Employer City, Employer Province */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="employerCity">Employer City</Label>
@@ -1025,26 +1048,6 @@ const LoanApplicationPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="employmentStatus">Employment Status</Label>
-                <Select
-                  value={formData.employmentStatus}
-                  onValueChange={(value) => handleSelectChange("employmentStatus", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="employed">Employed</SelectItem>
-                    <SelectItem value="self_employed">Self Employed</SelectItem>
-                    <SelectItem value="unemployed">Unemployed</SelectItem>
-                    <SelectItem value="retired">Retired</SelectItem>
-                    <SelectItem value="disability">Disability</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 
