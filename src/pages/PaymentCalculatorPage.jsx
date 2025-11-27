@@ -11,15 +11,16 @@ import { getAvailableTermsForRate } from "@/utils/dealerFeeCalculations";
 const PaymentCalculatorPage = () => {
   const navigate = useNavigate();
   const [purchaseAmount, setPurchaseAmount] = useState(5250);
-  const [interestRate, setInterestRate] = useState(11.99);
-  const [term, setTerm] = useState(60);
+  const [interestRate, setInterestRate] = useState(9.99);
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
-  const [promoRate, setPromoRate] = useState(9.99);
   const [promoTerm, setPromoTerm] = useState(36);
 
   const interestRates = [
     0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
   ];
+
+  const regularRate = 13.99;
+  const remainingMonths = 60 - promoTerm;
 
   // Get available terms for current interest rate
   const availableTerms = getAvailableTermsForRate(interestRate);
@@ -32,8 +33,8 @@ const PaymentCalculatorPage = () => {
 
   const loanAmount = calculateLoanAmount(purchaseAmount);
   const adminFee = loanAmount - purchaseAmount;
-  const promoPayment = calculateMonthlyPayment(loanAmount, promoRate, amortizationPeriod);
-  const regularPayment = calculateMonthlyPayment(loanAmount, interestRate, amortizationPeriod);
+  const promoPayment = calculateMonthlyPayment(loanAmount, interestRate, amortizationPeriod);
+  const regularPayment = calculateMonthlyPayment(loanAmount, regularRate, amortizationPeriod);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -76,7 +77,7 @@ const PaymentCalculatorPage = () => {
             {/* Promo Rate Display */}
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                {promoRate}% APR for {promoTerm} Months
+                {interestRate}% APR for {promoTerm} Months
               </h2>
             </div>
 
@@ -84,10 +85,10 @@ const PaymentCalculatorPage = () => {
               <h3 className="text-xl font-semibold text-foreground mb-4">Monthly payment</h3>
               <div className="space-y-2">
                 <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(promoPayment)} <span className="text-base font-normal">({promoRate}% for {promoTerm} months)</span>
+                  {formatCurrency(promoPayment)} <span className="text-base font-normal">({interestRate}% for {promoTerm} months)</span>
                 </p>
                 <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(regularPayment)} <span className="text-base font-normal">({interestRate}% after {promoTerm} months)</span>
+                  {formatCurrency(regularPayment)} <span className="text-base font-normal">({regularRate}% for {remainingMonths} months)</span>
                 </p>
               </div>
             </div>
@@ -122,25 +123,6 @@ const PaymentCalculatorPage = () => {
                 </Select>
               </div>
 
-              {/* Term Select */}
-              <div className="flex justify-between items-center">
-                <Label>Term</Label>
-                <Select value={term.toString()} onValueChange={(value) => setTerm(parseInt(value))}>
-                  <SelectTrigger className="w-40 font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">12 months</SelectItem>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
-                    <SelectItem value="48">48 months</SelectItem>
-                    <SelectItem value="60">60 months</SelectItem>
-                    <SelectItem value="84">84 months</SelectItem>
-                    <SelectItem value="120">120 months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Amortization Period Select */}
               <div className="flex justify-between items-center">
                 <Label>Amortization period</Label>
@@ -160,18 +142,6 @@ const PaymentCalculatorPage = () => {
                     <SelectItem value="240">240 months</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              {/* Promo Rate Input */}
-              <div className="flex justify-between items-center">
-                <Label>Promo Rate</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={promoRate}
-                  onChange={(e) => setPromoRate(parseFloat(e.target.value) || 0)}
-                  className="w-32 text-right font-semibold"
-                />
               </div>
 
               {/* Promo Term Select */}
