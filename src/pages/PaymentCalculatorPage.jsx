@@ -6,15 +6,23 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Info } from "lucide-react";
 import { calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
+import { getAvailableTermsForRate } from "@/utils/dealerFeeCalculations";
 
 const PaymentCalculatorPage = () => {
   const navigate = useNavigate();
   const [purchaseAmount, setPurchaseAmount] = useState(5250);
-  const [apr, setApr] = useState(11.50);
+  const [interestRate, setInterestRate] = useState(11.99);
   const [term, setTerm] = useState(60);
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
   const [promoRate, setPromoRate] = useState(9.99);
   const [promoTerm, setPromoTerm] = useState(36);
+
+  const interestRates = [
+    0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
+  ];
+
+  // Get available terms for current interest rate
+  const availableTerms = getAvailableTermsForRate(interestRate);
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -25,7 +33,7 @@ const PaymentCalculatorPage = () => {
   const loanAmount = calculateLoanAmount(purchaseAmount);
   const adminFee = loanAmount - purchaseAmount;
   const promoPayment = calculateMonthlyPayment(loanAmount, promoRate, amortizationPeriod);
-  const regularPayment = calculateMonthlyPayment(loanAmount, apr, amortizationPeriod);
+  const regularPayment = calculateMonthlyPayment(loanAmount, interestRate, amortizationPeriod);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -79,7 +87,7 @@ const PaymentCalculatorPage = () => {
                   {formatCurrency(promoPayment)} <span className="text-base font-normal">({promoRate}% for {promoTerm} months)</span>
                 </p>
                 <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(regularPayment)} <span className="text-base font-normal">({apr}% after {promoTerm} months)</span>
+                  {formatCurrency(regularPayment)} <span className="text-base font-normal">({interestRate}% after {promoTerm} months)</span>
                 </p>
               </div>
             </div>
@@ -97,16 +105,21 @@ const PaymentCalculatorPage = () => {
                 />
               </div>
 
-              {/* APR Input */}
+              {/* Interest Rate Select */}
               <div className="flex justify-between items-center">
-                <Label>APR</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={apr}
-                  onChange={(e) => setApr(parseFloat(e.target.value) || 0)}
-                  className="w-32 text-right font-semibold"
-                />
+                <Label>Interest Rate</Label>
+                <Select value={interestRate.toString()} onValueChange={(value) => setInterestRate(parseFloat(value))}>
+                  <SelectTrigger className="w-40 font-semibold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {interestRates.map(rate => (
+                      <SelectItem key={rate} value={rate.toString()}>
+                        {rate}%
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Term Select */}
@@ -169,11 +182,21 @@ const PaymentCalculatorPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="6">6 months</SelectItem>
-                    <SelectItem value="12">12 months</SelectItem>
-                    <SelectItem value="18">18 months</SelectItem>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
+                    {availableTerms.length > 0 ? (
+                      availableTerms.map(term => (
+                        <SelectItem key={term} value={term.toString()}>
+                          {term} months
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <>
+                        <SelectItem value="6">6 months</SelectItem>
+                        <SelectItem value="12">12 months</SelectItem>
+                        <SelectItem value="18">18 months</SelectItem>
+                        <SelectItem value="24">24 months</SelectItem>
+                        <SelectItem value="36">36 months</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
