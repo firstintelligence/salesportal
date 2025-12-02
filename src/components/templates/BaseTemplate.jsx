@@ -5,7 +5,8 @@ const BaseTemplate = ({ data, children }) => {
     <div
       className="bg-white mx-auto"
       style={{ 
-        width: "794px", 
+        width: "100%", 
+        maxWidth: "794px",
         minHeight: "1123px",
         padding: "18px", // 0.25 inches = 18px at 72 DPI
         boxSizing: "border-box"
