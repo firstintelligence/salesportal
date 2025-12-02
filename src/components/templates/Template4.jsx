@@ -21,6 +21,7 @@ const Template4 = ({ data }) => {
     notes = '', 
     isInvoice = false,
     signature = null,
+    coApplicantSignature = null,
   } = data || {};
 
   const customerName = billTo.firstName && billTo.lastName 
@@ -307,7 +308,13 @@ const Template4 = ({ data }) => {
             {data.billTo?.coApplicantName && (
               <div>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
-                <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+                {coApplicantSignature ? (
+                  <div className="mb-1 h-12 flex items-center">
+                    <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                  </div>
+                ) : (
+                  <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+                )}
                 <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
                 <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
