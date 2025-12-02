@@ -59,7 +59,9 @@ const Template4 = ({ data }) => {
                   {isInvoice ? 'INVOICE' : 'QUOTE'}
                 </h1>
                 <p className="text-sm mb-1">
-                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>{" "}
+                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>
+                </p>
+                <p className="text-sm mb-1">
                   {invoice.number || "N/A"}
                 </p>
                 <p className="text-sm mb-1">
