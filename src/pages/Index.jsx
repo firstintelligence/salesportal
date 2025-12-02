@@ -79,7 +79,7 @@ const noteOptions = [
   "We appreciate your trust in us. If you ever need assistance with your order, please visit our website or call customer service. We’re here to help!",
 ];
 
-const Index = () => {
+const Index = ({ preloadedCustomer }) => {
   const navigate = useNavigate();
   
   const [billTo, setBillTo] = useState({ 
@@ -138,6 +138,31 @@ const Index = () => {
   };
 
   useEffect(() => {
+    // Preload customer data if provided
+    if (preloadedCustomer) {
+      setBillTo({
+        firstName: preloadedCustomer.first_name || "",
+        lastName: preloadedCustomer.last_name || "",
+        email: preloadedCustomer.email || "",
+        phone: preloadedCustomer.phone || "",
+        address: preloadedCustomer.address || "",
+        city: preloadedCustomer.city || "",
+        province: preloadedCustomer.province || "ON",
+        postalCode: preloadedCustomer.postal_code || "",
+        coApplicantName: "",
+        coApplicantPhone: ""
+      });
+      setInvoice((prev) => ({
+        ...prev,
+        number: generateInvoiceNumber(
+          preloadedCustomer.first_name,
+          preloadedCustomer.last_name,
+          preloadedCustomer.phone
+        ),
+      }));
+      return;
+    }
+
     // Load form data from localStorage on component mount
     const savedFormData = localStorage.getItem("formData");
     if (savedFormData) {
@@ -192,7 +217,7 @@ const Index = () => {
       }));
       settaxPercentage(getProvincialTax('ON')); // Default to Ontario
     }
-  }, []);
+  }, [preloadedCustomer]);
 
   useEffect(() => {
     // Save form data to localStorage whenever it changes

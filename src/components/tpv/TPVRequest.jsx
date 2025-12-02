@@ -65,11 +65,31 @@ const amortizationPeriods = [
   "108 months", "120 months", "144 months", "180 months"
 ];
 
-const TPVRequest = ({ onBack }) => {
+const TPVRequest = ({ onBack, preloadedCustomer }) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(() => {
-    // Restore form data from localStorage if available
+    // If preloaded customer data exists, use it
+    if (preloadedCustomer) {
+      return {
+        firstName: preloadedCustomer.first_name || "",
+        lastName: preloadedCustomer.last_name || "",
+        phoneNumber: preloadedCustomer.phone || "",
+        email: preloadedCustomer.email || "",
+        address: preloadedCustomer.address || "",
+        city: preloadedCustomer.city || "",
+        province: preloadedCustomer.province || "",
+        postalCode: preloadedCustomer.postal_code || "",
+        products: [],
+        salesPrice: "",
+        interestRate: "",
+        promotionalTerm: "",
+        amortization: "",
+        monthlyPayment: "",
+      };
+    }
+    
+    // Otherwise restore form data from localStorage if available
     const saved = localStorage.getItem("tpvFormData");
     return saved ? JSON.parse(saved) : {
       firstName: "",

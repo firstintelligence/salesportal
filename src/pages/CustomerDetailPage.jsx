@@ -190,7 +190,7 @@ const CustomerDetailPage = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/tpv-request', { state: { customer } })}
+                  onClick={() => navigate('/tpv-ai', { state: { customer } })}
                 >
                   <Phone className="w-4 h-4 mr-2" />
                   Request TPV

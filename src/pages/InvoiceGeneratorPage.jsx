@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -6,6 +6,8 @@ import Index from "./Index";
 
 const InvoiceGeneratorPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customer = location.state?.customer;
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -25,7 +27,7 @@ const InvoiceGeneratorPage = () => {
           Back to Tools
         </Button>
       </div>
-      <Index />
+      <Index preloadedCustomer={customer} />
     </div>
   );
 };
