@@ -58,24 +58,26 @@ const Template4 = ({ data }) => {
                 <h1 className="text-3xl font-bold mb-2" style={{color: '#194578'}}>
                   {isInvoice ? 'INVOICE' : 'QUOTE'}
                 </h1>
-                <p className="text-sm mb-1">
+                <div className="flex items-baseline gap-1 text-sm mb-1">
                   <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>
-                </p>
-                <p className="text-sm mb-1">
-                  {invoice.number || "N/A"}
-                </p>
-                <p className="text-sm mb-1">
-                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>{" "}
-                  {invoice.date
-                    ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy")
-                    : "N/A"}
-                </p>
-                <p className="text-sm">
-                  <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>{" "}
-                  {invoice.paymentDate
-                    ? formatInTimeZone(new Date(invoice.paymentDate + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy")
-                    : "N/A"}
-                </p>
+                  <span>{invoice.number || 'N/A'}</span>
+                </div>
+                <div className="flex items-baseline gap-1 text-sm mb-1">
+                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Date:</span>
+                  <span>
+                    {invoice.date
+                      ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), 'America/Toronto', 'MMM dd, yyyy')
+                      : 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1 text-sm">
+                  <span className="font-semibold">{isInvoice ? 'Due Date' : 'Valid Until'}:</span>
+                  <span>
+                    {invoice.paymentDate
+                      ? formatInTimeZone(new Date(invoice.paymentDate + 'T12:00:00'), 'America/Toronto', 'MMM dd, yyyy')
+                      : 'N/A'}
+                  </span>
+                </div>
               </div>
               <div className="text-right">
                 <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.56rem] mb-1 ml-auto" />
