@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import TPVRequest from "@/components/tpv/TPVRequest";
 
 const TPVAiPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customer = location.state?.customer;
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -11,7 +13,7 @@ const TPVAiPage = () => {
     }
   }, [navigate]);
 
-  return <TPVRequest onBack={() => navigate("/landing")} />;
+  return <TPVRequest onBack={() => navigate("/landing")} preloadedCustomer={customer} />;
 };
 
 export default TPVAiPage;

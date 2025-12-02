@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,8 @@ import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customer = location.state?.customer;
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   
@@ -87,6 +89,23 @@ const LoanApplicationPage = () => {
     creditConsent: false,
     signatureDate: "",
   });
+
+  // Preload customer data
+  useEffect(() => {
+    if (customer) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: customer.first_name || "",
+        lastName: customer.last_name || "",
+        email: customer.email || "",
+        homePhone: customer.phone || "",
+        address: customer.address || "",
+        city: customer.city || "",
+        province: customer.province || "",
+        postalCode: customer.postal_code || "",
+      }));
+    }
+  }, [customer]);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;

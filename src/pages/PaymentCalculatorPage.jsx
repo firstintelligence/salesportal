@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,8 @@ import { getAvailableTermsForRate } from "@/utils/dealerFeeCalculations";
 
 const PaymentCalculatorPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customer = location.state?.customer;
   const [purchaseAmount, setPurchaseAmount] = useState(5250);
   const [interestRate, setInterestRate] = useState(9.99);
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
