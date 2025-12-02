@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -17,6 +17,15 @@ const LandingPage = () => {
   }, [navigate]);
 
   const tools = [
+    {
+      title: "Dashboard",
+      icon: LayoutDashboard,
+      description: "View your customer deals",
+      path: "/dashboard",
+      gradient: "from-slate-500/20 to-gray-500/20",
+      iconBg: "bg-slate-500/10",
+      iconColor: "text-slate-600",
+    },
     {
       title: "Savings Calculator",
       icon: Calculator,
