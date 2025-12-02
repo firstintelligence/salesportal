@@ -52,7 +52,39 @@ export const generatePDF = async (invoiceData, templateNumber) => {
 
       await convertImagesToBase64(pdfContainer);
       
-      // Get the HTML with minimal inline styles
+      // Inline only essential visual styles
+      const essentialProps = [
+        'color', 'background-color', 'background', 'border', 'border-top', 'border-right', 
+        'border-bottom', 'border-left', 'border-color', 'border-width', 'border-style',
+        'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+        'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+        'width', 'height', 'max-width', 'max-height', 'min-width', 'min-height',
+        'font-size', 'font-weight', 'font-family', 'line-height', 'text-align',
+        'display', 'flex', 'flex-direction', 'justify-content', 'align-items',
+        'gap', 'grid', 'grid-template-columns', 'position', 'top', 'left', 'right', 'bottom'
+      ];
+      
+      const inlineEssentialStyles = (element) => {
+        const computedStyle = window.getComputedStyle(element);
+        let styleString = '';
+        
+        essentialProps.forEach(prop => {
+          const value = computedStyle.getPropertyValue(prop);
+          if (value && value !== 'none' && value !== 'normal' && value !== 'auto') {
+            styleString += `${prop}:${value};`;
+          }
+        });
+        
+        if (styleString) {
+          const existingStyle = element.getAttribute('style') || '';
+          element.setAttribute('style', existingStyle + styleString);
+        }
+        
+        Array.from(element.children).forEach(child => inlineEssentialStyles(child));
+      };
+      
+      inlineEssentialStyles(pdfContainer.firstElementChild);
+      
       const html = `
         <!DOCTYPE html>
         <html>
@@ -61,9 +93,6 @@ export const generatePDF = async (invoiceData, templateNumber) => {
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body { font-family: Arial, sans-serif; background: white; }
-              img { max-width: 100%; height: auto; }
-              table { border-collapse: collapse; width: 100%; }
-              td, th { padding: 8px; text-align: left; }
             </style>
           </head>
           <body>
