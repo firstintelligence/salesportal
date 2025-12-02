@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import FloatingLabelInput from '../components/FloatingLabelInput';
@@ -131,11 +131,34 @@ const Index = ({ preloadedCustomer }) => {
   const [showContractorFees, setShowContractorFees] = useState(false); // Toggle for showing contractor fees
   const [isDownloading, setIsDownloading] = useState(false); // For PDF download state
   const [selectedCurrency] = useState('CAD'); // Default currency
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewContainerRef = useRef(null);
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
     setNotes(noteOptions[randomIndex]);
   };
+
+  useEffect(() => {
+    const container = previewContainerRef.current;
+    if (!container) return;
+
+    const updateScale = () => {
+      const width = container.clientWidth;
+      if (!width) return;
+      const scale = Math.min(1, width / 794); // 794px design width
+      setPreviewScale(scale);
+    };
+
+    updateScale();
+
+    const resizeObserver = new ResizeObserver(updateScale);
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     // Preload customer data if provided
@@ -678,11 +701,12 @@ const Index = ({ preloadedCustomer }) => {
             </Button>
           </div>
           <div className="w-full overflow-hidden">
-            <div className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full">
-              <div className="p-4 space-y-4 w-full">
+            <div
+              ref={previewContainerRef}
+              className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
+            >
+              <div className="p-4 space-y-4 w-full flex flex-col items-center">
                 {(() => {
-                  // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
-                  // But templates use 794 x 1123 at 72 DPI for print precision
                   const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
                   const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
                   
@@ -701,51 +725,58 @@ const Index = ({ preloadedCustomer }) => {
                   
                   const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
                   
-                  return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                    <div 
-                      key={pageIndex} 
-                      className="relative bg-white shadow-lg mx-auto" 
-                      style={{ 
-                        width: '100%',
-                        maxWidth: `${pageWidth}px`,
-                        aspectRatio: `${pageWidth} / ${pageHeight}`
-                      }}
-                    >
+                  return Array.from({ length: numberOfPages }, (_, pageIndex) => {
+                    const scaledWidth = pageWidth * previewScale;
+                    const scaledHeight = pageHeight * previewScale;
+
+                    return (
                       <div 
-                        className="w-full h-full origin-top-left"
-                        style={{
-                          transform: `scale(calc(min(100%, ${pageWidth}px) / ${pageWidth}))`,
-                          width: `${pageWidth}px`,
-                          height: `${pageHeight}px`
+                        key={pageIndex} 
+                        className="relative bg-white shadow-lg" 
+                        style={{ 
+                          width: `${scaledWidth}px`,
+                          height: `${scaledHeight}px`,
                         }}
                       >
-                        <InvoiceTemplate data={{
-                          invoice,
-                          billTo,
-                          shipTo,
-                          items,
-                          financing,
-                          rebatesIncentives,
-                          yourCompany,
-                          isInvoice,
-                          subTotal,
-                          grandTotal,
-                          taxAmount,
-                          taxPercentage,
-                          notes,
-                          selectedCurrency,
-                          pageNumber: pageIndex + 1,
-                          totalPages: numberOfPages
-                        }} templateNumber={4} />
-                      </div>
-                      {/* Page indicator - only show if multiple pages */}
-                      {numberOfPages > 1 && (
-                        <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                          Page {pageIndex + 1} of {numberOfPages}
+                        <div
+                          className="origin-top-left"
+                          style={{
+                            width: `${pageWidth}px`,
+                            height: `${pageHeight}px`,
+                            transform: `scale(${previewScale})`,
+                          }}
+                        >
+                          <InvoiceTemplate
+                            data={{
+                              invoice,
+                              billTo,
+                              shipTo,
+                              items,
+                              financing,
+                              rebatesIncentives,
+                              yourCompany,
+                              isInvoice,
+                              subTotal,
+                              grandTotal,
+                              taxAmount,
+                              taxPercentage,
+                              notes,
+                              selectedCurrency,
+                              pageNumber: pageIndex + 1,
+                              totalPages: numberOfPages,
+                            }}
+                            templateNumber={4}
+                          />
                         </div>
-                      )}
-                    </div>
-                  ));
+                        {/* Page indicator - only show if multiple pages */}
+                        {numberOfPages > 1 && (
+                          <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                            Page {pageIndex + 1} of {numberOfPages}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  });
                 })()}
               </div>
             </div>
