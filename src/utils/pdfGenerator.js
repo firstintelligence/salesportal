@@ -1,3 +1,4 @@
+import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 export const generatePDF = async (invoiceData, templateNumber) => {
@@ -86,39 +87,44 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       // Wait for final layout
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Calculate content area dimensions
-      const contentWidthMM = pageWidthMM - (marginMM * 2);
-      
-      // Use jsPDF's html method to preserve text selectability
-      const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]);
-      
-      await pdf.html(firstChild || pdfContainer, {
-        callback: function(doc) {
-          // Generate filename in format: "John Smith - 123 Main Street, Toronto, ON A1A 1A1 - GPHJS1234"
-          const { number } = invoiceData.invoice;
-          const { firstName, lastName, name, address, city, province, postalCode } = invoiceData.billTo;
-          
-          // Use firstName + lastName if available, otherwise fall back to name
-          const customerName = firstName && lastName 
-            ? `${firstName} ${lastName}` 
-            : name || "Customer";
-          
-          const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
-          const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
-
-          doc.save(fileName);
-          
-          // Cleanup
-          root.unmount();
-          document.body.removeChild(pdfContainer);
-          resolve();
-        },
-        x: marginMM,
-        y: marginMM,
-        width: contentWidthMM,
-        windowWidth: contentWidthPX,
-        margin: [marginMM, marginMM, marginMM, marginMM],
+      // Capture as canvas for accurate rendering
+      const canvas = await html2canvas(pdfContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        width: contentWidthPX,
+        height: contentHeightPX,
+        backgroundColor: '#ffffff',
       });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const contentWidthMM = pageWidthMM - (marginMM * 2);
+      const contentHeightMM = pageHeightMM - (marginMM * 2);
+      
+      const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]);
+      const imageAspectRatio = canvas.width / canvas.height;
+      const requiredHeightMM = contentWidthMM / imageAspectRatio;
+      const finalHeight = Math.min(requiredHeightMM, contentHeightMM);
+      
+      pdf.addImage(imgData, 'PNG', marginMM, marginMM, contentWidthMM, finalHeight, undefined, 'FAST');
+      
+      // Generate filename
+      const { number } = invoiceData.invoice;
+      const { firstName, lastName, name, address, city, province, postalCode } = invoiceData.billTo;
+      
+      const customerName = firstName && lastName 
+        ? `${firstName} ${lastName}` 
+        : name || "Customer";
+      
+      const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
+      const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
+
+      pdf.save(fileName);
+      
+      // Cleanup
+      root.unmount();
+      document.body.removeChild(pdfContainer);
+      resolve();
     } catch (error) {
       reject(error);
     }
