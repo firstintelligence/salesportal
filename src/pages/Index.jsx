@@ -136,6 +136,8 @@ const Index = ({ preloadedCustomer }) => {
   const previewContainerRef = useRef(null);
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
+  const [isCoApplicantSignaturePadOpen, setIsCoApplicantSignaturePadOpen] = useState(false);
+  const [coApplicantSignatureDataUrl, setCoApplicantSignatureDataUrl] = useState(null);
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -235,6 +237,7 @@ const Index = ({ preloadedCustomer }) => {
       });
       setNotes(parsedData.notes || "Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
       setSavedSignatureDataUrl(parsedData.signature || null);
+      setCoApplicantSignatureDataUrl(parsedData.coApplicantSignature || null);
       
     } else {
       // If no saved data, set default values
@@ -262,6 +265,7 @@ const Index = ({ preloadedCustomer }) => {
       rebatesIncentives,
       notes,
       signature: savedSignatureDataUrl,
+      coApplicantSignature: coApplicantSignatureDataUrl,
     };
     localStorage.setItem("formData", JSON.stringify(formData));
   }, [
@@ -278,6 +282,7 @@ const Index = ({ preloadedCustomer }) => {
     financing,
     rebatesIncentives,
     savedSignatureDataUrl,
+    coApplicantSignatureDataUrl,
   ]);
 
   const handleInputChange = (setter) => (e) => {
@@ -698,6 +703,42 @@ const Index = ({ preloadedCustomer }) => {
               </div>
             </div>
 
+            {billTo.coApplicantName && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-2">Co-Applicant Signature</h3>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 min-h-[120px] flex items-center justify-center bg-muted/30">
+                  {coApplicantSignatureDataUrl ? (
+                    <div className="relative w-full">
+                      <img 
+                        src={coApplicantSignatureDataUrl} 
+                        alt="Co-Applicant Signature" 
+                        className="max-h-[100px] mx-auto"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsCoApplicantSignaturePadOpen(true)}
+                        className="absolute top-0 right-0"
+                      >
+                        <Pen className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsCoApplicantSignaturePadOpen(true)}
+                    >
+                      <Pen className="h-4 w-4 mr-2" />
+                      Add Signature
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="mb-6">
               <div className="flex items-center mb-2">
                 <h3 className="text-lg font-medium">Notes</h3>
@@ -726,6 +767,13 @@ const Index = ({ preloadedCustomer }) => {
             onClose={() => setIsSignaturePadOpen(false)}
             onSave={(signatureDataUrl) => setSavedSignatureDataUrl(signatureDataUrl)}
             initialSignature={savedSignatureDataUrl}
+          />
+          
+          <FullscreenSignaturePad
+            isOpen={isCoApplicantSignaturePadOpen}
+            onClose={() => setIsCoApplicantSignaturePadOpen(false)}
+            onSave={(signatureDataUrl) => setCoApplicantSignatureDataUrl(signatureDataUrl)}
+            initialSignature={coApplicantSignatureDataUrl}
           />
         </div>
 
@@ -812,6 +860,7 @@ const Index = ({ preloadedCustomer }) => {
                               pageNumber: pageIndex + 1,
                               totalPages: numberOfPages,
                               signature: savedSignatureDataUrl,
+                              coApplicantSignature: coApplicantSignatureDataUrl,
                             }}
                             templateNumber={4}
                           />
