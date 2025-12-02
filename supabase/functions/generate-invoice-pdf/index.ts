@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,66 +11,43 @@ serve(async (req) => {
   }
 
   try {
-    const { invoiceData, templateNumber } = await req.json();
+    const { html, invoiceData } = await req.json();
     
-    console.log('Starting PDF generation for template:', templateNumber);
+    console.log('Starting PDF generation with PDFShift');
 
-    // Launch headless browser
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    
-    const page = await browser.newPage();
-    
-    // Set viewport to US Letter size (8.5" x 11" at 96 DPI)
-    await page.setViewport({
-      width: 816,  // 8.5 inches * 96 DPI
-      height: 1056, // 11 inches * 96 DPI
-      deviceScaleFactor: 2, // Higher quality rendering
-    });
+    const apiKey = Deno.env.get('PDFSHIFT_API_KEY');
+    if (!apiKey) {
+      throw new Error('PDFSHIFT_API_KEY not configured');
+    }
 
-    // Construct the invoice render URL
-    const baseUrl = Deno.env.get('VITE_SUPABASE_URL')?.replace('//', '//donhxrgrqeqnsmhtnazb.supabase.co') || '';
-    const renderUrl = `${baseUrl}/invoice-render`;
-    
-    // Navigate to the invoice render page with data
-    await page.goto(renderUrl, { 
-      waitUntil: 'networkidle0',
-      timeout: 30000 
-    });
-    
-    // Inject invoice data and template number
-    await page.evaluate((data, template) => {
-      (window as any).__INVOICE_DATA__ = data;
-      (window as any).__INVOICE_TEMPLATE__ = template;
-      // Trigger render event
-      window.dispatchEvent(new CustomEvent('invoice-data-ready'));
-    }, invoiceData, templateNumber);
-
-    // Wait for the invoice to render
-    await page.waitForFunction(() => {
-      return (window as any).__INVOICE_RENDERED__ === true;
-    }, { timeout: 10000 });
-
-    // Wait a bit more for fonts and images to load
-    await page.waitForTimeout(1000);
-
-    // Generate PDF with proper settings for text selectability
-    const pdfBuffer = await page.pdf({
-      format: 'Letter',
-      printBackground: true,
-      margin: {
-        top: '0.25in',
-        right: '0.25in',
-        bottom: '0.25in',
-        left: '0.25in',
+    // Call PDFShift API
+    const pdfShiftResponse = await fetch('https://api.pdfshift.io/v3/convert/pdf', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(`api:${apiKey}`)}`,
+        'Content-Type': 'application/json',
       },
-      preferCSSPageSize: false,
+      body: JSON.stringify({
+        source: html,
+        format: 'Letter',
+        margin: {
+          top: '0.25in',
+          right: '0.25in',
+          bottom: '0.25in',
+          left: '0.25in',
+        },
+        use_print: true,
+      }),
     });
 
-    await browser.close();
+    if (!pdfShiftResponse.ok) {
+      const errorText = await pdfShiftResponse.text();
+      console.error('PDFShift error:', errorText);
+      throw new Error(`PDFShift API error: ${pdfShiftResponse.status}`);
+    }
 
-    console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+    const pdfBuffer = await pdfShiftResponse.arrayBuffer();
+    console.log('PDF generated successfully, size:', pdfBuffer.byteLength, 'bytes');
 
     // Generate filename
     const { number } = invoiceData.invoice;
