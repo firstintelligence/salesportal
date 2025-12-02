@@ -1,9 +1,9 @@
 import React from 'react';
-import InputMask from 'react-input-mask';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import AddressLookupService from '../utils/addressLookupService';
+import { formatPhoneNumber } from '../utils/phoneFormat';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
   const provinces = [
@@ -50,22 +50,17 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           onChange={handleInputChange}
           name="email"
         />
-        <div className="relative">
-          <InputMask
-            mask="(999) 999-9999"
-            value={billTo.phone || ''}
-            onChange={handleInputChange}
-          >
-            {(inputProps) => (
-              <FloatingLabelInput
-                {...inputProps}
-                id="billToPhone"
-                label="Phone"
-                name="phone"
-              />
-            )}
-          </InputMask>
-        </div>
+        <FloatingLabelInput
+          id="billToPhone"
+          label="Phone"
+          value={billTo.phone || ''}
+          onChange={handleInputChange}
+          onBlur={(e) => {
+            const formatted = formatPhoneNumber(e.target.value);
+            handleInputChange({ target: { name: 'phone', value: formatted } });
+          }}
+          name="phone"
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <FloatingLabelInput
@@ -164,22 +159,17 @@ const BillToSection = ({ billTo, handleInputChange }) => {
               onChange={handleInputChange}
               name="coApplicantName"
             />
-            <div className="relative">
-              <InputMask
-                mask="(999) 999-9999"
-                value={billTo.coApplicantPhone || ''}
-                onChange={handleInputChange}
-              >
-                {(inputProps) => (
-                  <FloatingLabelInput
-                    {...inputProps}
-                    id="coApplicantPhone"
-                    label="Co-Applicant Phone"
-                    name="coApplicantPhone"
-                  />
-                )}
-              </InputMask>
-            </div>
+            <FloatingLabelInput
+              id="coApplicantPhone"
+              label="Co-Applicant Phone"
+              value={billTo.coApplicantPhone || ''}
+              onChange={handleInputChange}
+              onBlur={(e) => {
+                const formatted = formatPhoneNumber(e.target.value);
+                handleInputChange({ target: { name: 'coApplicantPhone', value: formatted } });
+              }}
+              name="coApplicantPhone"
+            />
           </div>
         )}
       </div>
