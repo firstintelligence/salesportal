@@ -49,10 +49,53 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          address: string
+          city: string | null
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string
+          postal_code: string | null
+          province: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone: string
+          postal_code?: string | null
+          province?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string
+          postal_code?: string | null
+          province?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       installation_checklists: {
         Row: {
           agent_id: string
           created_at: string
+          customer_id: string | null
           id: string
           status: string
           submitted_at: string | null
@@ -62,6 +105,7 @@ export type Database = {
         Insert: {
           agent_id: string
           created_at?: string
+          customer_id?: string | null
           id?: string
           status?: string
           submitted_at?: string | null
@@ -71,6 +115,7 @@ export type Database = {
         Update: {
           agent_id?: string
           created_at?: string
+          customer_id?: string | null
           id?: string
           status?: string
           submitted_at?: string | null
@@ -78,6 +123,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "installation_checklists_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "installation_checklists_tpv_request_id_fkey"
             columns: ["tpv_request_id"]
@@ -95,6 +147,7 @@ export type Database = {
           city: string | null
           created_at: string | null
           customer_address: string
+          customer_id: string | null
           customer_name: string | null
           customer_phone: string
           email: string | null
@@ -121,6 +174,7 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           customer_address: string
+          customer_id?: string | null
           customer_name?: string | null
           customer_phone: string
           email?: string | null
@@ -147,6 +201,7 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           customer_address?: string
+          customer_id?: string | null
           customer_name?: string | null
           customer_phone?: string
           email?: string | null
@@ -166,7 +221,15 @@ export type Database = {
           updated_at?: string | null
           vapi_call_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tpv_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
