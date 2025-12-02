@@ -39,20 +39,36 @@ const DashboardPage = () => {
   const fetchDeals = async (currentAgentId) => {
     try {
       setLoading(true);
+      
+      // Fetch customers with their related TPV data
       let query = supabase
-        .from("tpv_requests")
-        .select("*")
+        .from("customers")
+        .select(`
+          *,
+          tpv_requests!customer_id(
+            id,
+            agent_id,
+            products,
+            sales_price,
+            status,
+            created_at
+          )
+        `)
         .order("created_at", { ascending: false });
-
-      // If not admin MM23, filter by agent_id
-      if (currentAgentId !== "MM23") {
-        query = query.eq("agent_id", currentAgentId);
-      }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      setDeals(data || []);
+      
+      // Filter by agent if not admin
+      let filteredData = data || [];
+      if (currentAgentId !== "MM23") {
+        filteredData = filteredData.filter(customer => 
+          customer.tpv_requests && customer.tpv_requests.some(tpv => tpv.agent_id === currentAgentId)
+        );
+      }
+      
+      setDeals(filteredData);
     } catch (error) {
       console.error("Error fetching deals:", error);
     } finally {
@@ -131,27 +147,38 @@ const DashboardPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {deals.map((deal) => (
-                      <tr key={deal.id} className="border-b hover:bg-muted/30 transition-colors cursor-pointer">
-                        <td className="px-4 py-3 text-sm font-medium">
-                          {deal.customer_name || `${deal.first_name || ''} ${deal.last_name || ''}`.trim() || "Unnamed Customer"}
-                        </td>
-                        {agentId === "MM23" && (
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{getAgentName(deal.agent_id)}</td>
-                        )}
-                        <td className="px-4 py-3 text-sm text-muted-foreground">{deal.customer_phone || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {deal.customer_address || "N/A"}
-                          {deal.city && `, ${deal.city}`}
-                          {deal.province && `, ${deal.province}`}
-                          {deal.postal_code && ` ${deal.postal_code}`}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">{deal.products || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">{formatCurrency(deal.sales_price)}</td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground capitalize">{deal.status || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(deal.created_at)}</td>
-                      </tr>
-                    ))}
+                    {deals.map((customer) => {
+                      const latestTpv = customer.tpv_requests?.[0];
+                      const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
+                      
+                      return (
+                        <tr 
+                          key={customer.id} 
+                          className="border-b hover:bg-muted/30 transition-colors cursor-pointer"
+                          onClick={() => navigate(`/customer/${customer.id}`)}
+                        >
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {customer.first_name && customer.last_name 
+                              ? `${customer.first_name} ${customer.last_name}`
+                              : "Unnamed Customer"}
+                          </td>
+                          {agentId === "MM23" && (
+                            <td className="px-4 py-3 text-sm text-muted-foreground">{displayAgent || "N/A"}</td>
+                          )}
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{customer.phone || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">
+                            {customer.address || "N/A"}
+                            {customer.city && `, ${customer.city}`}
+                            {customer.province && `, ${customer.province}`}
+                            {customer.postal_code && ` ${customer.postal_code}`}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{latestTpv?.products || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{formatCurrency(latestTpv?.sales_price)}</td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground capitalize">{latestTpv?.status || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(customer.created_at)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
