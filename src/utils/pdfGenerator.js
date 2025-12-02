@@ -112,6 +112,9 @@ export const generatePDF = async (invoiceData, templateNumber) => {
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body { font-family: Arial, sans-serif; background: white; }
+              p { display: block; margin-bottom: 0.25rem; }
+              div { display: block; }
+              h1, h2, h3, h4, h5, h6 { display: block; }
             </style>
           </head>
           <body>
