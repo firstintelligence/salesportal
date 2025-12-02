@@ -11,6 +11,18 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
 
+  const agentNames = {
+    "MM23": "MoMo",
+    "TB0195": "Tadeo",
+    "AA9097": "Donny",
+    "HB6400": "Harry",
+    "TP5142": "Tony"
+  };
+
+  const getAgentName = (id) => {
+    return agentNames[id] || id;
+  };
+
   useEffect(() => {
     const authenticated = localStorage.getItem("authenticated");
     const storedAgentId = localStorage.getItem("agentId");
@@ -84,7 +96,7 @@ const DashboardPage = () => {
               {agentId === "MM23" ? "All Customer Deals" : "My Customer Deals"}
             </h1>
             <p className="text-muted-foreground">
-              {agentId === "MM23" ? "Viewing all deals from all agents" : `Showing deals for agent ${agentId}`}
+              {agentId === "MM23" ? "Viewing all deals from all agents" : `Showing deals for ${getAgentName(agentId)}`}
             </p>
           </div>
         </div>
@@ -125,7 +137,7 @@ const DashboardPage = () => {
                           {deal.customer_name || `${deal.first_name || ''} ${deal.last_name || ''}`.trim() || "Unnamed Customer"}
                         </td>
                         {agentId === "MM23" && (
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{deal.agent_id}</td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{getAgentName(deal.agent_id)}</td>
                         )}
                         <td className="px-4 py-3 text-sm text-muted-foreground">{deal.customer_phone || "N/A"}</td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
