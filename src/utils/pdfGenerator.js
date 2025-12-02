@@ -5,11 +5,58 @@ export const generatePDF = async (invoiceData, templateNumber) => {
     try {
       console.log('Starting server-side PDF generation...');
       
-      // Call the edge function to generate PDF server-side
+      // Render invoice to HTML
+      const pdfContainer = document.createElement('div');
+      document.body.appendChild(pdfContainer);
+      
+      pdfContainer.style.cssText = `
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        width: 794px;
+        background-color: white;
+        font-family: Arial, sans-serif;
+      `;
+      
+      // Get the template and render it
+      const { getTemplate } = await import('../utils/templateRegistry');
+      const Template = getTemplate(templateNumber);
+      const React = (await import('react')).default;
+      const { createRoot } = await import('react-dom/client');
+      
+      // Create React root and render
+      const root = createRoot(pdfContainer);
+      await new Promise((resolve) => {
+        root.render(React.createElement(Template, { data: invoiceData }));
+        setTimeout(resolve, 500); // Wait for rendering
+      });
+      
+      // Get the HTML
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { font-family: Arial, sans-serif; background: white; }
+            </style>
+          </head>
+          <body>
+            ${pdfContainer.innerHTML}
+          </body>
+        </html>
+      `;
+      
+      // Cleanup DOM
+      root.unmount();
+      document.body.removeChild(pdfContainer);
+      
+      // Call the edge function to generate PDF with PDFShift
       const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
         body: {
-          invoiceData,
-          templateNumber
+          html,
+          invoiceData
         }
       });
 
