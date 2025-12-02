@@ -678,62 +678,52 @@ const Index = ({ preloadedCustomer }) => {
             </Button>
           </div>
           <div 
-            className="w-full cursor-pointer"
-            onClick={handleDownloadPDF}
-            title="Click to download PDF"
+            className="w-full"
           >
             <div className="w-full">
-              <div className="bg-white rounded border border-gray-400 w-full overflow-hidden">
-                <div className="transform scale-75 origin-top-left bg-white"
-                     style={{ 
-                       width: '794px',
-                       height: '1029px',
-                       padding: '24px',
-                       boxSizing: 'border-box'
-                     }}>
-                  <div className="flex">
-                    {(() => {
-                      // Calculate if content needs multiple pages based on actual content
-                      const baseContentHeight = 800; // Template header, footer, sections
-                      const itemsHeight = items.length * 60; // Each item row ~60px
-                      const financingHeight = financing?.loanAmount ? 150 : 0;
-                      const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
-                      const notesHeight = notes ? 100 : 0;
-                      
-                      const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
-                      const pageHeight = 1123; // US Letter height in pixels at 72 DPI
-                      const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
-                      
-                      return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                        <div key={pageIndex} className="relative mr-4 last:mr-0">
-                          <InvoiceTemplate data={{
-                            invoice,
-                            billTo,
-                            shipTo,
-                            items,
-                            financing,
-                            rebatesIncentives,
-                            yourCompany,
-                            isInvoice,
-                            subTotal,
-                            grandTotal,
-                            taxAmount,
-                            taxPercentage,
-                            notes,
-                            selectedCurrency,
-                            pageNumber: pageIndex + 1,
-                            totalPages: numberOfPages
-                          }} templateNumber={4} />
-                          {/* Page indicator - only show if multiple pages */}
-                          {numberOfPages > 1 && (
-                            <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                              Page {pageIndex + 1} of {numberOfPages}
-                            </div>
-                          )}
-                        </div>
-                      ));
-                    })()}
-                  </div>
+              <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-y-auto overflow-x-hidden max-h-[800px]">
+                <div className="p-4 space-y-4">
+                  {(() => {
+                    // Calculate if content needs multiple pages based on actual content
+                    const baseContentHeight = 800; // Template header, footer, sections
+                    const itemsHeight = items.length * 60; // Each item row ~60px
+                    const financingHeight = financing?.loanAmount ? 150 : 0;
+                    const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
+                    const notesHeight = notes ? 100 : 0;
+                    
+                    const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
+                    const pageHeight = 1123; // US Letter height in pixels at 72 DPI
+                    const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
+                    
+                    return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+                      <div key={pageIndex} className="relative bg-white shadow-lg mx-auto" style={{ width: '794px', minHeight: '1123px' }}>
+                        <InvoiceTemplate data={{
+                          invoice,
+                          billTo,
+                          shipTo,
+                          items,
+                          financing,
+                          rebatesIncentives,
+                          yourCompany,
+                          isInvoice,
+                          subTotal,
+                          grandTotal,
+                          taxAmount,
+                          taxPercentage,
+                          notes,
+                          selectedCurrency,
+                          pageNumber: pageIndex + 1,
+                          totalPages: numberOfPages
+                        }} templateNumber={4} />
+                        {/* Page indicator - only show if multiple pages */}
+                        {numberOfPages > 1 && (
+                          <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                            Page {pageIndex + 1} of {numberOfPages}
+                          </div>
+                        )}
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
