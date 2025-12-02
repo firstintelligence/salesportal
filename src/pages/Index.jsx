@@ -678,70 +678,75 @@ const Index = ({ preloadedCustomer }) => {
             </Button>
           </div>
           <div className="w-full overflow-hidden">
-            <div className="w-full flex justify-center">
-              <div className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full">
-                <div className="p-4 space-y-4 w-full flex flex-col items-center">
-                  {(() => {
-                    // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
-                    // But templates use 794 x 1123 at 72 DPI for print precision
-                    const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
-                    const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
-                    
-                    // Estimate content height more accurately
-                    const headerHeight = 180;
-                    const itemRowHeight = 65;
-                    const financingHeight = financing?.loanAmount ? 170 : 0;
-                    const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 120 : 0;
-                    const summaryHeight = 100;
-                    const notesHeight = notes ? 80 : 0;
-                    const footerHeight = 150;
-                    
-                    const totalContentHeight = headerHeight + (items.length * itemRowHeight) + 
-                                              financingHeight + rebatesHeight + summaryHeight + 
-                                              notesHeight + footerHeight;
-                    
-                    const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
-                    
-                    return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+            <div className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full">
+              <div className="p-4 space-y-4 w-full">
+                {(() => {
+                  // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
+                  // But templates use 794 x 1123 at 72 DPI for print precision
+                  const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
+                  const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
+                  
+                  // Estimate content height more accurately
+                  const headerHeight = 180;
+                  const itemRowHeight = 65;
+                  const financingHeight = financing?.loanAmount ? 170 : 0;
+                  const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 120 : 0;
+                  const summaryHeight = 100;
+                  const notesHeight = notes ? 80 : 0;
+                  const footerHeight = 150;
+                  
+                  const totalContentHeight = headerHeight + (items.length * itemRowHeight) + 
+                                            financingHeight + rebatesHeight + summaryHeight + 
+                                            notesHeight + footerHeight;
+                  
+                  const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
+                  
+                  return Array.from({ length: numberOfPages }, (_, pageIndex) => (
+                    <div 
+                      key={pageIndex} 
+                      className="relative bg-white shadow-lg mx-auto" 
+                      style={{ 
+                        width: '100%',
+                        maxWidth: `${pageWidth}px`,
+                        aspectRatio: `${pageWidth} / ${pageHeight}`
+                      }}
+                    >
                       <div 
-                        key={pageIndex} 
-                        className="relative bg-white shadow-lg shrink-0" 
-                        style={{ 
-                          width: `${pageWidth}px`, 
-                          height: `${pageHeight}px`,
-                          maxWidth: '100%'
+                        className="w-full h-full origin-top-left"
+                        style={{
+                          transform: `scale(calc(min(100%, ${pageWidth}px) / ${pageWidth}))`,
+                          width: `${pageWidth}px`,
+                          height: `${pageHeight}px`
                         }}
                       >
-                        <div className="w-full h-full overflow-hidden">
-                          <InvoiceTemplate data={{
-                            invoice,
-                            billTo,
-                            shipTo,
-                            items,
-                            financing,
-                            rebatesIncentives,
-                            yourCompany,
-                            isInvoice,
-                            subTotal,
-                            grandTotal,
-                            taxAmount,
-                            taxPercentage,
-                            notes,
-                            selectedCurrency,
-                            pageNumber: pageIndex + 1,
-                            totalPages: numberOfPages
-                          }} templateNumber={4} />
-                        </div>
-                        {/* Page indicator - only show if multiple pages */}
-                        {numberOfPages > 1 && (
-                          <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                            Page {pageIndex + 1} of {numberOfPages}
-                          </div>
-                        )}
+                        <InvoiceTemplate data={{
+                          invoice,
+                          billTo,
+                          shipTo,
+                          items,
+                          financing,
+                          rebatesIncentives,
+                          yourCompany,
+                          isInvoice,
+                          subTotal,
+                          grandTotal,
+                          taxAmount,
+                          taxPercentage,
+                          notes,
+                          selectedCurrency,
+                          pageNumber: pageIndex + 1,
+                          totalPages: numberOfPages
+                        }} templateNumber={4} />
                       </div>
-                    ));
-                  })()}
-                </div>
+                      {/* Page indicator - only show if multiple pages */}
+                      {numberOfPages > 1 && (
+                        <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                          Page {pageIndex + 1} of {numberOfPages}
+                        </div>
+                      )}
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>
