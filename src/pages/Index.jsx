@@ -684,19 +684,28 @@ const Index = ({ preloadedCustomer }) => {
               <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-y-auto overflow-x-hidden max-h-[800px]">
                 <div className="p-4 space-y-4">
                   {(() => {
-                    // Calculate if content needs multiple pages based on actual content
-                    const baseContentHeight = 800; // Template header, footer, sections
-                    const itemsHeight = items.length * 60; // Each item row ~60px
-                    const financingHeight = financing?.loanAmount ? 150 : 0;
-                    const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 100 : 0;
-                    const notesHeight = notes ? 100 : 0;
+                    // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
+                    // But templates use 794 x 1123 at 72 DPI for print precision
+                    const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
+                    const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
                     
-                    const totalContentHeight = baseContentHeight + itemsHeight + financingHeight + rebatesHeight + notesHeight;
-                    const pageHeight = 1123; // US Letter height in pixels at 72 DPI
-                    const numberOfPages = totalContentHeight > pageHeight ? Math.ceil(totalContentHeight / pageHeight) : 1;
+                    // Estimate content height more accurately
+                    const headerHeight = 180;
+                    const itemRowHeight = 65;
+                    const financingHeight = financing?.loanAmount ? 170 : 0;
+                    const rebatesHeight = (rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0)) ? 120 : 0;
+                    const summaryHeight = 100;
+                    const notesHeight = notes ? 80 : 0;
+                    const footerHeight = 150;
+                    
+                    const totalContentHeight = headerHeight + (items.length * itemRowHeight) + 
+                                              financingHeight + rebatesHeight + summaryHeight + 
+                                              notesHeight + footerHeight;
+                    
+                    const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
                     
                     return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                      <div key={pageIndex} className="relative bg-white shadow-lg mx-auto" style={{ width: '794px', minHeight: '1123px' }}>
+                      <div key={pageIndex} className="relative bg-white shadow-lg mx-auto" style={{ width: `${pageWidth}px`, height: `${pageHeight}px` }}>
                         <InvoiceTemplate data={{
                           invoice,
                           billTo,

@@ -1,4 +1,5 @@
 import React from 'react';
+import InputMask from 'react-input-mask';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -49,13 +50,22 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           onChange={handleInputChange}
           name="email"
         />
-        <FloatingLabelInput
-          id="billToPhone"
-          label="Phone"
-          value={billTo.phone || ''}
-          onChange={handleInputChange}
-          name="phone"
-        />
+        <div className="relative">
+          <InputMask
+            mask="(999) 999-9999"
+            value={billTo.phone || ''}
+            onChange={handleInputChange}
+          >
+            {(inputProps) => (
+              <FloatingLabelInput
+                {...inputProps}
+                id="billToPhone"
+                label="Phone"
+                name="phone"
+              />
+            )}
+          </InputMask>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <FloatingLabelInput
@@ -154,13 +164,22 @@ const BillToSection = ({ billTo, handleInputChange }) => {
               onChange={handleInputChange}
               name="coApplicantName"
             />
-            <FloatingLabelInput
-              id="coApplicantPhone"
-              label="Co-Applicant Phone"
-              value={billTo.coApplicantPhone || ''}
-              onChange={handleInputChange}
-              name="coApplicantPhone"
-            />
+            <div className="relative">
+              <InputMask
+                mask="(999) 999-9999"
+                value={billTo.coApplicantPhone || ''}
+                onChange={handleInputChange}
+              >
+                {(inputProps) => (
+                  <FloatingLabelInput
+                    {...inputProps}
+                    id="coApplicantPhone"
+                    label="Co-Applicant Phone"
+                    name="coApplicantPhone"
+                  />
+                )}
+              </InputMask>
+            </div>
           </div>
         )}
       </div>
