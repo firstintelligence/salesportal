@@ -86,6 +86,9 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       // Wait for final layout
       await new Promise(resolve => setTimeout(resolve, 300));
       
+      // Calculate content area dimensions
+      const contentWidthMM = pageWidthMM - (marginMM * 2);
+      
       // Use jsPDF's html method to preserve text selectability
       const pdf = new jsPDF('p', 'mm', [pageWidthMM, pageHeightMM]);
       
