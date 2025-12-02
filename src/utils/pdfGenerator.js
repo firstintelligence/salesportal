@@ -80,7 +80,7 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         'font-size', 'font-weight', 'font-family', 'line-height', 'text-align',
         'display', 'flex', 'flex-direction', 'justify-content', 'align-items',
         'gap', 'grid', 'grid-template-columns', 'position', 'top', 'left', 'right', 'bottom',
-        'page-break-inside', 'break-inside'
+        'page-break-inside', 'break-inside', 'white-space'
       ];
       
       const inlineEssentialStyles = (element) => {
