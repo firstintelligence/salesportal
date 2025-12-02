@@ -31,13 +31,35 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         setTimeout(resolve, 500); // Wait for rendering
       });
       
+      // Convert images to base64
+      const convertImagesToBase64 = async (container) => {
+        const images = container.querySelectorAll('img');
+        const promises = Array.from(images).map(async (img) => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            ctx.drawImage(img, 0, 0);
+            const dataUrl = canvas.toDataURL('image/png');
+            img.src = dataUrl;
+          } catch (error) {
+            console.warn('Could not convert image to base64:', error);
+          }
+        });
+        await Promise.all(promises);
+      };
+
+      await convertImagesToBase64(pdfContainer);
+
       // Inline all computed styles before getting HTML
       const inlineStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
         let styleString = '';
         for (let i = 0; i < computedStyle.length; i++) {
           const prop = computedStyle[i];
-          styleString += `${prop}:${computedStyle.getPropertyValue(prop)};`;
+          const value = computedStyle.getPropertyValue(prop);
+          styleString += `${prop}:${value};`;
         }
         element.setAttribute('style', styleString);
         
