@@ -51,25 +51,8 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       };
 
       await convertImagesToBase64(pdfContainer);
-
-      // Inline all computed styles before getting HTML
-      const inlineStyles = (element) => {
-        const computedStyle = window.getComputedStyle(element);
-        let styleString = '';
-        for (let i = 0; i < computedStyle.length; i++) {
-          const prop = computedStyle[i];
-          const value = computedStyle.getPropertyValue(prop);
-          styleString += `${prop}:${value};`;
-        }
-        element.setAttribute('style', styleString);
-        
-        // Recursively inline styles for children
-        Array.from(element.children).forEach(child => inlineStyles(child));
-      };
       
-      inlineStyles(pdfContainer.firstElementChild);
-      
-      // Get the HTML with inlined styles
+      // Get the HTML with minimal inline styles
       const html = `
         <!DOCTYPE html>
         <html>
@@ -78,6 +61,9 @@ export const generatePDF = async (invoiceData, templateNumber) => {
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body { font-family: Arial, sans-serif; background: white; }
+              img { max-width: 100%; height: auto; }
+              table { border-collapse: collapse; width: 100%; }
+              td, th { padding: 8px; text-align: left; }
             </style>
           </head>
           <body>
