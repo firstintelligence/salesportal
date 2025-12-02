@@ -100,51 +100,51 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {deals.map((deal) => (
-              <Card key={deal.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {deal.customer_name || `${deal.first_name || ''} ${deal.last_name || ''}`.trim() || "Unnamed Customer"}
-                  </CardTitle>
-                  {agentId === "MM23" && (
-                    <p className="text-sm text-muted-foreground">Agent: {deal.agent_id}</p>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <p className="text-sm font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">{deal.customer_phone || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Address</p>
-                    <p className="text-sm text-muted-foreground">
-                      {deal.customer_address || "N/A"}
-                      {deal.city && `, ${deal.city}`}
-                      {deal.province && `, ${deal.province}`}
-                      {deal.postal_code && ` ${deal.postal_code}`}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Products</p>
-                    <p className="text-sm text-muted-foreground">{deal.products || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Sales Price</p>
-                    <p className="text-sm text-muted-foreground">{formatCurrency(deal.sales_price)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Status</p>
-                    <p className="text-sm text-muted-foreground capitalize">{deal.status || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Created</p>
-                    <p className="text-sm text-muted-foreground">{formatDate(deal.created_at)}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Customer</th>
+                      {agentId === "MM23" && (
+                        <th className="px-4 py-3 text-left text-sm font-semibold">Agent</th>
+                      )}
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Phone</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Address</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Products</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Sales Price</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deals.map((deal) => (
+                      <tr key={deal.id} className="border-b hover:bg-muted/30 transition-colors cursor-pointer">
+                        <td className="px-4 py-3 text-sm font-medium">
+                          {deal.customer_name || `${deal.first_name || ''} ${deal.last_name || ''}`.trim() || "Unnamed Customer"}
+                        </td>
+                        {agentId === "MM23" && (
+                          <td className="px-4 py-3 text-sm text-muted-foreground">{deal.agent_id}</td>
+                        )}
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{deal.customer_phone || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {deal.customer_address || "N/A"}
+                          {deal.city && `, ${deal.city}`}
+                          {deal.province && `, ${deal.province}`}
+                          {deal.postal_code && ` ${deal.postal_code}`}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{deal.products || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{formatCurrency(deal.sales_price)}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground capitalize">{deal.status || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(deal.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
