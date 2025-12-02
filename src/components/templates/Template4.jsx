@@ -183,11 +183,11 @@ const Template4 = ({ data }) => {
             </div>
 
             <div className="flex-1 mt-2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
+              <div className="grid grid-cols-2 gap-2" style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
+                <div style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                   {/* Financing Section */}
                   {financing && (
-                    <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e8f5e8', border: '1px solid #90c695'}}>
+                    <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e8f5e8', border: '1px solid #90c695', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                       <h3 className="text-sm font-semibold mb-2" style={{color: '#000000'}}>Financing Payment Details</h3>
                       <div className="grid grid-cols-1 gap-1 text-sm">
                         <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
@@ -200,8 +200,8 @@ const Template4 = ({ data }) => {
                     </div>
                   )}
                 </div>
-                <div>
-                  <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
+                <div style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
+                  <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                     <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
                     <div className="space-y-1">
                       <p className="flex justify-between text-sm">
