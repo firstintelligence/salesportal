@@ -15,6 +15,7 @@ import ReceiptPage from "./pages/ReceiptPage";
 import LoanApplicationPage from "./pages/LoanApplicationPage";
 import PaymentCalculatorPage from "./pages/PaymentCalculatorPage";
 import InstallationChecklistPage from "./pages/InstallationChecklistPage";
+import InvoiceRenderPage from "./pages/InvoiceRenderPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
+          <Route path="/invoice-render" element={<InvoiceRenderPage />} />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/customer/:customerId" element={<CustomerDetailPage />} />

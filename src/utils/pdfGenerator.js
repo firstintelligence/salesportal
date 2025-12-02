@@ -1,10 +1,63 @@
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { supabase } from '../integrations/supabase/client';
 
 export const generatePDF = async (invoiceData, templateNumber) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Create a dedicated PDF container
+      console.log('Starting server-side PDF generation...');
+      
+      // Call the edge function to generate PDF server-side
+      const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
+        body: {
+          invoiceData,
+          templateNumber
+        }
+      });
+
+      if (error) {
+        console.error('Error calling PDF generation function:', error);
+        throw error;
+      }
+
+      // The response is already a Blob from the edge function
+      const pdfBlob = data;
+      
+      // Generate filename
+      const { number } = invoiceData.invoice;
+      const { firstName, lastName, name, address, city, province, postalCode } = invoiceData.billTo;
+      
+      const customerName = firstName && lastName 
+        ? `${firstName} ${lastName}` 
+        : name || "Customer";
+      
+      const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
+      const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
+
+      // Create download link
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      console.log('PDF downloaded successfully');
+      resolve();
+    } catch (error) {
+      console.error('Error in PDF generation:', error);
+      reject(error);
+    }
+  });
+};
+
+// Legacy client-side PDF generation (keeping as fallback)
+export const generatePDFClientSide = async (invoiceData, templateNumber) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+      // Legacy implementation
       const pdfContainer = document.createElement('div');
       document.body.appendChild(pdfContainer);
       
