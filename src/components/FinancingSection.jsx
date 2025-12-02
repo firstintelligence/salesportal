@@ -74,24 +74,6 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
-            <Select 
-              value={(financing.amortizationPeriod || 180).toString()} 
-              onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="120">120 months (10 years)</SelectItem>
-                <SelectItem value="144">144 months (12 years)</SelectItem>
-                <SelectItem value="180">180 months (15 years)</SelectItem>
-                <SelectItem value="240">240 months (20 years)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
             <Select 
               value={(financing.loanTerm || 24).toString()} 
@@ -115,6 +97,24 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
                     <SelectItem value="60">60 months</SelectItem>
                   </>
                 )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
+            <Select 
+              value={(financing.amortizationPeriod || 180).toString()} 
+              onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="120">120 months (10 years)</SelectItem>
+                <SelectItem value="144">144 months (12 years)</SelectItem>
+                <SelectItem value="180">180 months (15 years)</SelectItem>
+                <SelectItem value="240">240 months (20 years)</SelectItem>
               </SelectContent>
             </Select>
           </div>
