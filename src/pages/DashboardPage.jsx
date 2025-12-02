@@ -61,12 +61,16 @@ const DashboardPage = () => {
       if (error) throw error;
       
       // Filter by agent if not admin
+      // MM23 (admin) sees ALL deals (past and future)
+      // Other agents only see their own deals
       let filteredData = data || [];
       if (currentAgentId !== "MM23") {
+        // Regular agents: only show customers where they have at least one TPV request
         filteredData = filteredData.filter(customer => 
           customer.tpv_requests && customer.tpv_requests.some(tpv => tpv.agent_id === currentAgentId)
         );
       }
+      // Admin sees all customers, even those without TPV yet
       
       setDeals(filteredData);
     } catch (error) {
