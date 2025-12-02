@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, name, className = '', disabled = false }) => {
+const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, onBlur, name, className = '', disabled = false }) => {
   return (
     <div className="relative">
       <input
@@ -11,6 +11,7 @@ const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, name, c
         placeholder=" "
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         autoComplete="off"
         data-lpignore="true"
