@@ -36,6 +36,24 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         const images = container.querySelectorAll('img');
         const promises = Array.from(images).map(async (img) => {
           try {
+            // Skip if image is already a data URL (like signatures)
+            if (img.src.startsWith('data:')) {
+              console.log('Skipping data URL image (already base64)');
+              return;
+            }
+            
+            // Wait for image to load
+            await new Promise((resolve, reject) => {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = resolve;
+                img.onerror = reject;
+                // Timeout after 5 seconds
+                setTimeout(() => resolve(), 5000);
+              }
+            });
+            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = img.naturalWidth || img.width;
