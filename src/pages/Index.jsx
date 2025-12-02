@@ -677,12 +677,10 @@ const Index = ({ preloadedCustomer }) => {
               )}
             </Button>
           </div>
-          <div 
-            className="w-full"
-          >
-            <div className="w-full">
-              <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-y-auto overflow-x-hidden max-h-[800px]">
-                <div className="p-4 space-y-4 flex flex-col items-center">
+          <div className="w-full overflow-hidden">
+            <div className="w-full flex justify-center">
+              <div className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full">
+                <div className="p-4 space-y-4 w-full flex flex-col items-center">
                   {(() => {
                     // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
                     // But templates use 794 x 1123 at 72 DPI for print precision
@@ -705,8 +703,16 @@ const Index = ({ preloadedCustomer }) => {
                     const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
                     
                     return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                      <div key={pageIndex} className="relative bg-white shadow-lg" style={{ width: '100%', maxWidth: `${pageWidth}px`, height: `${pageHeight}px` }}>
-                        <div style={{ transform: 'scale(1)', transformOrigin: 'top center' }}>
+                      <div 
+                        key={pageIndex} 
+                        className="relative bg-white shadow-lg shrink-0" 
+                        style={{ 
+                          width: `${pageWidth}px`, 
+                          height: `${pageHeight}px`,
+                          maxWidth: '100%'
+                        }}
+                      >
+                        <div className="w-full h-full overflow-hidden">
                           <InvoiceTemplate data={{
                             invoice,
                             billTo,
