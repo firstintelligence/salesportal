@@ -127,7 +127,7 @@ const Index = ({ preloadedCustomer }) => {
   const [subTotal, setSubTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
   const [notes, setNotes] = useState("Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
-  const [isInvoice, setIsInvoice] = useState(false); // Toggle for invoice vs quote
+  const [isInvoice, setIsInvoice] = useState(true); // Toggle for invoice vs quote - default to invoice
   const [showContractorFees, setShowContractorFees] = useState(false); // Toggle for showing contractor fees
   const [isDownloading, setIsDownloading] = useState(false); // For PDF download state
   const [selectedCurrency] = useState('CAD'); // Default currency
