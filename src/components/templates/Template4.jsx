@@ -303,7 +303,7 @@ const Template4 = ({ data }) => {
                 <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
               )}
               <p className="text-xs text-gray-600">{customerName}</p>
-              <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
             {data.billTo?.coApplicantName && (
               <div>
@@ -316,7 +316,7 @@ const Template4 = ({ data }) => {
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
                 )}
                 <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
-                <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
             )}
             {!data.billTo?.coApplicantName && <div></div>}
