@@ -8,11 +8,12 @@ import ItemDetails from "../components/ItemDetails";
 import FinancingSection from "../components/FinancingSection";
 import InvoiceTemplate from "../components/InvoiceTemplate";
 import RebatesSection from "../components/RebatesSection";
+import FullscreenSignaturePad from "../components/FullscreenSignaturePad";
 import { templates } from "../utils/templateRegistry";
 import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw, Loader2 } from "lucide-react";
+import { RefreshCw, Loader2, Pen } from "lucide-react";
 import { addDays } from "date-fns";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 
@@ -133,6 +134,8 @@ const Index = ({ preloadedCustomer }) => {
   const [selectedCurrency] = useState('CAD'); // Default currency
   const [previewScale, setPreviewScale] = useState(1);
   const previewContainerRef = useRef(null);
+  const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
+  const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -231,6 +234,7 @@ const Index = ({ preloadedCustomer }) => {
         manufacturerRebate: 0
       });
       setNotes(parsedData.notes || "Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
+      setSavedSignatureDataUrl(parsedData.signature || null);
       
     } else {
       // If no saved data, set default values
@@ -257,6 +261,7 @@ const Index = ({ preloadedCustomer }) => {
       financing,
       rebatesIncentives,
       notes,
+      signature: savedSignatureDataUrl,
     };
     localStorage.setItem("formData", JSON.stringify(formData));
   }, [
@@ -272,6 +277,7 @@ const Index = ({ preloadedCustomer }) => {
     grandTotal,
     financing,
     rebatesIncentives,
+    savedSignatureDataUrl,
   ]);
 
   const handleInputChange = (setter) => (e) => {
@@ -659,6 +665,40 @@ const Index = ({ preloadedCustomer }) => {
             </div>
 
             <div className="mb-6">
+              <h3 className="text-lg font-medium mb-2">Customer Signature</h3>
+              <div className="border-2 border-dashed border-border rounded-lg p-4 min-h-[120px] flex items-center justify-center bg-muted/30">
+                {savedSignatureDataUrl ? (
+                  <div className="relative w-full">
+                    <img 
+                      src={savedSignatureDataUrl} 
+                      alt="Customer Signature" 
+                      className="max-h-[100px] mx-auto"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsSignaturePadOpen(true)}
+                      className="absolute top-0 right-0"
+                    >
+                      <Pen className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsSignaturePadOpen(true)}
+                  >
+                    <Pen className="h-4 w-4 mr-2" />
+                    Add Signature
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-6">
               <div className="flex items-center mb-2">
                 <h3 className="text-lg font-medium">Notes</h3>
                 <button
@@ -680,6 +720,13 @@ const Index = ({ preloadedCustomer }) => {
 
             {/* Clear Form button removed */}
           </form>
+
+          <FullscreenSignaturePad
+            isOpen={isSignaturePadOpen}
+            onClose={() => setIsSignaturePadOpen(false)}
+            onSave={(signatureDataUrl) => setSavedSignatureDataUrl(signatureDataUrl)}
+            initialSignature={savedSignatureDataUrl}
+          />
         </div>
 
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
@@ -764,6 +811,7 @@ const Index = ({ preloadedCustomer }) => {
                               selectedCurrency,
                               pageNumber: pageIndex + 1,
                               totalPages: numberOfPages,
+                              signature: savedSignatureDataUrl,
                             }}
                             templateNumber={4}
                           />

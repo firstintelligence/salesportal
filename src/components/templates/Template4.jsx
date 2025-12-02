@@ -20,6 +20,7 @@ const Template4 = ({ data }) => {
     rebatesIncentives = {},
     notes = '', 
     isInvoice = false,
+    signature = null,
   } = data || {};
 
   const customerName = billTo.firstName && billTo.lastName 
@@ -293,7 +294,13 @@ const Template4 = ({ data }) => {
           <div className="grid grid-cols-2 gap-4 mb-2">
             <div>
               <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
-              <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+              {signature ? (
+                <div className="mb-1 h-12 flex items-center">
+                  <img src={signature} alt="Customer Signature" className="max-h-full" />
+                </div>
+              ) : (
+                <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+              )}
               <p className="text-xs text-gray-600">{customerName}</p>
               <p className="text-xs text-gray-600">Date: {formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
             </div>
