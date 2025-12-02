@@ -31,7 +31,23 @@ export const generatePDF = async (invoiceData, templateNumber) => {
         setTimeout(resolve, 500); // Wait for rendering
       });
       
-      // Get the HTML
+      // Inline all computed styles before getting HTML
+      const inlineStyles = (element) => {
+        const computedStyle = window.getComputedStyle(element);
+        let styleString = '';
+        for (let i = 0; i < computedStyle.length; i++) {
+          const prop = computedStyle[i];
+          styleString += `${prop}:${computedStyle.getPropertyValue(prop)};`;
+        }
+        element.setAttribute('style', styleString);
+        
+        // Recursively inline styles for children
+        Array.from(element.children).forEach(child => inlineStyles(child));
+      };
+      
+      inlineStyles(pdfContainer.firstElementChild);
+      
+      // Get the HTML with inlined styles
       const html = `
         <!DOCTYPE html>
         <html>
