@@ -682,7 +682,7 @@ const Index = ({ preloadedCustomer }) => {
           >
             <div className="w-full">
               <div className="bg-gray-100 rounded border border-gray-400 w-full overflow-y-auto overflow-x-hidden max-h-[800px]">
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-4 flex flex-col items-center">
                   {(() => {
                     // US Letter size: 8.5 x 11 inches = 816 x 1056 pixels at 96 DPI
                     // But templates use 794 x 1123 at 72 DPI for print precision
@@ -705,25 +705,27 @@ const Index = ({ preloadedCustomer }) => {
                     const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
                     
                     return Array.from({ length: numberOfPages }, (_, pageIndex) => (
-                      <div key={pageIndex} className="relative bg-white shadow-lg mx-auto" style={{ width: `${pageWidth}px`, height: `${pageHeight}px` }}>
-                        <InvoiceTemplate data={{
-                          invoice,
-                          billTo,
-                          shipTo,
-                          items,
-                          financing,
-                          rebatesIncentives,
-                          yourCompany,
-                          isInvoice,
-                          subTotal,
-                          grandTotal,
-                          taxAmount,
-                          taxPercentage,
-                          notes,
-                          selectedCurrency,
-                          pageNumber: pageIndex + 1,
-                          totalPages: numberOfPages
-                        }} templateNumber={4} />
+                      <div key={pageIndex} className="relative bg-white shadow-lg" style={{ width: '100%', maxWidth: `${pageWidth}px`, height: `${pageHeight}px` }}>
+                        <div style={{ transform: 'scale(1)', transformOrigin: 'top center' }}>
+                          <InvoiceTemplate data={{
+                            invoice,
+                            billTo,
+                            shipTo,
+                            items,
+                            financing,
+                            rebatesIncentives,
+                            yourCompany,
+                            isInvoice,
+                            subTotal,
+                            grandTotal,
+                            taxAmount,
+                            taxPercentage,
+                            notes,
+                            selectedCurrency,
+                            pageNumber: pageIndex + 1,
+                            totalPages: numberOfPages
+                          }} templateNumber={4} />
+                        </div>
                         {/* Page indicator - only show if multiple pages */}
                         {numberOfPages > 1 && (
                           <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
