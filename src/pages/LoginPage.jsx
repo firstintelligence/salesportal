@@ -12,6 +12,7 @@ const AGENT_CREDENTIALS = [
   { id: "AA9097", phone: "+1 (647) 716-9097" },
   { id: "HB6400", phone: "+1 (647) 377-6400" },
   { id: "TP5142", phone: "+1 (647) 549-5142" },
+  { id: "BB2704", phone: "+1 (519) 282-2704" },
 ];
 
 const LoginPage = () => {
