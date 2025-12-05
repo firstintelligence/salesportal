@@ -90,29 +90,59 @@ const StatsPage = () => {
   };
 
   const calculateLeaderboard = (tpvRequests) => {
-    const agentRevenues = {};
+    const agentData = {};
+    
+    // Get start of current week (Sunday)
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
     
     AGENT_IDS.forEach(id => {
-      agentRevenues[id] = 0;
+      agentData[id] = { weeklyRevenue: 0, totalRevenue: 0, firstDealDate: null, daysActive: 1 };
     });
     
-    tpvRequests
-      .filter(r => r.status === "completed")
-      .forEach(deal => {
-        const price = parseFloat(deal.sales_price?.replace(/[^0-9.-]+/g, "") || 0);
-        if (agentRevenues[deal.agent_id] !== undefined) {
-          agentRevenues[deal.agent_id] += price;
-        }
-      });
+    const completedDeals = tpvRequests.filter(r => r.status === "completed");
     
-    return Object.entries(agentRevenues)
-      .map(([id, revenue]) => ({
-        id,
-        name: AGENT_NAMES[id],
-        revenue,
-        tier: getCurrentTier(revenue),
-      }))
-      .sort((a, b) => b.revenue - a.revenue);
+    completedDeals.forEach(deal => {
+      const price = parseFloat(deal.sales_price?.replace(/[^0-9.-]+/g, "") || 0);
+      const dealDate = new Date(deal.created_at);
+      
+      if (agentData[deal.agent_id] !== undefined) {
+        // Total revenue for all time
+        agentData[deal.agent_id].totalRevenue += price;
+        
+        // Weekly revenue
+        if (dealDate >= weekStart) {
+          agentData[deal.agent_id].weeklyRevenue += price;
+        }
+        
+        // Track first deal date for projection
+        if (!agentData[deal.agent_id].firstDealDate || dealDate < agentData[deal.agent_id].firstDealDate) {
+          agentData[deal.agent_id].firstDealDate = dealDate;
+        }
+      }
+    });
+    
+    // Calculate projected annual for each agent
+    return Object.entries(agentData)
+      .map(([id, data]) => {
+        const daysActive = data.firstDealDate 
+          ? Math.max(1, Math.ceil((now - data.firstDealDate) / (1000 * 60 * 60 * 24)))
+          : 1;
+        const dailyEarnings = (data.totalRevenue * 0.10) / daysActive;
+        const projectedAnnual = dailyEarnings * 365;
+        
+        return {
+          id,
+          name: AGENT_NAMES[id],
+          weeklyRevenue: data.weeklyRevenue,
+          totalRevenue: data.totalRevenue,
+          projectedAnnual,
+          tier: getCurrentTier(data.totalRevenue),
+        };
+      })
+      .sort((a, b) => b.weeklyRevenue - a.weeklyRevenue);
   };
 
   const getCurrentTier = (revenue) => {
@@ -231,7 +261,7 @@ const StatsPage = () => {
 
   const currentAgentRevenue = selectedAgent === "all" 
     ? metrics?.totalRevenue || 0 
-    : leaderboard.find(a => a.id === selectedAgent)?.revenue || 0;
+    : leaderboard.find(a => a.id === selectedAgent)?.totalRevenue || 0;
   const currentTier = getCurrentTier(currentAgentRevenue);
   const nextTier = getNextTier(currentAgentRevenue);
   const tierProgress = getTierProgress(currentAgentRevenue);
@@ -436,8 +466,9 @@ const StatsPage = () => {
               <CardHeader className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-b">
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-amber-500" />
-                  Revenue Leaderboard
+                  Weekly Leaderboard
                 </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Revenue this week</p>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
@@ -475,10 +506,14 @@ const StatsPage = () => {
                           </div>
                         </div>
 
-                        {/* Revenue */}
+                        {/* Weekly Revenue & Projected Annual */}
                         <div className="text-right">
-                          <p className="font-bold text-foreground">{formatCurrency(agent.revenue)}</p>
-                          <p className="text-xs text-muted-foreground">Revenue</p>
+                          <p className="font-bold text-foreground">{formatCurrency(agent.weeklyRevenue)}</p>
+                          <p className="text-xs text-muted-foreground">This Week</p>
+                        </div>
+                        <div className="text-right min-w-[100px]">
+                          <p className="font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(agent.projectedAnnual)}</p>
+                          <p className="text-xs text-muted-foreground">Projected Annual</p>
                         </div>
                       </div>
                     );
@@ -497,9 +532,9 @@ const StatsPage = () => {
                         <span className="text-xl font-bold text-primary">#{myRank}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">Your Current Rank</p>
+                        <p className="font-semibold text-foreground">Your Weekly Rank</p>
                         <p className="text-sm text-muted-foreground">
-                          {myRank === 1 ? "You're the top performer!" : 
+                          {myRank === 1 ? "You're the top performer this week!" : 
                            myRank <= 3 ? "Great job! You're in the top 3!" : 
                            "Keep pushing to climb the ranks!"}
                         </p>
@@ -509,7 +544,7 @@ const StatsPage = () => {
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">To reach #{myRank - 1}</p>
                         <p className="font-semibold text-foreground">
-                          +{formatCurrency(leaderboard[myRank - 2]?.revenue - leaderboard[myRank - 1]?.revenue || 0)}
+                          +{formatCurrency(leaderboard[myRank - 2]?.weeklyRevenue - leaderboard[myRank - 1]?.weeklyRevenue || 0)}
                         </p>
                       </div>
                     )}
