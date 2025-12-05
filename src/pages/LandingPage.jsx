@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, BarChart3 } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -34,6 +34,15 @@ const LandingPage = () => {
       gradient: "from-purple-500/20 to-indigo-500/20",
       iconBg: "bg-purple-500/10",
       iconColor: "text-purple-600",
+    },
+    {
+      title: "Metrics",
+      icon: BarChart3,
+      description: "Track your performance KPIs",
+      path: "/metrics",
+      gradient: "from-rose-500/20 to-pink-500/20",
+      iconBg: "bg-rose-500/10",
+      iconColor: "text-rose-600",
     },
     {
       title: "Savings Calculator",
