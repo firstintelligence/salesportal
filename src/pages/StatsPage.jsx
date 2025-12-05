@@ -132,9 +132,13 @@ const StatsPage = () => {
       navigate("/");
       return;
     }
+    // Only admin MM23 can access stats page
+    if (storedAgentId !== "MM23") {
+      navigate("/landing");
+      return;
+    }
     setAgentId(storedAgentId);
-    const isAdmin = storedAgentId === "MM23";
-    setSelectedAgent(isAdmin ? "all" : storedAgentId);
+    setSelectedAgent("all");
     fetchAllData(storedAgentId);
   }, [navigate]);
 
