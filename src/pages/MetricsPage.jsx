@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, TrendingUp, DollarSign, Target, Users, Calendar, Package, Percent, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
 const AGENT_NAMES = {
@@ -14,11 +15,14 @@ const AGENT_NAMES = {
   BB2704: "Bonnie",
 };
 
+const AGENT_IDS = ["MM23", "TB0195", "AA9097", "HB6400", "TP5142", "BB2704"];
+
 const MetricsPage = () => {
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
+  const [selectedAgent, setSelectedAgent] = useState("all");
 
   useEffect(() => {
     const storedAgentId = localStorage.getItem("agentId");
@@ -27,10 +31,17 @@ const MetricsPage = () => {
       return;
     }
     setAgentId(storedAgentId);
-    fetchMetrics(storedAgentId);
+    const isAdmin = storedAgentId === "MM23";
+    setSelectedAgent(isAdmin ? "all" : storedAgentId);
+    fetchMetrics(storedAgentId, isAdmin ? "all" : storedAgentId);
   }, [navigate]);
 
-  const fetchMetrics = async (currentAgentId) => {
+  const handleAgentChange = (value) => {
+    setSelectedAgent(value);
+    fetchMetrics(agentId, value);
+  };
+
+  const fetchMetrics = async (currentAgentId, filterAgent = "all") => {
     try {
       setLoading(true);
       const isAdmin = currentAgentId === "MM23";
@@ -39,6 +50,8 @@ const MetricsPage = () => {
       let tpvQuery = supabase.from("tpv_requests").select("*");
       if (!isAdmin) {
         tpvQuery = tpvQuery.eq("agent_id", currentAgentId);
+      } else if (filterAgent !== "all") {
+        tpvQuery = tpvQuery.eq("agent_id", filterAgent);
       }
       const { data: tpvRequests, error: tpvError } = await tpvQuery;
       
@@ -187,12 +200,34 @@ const MetricsPage = () => {
         </div>
 
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            Performance Metrics
-          </h1>
-          <p className="text-muted-foreground">
-            {agentId === "MM23" ? "All Agents Overview" : `${agentName}'s Performance`}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                Performance Metrics
+              </h1>
+              <p className="text-muted-foreground">
+                {selectedAgent === "all" 
+                  ? "All Agents Overview" 
+                  : `${AGENT_NAMES[selectedAgent] || selectedAgent}'s Performance`}
+              </p>
+            </div>
+            
+            {agentId === "MM23" && (
+              <Select value={selectedAgent} onValueChange={handleAgentChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Agents</SelectItem>
+                  {AGENT_IDS.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {AGENT_NAMES[id]} ({id})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
 
         {/* Summary Cards */}
