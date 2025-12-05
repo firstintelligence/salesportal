@@ -16,6 +16,7 @@ import LoanApplicationPage from "./pages/LoanApplicationPage";
 import PaymentCalculatorPage from "./pages/PaymentCalculatorPage";
 import InstallationChecklistPage from "./pages/InstallationChecklistPage";
 import InvoiceRenderPage from "./pages/InvoiceRenderPage";
+import MetricsPage from "./pages/MetricsPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/template" element={<TemplatePage />} />
           <Route path="/receipt" element={<ReceiptPage />} />
           <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
+          <Route path="/metrics" element={<MetricsPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
