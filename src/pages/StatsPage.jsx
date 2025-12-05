@@ -205,8 +205,8 @@ const StatsPage = () => {
         const daysActive = data.firstDealDate 
           ? Math.max(1, Math.ceil((now - data.firstDealDate) / (1000 * 60 * 60 * 24)))
           : 1;
-        const dailyEarnings = (data.totalRevenue * 0.10) / daysActive;
-        const projectedAnnual = dailyEarnings * 365;
+        const dailySales = data.totalRevenue / daysActive;
+        const projectedAnnual = dailySales * 365;
         
         return {
           id,
