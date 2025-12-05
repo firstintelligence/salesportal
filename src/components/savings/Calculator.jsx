@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown, Play, X } from "lucide-react";
 
 const CATEGORIES = [
   { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500", bgColor: "bg-red-500", borderColor: "border-red-500" },
@@ -268,6 +269,69 @@ const illustrations = {
   battery: BatteryIllustration,
 };
 
+// Video explainers for each category
+const categoryVideos = {
+  hvac: {
+    title: "How Heat Pumps Save You Money",
+    description: "Learn how modern heat pumps deliver 3-4x more heating efficiency than traditional furnaces",
+    thumbnail: "https://img.youtube.com/vi/7J52mDjZzto/maxresdefault.jpg",
+    videoId: "7J52mDjZzto", // Heat pump explainer
+  },
+  insulation: {
+    title: "The Power of Proper Insulation",
+    description: "See how attic and wall insulation keeps your home comfortable year-round",
+    thumbnail: "https://img.youtube.com/vi/wEoG4K7xpA4/maxresdefault.jpg",
+    videoId: "wEoG4K7xpA4", // Insulation explainer
+  },
+  hotwater: {
+    title: "Heat Pump Water Heaters Explained",
+    description: "Discover why heat pump water heaters are 3x more efficient than traditional tanks",
+    thumbnail: "https://img.youtube.com/vi/bBc_GwOzEFY/maxresdefault.jpg",
+    videoId: "bBc_GwOzEFY", // HPWH explainer
+  },
+  solar: {
+    title: "Solar Panels: Your Home Power Plant",
+    description: "See how solar panels generate free electricity from sunlight",
+    thumbnail: "https://img.youtube.com/vi/xKxrkht7CpY/maxresdefault.jpg",
+    videoId: "xKxrkht7CpY", // Solar explainer
+  },
+  battery: {
+    title: "Home Batteries & Energy Independence",
+    description: "Learn how batteries store solar energy and provide backup power",
+    thumbnail: "https://img.youtube.com/vi/pxP0Cu00sZs/maxresdefault.jpg",
+    videoId: "pxP0Cu00sZs", // Battery explainer
+  },
+};
+
+// Video Card Component
+const VideoExplainer = ({ video, color, onPlay }) => (
+  <div 
+    onClick={onPlay}
+    className="relative bg-slate-900 rounded-2xl overflow-hidden cursor-pointer group hover:shadow-2xl transition-all duration-300"
+  >
+    <div className="relative aspect-video">
+      <img 
+        src={video.thumbnail} 
+        alt={video.title}
+        className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
+      />
+      {/* Play button overlay */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-r ${color} flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform`}>
+          <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+        </div>
+      </div>
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+    </div>
+    {/* Video info */}
+    <div className="absolute bottom-0 left-0 right-0 p-4">
+      <p className="text-white font-semibold text-sm md:text-base">{video.title}</p>
+      <p className="text-white/70 text-xs md:text-sm mt-1">{video.description}</p>
+    </div>
+  </div>
+);
+
 export function Calculator() {
   const [data, setData] = useState({
     squareFootage: "1500-2000",
@@ -283,6 +347,13 @@ export function Calculator() {
   });
 
   const [activeTab, setActiveTab] = useState("hvac");
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
+
+  const handlePlayVideo = (video) => {
+    setActiveVideo(video);
+    setVideoModalOpen(true);
+  };
 
   // Equipment costs for each category
   const equipmentCosts = {
@@ -361,8 +432,33 @@ export function Calculator() {
   const currentCategory = CATEGORIES.find(c => c.id === activeTab);
   const currentSavings = calculateCategorySavings(activeTab);
   const IllustrationComponent = illustrations[activeTab];
+  const currentVideo = categoryVideos[activeTab];
 
   return (
+    <>
+      {/* Video Modal */}
+      <Dialog open={videoModalOpen} onOpenChange={setVideoModalOpen}>
+        <DialogContent className="max-w-4xl p-0 bg-black border-0 overflow-hidden">
+          <button
+            onClick={() => setVideoModalOpen(false)}
+            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          {activeVideo && (
+            <div className="aspect-video w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo.videoId}?autoplay=1`}
+                title={activeVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
     <div className="space-y-6">
       {/* Home Details Section */}
       <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -566,6 +662,19 @@ export function Calculator() {
             {/* Visual Illustration */}
             <IllustrationComponent savings={currentSavings.monthly} />
 
+            {/* Video Explainer Section */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                <Play className="w-4 h-4" />
+                Watch Explainer Video
+              </h4>
+              <VideoExplainer 
+                video={currentVideo} 
+                color={currentCategory.color}
+                onPlay={() => handlePlayVideo(currentVideo)}
+              />
+            </div>
+
             {/* Financial Breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Monthly Breakdown */}
@@ -684,6 +793,7 @@ export function Calculator() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
