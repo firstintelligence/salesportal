@@ -16,6 +16,9 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
+  const agentId = localStorage.getItem("agentId");
+  const isAdmin = agentId === "MM23";
+
   const tools = [
     {
       title: "Dashboard",
@@ -35,7 +38,8 @@ const LandingPage = () => {
       iconBg: "bg-purple-500/10",
       iconColor: "text-purple-600",
     },
-    {
+    // Stats tile only visible to admin MM23
+    ...(isAdmin ? [{
       title: "Stats",
       icon: Trophy,
       description: "Leaderboard & performance",
@@ -43,7 +47,7 @@ const LandingPage = () => {
       gradient: "from-amber-500/20 to-yellow-500/20",
       iconBg: "bg-amber-500/10",
       iconColor: "text-amber-600",
-    },
+    }] : []),
     {
       title: "Savings Calculator",
       icon: Calculator,
