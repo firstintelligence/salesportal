@@ -38,8 +38,8 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   }, 0);
 
   return (
-    <div className="mb-6 h-full">
-      <h2 className="text-2xl font-semibold mb-2">Rebates & Incentives</h2>
+    <div className="mb-6 h-full flex flex-col">
+      <h2 className="text-lg font-semibold mb-2 whitespace-nowrap">Rebates & Incentives</h2>
       
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm font-medium">Use CGHG/CGHL</span>
