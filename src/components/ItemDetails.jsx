@@ -1,26 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { memo } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import ProductListItem from './ProductListItem';
 
-const ItemDetails = ({ items, handleItemChange, addItem, removeItem, moveItemUp, moveItemDown }) => {
-  // Use stable callbacks to prevent unnecessary re-renders
-  const handleMoveUp = useCallback((index) => {
-    if (index > 0) {
-      moveItemUp(index);
-    }
-  }, [moveItemUp]);
-
-  const handleMoveDown = useCallback((index) => {
-    if (index < items.length - 1) {
-      moveItemDown(index);
-    }
-  }, [moveItemDown, items.length]);
-
-  const handleRemove = useCallback((index) => {
-    removeItem(index);
-  }, [removeItem]);
-
+const ItemDetails = memo(({ items, handleItemChange, addItem, removeItem, moveItemUp, moveItemDown }) => {
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -33,16 +16,16 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, moveItemUp,
       <div className="space-y-4">
         {items.map((item, index) => (
           <ProductListItem
-            key={item.id || `item-${index}`}
+            key={item.id}
             item={item}
             index={index}
             isFirst={index === 0}
             isLast={index === items.length - 1}
             isOnly={items.length === 1}
             onItemChange={handleItemChange}
-            onRemove={handleRemove}
-            onMoveUp={handleMoveUp}
-            onMoveDown={handleMoveDown}
+            onRemove={removeItem}
+            onMoveUp={moveItemUp}
+            onMoveDown={moveItemDown}
           />
         ))}
       </div>
@@ -57,6 +40,8 @@ const ItemDetails = ({ items, handleItemChange, addItem, removeItem, moveItemUp,
       </Button>
     </div>
   );
-};
+});
+
+ItemDetails.displayName = 'ItemDetails';
 
 export default ItemDetails;

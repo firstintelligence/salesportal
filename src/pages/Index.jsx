@@ -223,7 +223,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
           email: "info@georgesplumbingandheating.ca"
         }
       );
-      setItems(parsedData.items || []);
+      // Ensure all items have unique IDs for proper React reconciliation
+      const loadedItems = parsedData.items || [];
+      setItems(loadedItems.map(item => ({
+        ...item,
+        id: item.id || crypto.randomUUID()
+      })));
       const province = parsedData.billTo?.province || 'ON';
       settaxPercentage(getProvincialTax(province));
       setFinancing(parsedData.financing || {
