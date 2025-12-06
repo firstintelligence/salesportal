@@ -1000,7 +1000,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
                               billTo,
                               shipTo,
                               items,
-                              financing,
+                              financing: {
+                                ...financing,
+                                monthlyPayment: calculateMonthlyPayment(
+                                  financing.loanAmount || 0,
+                                  financing.interestRate || 0,
+                                  financing.amortizationPeriod || 180
+                                )
+                              },
                               rebatesIncentives,
                               yourCompany,
                               isInvoice,
