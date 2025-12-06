@@ -208,7 +208,6 @@ const Template4 = ({ data }) => {
                 </div>
                 <div style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                   <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
-                    <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Summary</h3>
                     <div className="space-y-1">
                       <p className="flex justify-between text-sm">
                         <span>Sub Total:</span> 
@@ -227,6 +226,14 @@ const Template4 = ({ data }) => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Additional Notes - right under summary */}
+                  {notes && (
+                    <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
+                      <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Additional Notes</h3>
+                      <p className="text-xs">{notes}</p>
+                    </div>
+                  )}
 
                   {/* Rebates Section */}
                   {rebatesIncentives && Object.values(rebatesIncentives).some(value => value > 0) && (
@@ -254,22 +261,86 @@ const Template4 = ({ data }) => {
           </>
         )}
 
-        {/* Terms and Conditions and Additional Notes - only on last page */}
-        {isLastPage && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2" style={{pageBreakInside: 'avoid'}}>
-            <div style={{pageBreakInside: 'avoid'}}>
+        {/* Page 2: Terms and Conditions + Signature Section */}
+        {isLastPage && data.totalPages && data.totalPages > 1 && (
+          <div className="page-break-before" style={{pageBreakBefore: 'always'}}>
+            {/* Page 2 Header */}
+            <div className="flex justify-between items-start mb-6 pt-4">
+              <div>
+                <h1 className="text-2xl font-bold mb-2" style={{color: '#194578'}}>
+                  TERMS & CONDITIONS
+                </h1>
+                <p className="text-sm mb-1">
+                  <span className="font-semibold">{isInvoice ? 'Invoice' : 'Quote'}#:</span>{" "}
+                  {invoice.number || "N/A"}
+                </p>
+                <p className="text-sm mb-1">
+                  <span className="font-semibold">Customer:</span> {customerName}
+                </p>
+              </div>
+              <div className="text-right">
+                <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-16 mb-1 ml-auto" />
+              </div>
+            </div>
+
+            {/* Terms and Conditions Content */}
+            <div className="mb-8 p-4 rounded" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
+              <div className="text-sm text-gray-700 leading-relaxed">
+                <p className="mb-4">I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
+                
+                <p className="mb-2"><strong>1. Payment Terms:</strong> Payment is due as specified in this agreement. Late payments may be subject to additional charges.</p>
+                
+                <p className="mb-2"><strong>2. Warranty:</strong> All products and services are covered under manufacturer's warranty. Extended warranty options may be available.</p>
+                
+                <p className="mb-2"><strong>3. Cancellation Policy:</strong> Cancellations must be made in writing within 10 business days of signing. Deposits may be non-refundable.</p>
+                
+                <p className="mb-2"><strong>4. Installation:</strong> Installation dates are estimates and may be subject to change based on product availability and scheduling.</p>
+                
+                <p><strong>5. Liability:</strong> The seller is not liable for any indirect, incidental, or consequential damages arising from the use of products or services.</p>
+              </div>
+            </div>
+
+            {/* Signature Section on Page 2 */}
+            <div className="grid grid-cols-2 gap-8 mt-8">
+              <div>
+                <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
+                {signature ? (
+                  <div className="mb-2 h-16 flex items-center border-b-2 border-gray-400">
+                    <img src={signature} alt="Customer Signature" className="max-h-full" />
+                  </div>
+                ) : (
+                  <div className="border-b-2 border-gray-400 mb-2 h-12"></div>
+                )}
+                <p className="text-sm text-gray-600">{customerName}</p>
+                <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              </div>
+              {data.billTo?.coApplicantName && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                  {coApplicantSignature ? (
+                    <div className="mb-2 h-16 flex items-center border-b-2 border-gray-400">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                    </div>
+                  ) : (
+                    <div className="border-b-2 border-gray-400 mb-2 h-12"></div>
+                  )}
+                  <p className="text-sm text-gray-600">{data.billTo.coApplicantName}</p>
+                  <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Single page: Terms at bottom */}
+        {isLastPage && (!data.totalPages || data.totalPages === 1) && (
+          <div className="mt-4 mb-2" style={{pageBreakInside: 'avoid'}}>
+            <div className="p-3 rounded" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
               <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
               <div className="text-xs text-gray-700 leading-tight">
                 <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
               </div>
             </div>
-            
-            {notes && (
-              <div style={{pageBreakInside: 'avoid'}}>
-                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Additional Notes</h3>
-                <p className="text-xs">{notes}</p>
-              </div>
-            )}
           </div>
         )}
 
@@ -294,45 +365,47 @@ const Template4 = ({ data }) => {
           </div>
         )}
 
-        {/* Signature Section - Always at bottom of every page */}
-        <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
-          <div className="grid grid-cols-2 gap-4 mb-2">
-            <div>
-              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
-              {signature ? (
-                <div className="mb-1 h-12 flex items-center">
-                  <img src={signature} alt="Customer Signature" className="max-h-full" />
-                </div>
-              ) : (
-                <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
-              )}
-              <p className="text-xs text-gray-600">{customerName}</p>
-              <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
-            </div>
-            {data.billTo?.coApplicantName && (
+        {/* Signature Section - Only on single-page documents */}
+        {(!data.totalPages || data.totalPages === 1) && (
+          <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
+            <div className="grid grid-cols-2 gap-4 mb-2">
               <div>
-                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
-                {coApplicantSignature ? (
+                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
+                {signature ? (
                   <div className="mb-1 h-12 flex items-center">
-                    <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                    <img src={signature} alt="Customer Signature" className="max-h-full" />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
                 )}
-                <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
+                <p className="text-xs text-gray-600">{customerName}</p>
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
-            )}
-            {!data.billTo?.coApplicantName && <div></div>}
-          </div>
-          
-          {/* Page number - show on all pages when multi-page */}
-          {isMultiPage && (
-            <div className="text-center pt-1 border-t border-gray-200">
-              <p className="text-xs text-gray-500">Page {data.pageNumber || 1} of {data.totalPages || 1}</p>
+              {data.billTo?.coApplicantName && (
+                <div>
+                  <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                  {coApplicantSignature ? (
+                    <div className="mb-1 h-12 flex items-center">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                    </div>
+                  ) : (
+                    <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+                  )}
+                  <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
+                  <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                </div>
+              )}
+              {!data.billTo?.coApplicantName && <div></div>}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        
+        {/* Page number - show on all pages when multi-page */}
+        {isMultiPage && (
+          <div className="text-center pt-1 border-t border-gray-200">
+            <p className="text-xs text-gray-500">Page {data.pageNumber || 1} of {data.totalPages || 1}</p>
+          </div>
+        )}
       </div>
     </BaseTemplate>
   );
