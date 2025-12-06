@@ -147,7 +147,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
           <FloatingLabelInput
             id="monthlyPayment"
-            label="Monthly Payment"
+            label="Mo. Payment"
             value={`$${formatWithCommas(monthlyPayment)}`}
             disabled
             className="bg-green-50 border-green-200 font-semibold"
