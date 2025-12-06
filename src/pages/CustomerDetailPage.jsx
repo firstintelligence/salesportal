@@ -1,10 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, Calculator, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, Calculator, Plus, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 const CustomerDetailPage = () => {
@@ -13,6 +14,7 @@ const CustomerDetailPage = () => {
   const [customer, setCustomer] = useState(null);
   const [tpvRequests, setTpvRequests] = useState([]);
   const [checklists, setChecklists] = useState([]);
+  const [invoiceProfile, setInvoiceProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +25,15 @@ const CustomerDetailPage = () => {
     }
     
     fetchCustomerData();
+    loadInvoiceProfile();
   }, [customerId, navigate]);
+
+  const loadInvoiceProfile = () => {
+    const savedProfile = localStorage.getItem(`invoice_profile_${customerId}`);
+    if (savedProfile) {
+      setInvoiceProfile(JSON.parse(savedProfile));
+    }
+  };
 
   const fetchCustomerData = async () => {
     try {
@@ -64,6 +74,47 @@ const CustomerDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get TPV data for prefilling tools
+  const getLatestTpvData = () => {
+    const latestTpv = tpvRequests[0];
+    return latestTpv ? {
+      products: latestTpv.products,
+      salesPrice: latestTpv.sales_price,
+      interestRate: latestTpv.interest_rate,
+      monthlyPayment: latestTpv.monthly_payment,
+      amortization: latestTpv.amortization,
+      promotionalTerm: latestTpv.promotional_term
+    } : null;
+  };
+
+  const navigateToTpv = () => {
+    const tpvData = getLatestTpvData();
+    navigate('/tpv-ai', { 
+      state: { 
+        customer,
+        prefillData: tpvData || (invoiceProfile ? {
+          products: invoiceProfile.items?.map(i => i.name).join(', '),
+          salesPrice: invoiceProfile.grandTotal,
+          interestRate: invoiceProfile.financing?.interestRate
+        } : null)
+      } 
+    });
+  };
+
+  const navigateToLoanApplication = () => {
+    const tpvData = getLatestTpvData();
+    navigate('/loan-application', { 
+      state: { 
+        customer,
+        invoiceProfile,
+        prefillData: {
+          salesPrice: tpvData?.salesPrice || invoiceProfile?.grandTotal,
+          monthlyPayment: tpvData?.monthlyPayment
+        }
+      } 
+    });
   };
 
   const formatDate = (dateString) => {
@@ -157,6 +208,42 @@ const CustomerDetailPage = () => {
               </div>
             </div>
             
+            {/* Invoice Profile Summary (if saved) */}
+            {invoiceProfile && (
+              <>
+                <div className="bg-primary/5 rounded-lg p-4 border border-primary/10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-primary" />
+                      <span className="font-semibold">Invoice Profile</span>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      Saved {new Date(invoiceProfile.savedAt).toLocaleDateString()}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Products</p>
+                      <p className="font-medium">{invoiceProfile.items?.length || 0} items</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Subtotal</p>
+                      <p className="font-medium">{formatCurrency(invoiceProfile.subTotal)}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Tax</p>
+                      <p className="font-medium">{formatCurrency(invoiceProfile.taxAmount)}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Total</p>
+                      <p className="font-semibold text-primary">{formatCurrency(invoiceProfile.grandTotal)}</p>
+                    </div>
+                  </div>
+                </div>
+                <Separator className="my-6" />
+              </>
+            )}
+            
             <Separator className="my-6" />
             
             {/* Deal Action Buttons */}
@@ -166,15 +253,15 @@ const CustomerDetailPage = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/invoice-generator', { state: { customer } })}
+                  onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  Create Invoice
+                  {invoiceProfile ? 'Edit Invoice' : 'Create Invoice'}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/loan-application', { state: { customer } })}
+                  onClick={navigateToLoanApplication}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
                   Loan Application
@@ -182,7 +269,7 @@ const CustomerDetailPage = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/payment-calculator', { state: { customer } })}
+                  onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
                 >
                   <Calculator className="w-4 h-4 mr-2" />
                   Payment Calculator
@@ -190,7 +277,7 @@ const CustomerDetailPage = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => navigate('/tpv-ai', { state: { customer } })}
+                  onClick={navigateToTpv}
                 >
                   <Phone className="w-4 h-4 mr-2" />
                   Request TPV

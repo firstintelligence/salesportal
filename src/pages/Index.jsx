@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import FloatingLabelInput from '../components/FloatingLabelInput';
@@ -13,9 +13,12 @@ import { templates } from "../utils/templateRegistry";
 import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw, Loader2, Pen } from "lucide-react";
+import { RefreshCw, Loader2, Pen, Save } from "lucide-react";
 import { addDays } from "date-fns";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
+import { supabase } from "@/integrations/supabase/client";
+import { getSimplifiedProductList } from "../utils/productNameSimplifier";
+import { toast } from "sonner";
 
 // Helper function to get province tax name
 const getProvinceTaxName = (provinceCode) => {
@@ -80,7 +83,7 @@ const noteOptions = [
   "We appreciate your trust in us. If you ever need assistance with your order, please visit our website or call customer service. We’re here to help!",
 ];
 
-const Index = ({ preloadedCustomer }) => {
+const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   const navigate = useNavigate();
   
   const [billTo, setBillTo] = useState({ 
@@ -121,8 +124,9 @@ const Index = ({ preloadedCustomer }) => {
     email: "info@georgesplumbingandheating.ca",
   });
   const [items, setItems] = useState([
-    { quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
+    { id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
   ]);
+  const [isSaving, setIsSaving] = useState(false);
   const [taxPercentage, settaxPercentage] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
@@ -323,33 +327,37 @@ const Index = ({ preloadedCustomer }) => {
     updateTotals();
   };
 
-  const addItem = () => {
-    setItems([
-      ...items,
-      { name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" },
+  const addItem = useCallback(() => {
+    setItems(prev => [
+      ...prev,
+      { id: crypto.randomUUID(), name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" },
     ]);
-  };
+  }, []);
 
-  const removeItem = (index) => {
-    const newItems = items.filter((_, i) => i !== index);
-    setItems(newItems);
-  };
+  const removeItem = useCallback((index) => {
+    setItems(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-  const moveItemUp = (index) => {
+  const moveItemUp = useCallback((index) => {
     if (index > 0) {
-      const newItems = [...items];
-      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
-      setItems(newItems);
+      setItems(prev => {
+        const newItems = [...prev];
+        [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+        return newItems;
+      });
     }
-  };
+  }, []);
 
-  const moveItemDown = (index) => {
-    if (index < items.length - 1) {
-      const newItems = [...items];
-      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
-      setItems(newItems);
-    }
-  };
+  const moveItemDown = useCallback((index) => {
+    setItems(prev => {
+      if (index < prev.length - 1) {
+        const newItems = [...prev];
+        [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+        return newItems;
+      }
+      return prev;
+    });
+  }, []);
 
   const calculateSubTotal = () => {
     const calculatedSubTotal = items.reduce((sum, item) => sum + (item.quantity * item.amount), 0);
@@ -505,7 +513,7 @@ const Index = ({ preloadedCustomer }) => {
       phone: "(519) 851-2704",
       email: "info@georgesplumbingandheating.ca"
     });
-    setItems([{ name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
+    setItems([{ id: crypto.randomUUID(), name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
     settaxPercentage(getProvincialTax("ON"));
     setFinancing({
       financeCompany: "Financeit Canada Inc.",
@@ -522,6 +530,138 @@ const Index = ({ preloadedCustomer }) => {
     });
     setNotes("");
     localStorage.removeItem("formData");
+  };
+
+  // Save customer profile to dashboard
+  const handleSaveToDashboard = async () => {
+    // Validate required fields
+    if (!billTo.firstName || !billTo.lastName || !billTo.phone || !billTo.address) {
+      toast.error("Please fill in customer name, phone, and address before saving");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const agentId = localStorage.getItem("agentId");
+      if (!agentId) {
+        toast.error("Please login to save customer profiles");
+        return;
+      }
+
+      // Create or update customer
+      const customerData = {
+        first_name: billTo.firstName,
+        last_name: billTo.lastName,
+        email: billTo.email || null,
+        phone: billTo.phone,
+        address: billTo.address,
+        city: billTo.city || null,
+        province: billTo.province || 'ON',
+        postal_code: billTo.postalCode || null,
+      };
+
+      // Check if customer exists by phone number
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("phone", billTo.phone)
+        .single();
+
+      let customerId;
+      if (existingCustomer) {
+        // Update existing customer
+        const { error: updateError } = await supabase
+          .from("customers")
+          .update(customerData)
+          .eq("id", existingCustomer.id);
+        
+        if (updateError) throw updateError;
+        customerId = existingCustomer.id;
+      } else {
+        // Create new customer
+        const { data: newCustomer, error: insertError } = await supabase
+          .from("customers")
+          .insert(customerData)
+          .select("id")
+          .single();
+        
+        if (insertError) throw insertError;
+        customerId = newCustomer.id;
+      }
+
+      // Get simplified product list for TPV
+      const simplifiedProducts = getSimplifiedProductList(items);
+
+      // Create TPV request with invoice data (draft status)
+      const tpvData = {
+        customer_id: customerId,
+        agent_id: agentId,
+        customer_name: `${billTo.firstName} ${billTo.lastName}`,
+        first_name: billTo.firstName,
+        last_name: billTo.lastName,
+        customer_phone: billTo.phone,
+        customer_address: billTo.address,
+        city: billTo.city || null,
+        province: billTo.province || 'ON',
+        postal_code: billTo.postalCode || null,
+        email: billTo.email || null,
+        products: simplifiedProducts,
+        sales_price: grandTotal.toString(),
+        interest_rate: financing.interestRate?.toString() || null,
+        promotional_term: financing.loanTerm?.toString() || null,
+        amortization: financing.amortizationPeriod?.toString() || null,
+        monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
+          financing.loanAmount,
+          financing.interestRate || 0,
+          financing.amortizationPeriod
+        ).toString() : null,
+        status: 'draft'
+      };
+
+      // Check if draft TPV exists for this customer
+      const { data: existingTpv } = await supabase
+        .from("tpv_requests")
+        .select("id")
+        .eq("customer_id", customerId)
+        .eq("status", "draft")
+        .single();
+
+      if (existingTpv) {
+        await supabase
+          .from("tpv_requests")
+          .update(tpvData)
+          .eq("id", existingTpv.id);
+      } else {
+        await supabase
+          .from("tpv_requests")
+          .insert(tpvData);
+      }
+
+      // Store invoice data in localStorage for prefilling other tools
+      const invoiceProfile = {
+        customerId,
+        billTo,
+        items,
+        financing,
+        grandTotal,
+        subTotal,
+        taxAmount,
+        taxPercentage,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem(`invoice_profile_${customerId}`, JSON.stringify(invoiceProfile));
+
+      toast.success("Customer profile saved to dashboard!");
+      
+      // Navigate to customer detail page
+      navigate(`/customer/${customerId}`);
+
+    } catch (error) {
+      console.error("Error saving to dashboard:", error);
+      toast.error("Failed to save customer profile");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDownloadPDF = async () => {
@@ -778,22 +918,42 @@ const Index = ({ preloadedCustomer }) => {
         </div>
 
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
-            <Button 
-              onClick={handleDownloadPDF}
-              disabled={isDownloading}
-              className="bg-primary hover:bg-primary/90"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Downloading...
-                </>
-              ) : (
-                'Download PDF'
-              )}
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline"
+                onClick={handleSaveToDashboard}
+                disabled={isSaving}
+                className="flex-1 sm:flex-initial"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save to Dashboard
+                  </>
+                )}
+              </Button>
+              <Button 
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial"
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Downloading...
+                  </>
+                ) : (
+                  'Download PDF'
+                )}
+              </Button>
+            </div>
           </div>
           <div className="w-full overflow-hidden">
             <div
