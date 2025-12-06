@@ -269,7 +269,7 @@ const Template4 = ({ data }) => {
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-1 h-12 flex items-center">
-                    <img src={signature} alt="Customer Signature" className="max-h-full" />
+                    <img src={signature} alt="Customer Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -282,7 +282,7 @@ const Template4 = ({ data }) => {
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-1 h-12 flex items-center">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -341,7 +341,7 @@ const Template4 = ({ data }) => {
                 <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-2 h-16 flex items-center border-b-2 border-gray-400">
-                    <img src={signature} alt="Customer Signature" className="max-h-full" />
+                    <img src={signature} alt="Customer Signature" style={{maxHeight: '64px', height: 'auto', width: 'auto', maxWidth: '200px'}} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-2 h-12"></div>
@@ -354,7 +354,7 @@ const Template4 = ({ data }) => {
                   <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-2 h-16 flex items-center border-b-2 border-gray-400">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '64px', height: 'auto', width: 'auto', maxWidth: '200px'}} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-2 h-12"></div>
@@ -397,7 +397,7 @@ const Template4 = ({ data }) => {
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-1 h-12 flex items-center">
-                    <img src={signature} alt="Customer Signature" className="max-h-full" />
+                    <img src={signature} alt="Customer Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -410,7 +410,7 @@ const Template4 = ({ data }) => {
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-1 h-12 flex items-center">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
