@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import FloatingLabelInput from '@/components/FloatingLabelInput';
+import FloatingLabelInput from './FloatingLabelInput';
 import { Switch } from "@/components/ui/switch";
-
 const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   const [useCGHG, setUseCGHG] = useState(false);
   
@@ -14,12 +13,14 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
     setUseCGHG(newValue);
     
     if (newValue) {
+      // Set default CGHG/CGHL values
       setRebatesIncentives(prev => ({
         ...prev,
         federalRebate: 5000,
         provincialRebate: 5000
       }));
     } else {
+      // Clear values when toggled off
       setRebatesIncentives(prev => ({
         ...prev,
         federalRebate: 0,
@@ -28,9 +29,10 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
     }
   };
 
+  // Calculate total rebates with utility rebate multiplied by 12 (annual)
   const totalRebates = Object.entries(rebatesIncentives).reduce((sum, [key, value]) => {
     if (key === 'utilityRebate') {
-      return sum + (value * 12);
+      return sum + (value * 12); // Multiply monthly utility rebate by 12
     }
     return sum + value;
   }, 0);

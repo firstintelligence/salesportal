@@ -28,12 +28,8 @@ const Template4 = ({ data }) => {
     ? `${billTo.firstName} ${billTo.lastName}` 
     : billTo.name || "Customer Name";
 
-  // Use pre-calculated monthly payment from parent or calculate as fallback
-  const getMonthlyPayment = () => {
-    if (financing.monthlyPayment !== undefined) {
-      return financing.monthlyPayment;
-    }
-    // Fallback calculation
+  // Calculate monthly payment dynamically
+  const calculateMonthlyPayment = () => {
     if (!financing.loanAmount || !financing.amortizationPeriod) return 0;
     
     const principal = financing.loanAmount;
@@ -205,7 +201,7 @@ const Template4 = ({ data }) => {
                         <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
                         <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
                         <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
-                        <p><strong>Monthly Payment:</strong> ${getMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                        <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                       </div>
                     </div>
                   )}
