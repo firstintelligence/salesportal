@@ -10,10 +10,10 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   ];
 
   const monthlyPayment = calculateMonthlyPayment(
-    financing.loanAmount, 
-    financing.interestRate, 
-    financing.amortizationPeriod
-  );
+    financing.loanAmount || 0, 
+    financing.interestRate || 0, 
+    financing.amortizationPeriod || 180
+  ) || 0;
 
   const adminFee = Math.min(financing.loanAmount * 0.0149, 149);
 
@@ -125,7 +125,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div className="grid grid-cols-2 gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
@@ -145,13 +145,12 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             </Select>
           </div>
 
-          <FloatingLabelInput
-            id="monthlyPayment"
-            label="Mo. Payment"
-            value={`$${formatWithCommas(monthlyPayment)}`}
-            disabled
-            className="bg-green-50 border-green-200 font-semibold"
-          />
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Monthly Payment</label>
+            <div className="px-2.5 py-2 h-[40px] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 font-semibold flex items-center">
+              ${formatWithCommas(monthlyPayment)}
+            </div>
+          </div>
         </div>
 
         {/* Contractor/Dealer Fee Section */}
