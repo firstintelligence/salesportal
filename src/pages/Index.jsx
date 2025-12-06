@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import FloatingLabelInput from '../components/FloatingLabelInput';
-import BillToSection from '../components/BillToSection';
-import ShipToSection from '../components/ShipToSection';
-import ItemDetails from "../components/ItemDetails";
-import FinancingSection from "../components/FinancingSection";
-import InvoiceTemplate from "../components/InvoiceTemplate";
-import RebatesSection from "../components/RebatesSection";
-import FullscreenSignaturePad from "../components/FullscreenSignaturePad";
-import { templates } from "../utils/templateRegistry";
-import { generatePDF } from "../utils/pdfGenerator";
+import FloatingLabelInput from '@/components/FloatingLabelInput';
+import BillToSection from '@/components/BillToSection';
+import ShipToSection from '@/components/ShipToSection';
+import ItemDetails from "@/components/ItemDetails";
+import FinancingSection from "@/components/FinancingSection";
+import InvoiceTemplate from "@/components/InvoiceTemplate";
+import RebatesSection from "@/components/RebatesSection";
+import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
+import { templates } from "@/utils/templateRegistry";
+import { generatePDF } from "@/utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
 import { RefreshCw, Loader2, Pen, Save } from "lucide-react";
 import { addDays } from "date-fns";
-import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
+import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
 import { supabase } from "@/integrations/supabase/client";
-import { getSimplifiedProductList } from "../utils/productNameSimplifier";
+import { getSimplifiedProductList } from "@/utils/productNameSimplifier";
 import { toast } from "sonner";
 
 // Helper function to get province tax name
