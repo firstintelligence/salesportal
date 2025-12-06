@@ -28,13 +28,13 @@ const Template4 = ({ data }) => {
     ? `${billTo.firstName} ${billTo.lastName}` 
     : billTo.name || "Customer Name";
 
-  // Calculate monthly payment dynamically
+  // Calculate monthly payment dynamically using proper defaults
   const calculateMonthlyPayment = () => {
-    if (!financing.loanAmount || !financing.amortizationPeriod) return 0;
-    
-    const principal = financing.loanAmount;
+    const principal = financing.loanAmount || 0;
+    const term = financing.amortizationPeriod || 180;
     const rate = (financing.interestRate || 0) / 100 / 12;
-    const term = financing.amortizationPeriod;
+    
+    if (principal === 0 || term === 0) return 0;
     
     if (rate === 0) {
       return principal / term;
