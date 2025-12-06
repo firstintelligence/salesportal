@@ -31,8 +31,13 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
     setFinancing(prev => ({ ...prev, [field]: value }));
   };
 
+  // Format number with commas
+  const formatWithCommas = (num) => {
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   return (
-    <div className="mb-6 bg-green-50 p-4 rounded-lg">
+    <div className="mb-6 bg-green-50 p-4 rounded-lg h-full">
       <h2 className="text-2xl font-semibold mb-2">Financing Payment Details</h2>
       
       <div className="flex items-center justify-between mb-4">
@@ -60,21 +65,21 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           <FloatingLabelInput
             id="loanAmount"
             label="Loan Amount"
-            value={`$${(financing.loanAmount || 0).toFixed(2)}`}
+            value={`$${formatWithCommas(financing.loanAmount || 0)}`}
             disabled
           />
 
           <FloatingLabelInput
             id="adminFee"
             label="Admin Fee"
-            value={`$${Math.min((financing.loanAmount || 0) * 0.0149, 149).toFixed(2)}`}
+            value={`$${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}`}
             disabled
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Promotional Term</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Promo Term</label>
             <Select 
               value={(financing.loanTerm || 24).toString()} 
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
@@ -102,7 +107,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amortization Period</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Amortization</label>
             <Select 
               value={(financing.amortizationPeriod || 180).toString()} 
               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
@@ -111,10 +116,10 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="120">120 months (10 years)</SelectItem>
-                <SelectItem value="144">144 months (12 years)</SelectItem>
-                <SelectItem value="180">180 months (15 years)</SelectItem>
-                <SelectItem value="240">240 months (20 years)</SelectItem>
+                <SelectItem value="120">120 months</SelectItem>
+                <SelectItem value="144">144 months</SelectItem>
+                <SelectItem value="180">180 months</SelectItem>
+                <SelectItem value="240">240 months</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -122,7 +127,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
               value={(financing.interestRate || 0).toString()} 
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
@@ -143,9 +148,9 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           <FloatingLabelInput
             id="monthlyPayment"
             label="Monthly Payment"
-            value={`$${monthlyPayment.toFixed(2)}`}
+            value={`$${formatWithCommas(monthlyPayment)}`}
             disabled
-            className="bg-green-50 border-green-200"
+            className="bg-green-50 border-green-200 font-semibold"
           />
         </div>
 
