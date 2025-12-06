@@ -786,8 +786,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FinancingSection 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              <FinancingSection
                 financing={financing} 
                 setFinancing={setFinancing} 
                 invoiceAmount={subTotal}

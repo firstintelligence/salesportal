@@ -38,7 +38,7 @@ const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   }, 0);
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 h-full">
       <h2 className="text-2xl font-semibold mb-2">Rebates & Incentives</h2>
       
       <div className="flex items-center justify-between mb-4">
