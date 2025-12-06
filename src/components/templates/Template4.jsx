@@ -296,9 +296,8 @@ const Template4 = ({ data }) => {
           </div>
         )}
 
-        {/* Page 2: Terms and Conditions - Always on page 2 */}
-        {isLastPage && (
-          <div style={{pageBreakBefore: 'always'}}>
+        {/* Terms and Conditions - Always on a new page after invoice content */}
+        <div style={{pageBreakBefore: 'always'}}>
             {/* Page 2 Header */}
             <div className="flex justify-between items-start mb-6 pt-4">
               <div>
@@ -366,7 +365,6 @@ const Template4 = ({ data }) => {
               {!data.billTo?.coApplicantName && <div></div>}
             </div>
           </div>
-        )}
 
         {/* Continuation page header - for pages beyond page 1 that are not the last page */}
         {!isFirstPage && !isLastPage && (
