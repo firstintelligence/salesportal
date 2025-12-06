@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import FloatingLabelInput from '../components/FloatingLabelInput';
@@ -317,15 +317,16 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     });
   };
 
-  const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index][field] = value;
-    if (field === "quantity" || field === "amount") {
-      newItems[index].total = newItems[index].quantity * newItems[index].amount;
-    }
-    setItems(newItems);
-    updateTotals();
-  };
+  const handleItemChange = useCallback((index, field, value) => {
+    setItems(prev => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], [field]: value };
+      if (field === "quantity" || field === "amount") {
+        newItems[index].total = newItems[index].quantity * newItems[index].amount;
+      }
+      return newItems;
+    });
+  }, []);
 
   const addItem = useCallback(() => {
     setItems(prev => [
@@ -359,38 +360,29 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     });
   }, []);
 
-  const calculateSubTotal = () => {
-    const calculatedSubTotal = items.reduce((sum, item) => sum + (item.quantity * item.amount), 0);
-    setSubTotal(calculatedSubTotal); // Store as number
-    return calculatedSubTotal;
-  };
+  // Use useMemo for derived calculations to avoid state update cascades
+  const calculatedSubTotal = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.quantity * item.amount), 0);
+  }, [items]);
 
-  const calculateTaxAmount = (subTotalValue) => { // Renamed param to avoid conflict with state
-    const tax = (subTotalValue * taxPercentage) / 100;
-    setTaxAmount(tax); // Store as number
-    return tax;
-  };
+  const calculatedTaxAmount = useMemo(() => {
+    return (calculatedSubTotal * taxPercentage) / 100;
+  }, [calculatedSubTotal, taxPercentage]);
 
-  const calculateGrandTotal = (subTotalValue, taxAmountValue) => { // Renamed params to avoid conflict with state
-    const total = parseFloat(subTotalValue) + parseFloat(taxAmountValue);
-    setGrandTotal(total); // Store as number
-    return total;
-  };
+  const calculatedGrandTotal = useMemo(() => {
+    return calculatedSubTotal + calculatedTaxAmount;
+  }, [calculatedSubTotal, calculatedTaxAmount]);
 
-  const updateTotals = () => {
-    const currentSubTotal = calculateSubTotal();
-    const currentTaxAmount = calculateTaxAmount(currentSubTotal);
-    // setGrandTotal will be called by calculateGrandTotal via currentTaxAmount's setter,
-    // or directly if we prefer explicit calls.
-    // For clarity and directness, let's call it explicitly here.
-    calculateGrandTotal(currentSubTotal, currentTaxAmount);
-    // Note: setSubTotal and setTaxAmount are called within their respective calculate functions.
-  };
+  // Sync derived values to state for components that need them
+  useEffect(() => {
+    setSubTotal(calculatedSubTotal);
+    setTaxAmount(calculatedTaxAmount);
+    setGrandTotal(calculatedGrandTotal);
+  }, [calculatedSubTotal, calculatedTaxAmount, calculatedGrandTotal]);
 
   const handleTaxPercentageChange = (e) => {
     const taxRate = parseFloat(e.target.value) || 0;
     settaxPercentage(taxRate);
-    // updateTotals will be called by the useEffect listening to taxPercentage change
   };
 
   // Auto-set payment date to 7 days after invoice date
@@ -406,16 +398,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
 
   // Update financing loan amount when grand total changes
   useEffect(() => {
-    const loanAmount = calculateLoanAmount(grandTotal);
+    const loanAmount = calculateLoanAmount(calculatedGrandTotal);
     setFinancing(prev => ({
       ...prev,
       loanAmount
     }));
-  }, [grandTotal]);
-
-  useEffect(() => {
-    updateTotals();
-  }, [items, taxPercentage]);
+  }, [calculatedGrandTotal]);
 
   const handleTemplateClick = (templateNumber) => {
     const formData = {
