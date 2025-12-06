@@ -268,11 +268,11 @@ const Template4 = ({ data }) => {
               <div>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-1 h-24 flex items-center">
-                    <img src={signature} alt="Customer Signature" style={{maxHeight: '100px', height: 'auto', width: 'auto', maxWidth: '300px'}} />
+                  <div className="mb-1 flex items-center">
+                    <img src={signature} alt="Customer Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
                   </div>
                 ) : (
-                  <div className="border-b-2 border-gray-400 mb-1 h-8"></div>
+                  <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
                 )}
                 <p className="text-xs text-gray-600">{customerName}</p>
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
@@ -281,11 +281,11 @@ const Template4 = ({ data }) => {
                 <div>
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-1 h-24 flex items-center">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '100px', height: 'auto', width: 'auto', maxWidth: '300px'}} />
+                    <div className="mb-1 flex items-center">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
                     </div>
                   ) : (
-                    <div className="border-b-2 border-gray-400 mb-1 h-8"></div>
+                    <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
                   )}
                   <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
                   <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
@@ -339,11 +339,11 @@ const Template4 = ({ data }) => {
               <div>
                 <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-2 h-24 flex items-center border-b-2 border-gray-400">
-                    <img src={signature} alt="Customer Signature" style={{maxHeight: '100px', height: 'auto', width: 'auto', maxWidth: '300px'}} />
+                  <div className="mb-2 flex items-center border-b-2 border-gray-400">
+                    <img src={signature} alt="Customer Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
                   </div>
                 ) : (
-                  <div className="border-b-2 border-gray-400 mb-2 h-16"></div>
+                  <div className="border-b-2 border-gray-400 mb-2 h-10"></div>
                 )}
                 <p className="text-sm text-gray-600">{customerName}</p>
                 <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
@@ -352,11 +352,11 @@ const Template4 = ({ data }) => {
                 <div>
                   <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-2 h-24 flex items-center border-b-2 border-gray-400">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '100px', height: 'auto', width: 'auto', maxWidth: '300px'}} />
+                    <div className="mb-2 flex items-center border-b-2 border-gray-400">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
                     </div>
                   ) : (
-                    <div className="border-b-2 border-gray-400 mb-2 h-16"></div>
+                    <div className="border-b-2 border-gray-400 mb-2 h-10"></div>
                   )}
                   <p className="text-sm text-gray-600">{data.billTo.coApplicantName}</p>
                   <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
