@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FloatingLabelInput from './FloatingLabelInput';
 import { Switch } from "@/components/ui/switch";
+
 const RebatesSection = ({ rebatesIncentives, setRebatesIncentives }) => {
   const [useCGHG, setUseCGHG] = useState(false);
   
