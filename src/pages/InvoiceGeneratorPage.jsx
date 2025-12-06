@@ -8,6 +8,7 @@ const InvoiceGeneratorPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const customer = location.state?.customer;
+  const invoiceProfile = location.state?.invoiceProfile;
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -15,19 +16,28 @@ const InvoiceGeneratorPage = () => {
     }
   }, [navigate]);
 
+  // Determine back navigation based on where user came from
+  const handleBack = () => {
+    if (customer?.id) {
+      navigate(`/customer/${customer.id}`);
+    } else {
+      navigate("/landing");
+    }
+  };
+
   return (
     <div>
       <div className="bg-card border-b border-border p-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/landing")}
+          onClick={handleBack}
           className="mb-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Tools
+          {customer?.id ? 'Back to Customer' : 'Back to Tools'}
         </Button>
       </div>
-      <Index preloadedCustomer={customer} />
+      <Index preloadedCustomer={customer} preloadedInvoiceProfile={invoiceProfile} />
     </div>
   );
 };
