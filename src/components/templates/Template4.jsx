@@ -261,9 +261,44 @@ const Template4 = ({ data }) => {
           </>
         )}
 
-        {/* Page 2: Terms and Conditions + Signature Section */}
-        {isLastPage && data.totalPages && data.totalPages > 1 && (
-          <div className="page-break-before" style={{pageBreakBefore: 'always'}}>
+        {/* Signature Section - On every page (page 1 for first page) */}
+        {isFirstPage && (
+          <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <div>
+                <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
+                {signature ? (
+                  <div className="mb-1 h-12 flex items-center">
+                    <img src={signature} alt="Customer Signature" className="max-h-full" />
+                  </div>
+                ) : (
+                  <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+                )}
+                <p className="text-xs text-gray-600">{customerName}</p>
+                <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+              </div>
+              {data.billTo?.coApplicantName && (
+                <div>
+                  <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                  {coApplicantSignature ? (
+                    <div className="mb-1 h-12 flex items-center">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" className="max-h-full" />
+                    </div>
+                  ) : (
+                    <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
+                  )}
+                  <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
+                  <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                </div>
+              )}
+              {!data.billTo?.coApplicantName && <div></div>}
+            </div>
+          </div>
+        )}
+
+        {/* Page 2: Terms and Conditions - Always on page 2 */}
+        {isLastPage && (
+          <div style={{pageBreakBefore: 'always'}}>
             {/* Page 2 Header */}
             <div className="flex justify-between items-start mb-6 pt-4">
               <div>
@@ -328,22 +363,13 @@ const Template4 = ({ data }) => {
                   <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
                 </div>
               )}
+              {!data.billTo?.coApplicantName && <div></div>}
             </div>
           </div>
         )}
 
-        {/* Single page: Terms at bottom */}
-        {isLastPage && (!data.totalPages || data.totalPages === 1) && (
-          <div className="mt-4 mb-2" style={{pageBreakInside: 'avoid'}}>
-            <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
-            <div className="text-xs text-gray-700 leading-tight">
-              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Continuation page header */}
-        {!isFirstPage && (
+        {/* Continuation page header - for pages beyond page 1 that are not the last page */}
+        {!isFirstPage && !isLastPage && (
           <div className="flex justify-between items-start mb-3">
             <div>
               <h1 className="text-2xl font-bold mb-2" style={{color: '#194578'}}>
@@ -363,8 +389,8 @@ const Template4 = ({ data }) => {
           </div>
         )}
 
-        {/* Signature Section - Only on single-page documents */}
-        {(!data.totalPages || data.totalPages === 1) && (
+        {/* Signature Section - On continuation pages (not first, not last with T&C) */}
+        {!isFirstPage && !isLastPage && (
           <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
             <div className="grid grid-cols-2 gap-4 mb-2">
               <div>
@@ -395,13 +421,6 @@ const Template4 = ({ data }) => {
               )}
               {!data.billTo?.coApplicantName && <div></div>}
             </div>
-          </div>
-        )}
-        
-        {/* Page number - show on all pages when multi-page */}
-        {isMultiPage && (
-          <div className="text-center pt-1 border-t border-gray-200">
-            <p className="text-xs text-gray-500">Page {data.pageNumber || 1} of {data.totalPages || 1}</p>
           </div>
         )}
       </div>
