@@ -229,7 +229,7 @@ const Template4 = ({ data }) => {
 
                   {/* Additional Notes - right under summary */}
                   {notes && (
-                    <div className="p-3 rounded mb-4" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
+                    <div className="mb-4" style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                       <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Additional Notes</h3>
                       <p className="text-xs">{notes}</p>
                     </div>
@@ -284,7 +284,7 @@ const Template4 = ({ data }) => {
             </div>
 
             {/* Terms and Conditions Content */}
-            <div className="mb-8 p-4 rounded" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
+            <div className="mb-8">
               <div className="text-sm text-gray-700 leading-relaxed">
                 <p className="mb-4">I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
                 
@@ -335,11 +335,9 @@ const Template4 = ({ data }) => {
         {/* Single page: Terms at bottom */}
         {isLastPage && (!data.totalPages || data.totalPages === 1) && (
           <div className="mt-4 mb-2" style={{pageBreakInside: 'avoid'}}>
-            <div className="p-3 rounded" style={{backgroundColor: '#f8f9fa', border: '1px solid #dee2e6'}}>
-              <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
-              <div className="text-xs text-gray-700 leading-tight">
-                <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
-              </div>
+            <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Terms and Conditions</h3>
+            <div className="text-xs text-gray-700 leading-tight">
+              <p>I hereby confirm that I have read, understand and agree to all of the terms and conditions contained in this sales agreement, that I have been given an express opportunity to accept or decline this sales agreement and to correct any errors immediately before entering into it, and that I have received a copy of this sales agreement from the seller on the date of my signature as set out below.</p>
             </div>
           </div>
         )}
