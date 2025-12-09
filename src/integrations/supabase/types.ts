@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_profiles: {
+        Row: {
+          agent_id: string
+          created_at: string
+          first_name: string
+          id: string
+          is_super_admin: boolean | null
+          last_name: string | null
+          phone: string | null
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          first_name: string
+          id?: string
+          is_super_admin?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          is_super_admin?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checklist_photos: {
         Row: {
           category: string
@@ -61,6 +105,7 @@ export type Database = {
           phone: string
           postal_code: string | null
           province: string | null
+          tenant_id: string | null
           updated_at: string
         }
         Insert: {
@@ -74,6 +119,7 @@ export type Database = {
           phone: string
           postal_code?: string | null
           province?: string | null
+          tenant_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -87,9 +133,18 @@ export type Database = {
           phone?: string
           postal_code?: string | null
           province?: string | null
+          tenant_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       installation_checklists: {
         Row: {
@@ -139,6 +194,42 @@ export type Database = {
           },
         ]
       }
+      tenants: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          phone: string | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tpv_requests: {
         Row: {
           agent_id: string
@@ -164,6 +255,7 @@ export type Database = {
           recording_url: string | null
           sales_price: string | null
           status: string
+          tenant_id: string | null
           updated_at: string | null
           vapi_call_id: string | null
         }
@@ -191,6 +283,7 @@ export type Database = {
           recording_url?: string | null
           sales_price?: string | null
           status?: string
+          tenant_id?: string | null
           updated_at?: string | null
           vapi_call_id?: string | null
         }
@@ -218,6 +311,7 @@ export type Database = {
           recording_url?: string | null
           sales_price?: string | null
           status?: string
+          tenant_id?: string | null
           updated_at?: string | null
           vapi_call_id?: string | null
         }
@@ -227,6 +321,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tpv_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
