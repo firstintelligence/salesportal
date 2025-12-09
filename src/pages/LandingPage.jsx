@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy } from "lucide-react";
+import { useTenant } from "@/contexts/TenantContext";
+import { getTenantLogo } from "@/utils/tenantLogos";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { tenant, agentProfile, isSuperAdmin } = useTenant();
 
   useEffect(() => {
     // Reset scroll position to top when landing page loads
@@ -15,9 +18,6 @@ const LandingPage = () => {
       navigate("/");
     }
   }, [navigate]);
-
-  const agentId = localStorage.getItem("agentId");
-  const isAdmin = agentId === "MM23";
 
   const tools = [
     {
@@ -38,8 +38,8 @@ const LandingPage = () => {
       iconBg: "bg-purple-500/10",
       iconColor: "text-purple-600",
     },
-    // Stats tile only visible to admin MM23
-    ...(isAdmin ? [{
+    // Stats tile only visible to super admins
+    ...(isSuperAdmin ? [{
       title: "Stats",
       icon: Trophy,
       description: "Leaderboard & performance",
@@ -104,16 +104,33 @@ const LandingPage = () => {
     },
   ];
 
+  const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
+  const companyName = tenant?.name || "Sales Portal";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
+          {tenantLogo && (
+            <div className="flex justify-center mb-4">
+              <img 
+                src={tenantLogo} 
+                alt={companyName}
+                className="h-16 sm:h-20 lg:h-24 object-contain"
+              />
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">
-            George's Plumbing & Heating
+            {companyName}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
             Select a tool to get started
           </p>
+          {agentProfile && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Welcome, {agentProfile.first_name}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
