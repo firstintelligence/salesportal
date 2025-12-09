@@ -15,6 +15,9 @@ const Template5 = ({ data = {} }) => {
               <h1 className="text-4xl font-bold text-green-600">Invoice</h1>
             </div>
             <div className="text-right">
+              {yourCompany.logo && (
+                <img src={yourCompany.logo} alt={yourCompany.name} className="h-12 mb-2 ml-auto object-contain" />
+              )}
               <h2 className="text-xl font-bold">
                 {yourCompany.name || "Company Name"}
               </h2>

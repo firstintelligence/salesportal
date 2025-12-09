@@ -11,6 +11,9 @@ const Template9 = ({ data }) => {
       <div className="bg-white p-8 max-w-4xl mx-auto">
         <div className="flex justify-between items-start mb-8">
           <div>
+            {yourCompany.logo && (
+              <img src={yourCompany.logo} alt={yourCompany.name} className="h-12 mb-2 object-contain" />
+            )}
             <h1 className="text-3xl font-bold text-orange-600 mb-2">Invoice</h1>
             <h2 className="text-xl font-bold">
               {yourCompany.name || "Your Company Name"}

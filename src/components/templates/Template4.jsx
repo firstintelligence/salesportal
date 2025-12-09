@@ -80,7 +80,11 @@ const Template4 = ({ data }) => {
                 </div>
               </div>
               <div className="text-right">
-                <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.56rem] mb-1 ml-auto" />
+                {yourCompany.logo ? (
+                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className="h-[8.56rem] mb-1 ml-auto object-contain" />
+                ) : (
+                  <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-[8.56rem] mb-1 ml-auto" />
+                )}
               </div>
             </div>
 
@@ -313,7 +317,11 @@ const Template4 = ({ data }) => {
                 </p>
               </div>
               <div className="text-right">
-                <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-16 mb-1 ml-auto" />
+                {yourCompany.logo ? (
+                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className="h-16 mb-1 ml-auto object-contain" />
+                ) : (
+                  <img src="/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png" alt="Company Logo" className="h-16 mb-1 ml-auto" />
+                )}
               </div>
             </div>
 
