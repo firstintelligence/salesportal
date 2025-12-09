@@ -7,17 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 
-const AGENT_NAMES = {
-  MM23: "MoMo",
-  TB0195: "Tadeo",
-  AA9097: "Donny",
-  HB6400: "Harry",
-  TP5142: "Tony",
-  BB2704: "Bonnie",
+// Demo data for Polaron agents
+const POLARON_DEMO_STATS = {
+  CI11: { weeklyRevenue: 45000, totalRevenue: 187500, deals: 12 },
+  LA11: { weeklyRevenue: 38000, totalRevenue: 156000, deals: 10 },
+  AW11: { weeklyRevenue: 52000, totalRevenue: 215000, deals: 14 },
+  MA11: { weeklyRevenue: 41000, totalRevenue: 168000, deals: 11 },
+  MW11: { weeklyRevenue: 35000, totalRevenue: 142000, deals: 9 },
 };
-
-const AGENT_IDS = ["MM23", "TB0195", "AA9097", "HB6400", "TP5142", "BB2704"];
 
 const PROMOTION_TIERS = [
   { name: "Rookie", minRevenue: 0, maxRevenue: 25000, color: "from-slate-400 to-slate-600", bgColor: "bg-slate-500", icon: Star, bonus: "Base Commission" },
@@ -119,12 +118,15 @@ const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
 
 const StatsPage = () => {
   const navigate = useNavigate();
+  const { tenant, agentProfile, isSuperAdmin } = useTenant();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState("all");
   const [leaderboard, setLeaderboard] = useState([]);
   const [allTpvRequests, setAllTpvRequests] = useState([]);
+  const [tenantAgents, setTenantAgents] = useState([]);
+  const [agentNames, setAgentNames] = useState({});
 
   useEffect(() => {
     const storedAgentId = localStorage.getItem("agentId");
@@ -132,42 +134,170 @@ const StatsPage = () => {
       navigate("/");
       return;
     }
-    // Only admin MM23 can access stats page
-    if (storedAgentId !== "MM23") {
-      navigate("/landing");
-      return;
-    }
     setAgentId(storedAgentId);
     setSelectedAgent("all");
-    fetchAllData(storedAgentId);
+    fetchTenantAgents(storedAgentId);
   }, [navigate]);
+
+  const fetchTenantAgents = async (currentAgentId) => {
+    try {
+      setLoading(true);
+      
+      // First, get the current agent's tenant
+      const { data: currentAgent, error: agentError } = await supabase
+        .from("agent_profiles")
+        .select("*, tenants(*)")
+        .eq("agent_id", currentAgentId)
+        .single();
+      
+      if (agentError) {
+        console.error("Error fetching agent:", agentError);
+        navigate("/landing");
+        return;
+      }
+      
+      // Get all agents from the same tenant
+      const { data: agents, error: agentsError } = await supabase
+        .from("agent_profiles")
+        .select("*")
+        .eq("tenant_id", currentAgent.tenant_id);
+      
+      if (agentsError) throw agentsError;
+      
+      const agentIds = agents.map(a => a.agent_id);
+      const names = {};
+      agents.forEach(a => {
+        names[a.agent_id] = a.first_name;
+      });
+      
+      setTenantAgents(agentIds);
+      setAgentNames(names);
+      
+      // Check if this is Polaron tenant (use demo data)
+      const isPolaron = currentAgent.tenants?.slug === 'polaron';
+      
+      if (isPolaron) {
+        // Use demo data for Polaron
+        const demoLeaderboard = agentIds
+          .filter(id => POLARON_DEMO_STATS[id])
+          .map(id => {
+            const stats = POLARON_DEMO_STATS[id];
+            const dailySales = stats.totalRevenue / 30; // Assume 30 days active
+            const projectedAnnual = dailySales * 365;
+            return {
+              id,
+              name: names[id],
+              weeklyRevenue: stats.weeklyRevenue,
+              totalRevenue: stats.totalRevenue,
+              projectedAnnual,
+              tier: getCurrentTier(stats.totalRevenue),
+            };
+          })
+          .sort((a, b) => b.weeklyRevenue - a.weeklyRevenue);
+        
+        setLeaderboard(demoLeaderboard);
+        
+        // Calculate demo metrics for all agents
+        const totalRevenue = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.totalRevenue, 0);
+        const totalDeals = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.deals, 0);
+        const weeklyRevenue = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.weeklyRevenue, 0);
+        
+        setMetrics({
+          totalDeals,
+          totalRevenue,
+          averageDealValue: totalRevenue / totalDeals,
+          unitsPerDeal: 1.5,
+          totalAppointments: totalDeals * 1.3,
+          appointmentsPerDeal: 1.3,
+          revenuePerAppointment: totalRevenue / (totalDeals * 1.3),
+          closingRate: 77,
+          presentationRate: 85,
+          projectedAnnualEarnings: (totalRevenue * 0.10 / 30) * 365,
+          avgDealCycleTime: 3.2,
+          thisMonthDeals: totalDeals,
+          thisMonthRevenue: weeklyRevenue * 4,
+          daysActive: 30,
+        });
+        setAllTpvRequests([]);
+      } else {
+        // Fetch real data for other tenants
+        fetchAllData(currentAgentId, agentIds, names);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tenant agents:", error);
+      setLoading(false);
+    }
+  };
 
   const handleAgentChange = (value) => {
     setSelectedAgent(value);
-    calculateMetricsForAgent(value);
+    
+    // Check if using demo data (Polaron)
+    const isPolaron = tenant?.slug === 'polaron';
+    
+    if (isPolaron && value !== "all" && POLARON_DEMO_STATS[value]) {
+      const stats = POLARON_DEMO_STATS[value];
+      setMetrics({
+        totalDeals: stats.deals,
+        totalRevenue: stats.totalRevenue,
+        averageDealValue: stats.totalRevenue / stats.deals,
+        unitsPerDeal: 1.5,
+        totalAppointments: stats.deals * 1.3,
+        appointmentsPerDeal: 1.3,
+        revenuePerAppointment: stats.totalRevenue / (stats.deals * 1.3),
+        closingRate: 77,
+        presentationRate: 85,
+        projectedAnnualEarnings: (stats.totalRevenue * 0.10 / 30) * 365,
+        avgDealCycleTime: 3.2,
+        thisMonthDeals: stats.deals,
+        thisMonthRevenue: stats.weeklyRevenue * 4,
+        daysActive: 30,
+      });
+    } else if (isPolaron && value === "all") {
+      const totalRevenue = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.totalRevenue, 0);
+      const totalDeals = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.deals, 0);
+      const weeklyRevenue = Object.values(POLARON_DEMO_STATS).reduce((sum, s) => sum + s.weeklyRevenue, 0);
+      
+      setMetrics({
+        totalDeals,
+        totalRevenue,
+        averageDealValue: totalRevenue / totalDeals,
+        unitsPerDeal: 1.5,
+        totalAppointments: totalDeals * 1.3,
+        appointmentsPerDeal: 1.3,
+        revenuePerAppointment: totalRevenue / (totalDeals * 1.3),
+        closingRate: 77,
+        presentationRate: 85,
+        projectedAnnualEarnings: (totalRevenue * 0.10 / 30) * 365,
+        avgDealCycleTime: 3.2,
+        thisMonthDeals: totalDeals,
+        thisMonthRevenue: weeklyRevenue * 4,
+        daysActive: 30,
+      });
+    } else {
+      calculateMetricsForAgent(value);
+    }
   };
 
-  const fetchAllData = async (currentAgentId) => {
+  const fetchAllData = async (currentAgentId, agentIds, names) => {
     try {
-      setLoading(true);
       const { data: allRequests, error } = await supabase
         .from("tpv_requests")
-        .select("*");
+        .select("*")
+        .in("agent_id", agentIds);
       
       if (error) throw error;
       
       setAllTpvRequests(allRequests || []);
-      const leaderboardData = calculateLeaderboard(allRequests || []);
+      const leaderboardData = calculateLeaderboard(allRequests || [], agentIds, names);
       setLeaderboard(leaderboardData);
       
-      const isAdmin = currentAgentId === "MM23";
-      const filterAgent = isAdmin ? "all" : currentAgentId;
-      const calculatedMetrics = calculateMetrics(allRequests || [], filterAgent);
+      const calculatedMetrics = calculateMetrics(allRequests || [], "all");
       setMetrics(calculatedMetrics);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -176,14 +306,14 @@ const StatsPage = () => {
     setMetrics(calculatedMetrics);
   };
 
-  const calculateLeaderboard = (tpvRequests) => {
+  const calculateLeaderboard = (tpvRequests, agentIds, names) => {
     const agentData = {};
     const now = new Date();
     const weekStart = new Date(now);
     weekStart.setDate(now.getDate() - now.getDay());
     weekStart.setHours(0, 0, 0, 0);
     
-    AGENT_IDS.forEach(id => {
+    agentIds.forEach(id => {
       agentData[id] = { weeklyRevenue: 0, totalRevenue: 0, firstDealDate: null, daysActive: 1 };
     });
     
@@ -214,7 +344,7 @@ const StatsPage = () => {
         
         return {
           id,
-          name: AGENT_NAMES[id],
+          name: names[id] || id,
           weeklyRevenue: data.weeklyRevenue,
           totalRevenue: data.totalRevenue,
           projectedAnnual,
@@ -384,21 +514,21 @@ const StatsPage = () => {
               </div>
               <p className="text-muted-foreground">
                 {selectedAgent === "all" 
-                  ? "All Agents Performance Overview" 
-                  : `${AGENT_NAMES[selectedAgent] || selectedAgent}'s Performance Dashboard`}
+                  ? `${tenant?.name || "Team"} Performance Overview` 
+                  : `${agentNames[selectedAgent] || selectedAgent}'s Performance Dashboard`}
               </p>
             </div>
             
-            {agentId === "MM23" && (
+            {(isSuperAdmin || tenantAgents.length > 1) && (
               <Select value={selectedAgent} onValueChange={handleAgentChange}>
                 <SelectTrigger className="w-[200px] bg-background/50 backdrop-blur border-border/50">
                   <SelectValue placeholder="Select agent" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Agents</SelectItem>
-                  {AGENT_IDS.map((id) => (
+                  {tenantAgents.map((id) => (
                     <SelectItem key={id} value={id}>
-                      {AGENT_NAMES[id]} ({id})
+                      {agentNames[id]} ({id})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -426,7 +556,7 @@ const StatsPage = () => {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 animate-fade-in">
             {/* Hero Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <StatCard
                 icon={DollarSign}
                 iconColor="bg-emerald-500"
@@ -437,120 +567,79 @@ const StatsPage = () => {
                 delay={0}
               />
               <StatCard
-                icon={TrendingUp}
+                icon={Target}
                 iconColor="bg-blue-500"
                 title="Avg Deal Value"
                 value={formatCurrency(metrics?.averageDealValue || 0)}
-                subtitle="per closed deal"
+                subtitle={`${formatNumber(metrics?.unitsPerDeal || 0)} units/deal`}
                 gradient="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
                 delay={50}
               />
               <StatCard
-                icon={Target}
+                icon={Percent}
                 iconColor="bg-purple-500"
                 title="Closing Rate"
                 value={formatPercent(metrics?.closingRate || 0)}
-                subtitle="of appointments"
-                gradient="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30"
+                subtitle={`${metrics?.totalAppointments || 0} appointments`}
+                gradient="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30"
                 delay={100}
               />
               <StatCard
                 icon={Award}
                 iconColor="bg-amber-500"
-                title="Projected Annual"
-                value={formatCurrency(metrics?.projectedAnnualEarnings || 0)}
-                subtitle="at 10% commission"
+                title="Monthly Revenue"
+                value={formatCurrency(metrics?.thisMonthRevenue || 0)}
+                subtitle={`${metrics?.thisMonthDeals || 0} deals this month`}
                 gradient="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30"
                 delay={150}
               />
             </div>
 
-            {/* Detailed Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="border-border/50 bg-background/50 backdrop-blur hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Revenue per Appointment
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(metrics?.revenuePerAppointment || 0)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">From {metrics?.totalAppointments || 0} appointments</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border/50 bg-background/50 backdrop-blur hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Appointments per Deal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatNumber(metrics?.appointmentsPerDeal || 0)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Average visits to close</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border/50 bg-background/50 backdrop-blur hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Percent className="w-4 h-4" />
-                    Presentation Rate
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatPercent(metrics?.presentationRate || 0)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Appointments with presentations</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border/50 bg-background/50 backdrop-blur hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Package className="w-4 h-4" />
-                    Units per Deal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatNumber(metrics?.unitsPerDeal || 0)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Average equipment pieces</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border/50 bg-background/50 backdrop-blur hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Avg Deal Cycle
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatNumber(metrics?.avgDealCycleTime || 0, 0)} days</p>
-                  <p className="text-xs text-muted-foreground mt-1">Time between deals</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 bg-gradient-to-br from-emerald-500/10 via-green-500/10 to-teal-500/10 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    This Month
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(metrics?.thisMonthRevenue || 0)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{metrics?.thisMonthDeals || 0} deals this month</p>
-                </CardContent>
-              </Card>
+            {/* Secondary Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <StatCard
+                icon={Calendar}
+                iconColor="bg-rose-500"
+                title="Days Active"
+                value={metrics?.daysActive || 0}
+                subtitle="Sales period"
+                gradient="bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-red-950/30"
+                delay={200}
+              />
+              <StatCard
+                icon={Users}
+                iconColor="bg-cyan-500"
+                title="Rev/Appointment"
+                value={formatCurrency(metrics?.revenuePerAppointment || 0)}
+                subtitle="Per appointment"
+                gradient="bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/30 dark:to-sky-950/30"
+                delay={250}
+              />
+              <StatCard
+                icon={Package}
+                iconColor="bg-violet-500"
+                title="Presentation Rate"
+                value={formatPercent(metrics?.presentationRate || 0)}
+                subtitle="Presented to customers"
+                gradient="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30"
+                delay={300}
+              />
+              <StatCard
+                icon={TrendingUp}
+                iconColor="bg-green-500"
+                title="Projected Annual"
+                value={formatCurrency(metrics?.projectedAnnualEarnings || 0)}
+                subtitle="At 10% commission"
+                gradient="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30"
+                delay={350}
+              />
             </div>
           </TabsContent>
 
           {/* Leaderboard Tab */}
-          <TabsContent value="leaderboard" className="space-y-6 animate-fade-in">
-            <Card className="overflow-hidden border-0 shadow-xl bg-background/80 backdrop-blur">
-              <CardHeader className="bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-orange-500/10 border-b border-border/50">
+          <TabsContent value="leaderboard" className="animate-fade-in">
+            <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
+              <CardHeader className="border-b bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg">
@@ -558,190 +647,119 @@ const StatsPage = () => {
                     </div>
                     <div>
                       <CardTitle className="text-xl font-bold">Weekly Leaderboard</CardTitle>
-                      <p className="text-sm text-muted-foreground">Top performers this week</p>
+                      <p className="text-sm text-muted-foreground">{tenant?.name || "Team"} Rankings</p>
                     </div>
                   </div>
-                  <div className="px-3 py-1.5 bg-background/80 rounded-full text-xs font-medium text-muted-foreground">
-                    Week of {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </div>
+                  {myRank > 0 && (
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Your Rank</p>
+                      <p className="text-2xl font-black text-primary">#{myRank}</p>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/50">
-                  {leaderboard.map((agent, index) => (
-                    <LeaderboardRow
-                      key={agent.id}
-                      agent={agent}
-                      index={index}
-                      isCurrentUser={agent.id === agentId}
-                      formatCurrency={formatCurrency}
-                    />
-                  ))}
-                </div>
+              <CardContent className="p-0 divide-y divide-border/50">
+                {leaderboard.map((agent, index) => (
+                  <LeaderboardRow
+                    key={agent.id}
+                    agent={agent}
+                    index={index}
+                    isCurrentUser={agent.id === agentId}
+                    formatCurrency={formatCurrency}
+                  />
+                ))}
               </CardContent>
             </Card>
-
-            {/* Your Position Card */}
-            {myRank > 0 && (
-              <Card className="border-0 bg-gradient-to-br from-primary/10 via-primary/5 to-purple-500/10 shadow-lg">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/25">
-                        <span className="text-2xl font-black text-white">#{myRank}</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-lg text-foreground">Your Weekly Rank</p>
-                        <p className="text-sm text-muted-foreground">
-                          {myRank === 1 ? "🔥 You're the top performer!" : 
-                           myRank <= 3 ? "🏆 Great job! Top 3 this week!" : 
-                           "💪 Keep pushing to climb!"}
-                        </p>
-                      </div>
-                    </div>
-                    {myRank > 1 && (
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <ChevronUp className="w-4 h-4" />
-                          To reach #{myRank - 1}
-                        </div>
-                        <p className="font-bold text-lg text-foreground">
-                          +{formatCurrency(leaderboard[myRank - 2]?.weeklyRevenue - leaderboard[myRank - 1]?.weeklyRevenue || 0)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
 
           {/* Tiers Tab */}
           <TabsContent value="tiers" className="space-y-6 animate-fade-in">
-            {/* Current Tier Hero */}
-            <Card className={`overflow-hidden border-0 shadow-2xl bg-gradient-to-br ${currentTier.color}`}>
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMCAwaDQwdjQwSDB6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
-              <CardContent className="relative p-6 sm:p-8">
-                <div className="flex items-center gap-5 mb-6">
-                  <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center shadow-xl">
-                    <currentTier.icon className="w-10 h-10 text-white drop-shadow" />
+            {/* Current Tier Status */}
+            <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
+              <CardHeader className={`bg-gradient-to-r ${currentTier.color}`}>
+                <div className="flex items-center justify-between text-white">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-white/20 backdrop-blur">
+                      <currentTier.icon className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-90">Current Tier</p>
+                      <CardTitle className="text-2xl font-black">{currentTier.name}</CardTitle>
+                    </div>
                   </div>
-                  <div className="text-white">
-                    <p className="text-sm opacity-80 uppercase tracking-wider font-medium">Current Rank</p>
-                    <h2 className="text-3xl sm:text-4xl font-black">{currentTier.name}</h2>
-                    <p className="text-sm opacity-90 mt-1 font-medium">{currentTier.bonus}</p>
+                  <div className="text-right">
+                    <p className="text-sm opacity-90">Revenue</p>
+                    <p className="text-2xl font-black">{formatCurrency(currentAgentRevenue)}</p>
                   </div>
                 </div>
-
-                {nextTier && (
-                  <div className="space-y-3 bg-white/10 backdrop-blur rounded-xl p-4">
-                    <div className="flex justify-between text-white text-sm font-medium">
-                      <span>Progress to {nextTier.name}</span>
-                      <span>{formatCurrency(currentAgentRevenue)} / {formatCurrency(nextTier.minRevenue)}</span>
-                    </div>
-                    <div className="relative h-4 bg-white/20 rounded-full overflow-hidden">
-                      <div 
-                        className="absolute inset-y-0 left-0 bg-white/90 rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${tierProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-white/80 text-sm">
-                      <span className="font-bold text-white">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)}</span> more to unlock {nextTier.name}
-                    </p>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Progress to next tier</span>
+                    <span className="font-bold text-primary">{formatPercent(tierProgress)}</span>
                   </div>
-                )}
-
-                {!nextTier && (
-                  <div className="flex items-center gap-3 text-white bg-white/10 backdrop-blur rounded-xl p-4">
-                    <Crown className="w-6 h-6" />
-                    <span className="font-bold text-lg">You've reached the highest tier!</span>
-                    <Sparkles className="w-5 h-5 animate-pulse" />
-                  </div>
-                )}
+                  <Progress value={tierProgress} className="h-3" />
+                  {nextTier && (
+                    <div className="flex items-center justify-between text-sm pt-2">
+                      <div className="flex items-center gap-2">
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Next: <span className="font-semibold text-foreground">{nextTier.name}</span></span>
+                      </div>
+                      <span className="text-muted-foreground">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
             {/* All Tiers */}
-            <Card className="border-border/50 bg-background/80 backdrop-blur shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600">
-                    <Medal className="w-5 h-5 text-white" />
-                  </div>
-                  Promotion Tiers & Bonuses
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {PROMOTION_TIERS.map((tier, index) => {
-                    const TierIcon = tier.icon;
-                    const isCurrentTier = tier.name === currentTier.name;
-                    const isAchieved = currentAgentRevenue >= tier.minRevenue;
-                    
-                    return (
-                      <div 
-                        key={tier.name}
-                        className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 ${
-                          isCurrentTier 
-                            ? `bg-gradient-to-r ${tier.color} text-white shadow-lg scale-[1.02]` 
-                            : isAchieved 
-                              ? "bg-muted/50 border border-primary/20" 
-                              : "bg-muted/20 opacity-50"
-                        }`}
-                      >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform hover:scale-110 ${
-                          isCurrentTier ? "bg-white/20 shadow-lg" : `bg-gradient-to-br ${tier.color}`
-                        }`}>
-                          <TierIcon className="w-6 h-6 text-white drop-shadow" />
+            <div className="grid gap-3 sm:gap-4">
+              {PROMOTION_TIERS.map((tier, index) => {
+                const TierIcon = tier.icon;
+                const isCurrentTier = tier.name === currentTier.name;
+                const isAchieved = currentAgentRevenue >= tier.minRevenue;
+                
+                return (
+                  <Card 
+                    key={tier.name}
+                    className={`border-0 shadow-lg transition-all duration-300 ${
+                      isCurrentTier 
+                        ? "ring-2 ring-primary shadow-xl scale-[1.02]" 
+                        : isAchieved 
+                          ? "opacity-90" 
+                          : "opacity-60"
+                    }`}
+                  >
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl bg-gradient-to-br ${tier.color} shadow-lg flex-shrink-0`}>
+                          <TierIcon className="w-6 h-6 text-white" />
                         </div>
-                        
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className={`font-bold ${isCurrentTier ? "text-white" : "text-foreground"}`}>
-                              {tier.name}
-                            </p>
+                            <h3 className="font-bold text-lg">{tier.name}</h3>
                             {isCurrentTier && (
-                              <span className="text-xs px-2.5 py-1 bg-white/20 rounded-full font-medium">Current</span>
+                              <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full">Current</span>
                             )}
                             {isAchieved && !isCurrentTier && (
-                              <span className="text-xs px-2.5 py-1 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full font-medium">✓ Achieved</span>
+                              <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-600 rounded-full">Achieved</span>
                             )}
                           </div>
-                          <p className={`text-sm ${isCurrentTier ? "text-white/80" : "text-muted-foreground"}`}>
-                            {tier.maxRevenue === Infinity 
-                              ? `${formatCurrency(tier.minRevenue)}+` 
-                              : `${formatCurrency(tier.minRevenue)} - ${formatCurrency(tier.maxRevenue)}`}
-                          </p>
+                          <p className="text-sm text-muted-foreground">{tier.bonus}</p>
                         </div>
-
-                        <div className={`text-right ${isCurrentTier ? "text-white" : "text-foreground"}`}>
-                          <p className="font-bold">{tier.bonus}</p>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">{tier.maxRevenue === Infinity ? `${formatCurrency(tier.minRevenue)}+` : formatCurrency(tier.minRevenue)}</p>
+                          {tier.maxRevenue !== Infinity && (
+                            <p className="text-xs text-muted-foreground">to {formatCurrency(tier.maxRevenue)}</p>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Motivation Card */}
-            <Card className="border-0 bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-fuchsia-500/10 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-                    <Flame className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-foreground mb-1">Keep Pushing!</h3>
-                    <p className="text-muted-foreground">
-                      {nextTier 
-                        ? `You're ${formatPercent(tierProgress)} of the way to ${nextTier.name}! Close ${Math.ceil((nextTier.minRevenue - currentAgentRevenue) / (metrics?.averageDealValue || 15000))} more deals at your average deal value to level up.`
-                        : "You've mastered the game! Keep setting records and inspiring others."}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
