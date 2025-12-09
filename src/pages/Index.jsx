@@ -126,11 +126,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     manufacturerRebate: 0
   });
   const [yourCompany, setYourCompany] = useState({
-    name: tenantCompanyInfo.name,
-    address: tenantCompanyInfo.address,
-    phone: tenantCompanyInfo.phone,
-    email: tenantCompanyInfo.email,
-    logo: tenantLogo
+    name: tenant?.slug ? tenantCompanyInfo.name : "",
+    address: tenant?.slug ? tenantCompanyInfo.address : "",
+    phone: tenant?.slug ? tenantCompanyInfo.phone : "",
+    email: tenant?.slug ? tenantCompanyInfo.email : "",
+    logo: tenant?.slug ? tenantLogo : null
   });
   const [items, setItems] = useState([
     { id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
