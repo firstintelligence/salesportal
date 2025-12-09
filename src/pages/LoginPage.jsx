@@ -4,42 +4,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Shield, ArrowRight } from "lucide-react";
-
-// Map agent IDs to their associated phone numbers
-const AGENT_CREDENTIALS = [
-  { id: "MM23", phone: "+1 (905) 904-3544" },
-  { id: "TB0195", phone: "+1 (416) 875-0195" },
-  { id: "AA9097", phone: "+1 (647) 716-9097" },
-  { id: "HB6400", phone: "+1 (647) 377-6400" },
-  { id: "TP5142", phone: "+1 (647) 549-5142" },
-  { id: "BB2704", phone: "+1 (519) 282-2704" },
-  { id: "AB5394", phone: "+1 (613) 263-5394" },
-];
+import { useTenant } from "@/contexts/TenantContext";
 
 const LoginPage = () => {
   const [agentId, setAgentId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { loadTenantData } = useTenant();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const agent = AGENT_CREDENTIALS.find((a) => a.id === agentId);
-    if (agent) {
-      localStorage.setItem("authenticated", "true");
-      localStorage.setItem("agentId", agent.id);
-      if (agent.phone) {
-        localStorage.setItem("agentPhone", agent.phone);
+    try {
+      const profile = await loadTenantData(agentId);
+      
+      if (profile) {
+        localStorage.setItem("authenticated", "true");
+        localStorage.setItem("agentId", profile.agent_id);
+        if (profile.phone) {
+          localStorage.setItem("agentPhone", profile.phone);
+        }
+        toast.success("Access granted");
+        navigate("/landing");
+      } else {
+        toast.error("Invalid Agent ID");
+        setAgentId("");
       }
-      toast.success("Access granted");
-      navigate("/landing");
-    } else {
-      toast.error("Invalid Agent ID");
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error("Login failed. Please try again.");
       setAgentId("");
     }
+    
     setIsLoading(false);
   };
 
