@@ -19,6 +19,8 @@ import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculate
 import { supabase } from "@/integrations/supabase/client";
 import { getSimplifiedProductList } from "../utils/productNameSimplifier";
 import { toast } from "sonner";
+import { useTenant } from "@/contexts/TenantContext";
+import { getTenantCompanyInfo, getTenantLogo } from "@/utils/tenantLogos";
 
 // Helper function to get province tax name
 const getProvinceTaxName = (provinceCode) => {
@@ -85,6 +87,12 @@ const noteOptions = [
 
 const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   const navigate = useNavigate();
+  const { tenant } = useTenant();
+  
+  // Get tenant-specific company info
+  const tenantSlug = tenant?.slug || 'georges-plumbing';
+  const tenantCompanyInfo = getTenantCompanyInfo(tenantSlug);
+  const tenantLogo = getTenantLogo(tenantSlug);
   
   const [billTo, setBillTo] = useState({ 
     firstName: "", 
@@ -118,10 +126,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     manufacturerRebate: 0
   });
   const [yourCompany, setYourCompany] = useState({
-    name: "George's Plumbing and Heating",
-    address: "14 Rathmine Street, London, ON N5Z 1Z3",
-    phone: "(519) 851-2704",
-    email: "info@georgesplumbingandheating.ca",
+    name: tenantCompanyInfo.name,
+    address: tenantCompanyInfo.address,
+    phone: tenantCompanyInfo.phone,
+    email: tenantCompanyInfo.email,
+    logo: tenantLogo
   });
   const [items, setItems] = useState([
     { id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
@@ -142,6 +151,21 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   const [isCoApplicantSignaturePadOpen, setIsCoApplicantSignaturePadOpen] = useState(false);
   const [coApplicantSignatureDataUrl, setCoApplicantSignatureDataUrl] = useState(null);
+
+  // Update company info when tenant changes
+  useEffect(() => {
+    if (tenant?.slug) {
+      const companyInfo = getTenantCompanyInfo(tenant.slug);
+      const logo = getTenantLogo(tenant.slug);
+      setYourCompany({
+        name: companyInfo.name,
+        address: companyInfo.address,
+        phone: companyInfo.phone,
+        email: companyInfo.email,
+        logo: logo
+      });
+    }
+  }, [tenant?.slug]);
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
@@ -189,7 +213,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         number: generateInvoiceNumber(
           preloadedCustomer.first_name,
           preloadedCustomer.last_name,
-          preloadedCustomer.phone
+          preloadedCustomer.phone,
+          tenantCompanyInfo.invoicePrefix
         ),
       }));
       return;
@@ -252,7 +277,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       // If no saved data, set default values
       setInvoice((prev) => ({
         ...prev,
-        number: "GPH0000", // Will be updated when customer info is entered
+        number: `${tenantCompanyInfo.invoicePrefix}0000`, // Will be updated when customer info is entered
       }));
       settaxPercentage(getProvincialTax('ON')); // Default to Ontario
     }
@@ -308,7 +333,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         if (firstName && lastName && phone) {
           setInvoice(prevInvoice => ({
             ...prevInvoice,
-            number: generateInvoiceNumber(firstName, lastName, phone)
+            number: generateInvoiceNumber(firstName, lastName, phone, tenantCompanyInfo.invoicePrefix)
           }));
         }
       }
@@ -498,13 +523,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     setInvoice({
       date: "",
       paymentDate: "",
-      number: "GPH0000",
+      number: `${tenantCompanyInfo.invoicePrefix}0000`,
     });
     setYourCompany({
-      name: "George's Plumbing and Heating",
-      address: "14 Rathmine Street, London, ON N5Z 1Z3",
-      phone: "(519) 851-2704",
-      email: "info@georgesplumbingandheating.ca"
+      name: tenantCompanyInfo.name,
+      address: tenantCompanyInfo.address,
+      phone: tenantCompanyInfo.phone,
+      email: tenantCompanyInfo.email,
+      logo: tenantLogo
     });
     setItems([{ id: crypto.randomUUID(), name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
     settaxPercentage(getProvincialTax("ON"));

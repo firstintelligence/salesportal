@@ -17,16 +17,16 @@ export const calculateMonthlyPayment = (loanAmount, interestRate, amortizationPe
   return payment;
 };
 
-// Generate invoice number: GPHxy1234
-export const generateInvoiceNumber = (firstName, lastName, phone) => {
-  if (!firstName || !lastName || !phone) return 'GPH0000';
+// Generate invoice number: PREFIXxy1234
+export const generateInvoiceNumber = (firstName, lastName, phone, prefix = 'GPH') => {
+  if (!firstName || !lastName || !phone) return `${prefix}0000`;
   
   const firstInitial = firstName.charAt(0).toUpperCase();
   const lastInitial = lastName.charAt(0).toUpperCase();
   const phoneDigits = phone.replace(/\D/g, ''); // Remove non-digits
   const lastFourDigits = phoneDigits.slice(-4).padStart(4, '0');
   
-  return `GPH${firstInitial}${lastInitial}${lastFourDigits}`;
+  return `${prefix}${firstInitial}${lastInitial}${lastFourDigits}`;
 };
 
 // Get tax rate by province

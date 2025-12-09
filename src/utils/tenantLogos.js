@@ -5,12 +5,63 @@ export const getTenantLogo = (tenantSlug) => {
   const logos = {
     'georges-plumbing': '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png',
     'polaron-comfort': polaronLogo,
-    'maher-heating': null, // Placeholder - no logo yet
-    'crown-construction': null, // Placeholder - no logo yet
-    'marathon-electric': null, // Placeholder - no logo yet
+    'polaron': polaronLogo,
+    'maher-heating': null,
+    'crown-construction': null,
+    'marathon-electric': null,
   };
   
   return logos[tenantSlug] || null;
+};
+
+// Tenant company info
+export const getTenantCompanyInfo = (tenantSlug) => {
+  const companies = {
+    'georges-plumbing': {
+      name: "George's Plumbing and Heating",
+      address: "14 Rathmine Street, London, ON N5Z 1Z3",
+      phone: "(519) 851-2704",
+      email: "info@georgesplumbingandheating.ca",
+      invoicePrefix: "GPH"
+    },
+    'polaron-comfort': {
+      name: "Polaron Comfort",
+      address: "2 Tippett Rd Floor 4, North York, ON M3H 2V2",
+      phone: "+1 888-318-1988",
+      email: "info@polaronsolar.com",
+      invoicePrefix: "PC"
+    },
+    'polaron': {
+      name: "Polaron Comfort",
+      address: "2 Tippett Rd Floor 4, North York, ON M3H 2V2",
+      phone: "+1 888-318-1988",
+      email: "info@polaronsolar.com",
+      invoicePrefix: "PC"
+    },
+    'maher-heating': {
+      name: "Maher Heating & Cooling",
+      address: "",
+      phone: "",
+      email: "",
+      invoicePrefix: "MHC"
+    },
+    'crown-construction': {
+      name: "Crown Construction",
+      address: "",
+      phone: "",
+      email: "",
+      invoicePrefix: "CC"
+    },
+    'marathon-electric': {
+      name: "Marathon Electric",
+      address: "1200 Bay Street, Toronto, ON M5W 2A9",
+      phone: "+1 (647) 794-1199",
+      email: "info@marathon-electric.ca",
+      invoicePrefix: "ME"
+    },
+  };
+  
+  return companies[tenantSlug] || companies['georges-plumbing'];
 };
 
 // Tenant color schemes
@@ -21,6 +72,10 @@ export const getTenantColors = (tenantSlug) => {
       secondary: 'hsl(224, 76%, 48%)',
     },
     'polaron-comfort': {
+      primary: 'hsl(145, 63%, 42%)',
+      secondary: 'hsl(145, 63%, 32%)',
+    },
+    'polaron': {
       primary: 'hsl(145, 63%, 42%)',
       secondary: 'hsl(145, 63%, 32%)',
     },
