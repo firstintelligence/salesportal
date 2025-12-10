@@ -12,9 +12,10 @@ const AppointmentsPage = () => {
   const navigate = useNavigate();
   const [agentId, setAgentId] = useState(null);
   const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
+  const [isConfigured, setIsConfigured] = useState(false);
 
   const agentNames = {
     "MM23": "MoMo",
@@ -34,31 +35,8 @@ const AppointmentsPage = () => {
     }
     
     setAgentId(storedAgentId);
-    fetchAppointments(storedAgentId);
-  }, [navigate, currentDate, viewMode]);
-
-  const fetchAppointments = async (currentAgentId) => {
-    try {
-      setLoading(true);
-      
-      // Call edge function to fetch Google Calendar events
-      const { data, error } = await supabase.functions.invoke('fetch-calendar-events', {
-        body: { 
-          agentId: currentAgentId,
-          startDate: getStartDate().toISOString(),
-          endDate: getEndDate().toISOString()
-        }
-      });
-
-      if (error) throw error;
-      setAppointments(data?.events || []);
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-      toast.error("Failed to load appointments");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Calendar integration is currently disabled - skip fetching
+  }, [navigate]);
 
   const getStartDate = () => {
     if (viewMode === "month") {
@@ -275,7 +253,15 @@ const AppointmentsPage = () => {
               </TabsList>
             </Tabs>
 
-            {loading ? (
+            {!isConfigured ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="text-6xl mb-4">📅</div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
+                <p className="text-muted-foreground max-w-md">
+                  Google Calendar integration is not yet configured. Once enabled, you'll be able to view and manage your appointments here.
+                </p>
+              </div>
+            ) : loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
