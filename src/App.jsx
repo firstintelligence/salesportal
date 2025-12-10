@@ -1,8 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { TenantProvider } from "./contexts/TenantContext";
+import TenantSwitcher from "./components/TenantSwitcher";
 import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -21,29 +22,41 @@ import StatsPage from "./pages/StatsPage";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const location = useLocation();
+  const showTenantSwitcher = location.pathname !== '/' && location.pathname !== '/invoice-render';
+
+  return (
+    <>
+      {showTenantSwitcher && <TenantSwitcher />}
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/invoice-render" element={<InvoiceRenderPage />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/customer/:customerId" element={<CustomerDetailPage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
+        <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
+        <Route path="/loan-application" element={<LoanApplicationPage />} />
+        <Route path="/payment-calculator" element={<PaymentCalculatorPage />} />
+        <Route path="/tpv-ai" element={<TPVAiPage />} />
+        <Route path="/template" element={<TemplatePage />} />
+        <Route path="/receipt" element={<ReceiptPage />} />
+        <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
+        <Route path="/stats" element={<StatsPage />} />
+      </Routes>
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TenantProvider>
       <TooltipProvider>
         <Toaster />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/invoice-render" element={<InvoiceRenderPage />} />
-            <Route path="/landing" element={<LandingPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/customer/:customerId" element={<CustomerDetailPage />} />
-            <Route path="/appointments" element={<AppointmentsPage />} />
-            <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
-            <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
-            <Route path="/loan-application" element={<LoanApplicationPage />} />
-            <Route path="/payment-calculator" element={<PaymentCalculatorPage />} />
-            <Route path="/tpv-ai" element={<TPVAiPage />} />
-            <Route path="/template" element={<TemplatePage />} />
-            <Route path="/receipt" element={<ReceiptPage />} />
-            <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-          </Routes>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </TenantProvider>
