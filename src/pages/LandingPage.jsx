@@ -23,82 +23,64 @@ const LandingPage = () => {
       title: "Dashboard",
       icon: LayoutDashboard,
       path: "/dashboard",
-      bgColor: "bg-gradient-to-br from-slate-800 to-slate-900",
-      iconBg: "bg-slate-600",
-      iconColor: "text-white",
-      hoverRing: "hover:ring-slate-400",
+      gradient: "from-indigo-500 via-indigo-600 to-blue-700",
+      accentColor: "bg-white/20",
     },
     {
       title: "Appointments",
       icon: Calendar,
       path: "/appointments",
-      bgColor: "bg-gradient-to-br from-violet-600 to-purple-800",
-      iconBg: "bg-violet-400",
-      iconColor: "text-white",
-      hoverRing: "hover:ring-violet-400",
+      gradient: "from-rose-400 via-pink-500 to-fuchsia-600",
+      accentColor: "bg-white/20",
     },
     {
       title: "Stats",
       icon: Trophy,
       path: "/stats",
-      bgColor: "bg-gradient-to-br from-amber-500 to-orange-600",
-      iconBg: "bg-amber-300",
-      iconColor: "text-amber-900",
-      hoverRing: "hover:ring-amber-400",
+      gradient: "from-amber-400 via-yellow-500 to-orange-500",
+      accentColor: "bg-white/20",
     },
     {
       title: "Savings Calculator",
       icon: Calculator,
       path: "/savings-calculator",
-      bgColor: "bg-gradient-to-br from-emerald-500 to-teal-700",
-      iconBg: "bg-emerald-300",
-      iconColor: "text-emerald-900",
-      hoverRing: "hover:ring-emerald-400",
+      gradient: "from-emerald-400 via-green-500 to-teal-600",
+      accentColor: "bg-white/20",
     },
     {
       title: "Payment Calculator",
       icon: DollarSign,
       path: "/payment-calculator",
-      bgColor: "bg-gradient-to-br from-pink-500 to-rose-700",
-      iconBg: "bg-pink-300",
-      iconColor: "text-pink-900",
-      hoverRing: "hover:ring-pink-400",
+      gradient: "from-violet-500 via-purple-600 to-indigo-700",
+      accentColor: "bg-white/20",
     },
     {
       title: "Invoice Generator",
       icon: FileText,
       path: "/invoice-generator",
-      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-700",
-      iconBg: "bg-blue-300",
-      iconColor: "text-blue-900",
-      hoverRing: "hover:ring-blue-400",
+      gradient: "from-cyan-400 via-sky-500 to-blue-600",
+      accentColor: "bg-white/20",
     },
     {
       title: "Loan Application",
       icon: CreditCard,
       path: "/loan-application",
-      bgColor: "bg-gradient-to-br from-fuchsia-500 to-purple-700",
-      iconBg: "bg-fuchsia-300",
-      iconColor: "text-fuchsia-900",
-      hoverRing: "hover:ring-fuchsia-400",
+      gradient: "from-lime-400 via-green-500 to-emerald-600",
+      accentColor: "bg-white/20",
     },
     {
       title: "TPV AI",
       icon: Phone,
       path: "/tpv-ai",
-      bgColor: "bg-gradient-to-br from-orange-500 to-red-600",
-      iconBg: "bg-orange-300",
-      iconColor: "text-orange-900",
-      hoverRing: "hover:ring-orange-400",
+      gradient: "from-red-500 via-rose-600 to-pink-700",
+      accentColor: "bg-white/20",
     },
     {
       title: "Installation Checklist",
       icon: ClipboardCheck,
       path: "/installation-checklist",
-      bgColor: "bg-gradient-to-br from-cyan-500 to-blue-700",
-      iconBg: "bg-cyan-300",
-      iconColor: "text-cyan-900",
-      hoverRing: "hover:ring-cyan-400",
+      gradient: "from-teal-400 via-cyan-500 to-sky-600",
+      accentColor: "bg-white/20",
     },
   ];
 
@@ -144,27 +126,37 @@ const LandingPage = () => {
               key={tool.path}
               onClick={() => navigate(tool.path)}
               className={`
-                group relative cursor-pointer rounded-2xl p-5 sm:p-6
-                ${tool.bgColor}
-                shadow-lg shadow-slate-300/30 dark:shadow-slate-900/50
-                ring-2 ring-transparent ${tool.hoverRing}
+                group relative cursor-pointer rounded-2xl overflow-hidden
+                bg-gradient-to-br ${tool.gradient}
+                shadow-lg
                 transition-all duration-300 ease-out
-                hover:scale-[1.03] hover:-translate-y-1.5
-                hover:shadow-xl
+                hover:scale-[1.04] hover:-translate-y-2
+                hover:shadow-2xl
                 active:scale-[0.97]
+                aspect-square
               `}
             >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className={`p-3 rounded-xl ${tool.iconBg} shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-                  <tool.icon className={`w-6 h-6 sm:w-7 sm:h-7 ${tool.iconColor}`} />
+              {/* Large background icon */}
+              <div className="absolute -right-4 -bottom-4 opacity-[0.15] transition-all duration-500 group-hover:opacity-25 group-hover:scale-110">
+                <tool.icon className="w-32 h-32 sm:w-36 sm:h-36 text-white" strokeWidth={1} />
+              </div>
+              
+              {/* Gradient overlay for depth */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10" />
+              
+              {/* Content */}
+              <div className="relative h-full flex flex-col justify-between p-4 sm:p-5">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${tool.accentColor} backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
+                  <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2} />
                 </div>
-                <h2 className="text-sm sm:text-base font-semibold text-white leading-tight drop-shadow-sm">
+                
+                <h2 className="text-sm sm:text-base font-bold text-white leading-tight drop-shadow-md">
                   {tool.title}
                 </h2>
               </div>
               
               {/* Shine effect on hover */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700 pointer-events-none" />
             </div>
           ))}
         </div>
