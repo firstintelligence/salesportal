@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Calendar, ChevronRight, Search } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Search, FileText, ClipboardCheck, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { formatPhoneNumber } from "@/utils/phoneFormat";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -33,12 +35,17 @@ const DashboardPage = () => {
     "TB0195": "Tadeo",
     "AA9097": "Donny",
     "HB6400": "Harry",
-    "TP5142": "Tony"
+    "TP5142": "Tony",
+    "CI11": "Chris",
+    "LA11": "Levi",
+    "AW11": "Ann",
+    "MA11": "Mohamed",
+    "MW11": "Mohan",
+    "BB2704": "Bonnie",
+    "AB5394": "Abe"
   };
 
-  const getAgentName = (id) => {
-    return agentNames[id] || id;
-  };
+  const getAgentName = (id) => agentNames[id] || id;
 
   useEffect(() => {
     const authenticated = localStorage.getItem("authenticated");
@@ -102,26 +109,14 @@ const DashboardPage = () => {
     }).format(numAmount);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'completed':
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
-      case 'pending':
-        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-      case 'failed':
-        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-      default:
-        return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
-    }
+  const getStatusBadge = (status) => {
+    const styles = {
+      completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+      pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+      initiated: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+      failed: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    };
+    return styles[status?.toLowerCase()] || 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20';
   };
 
   const handleCreateDeal = async () => {
@@ -165,6 +160,23 @@ const DashboardPage = () => {
     } catch (error) {
       console.error("Error creating deal:", error);
       toast.error("Failed to create new deal");
+    }
+  };
+
+  const handleActionClick = (e, action, customer) => {
+    e.stopPropagation();
+    switch (action) {
+      case 'tpv':
+        navigate(`/customer/${customer.id}?action=tpv`);
+        break;
+      case 'loan':
+        navigate(`/customer/${customer.id}?action=loan`);
+        break;
+      case 'checklist':
+        navigate(`/customer/${customer.id}?action=checklist`);
+        break;
+      default:
+        navigate(`/customer/${customer.id}`);
     }
   };
 
@@ -246,7 +258,7 @@ const DashboardPage = () => {
                         id="phone"
                         value={newDeal.phone}
                         onChange={(e) => setNewDeal({ ...newDeal, phone: e.target.value })}
-                        placeholder="(555) 123-4567"
+                        placeholder="(416) 555-1234"
                       />
                     </div>
                     <div className="space-y-2">
@@ -344,90 +356,145 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3">
-            {filteredDeals.map((customer) => {
-              const latestTpv = customer.tpv_requests?.[0];
-              const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
-              const fullName = customer.first_name && customer.last_name 
-                ? `${customer.first_name} ${customer.last_name}`
-                : "Unnamed Customer";
-              const salesPrice = formatCurrency(latestTpv?.sales_price);
-              
-              return (
-                <Card 
-                  key={customer.id}
-                  className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                  onClick={() => navigate(`/customer/${customer.id}`)}
-                >
-                  <CardContent className="p-4 sm:p-5">
-                    <div className="flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                          <span className="text-lg sm:text-xl font-bold text-primary">
-                            {customer.first_name?.[0]?.toUpperCase() || 'C'}
-                          </span>
-                        </div>
-                      </div>
+          <TooltipProvider delayDuration={200}>
+            <div className="space-y-3">
+              {filteredDeals.map((customer) => {
+                const latestTpv = customer.tpv_requests?.[0];
+                const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
+                const fullName = customer.first_name && customer.last_name 
+                  ? `${customer.first_name} ${customer.last_name}`
+                  : "Unnamed Customer";
+                const salesPrice = formatCurrency(latestTpv?.sales_price);
+                const tpvCompleted = latestTpv?.status?.toLowerCase() === 'completed';
+                
+                return (
+                  <Card 
+                    key={customer.id}
+                    className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 bg-white dark:bg-slate-900/80 border-slate-200/80 dark:border-slate-700/50 overflow-hidden"
+                    onClick={() => navigate(`/customer/${customer.id}`)}
+                  >
+                    <CardContent className="p-0">
+                      <div className="flex">
+                        {/* Main Content Area */}
+                        <div className="flex-1 p-4 sm:p-5">
+                          <div className="flex items-start gap-4">
+                            {/* Avatar */}
+                            <div className="hidden sm:flex flex-shrink-0">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-2 ring-primary/10">
+                                <span className="text-lg font-bold text-primary">
+                                  {customer.first_name?.[0]?.toUpperCase() || 'C'}
+                                </span>
+                              </div>
+                            </div>
 
-                      {/* Main Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <div>
-                            <h3 className="font-semibold text-foreground text-base sm:text-lg truncate">
-                              {fullName}
-                            </h3>
-                            {displayAgent && (
-                              <span className="text-xs text-muted-foreground">Agent: {displayAgent}</span>
-                            )}
+                            {/* Info Section */}
+                            <div className="flex-1 min-w-0">
+                              {/* Top Row - Name & Status */}
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                <h3 className="font-semibold text-foreground text-base sm:text-lg">
+                                  {fullName}
+                                </h3>
+                                {latestTpv?.status && (
+                                  <Badge variant="outline" className={`${getStatusBadge(latestTpv.status)} text-[10px] font-medium uppercase tracking-wide px-2 py-0.5`}>
+                                    TPV {latestTpv.status}
+                                  </Badge>
+                                )}
+                                {displayAgent && (
+                                  <span className="text-xs text-muted-foreground bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                                    {displayAgent}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Details Grid */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
+                                {/* Phone */}
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Phone className="w-3.5 h-3.5 text-primary/60" />
+                                  <span className="font-mono text-xs">{formatPhoneNumber(customer.phone)}</span>
+                                </div>
+                                
+                                {/* Location */}
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <MapPin className="w-3.5 h-3.5 text-primary/60" />
+                                  <span className="truncate text-xs">{customer.city || customer.address}</span>
+                                </div>
+
+                                {/* Products */}
+                                {latestTpv?.products && (
+                                  <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Package className="w-3.5 h-3.5 text-primary/60" />
+                                    <span className="truncate text-xs">{latestTpv.products}</span>
+                                  </div>
+                                )}
+
+                                {/* Price */}
+                                {salesPrice && (
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">{salesPrice}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          {latestTpv?.status && (
-                            <Badge variant="secondary" className={`${getStatusColor(latestTpv.status)} text-xs font-medium capitalize shrink-0`}>
-                              {latestTpv.status}
-                            </Badge>
-                          )}
                         </div>
 
-                        {/* Info Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1 text-sm">
-                          {customer.phone && (
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Phone className="w-3.5 h-3.5 shrink-0" />
-                              <span className="truncate">{customer.phone}</span>
-                            </div>
-                          )}
-                          
-                          {customer.address && (
-                            <div className="flex items-center gap-1.5 text-muted-foreground col-span-2 sm:col-span-1">
-                              <MapPin className="w-3.5 h-3.5 shrink-0" />
-                              <span className="truncate">{customer.city || customer.address}</span>
-                            </div>
-                          )}
+                        {/* Action Buttons Sidebar */}
+                        <div className="flex flex-col items-center justify-center gap-1 px-3 py-3 bg-slate-50/50 dark:bg-slate-800/30 border-l border-slate-200/50 dark:border-slate-700/30">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={(e) => handleActionClick(e, 'tpv', customer)}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                                  tpvCompleted 
+                                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' 
+                                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'
+                                }`}
+                              >
+                                <PhoneCall className="w-4 h-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left" className="text-xs">
+                              {tpvCompleted ? 'TPV Completed' : 'Initiate TPV'}
+                            </TooltipContent>
+                          </Tooltip>
 
-                          {latestTpv?.products && (
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Package className="w-3.5 h-3.5 shrink-0" />
-                              <span className="truncate">{latestTpv.products}</span>
-                            </div>
-                          )}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={(e) => handleActionClick(e, 'loan', customer)}
+                                className="w-9 h-9 rounded-full flex items-center justify-center bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-all"
+                              >
+                                <FileText className="w-4 h-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left" className="text-xs">
+                              Loan Application
+                            </TooltipContent>
+                          </Tooltip>
 
-                          {salesPrice && (
-                            <div className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
-                              <DollarSign className="w-3.5 h-3.5 shrink-0" />
-                              <span>{salesPrice}</span>
-                            </div>
-                          )}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={(e) => handleActionClick(e, 'checklist', customer)}
+                                className="w-9 h-9 rounded-full flex items-center justify-center bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all"
+                              >
+                                <ClipboardCheck className="w-4 h-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left" className="text-xs">
+                              Installation Checklist
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
-
-                      {/* Arrow */}
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors shrink-0" />
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TooltipProvider>
         )}
       </div>
     </div>
