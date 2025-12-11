@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Calendar, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 const DashboardPage = () => {
@@ -14,6 +15,7 @@ const DashboardPage = () => {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newDeal, setNewDeal] = useState({
     first_name: "",
@@ -55,7 +57,6 @@ const DashboardPage = () => {
     try {
       setLoading(true);
       
-      // Fetch customers with their related TPV data
       let query = supabase
         .from("customers")
         .select(`
@@ -75,17 +76,12 @@ const DashboardPage = () => {
 
       if (error) throw error;
       
-      // Filter by agent if not admin
-      // MM23 (admin) sees ALL deals (past and future)
-      // Other agents only see their own deals
       let filteredData = data || [];
       if (currentAgentId !== "MM23") {
-        // Regular agents: only show customers where they have at least one TPV request
         filteredData = filteredData.filter(customer => 
           customer.tpv_requests && customer.tpv_requests.some(tpv => tpv.agent_id === currentAgentId)
         );
       }
-      // Admin sees all customers, even those without TPV yet
       
       setDeals(filteredData);
     } catch (error) {
@@ -96,32 +92,45 @@ const DashboardPage = () => {
   };
 
   const formatCurrency = (amount) => {
-    if (!amount) return "N/A";
+    if (!amount) return null;
     const numAmount = parseFloat(amount);
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-CA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'CAD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(numAmount);
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return null;
     return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
       month: 'short',
       day: 'numeric',
+      year: 'numeric',
     });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+      case 'pending':
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      case 'failed':
+        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+      default:
+        return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+    }
   };
 
   const handleCreateDeal = async () => {
     try {
-      // Validate required fields
       if (!newDeal.first_name || !newDeal.last_name || !newDeal.phone || !newDeal.address) {
-        toast.error("Please fill in all required fields (First Name, Last Name, Phone, Address)");
+        toast.error("Please fill in all required fields");
         return;
       }
 
-      // Create new customer
       const { data: customer, error } = await supabase
         .from("customers")
         .insert([{
@@ -139,10 +148,8 @@ const DashboardPage = () => {
 
       if (error) throw error;
 
-      toast.success("New deal created successfully!");
+      toast.success("New deal created!");
       setIsCreateDialogOpen(false);
-      
-      // Reset form
       setNewDeal({
         first_name: "",
         last_name: "",
@@ -154,49 +161,59 @@ const DashboardPage = () => {
         postal_code: ""
       });
 
-      // Navigate to the new customer's detail page
       navigate(`/customer/${customer.id}`);
     } catch (error) {
       console.error("Error creating deal:", error);
-      toast.error("Failed to create new deal. Please try again.");
+      toast.error("Failed to create new deal");
     }
   };
 
+  const filteredDeals = deals.filter(customer => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const fullName = `${customer.first_name || ''} ${customer.last_name || ''}`.toLowerCase();
+    const phone = (customer.phone || '').toLowerCase();
+    const address = (customer.address || '').toLowerCase();
+    return fullName.includes(query) || phone.includes(query) || address.includes(query);
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/landing")}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Tools
-          </Button>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-            <div className="text-center sm:text-left">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                {agentId === "MM23" ? "All Customer Deals" : "My Customer Deals"}
-              </h1>
-              <p className="text-muted-foreground">
-                {agentId === "MM23" ? "Viewing all deals from all agents" : `Showing deals for ${getAgentName(agentId)}`}
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      {/* Header */}
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/landing")}
+                className="rounded-full"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                  {agentId === "MM23" ? "All Deals" : "My Deals"}
+                </h1>
+                <p className="text-sm text-muted-foreground hidden sm:block">
+                  {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''}
+                </p>
+              </div>
             </div>
             
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="lg" className="gap-2">
-                  <Plus className="w-5 h-5" />
-                  Create New Deal
+                <Button className="gap-2 rounded-full shadow-lg">
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">New Deal</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Deal</DialogTitle>
                   <DialogDescription>
-                    Enter customer information to create a new deal profile
+                    Enter customer information to create a new deal
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -297,74 +314,120 @@ const DashboardPage = () => {
             </Dialog>
           </div>
         </div>
+      </div>
 
+      {/* Search Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, phone, or address..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl shadow-sm"
+          />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-        ) : deals.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No customer deals found.</p>
+        ) : filteredDeals.length === 0 ? (
+          <Card className="border-dashed border-2">
+            <CardContent className="py-16 text-center">
+              <User className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
+              <p className="text-muted-foreground text-lg mb-2">No customers found</p>
+              <p className="text-muted-foreground/70 text-sm">Create your first deal to get started</p>
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Customer</th>
-                      {agentId === "MM23" && (
-                        <th className="px-4 py-3 text-left text-sm font-semibold">Agent</th>
-                      )}
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Phone</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Address</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Products</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Sales Price</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {deals.map((customer) => {
-                      const latestTpv = customer.tpv_requests?.[0];
-                      const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
-                      
-                      return (
-                        <tr 
-                          key={customer.id} 
-                          className="border-b hover:bg-muted/30 transition-colors cursor-pointer"
-                          onClick={() => navigate(`/customer/${customer.id}`)}
-                        >
-                          <td className="px-4 py-3 text-sm font-medium">
-                            {customer.first_name && customer.last_name 
-                              ? `${customer.first_name} ${customer.last_name}`
-                              : "Unnamed Customer"}
-                          </td>
-                          {agentId === "MM23" && (
-                            <td className="px-4 py-3 text-sm text-muted-foreground">{displayAgent || "N/A"}</td>
+          <div className="grid gap-3">
+            {filteredDeals.map((customer) => {
+              const latestTpv = customer.tpv_requests?.[0];
+              const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
+              const fullName = customer.first_name && customer.last_name 
+                ? `${customer.first_name} ${customer.last_name}`
+                : "Unnamed Customer";
+              const salesPrice = formatCurrency(latestTpv?.sales_price);
+              
+              return (
+                <Card 
+                  key={customer.id}
+                  className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                  onClick={() => navigate(`/customer/${customer.id}`)}
+                >
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                          <span className="text-lg sm:text-xl font-bold text-primary">
+                            {customer.first_name?.[0]?.toUpperCase() || 'C'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Main Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div>
+                            <h3 className="font-semibold text-foreground text-base sm:text-lg truncate">
+                              {fullName}
+                            </h3>
+                            {displayAgent && (
+                              <span className="text-xs text-muted-foreground">Agent: {displayAgent}</span>
+                            )}
+                          </div>
+                          {latestTpv?.status && (
+                            <Badge variant="secondary" className={`${getStatusColor(latestTpv.status)} text-xs font-medium capitalize shrink-0`}>
+                              {latestTpv.status}
+                            </Badge>
                           )}
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{customer.phone || "N/A"}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">
-                            {customer.address || "N/A"}
-                            {customer.city && `, ${customer.city}`}
-                            {customer.province && `, ${customer.province}`}
-                            {customer.postal_code && ` ${customer.postal_code}`}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{latestTpv?.products || "N/A"}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{formatCurrency(latestTpv?.sales_price)}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground capitalize">{latestTpv?.status || "N/A"}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(customer.created_at)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                        </div>
+
+                        {/* Info Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1 text-sm">
+                          {customer.phone && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Phone className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">{customer.phone}</span>
+                            </div>
+                          )}
+                          
+                          {customer.address && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground col-span-2 sm:col-span-1">
+                              <MapPin className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">{customer.city || customer.address}</span>
+                            </div>
+                          )}
+
+                          {latestTpv?.products && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Package className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">{latestTpv.products}</span>
+                            </div>
+                          )}
+
+                          {salesPrice && (
+                            <div className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
+                              <DollarSign className="w-3.5 h-3.5 shrink-0" />
+                              <span>{salesPrice}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Arrow */}
+                      <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors shrink-0" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
