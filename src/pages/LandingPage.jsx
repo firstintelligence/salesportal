@@ -120,7 +120,7 @@ const LandingPage = () => {
         </div>
 
         {/* Tools Grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 lg:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 lg:gap-5">
           {tools.map((tool) => (
             <div
               key={tool.path}
@@ -133,7 +133,7 @@ const LandingPage = () => {
                 hover:scale-[1.04] hover:-translate-y-1 sm:hover:-translate-y-2
                 hover:shadow-xl sm:hover:shadow-2xl
                 active:scale-[0.97]
-                aspect-square
+                aspect-[4/3] sm:aspect-square
               `}
             >
               {/* Large background icon */}
