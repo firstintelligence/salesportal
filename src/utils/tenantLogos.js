@@ -1,9 +1,10 @@
-import polaronLogo from '@/assets/polaron-logo.webp';
+import polaronLogo from '@/assets/polaron-logo.png';
+import georgesLogo from '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
 // Tenant logo mappings
 export const getTenantLogo = (tenantSlug) => {
   const logos = {
-    'georges-plumbing': '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png',
+    'georges-plumbing': georgesLogo,
     'polaron-comfort': polaronLogo,
     'polaron': polaronLogo,
     'maher-heating': null,
@@ -13,6 +14,12 @@ export const getTenantLogo = (tenantSlug) => {
   
   return logos[tenantSlug] || null;
 };
+
+// Default logo for login page (shows all available tenant logos)
+export const getDefaultLogos = () => ({
+  georges: georgesLogo,
+  polaron: polaronLogo,
+});
 
 // Tenant company info
 export const getTenantCompanyInfo = (tenantSlug) => {

@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Shield, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
+import { getDefaultLogos } from "@/utils/tenantLogos";
 
 const LoginPage = () => {
   const [agentId, setAgentId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { loadTenantData } = useTenant();
+  const logos = getDefaultLogos();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,11 +52,18 @@ const LoginPage = () => {
       <div className="w-full max-w-md px-4 relative z-10">
         {/* Solid white card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
+          {/* Logos */}
+          <div className="flex justify-center items-center gap-6 mb-6">
+            <img 
+              src={logos.georges} 
+              alt="George's Plumbing" 
+              className="h-14 md:h-16 object-contain"
+            />
+            <img 
+              src={logos.polaron} 
+              alt="Polaron" 
+              className="h-14 md:h-16 object-contain"
+            />
           </div>
 
           {/* Header */}
