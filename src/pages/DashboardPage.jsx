@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Search, FileText, ClipboardCheck, PhoneCall } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Search, FileText, ClipboardCheck, PhoneCall, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { formatPhoneNumber } from "@/utils/phoneFormat";
@@ -109,14 +108,12 @@ const DashboardPage = () => {
     }).format(numAmount);
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-      pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-      initiated: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-      failed: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
-    };
-    return styles[status?.toLowerCase()] || 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20';
+  const getProgressColor = (tpvStatus) => {
+    const status = tpvStatus?.toLowerCase();
+    if (status === 'completed') return 'border-l-emerald-500 bg-gradient-to-r from-emerald-50/50 to-transparent dark:from-emerald-950/20';
+    if (status === 'pending' || status === 'initiated') return 'border-l-amber-500 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20';
+    if (status === 'failed') return 'border-l-red-500 bg-gradient-to-r from-red-50/50 to-transparent dark:from-red-950/20';
+    return 'border-l-slate-300 dark:border-l-slate-600';
   };
 
   const handleCreateDeal = async () => {
@@ -189,26 +186,46 @@ const DashboardPage = () => {
     return fullName.includes(query) || phone.includes(query) || address.includes(query);
   });
 
+  const ActionButton = ({ completed, icon: Icon, label, onClick }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={onClick}
+          className={`relative w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+            completed 
+              ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30' 
+              : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-400 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-slate-600'
+          }`}
+        >
+          {completed ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="text-xs">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
       {/* Header */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/landing")}
-                className="rounded-full"
+                className="rounded-full h-9 w-9"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                <h1 className="text-lg font-semibold text-foreground">
                   {agentId === "MM23" ? "All Deals" : "My Deals"}
                 </h1>
-                <p className="text-sm text-muted-foreground hidden sm:block">
+                <p className="text-xs text-muted-foreground">
                   {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -216,277 +233,243 @@ const DashboardPage = () => {
             
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2 rounded-full shadow-lg">
+                <Button size="sm" className="gap-1.5 rounded-full h-9 px-4">
                   <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">New Deal</span>
+                  <span className="hidden sm:inline">New</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4">
                 <DialogHeader>
                   <DialogTitle>Create New Deal</DialogTitle>
                   <DialogDescription>
-                    Enter customer information to create a new deal
+                    Enter customer information
                   </DialogDescription>
                 </DialogHeader>
                 
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first_name">First Name *</Label>
+                <div className="grid gap-3 py-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="first_name" className="text-xs">First Name *</Label>
                       <Input
                         id="first_name"
                         value={newDeal.first_name}
                         onChange={(e) => setNewDeal({ ...newDeal, first_name: e.target.value })}
                         placeholder="John"
+                        className="h-9"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last_name">Last Name *</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="last_name" className="text-xs">Last Name *</Label>
                       <Input
                         id="last_name"
                         value={newDeal.last_name}
                         onChange={(e) => setNewDeal({ ...newDeal, last_name: e.target.value })}
                         placeholder="Smith"
+                        className="h-9"
                       />
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone *</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="phone" className="text-xs">Phone *</Label>
                       <Input
                         id="phone"
                         value={newDeal.phone}
                         onChange={(e) => setNewDeal({ ...newDeal, phone: e.target.value })}
                         placeholder="(416) 555-1234"
+                        className="h-9"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email" className="text-xs">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         value={newDeal.email}
                         onChange={(e) => setNewDeal({ ...newDeal, email: e.target.value })}
                         placeholder="john@example.com"
+                        className="h-9"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address *</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="address" className="text-xs">Address *</Label>
                     <Input
                       id="address"
                       value={newDeal.address}
                       onChange={(e) => setNewDeal({ ...newDeal, address: e.target.value })}
                       placeholder="123 Main Street"
+                      className="h-9"
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="city" className="text-xs">City</Label>
                       <Input
                         id="city"
                         value={newDeal.city}
                         onChange={(e) => setNewDeal({ ...newDeal, city: e.target.value })}
                         placeholder="Toronto"
+                        className="h-9"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="province">Province</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="province" className="text-xs">Province</Label>
                       <Input
                         id="province"
                         value={newDeal.province}
                         onChange={(e) => setNewDeal({ ...newDeal, province: e.target.value })}
                         placeholder="ON"
+                        className="h-9"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="postal_code">Postal Code</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="postal_code" className="text-xs">Postal</Label>
                       <Input
                         id="postal_code"
                         value={newDeal.postal_code}
                         onChange={(e) => setNewDeal({ ...newDeal, postal_code: e.target.value })}
                         placeholder="M5V 1A1"
+                        className="h-9"
                       />
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex justify-end gap-3">
-                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setIsCreateDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleCreateDeal}>
-                    Create Deal
+                  <Button size="sm" onClick={handleCreateDeal}>
+                    Create
                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
         </div>
-      </div>
 
-      {/* Search Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, phone, or address..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl shadow-sm"
-          />
+        {/* Search Bar */}
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 bg-slate-100 dark:bg-slate-800 border-0 rounded-lg"
+            />
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div className="p-3 pb-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : filteredDeals.length === 0 ? (
-          <Card className="border-dashed border-2">
-            <CardContent className="py-16 text-center">
-              <User className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
-              <p className="text-muted-foreground text-lg mb-2">No customers found</p>
-              <p className="text-muted-foreground/70 text-sm">Create your first deal to get started</p>
+          <Card className="border-dashed border-2 bg-white dark:bg-slate-900">
+            <CardContent className="py-12 text-center">
+              <User className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground text-sm">No customers found</p>
             </CardContent>
           </Card>
         ) : (
-          <TooltipProvider delayDuration={200}>
-            <div className="space-y-3">
+          <TooltipProvider delayDuration={300}>
+            <div className="space-y-2">
               {filteredDeals.map((customer) => {
                 const latestTpv = customer.tpv_requests?.[0];
                 const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
                 const fullName = customer.first_name && customer.last_name 
                   ? `${customer.first_name} ${customer.last_name}`
-                  : "Unnamed Customer";
+                  : "Unnamed";
                 const salesPrice = formatCurrency(latestTpv?.sales_price);
                 const tpvCompleted = latestTpv?.status?.toLowerCase() === 'completed';
+                // Mock states for loan and checklist - these would come from actual data
+                const loanCompleted = false;
+                const checklistCompleted = false;
                 
                 return (
                   <Card 
                     key={customer.id}
-                    className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 bg-white dark:bg-slate-900/80 border-slate-200/80 dark:border-slate-700/50 overflow-hidden"
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md bg-white dark:bg-slate-900 border-0 border-l-4 rounded-lg overflow-hidden ${getProgressColor(latestTpv?.status)}`}
                     onClick={() => navigate(`/customer/${customer.id}`)}
                   >
-                    <CardContent className="p-0">
-                      <div className="flex">
-                        {/* Main Content Area */}
-                        <div className="flex-1 p-4 sm:p-5">
-                          <div className="flex items-start gap-4">
-                            {/* Avatar */}
-                            <div className="hidden sm:flex flex-shrink-0">
-                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-2 ring-primary/10">
-                                <span className="text-lg font-bold text-primary">
-                                  {customer.first_name?.[0]?.toUpperCase() || 'C'}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Info Section */}
-                            <div className="flex-1 min-w-0">
-                              {/* Top Row - Name & Status */}
-                              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                <h3 className="font-semibold text-foreground text-base sm:text-lg">
-                                  {fullName}
-                                </h3>
-                                {latestTpv?.status && (
-                                  <Badge variant="outline" className={`${getStatusBadge(latestTpv.status)} text-[10px] font-medium uppercase tracking-wide px-2 py-0.5`}>
-                                    TPV {latestTpv.status}
-                                  </Badge>
-                                )}
-                                {displayAgent && (
-                                  <span className="text-xs text-muted-foreground bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                                    {displayAgent}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Details Grid */}
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
-                                {/* Phone */}
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <Phone className="w-3.5 h-3.5 text-primary/60" />
-                                  <span className="font-mono text-xs">{formatPhoneNumber(customer.phone)}</span>
-                                </div>
-                                
-                                {/* Location */}
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <MapPin className="w-3.5 h-3.5 text-primary/60" />
-                                  <span className="truncate text-xs">{customer.city || customer.address}</span>
-                                </div>
-
-                                {/* Products */}
-                                {latestTpv?.products && (
-                                  <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Package className="w-3.5 h-3.5 text-primary/60" />
-                                    <span className="truncate text-xs">{latestTpv.products}</span>
-                                  </div>
-                                )}
-
-                                {/* Price */}
-                                {salesPrice && (
-                                  <div className="flex items-center gap-2">
-                                    <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">{salesPrice}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                    <CardContent className="p-3">
+                      {/* Top Row - Name, Agent, Price */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <h3 className="font-medium text-foreground text-sm truncate">
+                            {fullName}
+                          </h3>
+                          {displayAgent && (
+                            <span className="text-[10px] text-muted-foreground bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded shrink-0">
+                              {displayAgent}
+                            </span>
+                          )}
                         </div>
+                        {salesPrice && (
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm shrink-0 ml-2">
+                            {salesPrice}
+                          </span>
+                        )}
+                      </div>
 
-                        {/* Action Buttons Sidebar */}
-                        <div className="flex flex-col items-center justify-center gap-1 px-3 py-3 bg-slate-50/50 dark:bg-slate-800/30 border-l border-slate-200/50 dark:border-slate-700/30">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={(e) => handleActionClick(e, 'tpv', customer)}
-                                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                                  tpvCompleted 
-                                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' 
-                                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'
-                                }`}
-                              >
-                                <PhoneCall className="w-4 h-4" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="text-xs">
-                              {tpvCompleted ? 'TPV Completed' : 'Initiate TPV'}
-                            </TooltipContent>
-                          </Tooltip>
+                      {/* Middle Row - Details */}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                        <div className="flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          <span className="font-mono">{formatPhoneNumber(customer.phone)}</span>
+                        </div>
+                        <span className="text-slate-300 dark:text-slate-700">•</span>
+                        <div className="flex items-center gap-1 truncate">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{customer.city || customer.address}</span>
+                        </div>
+                        {latestTpv?.products && (
+                          <>
+                            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                            <div className="hidden sm:flex items-center gap-1 truncate">
+                              <Package className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{latestTpv.products}</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
 
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={(e) => handleActionClick(e, 'loan', customer)}
-                                className="w-9 h-9 rounded-full flex items-center justify-center bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-all"
-                              >
-                                <FileText className="w-4 h-4" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="text-xs">
-                              Loan Application
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={(e) => handleActionClick(e, 'checklist', customer)}
-                                className="w-9 h-9 rounded-full flex items-center justify-center bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all"
-                              >
-                                <ClipboardCheck className="w-4 h-4" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="text-xs">
-                              Installation Checklist
-                            </TooltipContent>
-                          </Tooltip>
+                      {/* Bottom Row - Action Buttons */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <ActionButton 
+                            completed={tpvCompleted}
+                            icon={PhoneCall}
+                            label={tpvCompleted ? "TPV Complete" : "Start TPV"}
+                            onClick={(e) => handleActionClick(e, 'tpv', customer)}
+                          />
+                          <ActionButton 
+                            completed={loanCompleted}
+                            icon={FileText}
+                            label={loanCompleted ? "Loan Complete" : "Loan Application"}
+                            onClick={(e) => handleActionClick(e, 'loan', customer)}
+                          />
+                          <ActionButton 
+                            completed={checklistCompleted}
+                            icon={ClipboardCheck}
+                            label={checklistCompleted ? "Checklist Complete" : "Installation Checklist"}
+                            onClick={(e) => handleActionClick(e, 'checklist', customer)}
+                          />
+                        </div>
+                        
+                        {/* Progress indicator */}
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${tpvCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-1.5 h-1.5 rounded-full ${loanCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-1.5 h-1.5 rounded-full ${checklistCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
                         </div>
                       </div>
                     </CardContent>
