@@ -9,7 +9,6 @@ const LandingPage = () => {
   const { tenant, agentProfile, isSuperAdmin } = useTenant();
 
   useEffect(() => {
-    // Reset scroll position to top when landing page loads
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -23,83 +22,83 @@ const LandingPage = () => {
     {
       title: "Dashboard",
       icon: LayoutDashboard,
-      description: "View your customer deals",
       path: "/dashboard",
-      gradient: "from-slate-500/20 to-gray-500/20",
-      iconBg: "bg-slate-500/10",
-      iconColor: "text-slate-600",
+      bgColor: "bg-gradient-to-br from-slate-800 to-slate-900",
+      iconBg: "bg-slate-600",
+      iconColor: "text-white",
+      hoverRing: "hover:ring-slate-400",
     },
     {
       title: "Appointments",
       icon: Calendar,
-      description: "View and manage appointments",
       path: "/appointments",
-      gradient: "from-purple-500/20 to-indigo-500/20",
-      iconBg: "bg-purple-500/10",
-      iconColor: "text-purple-600",
+      bgColor: "bg-gradient-to-br from-violet-600 to-purple-800",
+      iconBg: "bg-violet-400",
+      iconColor: "text-white",
+      hoverRing: "hover:ring-violet-400",
     },
     {
       title: "Stats",
       icon: Trophy,
-      description: "Leaderboard & performance",
       path: "/stats",
-      gradient: "from-amber-500/20 to-yellow-500/20",
-      iconBg: "bg-amber-500/10",
-      iconColor: "text-amber-600",
+      bgColor: "bg-gradient-to-br from-amber-500 to-orange-600",
+      iconBg: "bg-amber-300",
+      iconColor: "text-amber-900",
+      hoverRing: "hover:ring-amber-400",
     },
     {
       title: "Savings Calculator",
       icon: Calculator,
-      description: "Calculate potential savings",
       path: "/savings-calculator",
-      gradient: "from-emerald-500/20 to-teal-500/20",
-      iconBg: "bg-emerald-500/10",
-      iconColor: "text-emerald-600",
+      bgColor: "bg-gradient-to-br from-emerald-500 to-teal-700",
+      iconBg: "bg-emerald-300",
+      iconColor: "text-emerald-900",
+      hoverRing: "hover:ring-emerald-400",
     },
     {
       title: "Payment Calculator",
       icon: DollarSign,
-      description: "Calculate installment estimates",
       path: "/payment-calculator",
-      gradient: "from-pink-500/20 to-rose-500/20",
-      iconBg: "bg-pink-500/10",
-      iconColor: "text-pink-600",
+      bgColor: "bg-gradient-to-br from-pink-500 to-rose-700",
+      iconBg: "bg-pink-300",
+      iconColor: "text-pink-900",
+      hoverRing: "hover:ring-pink-400",
     },
     {
       title: "Invoice Generator",
       icon: FileText,
-      description: "Create professional invoices and quotes",
       path: "/invoice-generator",
-      gradient: "from-blue-500/20 to-indigo-500/20",
-      iconBg: "bg-blue-500/10",
-      iconColor: "text-blue-600",
+      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-700",
+      iconBg: "bg-blue-300",
+      iconColor: "text-blue-900",
+      hoverRing: "hover:ring-blue-400",
     },
     {
       title: "Loan Application",
       icon: CreditCard,
-      description: "Complete financing application form",
       path: "/loan-application",
-      gradient: "from-violet-500/20 to-purple-500/20",
-      iconBg: "bg-violet-500/10",
-      iconColor: "text-violet-600",
+      bgColor: "bg-gradient-to-br from-fuchsia-500 to-purple-700",
+      iconBg: "bg-fuchsia-300",
+      iconColor: "text-fuchsia-900",
+      hoverRing: "hover:ring-fuchsia-400",
     },
     {
       title: "TPV AI",
       icon: Phone,
-      description: "Third-party verification calls",
       path: "/tpv-ai",
-      gradient: "from-orange-500/20 to-amber-500/20",
-      iconBg: "bg-orange-500/10",
-      iconColor: "text-orange-600",
+      bgColor: "bg-gradient-to-br from-orange-500 to-red-600",
+      iconBg: "bg-orange-300",
+      iconColor: "text-orange-900",
+      hoverRing: "hover:ring-orange-400",
     },
     {
       title: "Installation Checklist",
       icon: ClipboardCheck,
-      description: "Photo documentation for installations",
       path: "/installation-checklist",
-      gradient: "from-cyan-500/20 to-sky-500/20",
-      iconBg: "bg-cyan-500/10",
-      iconColor: "text-cyan-600",
+      bgColor: "bg-gradient-to-br from-cyan-500 to-blue-700",
+      iconBg: "bg-cyan-300",
+      iconColor: "text-cyan-900",
+      hoverRing: "hover:ring-cyan-400",
     },
   ];
 
@@ -107,62 +106,65 @@ const LandingPage = () => {
   const companyName = tenant?.name || "Sales Portal";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-8 sm:mb-12">
+        {/* Header Section */}
+        <div className="text-center mb-10 sm:mb-14">
           {tenantLogo && (
-            <div className="flex justify-center mb-4">
-              <img 
-                src={tenantLogo} 
-                alt={companyName}
-                className="h-16 sm:h-20 lg:h-24 object-contain"
-              />
+            <div className="flex justify-center mb-6">
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50">
+                <img 
+                  src={tenantLogo} 
+                  alt={companyName}
+                  className="h-14 sm:h-18 lg:h-20 object-contain"
+                />
+              </div>
             </div>
           )}
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">
+          
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-3">
             {companyName}
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Select a tool to get started
-          </p>
+          
           {agentProfile && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-lg sm:text-xl font-medium text-foreground/80 mb-1">
               Welcome, {agentProfile.first_name}
             </p>
           )}
+          
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Select a tool to get started
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+        {/* Tools Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
           {tools.map((tool) => (
             <div
               key={tool.path}
               onClick={() => navigate(tool.path)}
               className={`
-                group relative cursor-pointer rounded-2xl p-4 sm:p-5 lg:p-6
-                bg-gradient-to-br ${tool.gradient}
-                backdrop-blur-sm border border-border/50
-                shadow-sm hover:shadow-lg
+                group relative cursor-pointer rounded-2xl p-5 sm:p-6
+                ${tool.bgColor}
+                shadow-lg shadow-slate-300/30 dark:shadow-slate-900/50
+                ring-2 ring-transparent ${tool.hoverRing}
                 transition-all duration-300 ease-out
-                hover:scale-[1.02] hover:-translate-y-1
-                active:scale-[0.98]
+                hover:scale-[1.03] hover:-translate-y-1.5
+                hover:shadow-xl
+                active:scale-[0.97]
               `}
             >
-              <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
-                <div className={`p-3 sm:p-4 rounded-xl ${tool.iconBg} transition-transform duration-300 group-hover:scale-110`}>
-                  <tool.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${tool.iconColor}`} />
+              <div className="flex flex-col items-center text-center space-y-3">
+                <div className={`p-3 rounded-xl ${tool.iconBg} shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  <tool.icon className={`w-6 h-6 sm:w-7 sm:h-7 ${tool.iconColor}`} />
                 </div>
-                <div>
-                  <h2 className="text-sm sm:text-base lg:text-lg font-semibold text-foreground leading-tight">
-                    {tool.title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
-                    {tool.description}
-                  </p>
-                </div>
+                <h2 className="text-sm sm:text-base font-semibold text-white leading-tight drop-shadow-sm">
+                  {tool.title}
+                </h2>
               </div>
               
-              {/* Subtle hover indicator */}
-              <div className="absolute inset-0 rounded-2xl ring-2 ring-primary/0 group-hover:ring-primary/20 transition-all duration-300" />
+              {/* Shine effect on hover */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </div>
           ))}
         </div>
