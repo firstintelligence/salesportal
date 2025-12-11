@@ -11,14 +11,39 @@ import {
 import { Building2 } from 'lucide-react';
 
 const TenantSwitcher = () => {
-  const { tenant, isSuperAdmin, switchTenant, loading: contextLoading } = useTenant();
+  const { tenant, agentProfile, switchTenant, loading: contextLoading } = useTenant();
   const [tenants, setTenants] = useState([]);
   const [tenantsLoading, setTenantsLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
+  // Check super admin status from database
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      if (contextLoading || !agentProfile?.agent_id) {
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('agent_profiles')
+        .select('is_super_admin')
+        .eq('agent_id', agentProfile.agent_id)
+        .single();
+
+      if (!error && data?.is_super_admin) {
+        setIsSuperAdmin(true);
+      } else {
+        setIsSuperAdmin(false);
+        setTenantsLoading(false);
+      }
+    };
+
+    checkSuperAdmin();
+  }, [contextLoading, agentProfile?.agent_id]);
+
+  // Fetch tenants only if super admin
   useEffect(() => {
     const fetchTenants = async () => {
-      if (contextLoading || !isSuperAdmin) {
-        setTenantsLoading(false);
+      if (!isSuperAdmin) {
         return;
       }
 
@@ -34,9 +59,9 @@ const TenantSwitcher = () => {
     };
 
     fetchTenants();
-  }, [isSuperAdmin, contextLoading]);
+  }, [isSuperAdmin]);
 
-  // Only show for super admins after context is loaded
+  // Only show for super admins after loading
   if (contextLoading || !isSuperAdmin || tenantsLoading) {
     return null;
   }
