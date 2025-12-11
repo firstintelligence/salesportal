@@ -120,37 +120,37 @@ const LandingPage = () => {
         </div>
 
         {/* Tools Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 lg:gap-5">
           {tools.map((tool) => (
             <div
               key={tool.path}
               onClick={() => navigate(tool.path)}
               className={`
-                group relative cursor-pointer rounded-2xl overflow-hidden
+                group relative cursor-pointer rounded-xl sm:rounded-2xl overflow-hidden
                 bg-gradient-to-br ${tool.gradient}
-                shadow-lg
+                shadow-md sm:shadow-lg
                 transition-all duration-300 ease-out
-                hover:scale-[1.04] hover:-translate-y-2
-                hover:shadow-2xl
+                hover:scale-[1.04] hover:-translate-y-1 sm:hover:-translate-y-2
+                hover:shadow-xl sm:hover:shadow-2xl
                 active:scale-[0.97]
                 aspect-square
               `}
             >
               {/* Large background icon */}
-              <div className="absolute -right-4 -bottom-4 opacity-[0.15] transition-all duration-500 group-hover:opacity-25 group-hover:scale-110">
-                <tool.icon className="w-32 h-32 sm:w-36 sm:h-36 text-white" strokeWidth={1} />
+              <div className="absolute -right-2 -bottom-2 sm:-right-4 sm:-bottom-4 opacity-[0.15] transition-all duration-500 group-hover:opacity-25 group-hover:scale-110">
+                <tool.icon className="w-16 h-16 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-white" strokeWidth={1} />
               </div>
               
               {/* Gradient overlay for depth */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10" />
               
               {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-4 sm:p-5">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${tool.accentColor} backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-                  <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2} />
+              <div className="relative h-full flex flex-col justify-between p-2.5 sm:p-4 lg:p-5">
+                <div className={`w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl ${tool.accentColor} backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
+                  <tool.icon className="w-3.5 h-3.5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" strokeWidth={2} />
                 </div>
                 
-                <h2 className="text-sm sm:text-base font-bold text-white leading-tight drop-shadow-md">
+                <h2 className="text-[10px] sm:text-sm lg:text-base font-bold text-white leading-tight drop-shadow-md">
                   {tool.title}
                 </h2>
               </div>
