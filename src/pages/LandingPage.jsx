@@ -133,7 +133,7 @@ const LandingPage = () => {
                 hover:scale-[1.04] hover:-translate-y-1 sm:hover:-translate-y-2
                 hover:shadow-xl sm:hover:shadow-2xl
                 active:scale-[0.97]
-                aspect-[4/3] sm:aspect-square
+                aspect-[5/2] sm:aspect-square
               `}
             >
               {/* Large background icon */}
