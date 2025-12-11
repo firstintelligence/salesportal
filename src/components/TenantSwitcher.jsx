@@ -11,14 +11,14 @@ import {
 import { Building2 } from 'lucide-react';
 
 const TenantSwitcher = () => {
-  const { tenant, isSuperAdmin, switchTenant } = useTenant();
+  const { tenant, isSuperAdmin, switchTenant, loading: contextLoading } = useTenant();
   const [tenants, setTenants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [tenantsLoading, setTenantsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTenants = async () => {
-      if (!isSuperAdmin) {
-        setLoading(false);
+      if (contextLoading || !isSuperAdmin) {
+        setTenantsLoading(false);
         return;
       }
 
@@ -30,14 +30,14 @@ const TenantSwitcher = () => {
       if (!error && data) {
         setTenants(data);
       }
-      setLoading(false);
+      setTenantsLoading(false);
     };
 
     fetchTenants();
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, contextLoading]);
 
-  // Only show for super admins
-  if (!isSuperAdmin || loading) {
+  // Only show for super admins after context is loaded
+  if (contextLoading || !isSuperAdmin || tenantsLoading) {
     return null;
   }
 
