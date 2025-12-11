@@ -5,12 +5,11 @@ const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 // Tenant logo mappings
 export const getTenantLogo = (tenantSlug) => {
   const logos = {
-    'georges-plumbing': georgesLogo,
-    'polaron-comfort': polaronLogo,
+    'georges': georgesLogo,
     'polaron': polaronLogo,
-    'maher-heating': null,
-    'crown-construction': null,
-    'marathon-electric': null,
+    'maher': null,
+    'crown': null,
+    'marathon': null,
   };
   
   return logos[tenantSlug] || null;
@@ -25,19 +24,12 @@ export const getDefaultLogos = () => ({
 // Tenant company info
 export const getTenantCompanyInfo = (tenantSlug) => {
   const companies = {
-    'georges-plumbing': {
+    'georges': {
       name: "George's Plumbing and Heating",
       address: "14 Rathmine Street, London, ON N5Z 1Z3",
       phone: "(519) 851-2704",
       email: "info@georgesplumbingandheating.ca",
       invoicePrefix: "GPH"
-    },
-    'polaron-comfort': {
-      name: "Polaron Comfort",
-      address: "2 Tippett Rd Floor 4, North York, ON M3H 2V2",
-      phone: "+1 888-318-1988",
-      email: "info@polaronsolar.com",
-      invoicePrefix: "PC"
     },
     'polaron': {
       name: "Polaron Comfort",
@@ -46,21 +38,21 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@polaronsolar.com",
       invoicePrefix: "PC"
     },
-    'maher-heating': {
+    'maher': {
       name: "Maher Heating & Cooling",
       address: "",
       phone: "",
       email: "",
       invoicePrefix: "MHC"
     },
-    'crown-construction': {
+    'crown': {
       name: "Crown Construction",
       address: "",
       phone: "",
       email: "",
       invoicePrefix: "CC"
     },
-    'marathon-electric': {
+    'marathon': {
       name: "Marathon Electric",
       address: "1200 Bay Street, Toronto, ON M5W 2A9",
       phone: "+1 (647) 794-1199",
@@ -69,37 +61,33 @@ export const getTenantCompanyInfo = (tenantSlug) => {
     },
   };
   
-  return companies[tenantSlug] || companies['georges-plumbing'];
+  return companies[tenantSlug] || companies['georges'];
 };
 
 // Tenant color schemes
 export const getTenantColors = (tenantSlug) => {
   const colors = {
-    'georges-plumbing': {
+    'georges': {
       primary: 'hsl(221, 83%, 53%)',
       secondary: 'hsl(224, 76%, 48%)',
-    },
-    'polaron-comfort': {
-      primary: 'hsl(145, 63%, 42%)',
-      secondary: 'hsl(145, 63%, 32%)',
     },
     'polaron': {
       primary: 'hsl(145, 63%, 42%)',
       secondary: 'hsl(145, 63%, 32%)',
     },
-    'maher-heating': {
+    'maher': {
       primary: 'hsl(0, 84%, 60%)',
       secondary: 'hsl(0, 84%, 50%)',
     },
-    'crown-construction': {
+    'crown': {
       primary: 'hsl(45, 93%, 47%)',
       secondary: 'hsl(45, 93%, 37%)',
     },
-    'marathon-electric': {
+    'marathon': {
       primary: 'hsl(280, 68%, 50%)',
       secondary: 'hsl(280, 68%, 40%)',
     },
   };
   
-  return colors[tenantSlug] || colors['georges-plumbing'];
+  return colors[tenantSlug] || colors['georges'];
 };
