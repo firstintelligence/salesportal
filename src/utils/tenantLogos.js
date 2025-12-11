@@ -1,5 +1,6 @@
 import polaronLogo from '@/assets/polaron-logo.png';
-import georgesLogo from '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
+
+const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
 // Tenant logo mappings
 export const getTenantLogo = (tenantSlug) => {
