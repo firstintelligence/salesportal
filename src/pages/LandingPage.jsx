@@ -157,7 +157,7 @@ const LandingPage = () => {
                   <tool.icon className={`w-3.5 h-3.5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${tool.iconColor}`} strokeWidth={2} />
                 </div>
                 
-                <h2 className={`text-[10px] sm:text-sm lg:text-base font-semibold ${tool.iconColor} leading-tight`}>
+                <h2 className="text-[10px] sm:text-sm lg:text-base font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                   {tool.title}
                 </h2>
               </div>

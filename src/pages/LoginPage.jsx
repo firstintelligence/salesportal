@@ -52,19 +52,6 @@ const LoginPage = () => {
       <div className="w-full max-w-md px-4 relative z-10">
         {/* Solid white card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
-          {/* Logos */}
-          <div className="flex justify-center items-center gap-6 mb-6">
-            <img 
-              src={logos.georges} 
-              alt="George's Plumbing" 
-              className="h-14 md:h-16 object-contain"
-            />
-            <img 
-              src={logos.polaron} 
-              alt="Polaron" 
-              className="h-14 md:h-16 object-contain"
-            />
-          </div>
 
           {/* Header */}
           <div className="text-center mb-8">
