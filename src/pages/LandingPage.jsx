@@ -97,10 +97,10 @@ const LandingPage = () => {
   const companyName = tenant?.name || "Sales Portal";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 p-4 pt-10 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-10 sm:mb-14">
+        <div className="text-center mb-8 sm:mb-14">
           {tenantLogo && (
             <div className="flex justify-center mb-6">
               <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50">
