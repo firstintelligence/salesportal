@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { formatPhoneNumber } from "@/utils/phoneFormat";
+import { useTenant } from "@/contexts/TenantContext";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const { tenant, loading: tenantLoading } = useTenant();
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
@@ -56,13 +58,18 @@ const DashboardPage = () => {
     }
     
     setAgentId(storedAgentId);
-    fetchDeals(storedAgentId);
-  }, [navigate]);
+    
+    // Wait for tenant to load before fetching deals
+    if (!tenantLoading && tenant?.id) {
+      fetchDeals(storedAgentId, tenant.id);
+    }
+  }, [navigate, tenant?.id, tenantLoading]);
 
-  const fetchDeals = async (currentAgentId) => {
+  const fetchDeals = async (currentAgentId, tenantId) => {
     try {
       setLoading(true);
       
+      // CRITICAL: Always filter by tenant_id to ensure complete data isolation
       let query = supabase
         .from("customers")
         .select(`
@@ -76,6 +83,7 @@ const DashboardPage = () => {
             created_at
           )
         `)
+        .eq("tenant_id", tenantId) // CRITICAL: Filter by tenant for data isolation
         .order("created_at", { ascending: false });
 
       const { data, error } = await query;
@@ -122,6 +130,11 @@ const DashboardPage = () => {
         toast.error("Please fill in all required fields");
         return;
       }
+      
+      if (!tenant?.id) {
+        toast.error("Tenant not loaded. Please try again.");
+        return;
+      }
 
       const { data: customer, error } = await supabase
         .from("customers")
@@ -133,7 +146,8 @@ const DashboardPage = () => {
           address: newDeal.address.trim(),
           city: newDeal.city.trim() || null,
           province: newDeal.province.trim() || null,
-          postal_code: newDeal.postal_code.trim() || null
+          postal_code: newDeal.postal_code.trim() || null,
+          tenant_id: tenant.id // CRITICAL: Associate customer with current tenant
         }])
         .select()
         .single();
@@ -205,6 +219,15 @@ const DashboardPage = () => {
       </TooltipContent>
     </Tooltip>
   );
+
+  // CRITICAL: Block rendering until tenant is fully loaded to prevent cross-tenant data exposure
+  if (tenantLoading || !tenant?.id) {
+    return (
+      <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950">

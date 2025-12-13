@@ -87,12 +87,15 @@ const noteOptions = [
 
 const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   const navigate = useNavigate();
-  const { tenant } = useTenant();
+  const { tenant, loading: tenantLoading } = useTenant();
   
-  // Get tenant-specific company info
-  const tenantSlug = tenant?.slug || 'georges-plumbing';
-  const tenantCompanyInfo = getTenantCompanyInfo(tenantSlug);
-  const tenantLogo = getTenantLogo(tenantSlug);
+  // CRITICAL: Don't render anything until tenant is fully loaded to prevent cross-tenant data exposure
+  const tenantSlug = tenant?.slug;
+  const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;
+  const tenantLogo = tenantSlug ? getTenantLogo(tenantSlug) : null;
+  
+  // Tenant-specific localStorage key to ensure complete data isolation
+  const formDataKey = tenantSlug ? `formData_${tenantSlug}` : null;
   
   const [billTo, setBillTo] = useState({ 
     firstName: "", 
@@ -126,11 +129,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     manufacturerRebate: 0
   });
   const [yourCompany, setYourCompany] = useState({
-    name: tenant?.slug ? tenantCompanyInfo.name : "",
-    address: tenant?.slug ? tenantCompanyInfo.address : "",
-    phone: tenant?.slug ? tenantCompanyInfo.phone : "",
-    email: tenant?.slug ? tenantCompanyInfo.email : "",
-    logo: tenant?.slug ? tenantLogo : null
+    name: tenantCompanyInfo?.name || "",
+    address: tenantCompanyInfo?.address || "",
+    phone: tenantCompanyInfo?.phone || "",
+    email: tenantCompanyInfo?.email || "",
+    logo: tenantLogo || null
   });
   const [items, setItems] = useState([
     { id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
@@ -194,6 +197,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   }, []);
 
   useEffect(() => {
+    // CRITICAL: Wait for tenant to be loaded before doing anything
+    if (!formDataKey || !tenantCompanyInfo) return;
+    
     // Preload customer data if provided
     if (preloadedCustomer) {
       setBillTo({
@@ -220,8 +226,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       return;
     }
 
-    // Load form data from localStorage on component mount
-    const savedFormData = localStorage.getItem("formData");
+    // Load form data from tenant-specific localStorage key
+    const savedFormData = localStorage.getItem(formDataKey);
     if (savedFormData) {
       const parsedData = JSON.parse(savedFormData);
       setBillTo(parsedData.billTo || { 
@@ -240,14 +246,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       setInvoice(
         parsedData.invoice || { date: "", paymentDate: "", number: "" }
       );
-      setYourCompany(
-        parsedData.yourCompany || { 
-          name: "George's Plumbing and Heating",
-          address: "14 Rathmine Street, London, ON N5Z 1Z3",
-          phone: "(519) 851-2704",
-          email: "info@georgesplumbingandheating.ca"
-        }
-      );
+      // ALWAYS use current tenant's company info - never load from storage
+      setYourCompany({
+        name: tenantCompanyInfo.name,
+        address: tenantCompanyInfo.address,
+        phone: tenantCompanyInfo.phone,
+        email: tenantCompanyInfo.email,
+        logo: tenantLogo
+      });
       // Ensure all items have unique IDs for proper React reconciliation
       const loadedItems = parsedData.items || [];
       setItems(loadedItems.map(item => ({
@@ -274,22 +280,32 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       setCoApplicantSignatureDataUrl(parsedData.coApplicantSignature || null);
       
     } else {
-      // If no saved data, set default values
+      // If no saved data, set default values with current tenant info
+      setYourCompany({
+        name: tenantCompanyInfo.name,
+        address: tenantCompanyInfo.address,
+        phone: tenantCompanyInfo.phone,
+        email: tenantCompanyInfo.email,
+        logo: tenantLogo
+      });
       setInvoice((prev) => ({
         ...prev,
         number: `${tenantCompanyInfo.invoicePrefix}0000`, // Will be updated when customer info is entered
       }));
       settaxPercentage(getProvincialTax('ON')); // Default to Ontario
     }
-  }, [preloadedCustomer]);
+  }, [preloadedCustomer, formDataKey, tenantCompanyInfo, tenantLogo]);
 
   useEffect(() => {
-    // Save form data to localStorage whenever it changes
+    // CRITICAL: Only save when tenant is loaded to prevent cross-tenant data
+    if (!formDataKey) return;
+    
+    // Save form data to tenant-specific localStorage key
     const formData = {
       billTo,
       shipTo,
       invoice,
-      yourCompany,
+      // Don't save yourCompany - always use current tenant info
       items,
       taxPercentage,
       taxAmount,
@@ -301,12 +317,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       signature: savedSignatureDataUrl,
       coApplicantSignature: coApplicantSignatureDataUrl,
     };
-    localStorage.setItem("formData", JSON.stringify(formData));
+    localStorage.setItem(formDataKey, JSON.stringify(formData));
   }, [
+    formDataKey,
     billTo,
     shipTo,
     invoice,
-    yourCompany,
     items,
     taxPercentage,
     notes,
@@ -548,7 +564,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       manufacturerRebate: 0
     });
     setNotes("");
-    localStorage.removeItem("formData");
+    if (formDataKey) {
+      localStorage.removeItem(formDataKey);
+    }
   };
 
   // Save customer profile to dashboard
@@ -567,7 +585,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         return;
       }
 
-      // Create or update customer
+      // Create or update customer with tenant_id
       const customerData = {
         first_name: billTo.firstName,
         last_name: billTo.lastName,
@@ -577,13 +595,15 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         city: billTo.city || null,
         province: billTo.province || 'ON',
         postal_code: billTo.postalCode || null,
+        tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
       };
 
-      // Check if customer exists by phone number
+      // Check if customer exists by phone number within the same tenant
       const { data: existingCustomer } = await supabase
         .from("customers")
         .select("id")
         .eq("phone", billTo.phone)
+        .eq("tenant_id", tenant?.id)
         .single();
 
       let customerId;
@@ -614,6 +634,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       // Create TPV request with invoice data (draft status)
       const tpvData = {
         customer_id: customerId,
+        tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
         agent_id: agentId,
         customer_name: `${billTo.firstName} ${billTo.lastName}`,
         first_name: billTo.firstName,
@@ -668,7 +689,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         taxPercentage,
         savedAt: new Date().toISOString()
       };
-      localStorage.setItem(`invoice_profile_${customerId}`, JSON.stringify(invoiceProfile));
+      localStorage.setItem(`invoice_profile_${tenantSlug}_${customerId}`, JSON.stringify(invoiceProfile));
 
       toast.success("Customer profile saved to dashboard!");
       
@@ -712,6 +733,17 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     }
   };
 
+  // CRITICAL: Block rendering until tenant is fully loaded to prevent any cross-tenant data flash
+  if (tenantLoading || !tenantSlug || !tenantCompanyInfo) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
