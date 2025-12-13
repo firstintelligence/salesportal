@@ -7,15 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useTenant } from "@/contexts/TenantContext";
 
 const CustomerDetailPage = () => {
   const navigate = useNavigate();
   const { customerId } = useParams();
+  const { tenant, loading: tenantLoading } = useTenant();
   const [customer, setCustomer] = useState(null);
   const [tpvRequests, setTpvRequests] = useState([]);
   const [checklists, setChecklists] = useState([]);
   const [invoiceProfile, setInvoiceProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Tenant-specific localStorage key for invoice profiles
+  const tenantSlug = tenant?.slug;
 
   useEffect(() => {
     const authenticated = localStorage.getItem("authenticated");
@@ -24,12 +29,17 @@ const CustomerDetailPage = () => {
       return;
     }
     
+    // Wait for tenant to load before fetching data
+    if (tenantLoading || !tenantSlug) return;
+    
     fetchCustomerData();
     loadInvoiceProfile();
-  }, [customerId, navigate]);
+  }, [customerId, navigate, tenantLoading, tenantSlug]);
 
   const loadInvoiceProfile = () => {
-    const savedProfile = localStorage.getItem(`invoice_profile_${customerId}`);
+    if (!tenantSlug) return;
+    // Use tenant-scoped key for complete isolation
+    const savedProfile = localStorage.getItem(`invoice_profile_${tenantSlug}_${customerId}`);
     if (savedProfile) {
       setInvoiceProfile(JSON.parse(savedProfile));
     }
@@ -39,17 +49,22 @@ const CustomerDetailPage = () => {
     try {
       setLoading(true);
 
-      // Fetch customer
+      // CRITICAL: Verify customer belongs to current tenant for data isolation
       const { data: customerData, error: customerError } = await supabase
         .from("customers")
         .select("*")
         .eq("id", customerId)
+        .eq("tenant_id", tenant.id) // CRITICAL: Filter by tenant for security
         .single();
 
-      if (customerError) throw customerError;
+      if (customerError) {
+        console.error("Error fetching customer:", customerError);
+        setCustomer(null);
+        return;
+      }
       setCustomer(customerData);
 
-      // Fetch TPV requests
+      // Fetch TPV requests (filtered by customer which is already tenant-filtered)
       const { data: tpvData, error: tpvError } = await supabase
         .from("tpv_requests")
         .select("*")
