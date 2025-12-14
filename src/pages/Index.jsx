@@ -111,7 +111,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
   const [invoice, setInvoice] = useState({
-    date: "",
+    date: new Date().toISOString().split('T')[0],
     paymentDate: "",
     number: "",
   });
