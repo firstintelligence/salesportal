@@ -789,17 +789,29 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         <div className="absolute left-0 flex gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600"
-            aria-label="Clear Form"
+            className="bg-red-500 text-white px-3 py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2"
+            aria-label="Clear Invoice"
           >
-            <FiTrash2 size={24} />
+            <FiTrash2 size={20} />
+            <span className="hidden sm:inline text-sm font-medium">Clear</span>
           </button>
           <button
-            onClick={fillDummyData}
-            className="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600"
-            aria-label="Fill with Dummy Data"
+            onClick={handleSaveToDashboard}
+            disabled={isSaving}
+            className="bg-green-600 text-white px-3 py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            aria-label="Save Invoice"
           >
-            <FiEdit size={24} />
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="hidden sm:inline text-sm font-medium">Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm font-medium">Save</span>
+              </>
+            )}
           </button>
         </div>
         <h1 className="text-3xl font-bold">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
@@ -1010,25 +1022,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button 
-                variant="outline"
-                onClick={handleSaveToDashboard}
-                disabled={isSaving}
-                className="flex-1 sm:flex-initial"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save to Dashboard
-                  </>
-                )}
-              </Button>
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
               <Button 
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
