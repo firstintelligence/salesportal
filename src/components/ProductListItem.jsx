@@ -108,6 +108,7 @@ const ProductListItem = memo(({
         {/* Actions */}
         <div className="flex items-center gap-0.5">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
@@ -118,6 +119,7 @@ const ProductListItem = memo(({
           </Button>
           {!isOnly && (
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
