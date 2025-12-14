@@ -194,25 +194,29 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       const horizontalPadding = 32; // p-4 left + right
-      const verticalPadding = 32;   // p-4 top + bottom
+      const verticalPadding = 32; // p-4 top + bottom
 
       const availableWidth = containerWidth - horizontalPadding;
       const availableHeight = containerHeight - verticalPadding;
 
-      if (!availableWidth || availableWidth <= 0) return;
+      if (!availableWidth || availableWidth <= 0 || !availableHeight || availableHeight <= 0) return;
 
-      const pageWidth = 794;  // Base template width
+      const pageWidth = 794; // Base template width
       const pageHeight = 1123; // Base template height
 
-      // Always fit to container WIDTH; allow vertical scrolling for height
+      // Fit to both width AND height so the full page is always visible
       const widthScale = availableWidth / pageWidth;
+      const heightScale = availableHeight / pageHeight;
 
-      // Optionally clamp to a reasonable maximum so it doesn't blow up on huge screens
-      const scale = Math.min(widthScale, 1.5);
+      // Clamp to a reasonable maximum so it doesn't blow up on huge screens
+      const scale = Math.min(widthScale, heightScale, 1.5);
       setPreviewScale(scale);
     };
+
+    // Run once on mount
     updateScale();
 
+    // Recalculate whenever the container size changes
     const resizeObserver = new ResizeObserver(updateScale);
     resizeObserver.observe(container);
 
