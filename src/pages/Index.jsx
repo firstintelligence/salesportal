@@ -111,16 +111,17 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     coApplicantPhone: ""
   });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
-  // Get today's date in Toronto timezone
-  const getTodayInToronto = () => {
-    const torontoTime = toZonedTime(new Date(), 'America/Toronto');
-    return format(torontoTime, 'yyyy-MM-dd');
-  };
   
-  const [invoice, setInvoice] = useState({
-    date: getTodayInToronto(),
-    paymentDate: "",
-    number: "",
+  // Get today's date in Toronto timezone - computed once on mount
+  const [invoice, setInvoice] = useState(() => {
+    const torontoTime = toZonedTime(new Date(), 'America/Toronto');
+    const todayFormatted = format(torontoTime, 'yyyy-MM-dd');
+    const dueDateFormatted = format(addDays(torontoTime, 7), 'yyyy-MM-dd');
+    return {
+      date: todayFormatted,
+      paymentDate: dueDateFormatted,
+      number: "",
+    };
   });
   const [financing, setFinancing] = useState({
     financeCompany: "Financeit Canada Inc.",
@@ -438,16 +439,20 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     settaxPercentage(taxRate);
   };
 
-  // Auto-set payment date to 7 days after invoice date
-  useEffect(() => {
-    if (invoice.date) {
-      const paymentDate = addDays(new Date(invoice.date), 7);
+  // Auto-set payment date to 7 days after invoice date - only update paymentDate, not the whole invoice
+  const handleDateChange = useCallback((e) => {
+    const { name, value } = e.target;
+    if (name === 'date' && value) {
+      const paymentDate = addDays(new Date(value), 7);
       setInvoice(prev => ({
         ...prev,
-        paymentDate: paymentDate.toISOString().split('T')[0]
+        date: value,
+        paymentDate: format(paymentDate, 'yyyy-MM-dd')
       }));
+    } else {
+      setInvoice(prev => ({ ...prev, [name]: value }));
     }
-  }, [invoice.date]);
+  }, []);
 
   // Update financing loan amount when grand total changes
   useEffect(() => {
@@ -808,7 +813,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
                   label={`${isInvoice ? 'Invoice' : 'Quote'} Date`}
                   type="date"
                   value={invoice.date}
-                  onChange={handleInputChange(setInvoice)}
+                  onChange={handleDateChange}
                   name="date"
                 />
                 <FloatingLabelInput
