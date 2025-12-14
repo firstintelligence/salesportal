@@ -90,6 +90,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   const navigate = useNavigate();
   const { tenant, loading: tenantLoading } = useTenant();
   
+  // Track whether we've already loaded initial form data to avoid overwriting user input
+  const hasLoadedInitialData = useRef(false);
+  
   // CRITICAL: Don't render anything until tenant is fully loaded to prevent cross-tenant data exposure
   const tenantSlug = tenant?.slug;
   const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;
@@ -205,8 +208,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   }, []);
 
   useEffect(() => {
-    // CRITICAL: Wait for tenant to be loaded before doing anything
-    if (!formDataKey || !tenantCompanyInfo) return;
+    // CRITICAL: Wait for tenant to be loaded before doing anything, and only run once
+    if (!formDataKey || !tenantCompanyInfo || hasLoadedInitialData.current) return;
+    
+    // Mark as loaded so we don't overwrite user input on subsequent tenant changes
+    hasLoadedInitialData.current = true;
     
     // Preload customer data if provided
     if (preloadedCustomer) {
