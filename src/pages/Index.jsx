@@ -883,7 +883,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 items-stretch">
               <FinancingSection
                 financing={financing} 
                 setFinancing={setFinancing} 
