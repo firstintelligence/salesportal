@@ -1048,9 +1048,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
           <div className="w-full overflow-hidden">
             <div
               ref={previewContainerRef}
-              className="bg-gray-100 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
+              className="bg-gray-200 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
             >
-              <div className="p-4 space-y-4 w-full flex flex-col items-center">
+              <div className="p-4 w-full flex flex-col items-center gap-6">
                 {(() => {
                   const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
                   const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
@@ -1075,50 +1075,60 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
                     const scaledHeight = pageHeight * previewScale;
 
                     return (
-                      <div 
-                        key={pageIndex} 
-                        className="relative bg-white shadow-lg" 
-                        style={{ 
-                          width: `${scaledWidth}px`,
-                          height: `${scaledHeight}px`,
-                        }}
-                      >
-                        <div
-                          className="origin-top-left"
-                          style={{
-                            width: `${pageWidth}px`,
-                            height: `${pageHeight}px`,
-                            transform: `scale(${previewScale})`,
+                      <div key={pageIndex} className="relative">
+                        {/* Page container with shadow and border for visual separation */}
+                        <div 
+                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm" 
+                          style={{ 
+                            width: `${scaledWidth}px`,
+                            height: `${scaledHeight}px`,
                           }}
                         >
-                          <InvoiceTemplate
-                            data={{
-                              invoice,
-                              billTo,
-                              shipTo,
-                              items,
-                              financing,
-                              rebatesIncentives,
-                              yourCompany,
-                              isInvoice,
-                              subTotal,
-                              grandTotal,
-                              taxAmount,
-                              taxPercentage,
-                              notes,
-                              selectedCurrency,
-                              pageNumber: pageIndex + 1,
-                              totalPages: numberOfPages,
-                              signature: savedSignatureDataUrl,
-                              coApplicantSignature: coApplicantSignatureDataUrl,
+                          <div
+                            className="origin-top-left"
+                            style={{
+                              width: `${pageWidth}px`,
+                              height: `${pageHeight}px`,
+                              transform: `scale(${previewScale})`,
                             }}
-                            templateNumber={4}
-                          />
+                          >
+                            <InvoiceTemplate
+                              data={{
+                                invoice,
+                                billTo,
+                                shipTo,
+                                items,
+                                financing,
+                                rebatesIncentives,
+                                yourCompany,
+                                isInvoice,
+                                subTotal,
+                                grandTotal,
+                                taxAmount,
+                                taxPercentage,
+                                notes,
+                                selectedCurrency,
+                                pageNumber: pageIndex + 1,
+                                totalPages: numberOfPages,
+                                signature: savedSignatureDataUrl,
+                                coApplicantSignature: coApplicantSignatureDataUrl,
+                              }}
+                              templateNumber={4}
+                            />
+                          </div>
+                          {/* Page indicator - only show if multiple pages */}
+                          {numberOfPages > 1 && (
+                            <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
+                              Page {pageIndex + 1} of {numberOfPages}
+                            </div>
+                          )}
                         </div>
-                        {/* Page indicator - only show if multiple pages */}
-                        {numberOfPages > 1 && (
-                          <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">
-                            Page {pageIndex + 1} of {numberOfPages}
+                        {/* Page separator label */}
+                        {pageIndex < numberOfPages - 1 && (
+                          <div className="flex items-center justify-center py-2 mt-4">
+                            <div className="flex-1 border-t-2 border-dashed border-gray-400"></div>
+                            <span className="px-3 text-xs font-medium text-gray-500 bg-gray-200">PAGE BREAK</span>
+                            <div className="flex-1 border-t-2 border-dashed border-gray-400"></div>
                           </div>
                         )}
                       </div>
