@@ -1,6 +1,11 @@
 import React from 'react';
 
 const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, onBlur, name, className = '', disabled = false }) => {
+  // For date inputs or when value exists, always show label in floated position
+  const hasValue = value !== undefined && value !== null && value !== '';
+  const isDateType = type === 'date';
+  const shouldFloatLabel = hasValue || isDateType;
+
   return (
     <div className="relative">
       <input
@@ -21,7 +26,11 @@ const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, onBlur,
       />
       <label
         htmlFor={id}
-        className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 pointer-events-none whitespace-nowrap"
+        className={`absolute text-sm duration-300 transform z-10 origin-[0] bg-white px-2 start-1 pointer-events-none whitespace-nowrap ${
+          shouldFloatLabel 
+            ? 'scale-75 -translate-y-4 top-2 text-gray-500 peer-focus:text-blue-600' 
+            : 'text-gray-500 scale-100 -translate-y-1/2 top-1/2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-blue-600'
+        }`}
       >
         {label}
       </label>
