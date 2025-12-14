@@ -84,8 +84,8 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
               value={(financing.loanTerm || 24).toString()} 
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
             >
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger className="text-left">
+                <SelectValue className="text-left" />
               </SelectTrigger>
               <SelectContent>
                 {availableTerms.length > 0 ? (
@@ -112,8 +112,8 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
               value={(financing.amortizationPeriod || 180).toString()} 
               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
             >
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger className="text-left">
+                <SelectValue className="text-left" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="120">120 months</SelectItem>
