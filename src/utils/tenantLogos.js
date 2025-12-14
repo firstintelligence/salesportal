@@ -36,7 +36,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       address: "2 Tippett Rd Floor 4, North York, ON M3H 2V2",
       phone: "+1 888-318-1988",
       email: "info@polaronsolar.com",
-      invoicePrefix: "PC"
+      invoicePrefix: "PLRN"
     },
     'maher': {
       name: "Maher Heating & Cooling",
@@ -57,7 +57,14 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       address: "1200 Bay Street, Toronto, ON M5W 2A9",
       phone: "+1 (647) 794-1199",
       email: "info@marathon-electric.ca",
-      invoicePrefix: "ME"
+      invoicePrefix: "MARA"
+    },
+    'provincial': {
+      name: "Provincial Energy Group",
+      address: "",
+      phone: "",
+      email: "",
+      invoicePrefix: "PROV"
     },
   };
   
