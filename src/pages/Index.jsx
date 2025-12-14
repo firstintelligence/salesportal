@@ -191,9 +191,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     if (!container) return;
 
     const updateScale = () => {
-      const width = container.clientWidth;
-      if (!width) return;
-      const scale = Math.min(1, width / 794); // 794px design width
+      const containerWidth = container.clientWidth;
+      const padding = 32; // Account for p-4 padding (16px on each side)
+      const availableWidth = containerWidth - padding;
+      if (!availableWidth || availableWidth <= 0) return;
+      const scale = availableWidth / 794; // Scale to fit 100% of available width
       setPreviewScale(scale);
     };
 
