@@ -192,10 +192,22 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
 
     const updateScale = () => {
       const containerWidth = container.clientWidth;
-      const padding = 32; // Account for p-4 padding (16px on each side)
-      const availableWidth = containerWidth - padding;
-      if (!availableWidth || availableWidth <= 0) return;
-      const scale = availableWidth / 794; // Scale to fit 100% of available width
+      const containerHeight = container.clientHeight;
+      const horizontalPadding = 32; // p-4 left + right
+      const verticalPadding = 32;   // p-4 top + bottom
+
+      const availableWidth = containerWidth - horizontalPadding;
+      const availableHeight = containerHeight - verticalPadding;
+
+      if (!availableWidth || !availableHeight || availableWidth <= 0 || availableHeight <= 0) return;
+
+      const pageWidth = 794;  // Base template width
+      const pageHeight = 1123; // Base template height
+
+      const widthScale = availableWidth / pageWidth;
+      const heightScale = availableHeight / pageHeight;
+
+      const scale = Math.min(widthScale, heightScale);
       setPreviewScale(scale);
     };
 
