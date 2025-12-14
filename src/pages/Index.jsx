@@ -199,18 +199,18 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       const availableWidth = containerWidth - horizontalPadding;
       const availableHeight = containerHeight - verticalPadding;
 
-      if (!availableWidth || !availableHeight || availableWidth <= 0 || availableHeight <= 0) return;
+      if (!availableWidth || availableWidth <= 0) return;
 
       const pageWidth = 794;  // Base template width
       const pageHeight = 1123; // Base template height
 
+      // Always fit to container WIDTH; allow vertical scrolling for height
       const widthScale = availableWidth / pageWidth;
-      const heightScale = availableHeight / pageHeight;
 
-      const scale = Math.min(widthScale, heightScale);
+      // Optionally clamp to a reasonable maximum so it doesn't blow up on huge screens
+      const scale = Math.min(widthScale, 1.5);
       setPreviewScale(scale);
     };
-
     updateScale();
 
     const resizeObserver = new ResizeObserver(updateScale);
