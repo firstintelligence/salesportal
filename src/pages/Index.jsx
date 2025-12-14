@@ -555,6 +555,10 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
   };
 
   const clearForm = () => {
+    // Get today's date and due date (7 days later)
+    const today = getTodayInToronto();
+    const dueDate = format(addDays(new Date(today), 7), 'yyyy-MM-dd');
+    
     setBillTo({ 
       firstName: "", 
       lastName: "", 
@@ -569,8 +573,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     });
     setShipTo({ name: "", address: "", phone: "" });
     setInvoice({
-      date: "",
-      paymentDate: "",
+      date: today,
+      paymentDate: dueDate,
       number: `${tenantCompanyInfo.invoicePrefix}0000`,
     });
     setYourCompany({
@@ -596,6 +600,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       manufacturerRebate: 0
     });
     setNotes("");
+    setSavedSignatureDataUrl(null);
+    setCoApplicantSignatureDataUrl(null);
     if (formDataKey) {
       localStorage.removeItem(formDataKey);
     }
