@@ -793,7 +793,6 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
                   value={invoice.number}
                   onChange={handleInputChange(setInvoice)}
                   name="number"
-                  disabled
                 />
                 <FloatingLabelInput
                   id="invoiceDate"
