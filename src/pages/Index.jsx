@@ -14,7 +14,8 @@ import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
 import { RefreshCw, Loader2, Pen, Save } from "lucide-react";
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 import { supabase } from "@/integrations/supabase/client";
 import { getSimplifiedProductList } from "../utils/productNameSimplifier";
@@ -110,8 +111,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     coApplicantPhone: ""
   });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
+  // Get today's date in Toronto timezone
+  const getTodayInToronto = () => {
+    const torontoTime = toZonedTime(new Date(), 'America/Toronto');
+    return format(torontoTime, 'yyyy-MM-dd');
+  };
+  
   const [invoice, setInvoice] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: getTodayInToronto(),
     paymentDate: "",
     number: "",
   });
