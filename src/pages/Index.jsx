@@ -747,9 +747,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
-        <div className="flex gap-2">
+      <div className="relative flex items-center justify-center mb-8">
+        <div className="absolute left-0 flex gap-2">
           <button
             onClick={clearForm}
             className="bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600"
@@ -765,6 +764,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
             <FiEdit size={24} />
           </button>
         </div>
+        <h1 className="text-3xl font-bold">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-1 lg:order-1">
