@@ -1,10 +1,54 @@
 import React from 'react';
 
-const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, onBlur, name, className = '', disabled = false }) => {
+// Capitalize first letter of each word
+const capitalizeWords = (str) => {
+  if (!str) return str;
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+// Format Canadian postal code: uppercase, space after 3rd char (e.g., A1A 1A1)
+const formatPostalCode = (str) => {
+  if (!str) return str;
+  // Remove all spaces and uppercase
+  const cleaned = str.replace(/\s/g, '').toUpperCase();
+  // Add space after 3rd character if length > 3
+  if (cleaned.length > 3) {
+    return cleaned.slice(0, 3) + ' ' + cleaned.slice(3, 6);
+  }
+  return cleaned;
+};
+
+const FloatingLabelInput = ({ 
+  id, 
+  label, 
+  type = 'text', 
+  value, 
+  onChange, 
+  onBlur, 
+  name, 
+  className = '', 
+  disabled = false,
+  autoCapitalize = true,
+  isPostalCode = false
+}) => {
   // For date inputs or when value exists, always show label in floated position
   const hasValue = value !== undefined && value !== null && value !== '';
   const isDateType = type === 'date';
   const shouldFloatLabel = hasValue || isDateType;
+
+  const handleChange = (e) => {
+    let newValue = e.target.value;
+    
+    if (isPostalCode) {
+      // For postal code: uppercase and format
+      newValue = formatPostalCode(newValue);
+    } else if (autoCapitalize && type === 'text' && name !== 'email') {
+      // Auto-capitalize first letter of each word (except email)
+      newValue = capitalizeWords(newValue);
+    }
+    
+    onChange({ target: { name: e.target.name, value: newValue } });
+  };
 
   return (
     <div className="relative">
@@ -12,10 +56,10 @@ const FloatingLabelInput = ({ id, label, type = 'text', value, onChange, onBlur,
         type={type}
         id={id}
         name={name}
-        className={`block px-2.5 pb-2.5 pt-4 w-full min-h-[40px] md:h-[40px] h-[48px] md:text-sm text-base text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''} ${className}`}
+        className={`block px-2.5 pb-2.5 pt-4 w-full min-h-[40px] md:h-[40px] h-[48px] text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''} ${className}`}
         placeholder=" "
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onBlur={onBlur}
         disabled={disabled}
         autoComplete="off"

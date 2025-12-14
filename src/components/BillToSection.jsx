@@ -81,12 +81,12 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div>
           <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
-            <SelectTrigger className="h-[40px]">
+            <SelectTrigger className="h-[40px] text-sm">
               <SelectValue placeholder="Select province" />
             </SelectTrigger>
             <SelectContent>
               {provinces.map((prov) => (
-                <SelectItem key={prov.code} value={prov.code}>
+                <SelectItem key={prov.code} value={prov.code} className="text-sm">
                   {prov.name}
                 </SelectItem>
               ))}
@@ -100,6 +100,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             value={billTo.postalCode || ''}
             onChange={handleInputChange}
             name="postalCode"
+            isPostalCode={true}
           />
           <Button
             type="button"
