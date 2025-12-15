@@ -204,12 +204,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       const pageWidth = 794; // Base template width
       const pageHeight = 1123; // Base template height
 
-      // Fit to both width AND height so the full page is always visible
+      // Fit to container WIDTH only; allow vertical scrolling for height
       const widthScale = availableWidth / pageWidth;
-      const heightScale = availableHeight / pageHeight;
 
       // Clamp to a reasonable maximum so it doesn't blow up on huge screens
-      const scale = Math.min(widthScale, heightScale, 1.5);
+      const scale = Math.min(widthScale, 1.5);
       setPreviewScale(scale);
     };
 
