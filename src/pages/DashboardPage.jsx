@@ -368,7 +368,11 @@ const DashboardPage = () => {
                       <Input
                         id="postal_code"
                         value={newDeal.postal_code}
-                        onChange={(e) => setNewDeal({ ...newDeal, postal_code: e.target.value })}
+                        onChange={(e) => {
+                          const cleaned = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 6);
+                          const formatted = cleaned.length > 3 ? cleaned.slice(0, 3) + ' ' + cleaned.slice(3) : cleaned;
+                          setNewDeal({ ...newDeal, postal_code: formatted });
+                        }}
                         placeholder="M5V 1A1"
                         className="h-9"
                       />
