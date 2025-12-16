@@ -187,12 +187,12 @@ serve(async (req) => {
               const signatureBytes = base64ToUint8Array(signatureBase64);
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
-              // Draw signature centered in the signature field area
+              // Draw signature centered in the signature field area - larger to match other pages
               firstPage.drawImage(signatureImage, {
-                x: 115,
-                y: 80,
-                width: 200,
-                height: 50,
+                x: 80,
+                y: 60,
+                width: 280,
+                height: 70,
               });
               console.log('Signature embedded on page');
             } catch (sigError) {
