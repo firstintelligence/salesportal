@@ -103,7 +103,8 @@ serve(async (req) => {
         }
 
         // Extract customer info
-        const { firstName, lastName, signature } = invoiceData.billTo || {};
+        const { firstName, lastName } = invoiceData.billTo || {};
+        const signature = invoiceData.signature; // Signature is at top level
         const customerName = firstName && lastName ? `${firstName} ${lastName}` : (invoiceData.billTo?.name || '');
         const companyName = tenantInfo?.name || "George's Plumbing and Heating";
         const currentDate = formatDateFull(new Date());
@@ -111,6 +112,7 @@ serve(async (req) => {
         console.log('Customer Name:', customerName);
         console.log('Company Name:', companyName);
         console.log('Current Date:', currentDate);
+        console.log('Signature provided:', !!signature);
 
         // Get the first page for drawing
         const pages = cpaPdf.getPages();

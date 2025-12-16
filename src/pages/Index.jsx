@@ -777,7 +777,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           taxAmount,
           taxPercentage,
           notes,
-          selectedCurrency
+          selectedCurrency,
+          signature: savedSignatureDataUrl,
+          coApplicantSignature: coApplicantSignatureDataUrl
         };
         await generatePDF(formData, 4, tenantSlug); // Using template 4
       } catch (error) {
