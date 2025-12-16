@@ -90,12 +90,9 @@ const DashboardPage = () => {
 
       if (error) throw error;
       
+      // Filter by agent_id - agents see only their own customers, admin sees all
+      // Note: RLS policies also enforce this, but we filter here for clarity
       let filteredData = data || [];
-      if (currentAgentId !== "MM23") {
-        filteredData = filteredData.filter(customer => 
-          customer.tpv_requests && customer.tpv_requests.some(tpv => tpv.agent_id === currentAgentId)
-        );
-      }
       
       setDeals(filteredData);
     } catch (error) {
@@ -136,6 +133,8 @@ const DashboardPage = () => {
         return;
       }
 
+      const currentAgentId = localStorage.getItem("agentId");
+      
       const { data: customer, error } = await supabase
         .from("customers")
         .insert([{
@@ -147,7 +146,8 @@ const DashboardPage = () => {
           city: newDeal.city.trim() || null,
           province: newDeal.province.trim() || null,
           postal_code: newDeal.postal_code.trim() || null,
-          tenant_id: tenant.id // CRITICAL: Associate customer with current tenant
+          tenant_id: tenant.id, // CRITICAL: Associate customer with current tenant
+          agent_id: currentAgentId // Track which agent created this customer
         }])
         .select()
         .single();

@@ -626,7 +626,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         return;
       }
 
-      // Create or update customer with tenant_id
+      // Create or update customer with tenant_id and agent_id
       const customerData = {
         first_name: billTo.firstName,
         last_name: billTo.lastName,
@@ -637,6 +637,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
         province: billTo.province || 'ON',
         postal_code: billTo.postalCode || null,
         tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
+        agent_id: agentId, // Track which agent created this customer
       };
 
       // Check if customer exists by phone number within the same tenant
