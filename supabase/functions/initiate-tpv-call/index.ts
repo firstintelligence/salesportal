@@ -122,7 +122,7 @@ serve(async (req) => {
     const callData = await response.json();
     console.log('VAPI call initiated successfully:', callData);
 
-    // Log to database
+    // Log to database and create customer if needed
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -130,9 +130,54 @@ serve(async (req) => {
       try {
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
         
+        // First, create or get customer
+        let customerId = formData.customerId; // May be passed if coming from customer detail page
+        
+        if (!customerId) {
+          // Check if customer exists by phone number and tenant
+          const { data: existingCustomer } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('phone', cleanPhone.length === 10 ? cleanPhone : formData.phoneNumber.replace(/\D/g, ''))
+            .eq('tenant_id', formData.tenantId)
+            .maybeSingle();
+          
+          if (existingCustomer) {
+            customerId = existingCustomer.id;
+            console.log('Found existing customer:', customerId);
+          } else {
+            // Create new customer
+            const { data: newCustomer, error: customerError } = await supabase
+              .from('customers')
+              .insert({
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                phone: cleanPhone.length === 10 ? cleanPhone : formData.phoneNumber.replace(/\D/g, ''),
+                email: formData.email || null,
+                address: formData.address,
+                city: formData.city || null,
+                province: formData.province || null,
+                postal_code: formData.postalCode || null,
+                tenant_id: formData.tenantId,
+                agent_id: formData.agentId, // Track which agent created this customer
+              })
+              .select('id')
+              .single();
+            
+            if (customerError) {
+              console.error('Failed to create customer:', customerError);
+            } else {
+              customerId = newCustomer.id;
+              console.log('Created new customer:', customerId);
+            }
+          }
+        }
+        
         const { data: insertData, error: insertError } = await supabase
           .from('tpv_requests')
           .insert({
+            customer_id: customerId || null,
+            tenant_id: formData.tenantId,
             agent_id: formData.agentId,
             first_name: formData.firstName,
             last_name: formData.lastName,

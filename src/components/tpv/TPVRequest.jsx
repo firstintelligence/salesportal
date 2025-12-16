@@ -191,6 +191,8 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
       const payload = {
         agentId,
         tenantSlug: tenant?.slug || 'georges',
+        tenantId: tenant?.id || null, // Pass tenant ID for customer creation
+        customerId: preloadedCustomer?.id || null, // Pass customer ID if editing existing
         firstName: formData.firstName,
         lastName: formData.lastName,
         customerName: `${formData.firstName} ${formData.lastName}`,
