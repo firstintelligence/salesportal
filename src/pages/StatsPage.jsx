@@ -538,22 +538,18 @@ const StatsPage = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg bg-background/50 backdrop-blur p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-2 max-w-sm bg-background/50 backdrop-blur p-1 rounded-xl">
             <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow">
               <TrendingUp className="w-4 h-4 mr-2" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow">
-              <Trophy className="w-4 h-4 mr-2" />
-              Leaderboard
-            </TabsTrigger>
             <TabsTrigger value="tiers" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow">
               <Medal className="w-4 h-4 mr-2" />
-              Tiers
+              Rank & Tiers
             </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+          {/* Overview Tab - Combined with Leaderboard */}
           <TabsContent value="overview" className="space-y-6 animate-fade-in">
             {/* Hero Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -634,10 +630,8 @@ const StatsPage = () => {
                 delay={350}
               />
             </div>
-          </TabsContent>
 
-          {/* Leaderboard Tab */}
-          <TabsContent value="leaderboard" className="animate-fade-in">
+            {/* Leaderboard Section */}
             <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
               <CardHeader className="border-b bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5">
                 <div className="flex items-center justify-between">
@@ -672,93 +666,134 @@ const StatsPage = () => {
             </Card>
           </TabsContent>
 
-          {/* Tiers Tab */}
+          {/* Tiers Tab - Redesigned */}
           <TabsContent value="tiers" className="space-y-6 animate-fade-in">
-            {/* Current Tier Status */}
+            {/* Current Tier Status - Compact Hero */}
             <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
-              <CardHeader className={`bg-gradient-to-r ${currentTier.color}`}>
+              <div className={`p-6 bg-gradient-to-r ${currentTier.color}`}>
                 <div className="flex items-center justify-between text-white">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-white/20 backdrop-blur">
-                      <currentTier.icon className="w-8 h-8" />
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-white/20 backdrop-blur">
+                      <currentTier.icon className="w-10 h-10" />
                     </div>
                     <div>
-                      <p className="text-sm opacity-90">Current Tier</p>
-                      <CardTitle className="text-2xl font-black">{currentTier.name}</CardTitle>
+                      <p className="text-sm opacity-90 font-medium">Your Current Tier</p>
+                      <h2 className="text-3xl font-black">{currentTier.name}</h2>
+                      <p className="text-sm opacity-90 mt-1">{currentTier.bonus}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm opacity-90">Revenue</p>
-                    <p className="text-2xl font-black">{formatCurrency(currentAgentRevenue)}</p>
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm opacity-90">Total Revenue</p>
+                    <p className="text-3xl font-black">{formatCurrency(currentAgentRevenue)}</p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Progress to next tier</span>
-                    <span className="font-bold text-primary">{formatPercent(tierProgress)}</span>
-                  </div>
-                  <Progress value={tierProgress} className="h-3" />
-                  {nextTier && (
-                    <div className="flex items-center justify-between text-sm pt-2">
-                      <div className="flex items-center gap-2">
-                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Next: <span className="font-semibold text-foreground">{nextTier.name}</span></span>
-                      </div>
-                      <span className="text-muted-foreground">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+              </div>
+              
+              {/* Progress to Next Tier */}
+              {nextTier && (
+                <div className="p-5 bg-muted/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <ChevronUp className="w-4 h-4 text-primary" />
+                      <span className="font-semibold">Next: {nextTier.name}</span>
                     </div>
-                  )}
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+                  </div>
+                  <div className="relative">
+                    <Progress value={tierProgress} className="h-4 rounded-full" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-white drop-shadow">{formatPercent(tierProgress)}</span>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
+              )}
             </Card>
 
-            {/* All Tiers */}
-            <div className="grid gap-3 sm:gap-4">
-              {PROMOTION_TIERS.map((tier, index) => {
-                const TierIcon = tier.icon;
-                const isCurrentTier = tier.name === currentTier.name;
-                const isAchieved = currentAgentRevenue >= tier.minRevenue;
-                
-                return (
-                  <Card 
-                    key={tier.name}
-                    className={`border-0 shadow-lg transition-all duration-300 ${
-                      isCurrentTier 
-                        ? "ring-2 ring-primary shadow-xl scale-[1.02]" 
-                        : isAchieved 
-                          ? "opacity-90" 
-                          : "opacity-60"
-                    }`}
-                  >
-                    <CardContent className="p-4 sm:p-5">
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${tier.color} shadow-lg flex-shrink-0`}>
-                          <TierIcon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-lg">{tier.name}</h3>
-                            {isCurrentTier && (
-                              <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full">Current</span>
-                            )}
-                            {isAchieved && !isCurrentTier && (
-                              <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-600 rounded-full">Achieved</span>
+            {/* Visual Tier Progression */}
+            <div>
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Star className="w-5 h-5 text-amber-500" />
+                Commission Tiers
+              </h3>
+              
+              {/* Horizontal Scroll on Mobile */}
+              <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible">
+                <div className="flex gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-max sm:min-w-0">
+                  {PROMOTION_TIERS.map((tier, index) => {
+                    const TierIcon = tier.icon;
+                    const isCurrentTier = tier.name === currentTier.name;
+                    const isAchieved = currentAgentRevenue >= tier.minRevenue;
+                    const isLocked = !isAchieved;
+                    
+                    return (
+                      <Card 
+                        key={tier.name}
+                        className={`border-0 transition-all duration-300 flex-shrink-0 w-[280px] sm:w-auto ${
+                          isCurrentTier 
+                            ? "ring-2 ring-primary shadow-xl shadow-primary/20" 
+                            : isAchieved 
+                              ? "shadow-lg bg-card" 
+                              : "shadow-md bg-muted/30 opacity-70"
+                        }`}
+                      >
+                        <CardContent className="p-5">
+                          <div className="flex items-start gap-4">
+                            {/* Tier Icon */}
+                            <div className={`relative p-3 rounded-xl bg-gradient-to-br ${tier.color} shadow-lg flex-shrink-0 ${isLocked ? 'grayscale' : ''}`}>
+                              <TierIcon className="w-7 h-7 text-white" />
+                              {isCurrentTier && (
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                                  <Sparkles className="w-2.5 h-2.5 text-white" />
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Tier Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-bold text-base">{tier.name}</h4>
+                                {isCurrentTier && (
+                                  <span className="text-[10px] px-2 py-0.5 bg-primary text-primary-foreground rounded-full font-semibold">YOU</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{tier.bonus}</p>
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="w-3.5 h-3.5 text-muted-foreground" />
+                                <span className="text-sm font-semibold">
+                                  {tier.maxRevenue === Infinity 
+                                    ? `${formatCurrency(tier.minRevenue)}+` 
+                                    : `${formatCurrency(tier.minRevenue)} - ${formatCurrency(tier.maxRevenue)}`
+                                  }
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Status Indicator */}
+                          <div className={`mt-4 pt-3 border-t border-border/50 flex items-center gap-2 ${isLocked ? 'text-muted-foreground' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            {isCurrentTier ? (
+                              <>
+                                <Sparkles className="w-4 h-4" />
+                                <span className="text-xs font-semibold">Current Level</span>
+                              </>
+                            ) : isAchieved ? (
+                              <>
+                                <Award className="w-4 h-4" />
+                                <span className="text-xs font-semibold">Unlocked</span>
+                              </>
+                            ) : (
+                              <>
+                                <Target className="w-4 h-4" />
+                                <span className="text-xs font-medium">{formatCurrency(tier.minRevenue - currentAgentRevenue)} to unlock</span>
+                              </>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">{tier.bonus}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-lg">{tier.maxRevenue === Infinity ? `${formatCurrency(tier.minRevenue)}+` : formatCurrency(tier.minRevenue)}</p>
-                          {tier.maxRevenue !== Infinity && (
-                            <p className="text-xs text-muted-foreground">to {formatCurrency(tier.maxRevenue)}</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
