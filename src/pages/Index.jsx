@@ -22,6 +22,7 @@ import { getSimplifiedProductList } from "../utils/productNameSimplifier";
 import { toast } from "sonner";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantCompanyInfo, getTenantLogo } from "@/utils/tenantLogos";
+import { formatPhoneNumber } from "@/utils/inputFormatting";
 
 // Helper function to get province tax name
 const getProvinceTaxName = (provinceCode) => {
@@ -248,7 +249,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         firstName: preloadedCustomer.first_name || "",
         lastName: preloadedCustomer.last_name || "",
         email: preloadedCustomer.email || "",
-        phone: preloadedCustomer.phone || "",
+        phone: formatPhoneNumber(preloadedCustomer.phone) || "",
         address: preloadedCustomer.address || "",
         city: preloadedCustomer.city || "",
         province: preloadedCustomer.province || "ON",
@@ -272,17 +273,18 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     const savedFormData = localStorage.getItem(formDataKey);
     if (savedFormData) {
       const parsedData = JSON.parse(savedFormData);
-      setBillTo(parsedData.billTo || { 
-        firstName: "", 
-        lastName: "", 
-        email: "", 
-        phone: "", 
-        address: "", 
-        city: "", 
-        province: "ON", 
-        postalCode: "",
-        coApplicantName: "",
-        coApplicantPhone: ""
+      const loadedBillTo = parsedData.billTo || {};
+      setBillTo({ 
+        firstName: loadedBillTo.firstName || "", 
+        lastName: loadedBillTo.lastName || "", 
+        email: loadedBillTo.email || "", 
+        phone: formatPhoneNumber(loadedBillTo.phone) || "", 
+        address: loadedBillTo.address || "", 
+        city: loadedBillTo.city || "", 
+        province: loadedBillTo.province || "ON", 
+        postalCode: loadedBillTo.postalCode || "",
+        coApplicantName: loadedBillTo.coApplicantName || "",
+        coApplicantPhone: formatPhoneNumber(loadedBillTo.coApplicantPhone) || ""
       });
       setShipTo(parsedData.shipTo || { name: "", address: "", phone: "" });
       setInvoice(
