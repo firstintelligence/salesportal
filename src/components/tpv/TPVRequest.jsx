@@ -34,22 +34,36 @@ const canadianProvinces = [
   { value: "YT", label: "Yukon" },
 ];
 
-const hvacProducts = [
-  "Air Conditioner",
-  "Furnace",
-  "Heat Pump",
-  "Water Heater",
-  "Tankless Water Heater",
-  "Boiler",
-  "Air Handler",
-  "Ductless Mini Split",
-  "Thermostat",
-  "Air Purifier",
-  "Humidifier",
-  "Dehumidifier",
-  "UV Light",
-  "Duct Cleaning",
-  "Maintenance Plan",
+// Grouped products for easier selection
+const productGroups = [
+  {
+    label: "Heating & Cooling",
+    products: ["Air Conditioner", "Furnace", "Heat Pump", "Boiler", "Air Handler", "Ductless Mini Split"]
+  },
+  {
+    label: "Water",
+    products: ["Water Heater", "Tankless Water Heater", "Water Softener"]
+  },
+  {
+    label: "Air Quality",
+    products: ["Air Purifier", "Humidifier", "Dehumidifier", "UV Air Filter", "Carbon Filter"]
+  },
+  {
+    label: "Water Quality",
+    products: ["UV Water Filter"]
+  },
+  {
+    label: "Insulation",
+    products: ["Attic Insulation", "Air Sealing"]
+  },
+  {
+    label: "Energy",
+    products: ["Home Battery", "Thermostat"]
+  },
+  {
+    label: "Services",
+    products: ["Duct Cleaning", "Maintenance Plan"]
+  }
 ];
 
 const interestRates = [
@@ -58,12 +72,13 @@ const interestRates = [
 ];
 
 const promotionalTerms = [
-  "No Promo", "3 months", "6 months", "12 months", "18 months", "24 months"
+  "No Promo", "3 months", "6 months", "12 months", "18 months", "24 months",
+  "36 months", "48 months", "60 months"
 ];
 
 const amortizationPeriods = [
   "60 months", "72 months", "84 months", "96 months", 
-  "108 months", "120 months", "144 months", "180 months"
+  "108 months", "120 months", "144 months", "180 months", "240 months"
 ];
 
 const TPVRequest = ({ onBack, preloadedCustomer }) => {
@@ -343,20 +358,25 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
               {/* Products */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Products *</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {hvacProducts.map((product) => (
-                    <div key={product} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={product}
-                        checked={formData.products.includes(product)}
-                        onCheckedChange={() => handleProductToggle(product)}
-                      />
-                      <Label htmlFor={product} className="text-sm cursor-pointer">
-                        {product}
-                      </Label>
+                {productGroups.map((group) => (
+                  <div key={group.label} className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">{group.label}</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {group.products.map((product) => (
+                        <div key={product} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={product}
+                            checked={formData.products.includes(product)}
+                            onCheckedChange={() => handleProductToggle(product)}
+                          />
+                          <Label htmlFor={product} className="text-sm cursor-pointer">
+                            {product}
+                          </Label>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
 
               {/* Financing */}

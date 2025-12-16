@@ -23,11 +23,18 @@ serve(async (req) => {
 
     // Validate agent ID
     const VALID_AGENTS: Record<string, string> = {
+      // George's agents
       'MM23': '+19059043544',
       'WK8448': '+16476258448',
       'TB0195': '+14168750195',
       'AA9097': '+16477169097',
       'HB6400': '+16473776400',
+      // Polaron agents
+      'CI11': '+10000000001', // Placeholder - update with real number
+      'LA11': '+10000000002', // Placeholder - update with real number
+      'AW11': '+10000000003', // Placeholder - update with real number
+      'MA11': '+19059043544',
+      'MW11': '+10000000005', // Placeholder - update with real number
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
