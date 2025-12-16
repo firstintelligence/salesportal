@@ -13,6 +13,8 @@ const AGENT_MAPPING: Record<string, string> = {
   'TB0195': '+14168750195',
   'AA9097': '+16477169097',
   'HB6400': '+16473776400',
+  // Polaron agents
+  'MA11': '+19059043544',
 };
 
 // Admin agent who receives all notifications
