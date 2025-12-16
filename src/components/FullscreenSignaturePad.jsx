@@ -157,10 +157,11 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
                   style: { 
                     width: canvasSize.width,
                     height: Math.min(canvasSize.height, 300),
-                    touchAction: 'none'
+                    touchAction: 'none',
+                    backgroundColor: 'white' // Visual background only, not in exported image
                   }
                 }}
-                backgroundColor="rgb(255, 255, 255)"
+                backgroundColor="rgba(0,0,0,0)"
                 penColor="black"
                 minWidth={1.5}
                 maxWidth={3}
