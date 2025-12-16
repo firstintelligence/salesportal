@@ -234,7 +234,6 @@ const DashboardPage = () => {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
         <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -252,15 +251,14 @@ const DashboardPage = () => {
                   {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''}
                 </p>
               </div>
-            </div>
-            
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5 rounded-full h-9 px-4">
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">New</span>
-                </Button>
-              </DialogTrigger>
+              
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 rounded-full h-9 px-4">
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">New</span>
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4">
                 <DialogHeader>
                   <DialogTitle>Create New Deal</DialogTitle>
