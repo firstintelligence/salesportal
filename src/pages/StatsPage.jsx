@@ -28,23 +28,23 @@ const PROMOTION_TIERS = [
 
 const StatCard = ({ icon: Icon, iconColor, title, value, subtitle, gradient, delay = 0 }) => (
   <Card 
-    className={`relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${gradient}`}
+    className={`relative overflow-hidden border-0 shadow-md lg:shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${gradient}`}
     style={{ animationDelay: `${delay}ms` }}
   >
-    <div className="absolute top-0 right-0 w-24 h-24 opacity-10">
+    <div className="absolute top-0 right-0 w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 opacity-10">
       <Icon className="w-full h-full" />
     </div>
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium text-foreground/70 flex items-center gap-2">
-        <div className={`p-2 rounded-lg ${iconColor}`}>
-          <Icon className="w-4 h-4 text-white" />
+    <CardHeader className="pb-1 pt-3 px-3 md:pb-2 md:pt-4 md:px-4 lg:pt-6 lg:px-6">
+      <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium text-foreground/70 flex items-center gap-1.5 md:gap-2">
+        <div className={`p-1 md:p-1.5 lg:p-2 rounded-md lg:rounded-lg ${iconColor}`}>
+          <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-white" />
         </div>
-        {title}
+        <span className="truncate">{title}</span>
       </CardTitle>
     </CardHeader>
-    <CardContent>
-      <p className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{value}</p>
-      <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+    <CardContent className="pb-3 px-3 md:pb-4 md:px-4 lg:pb-6 lg:px-6">
+      <p className="text-lg md:text-xl lg:text-3xl font-bold text-foreground tracking-tight">{value}</p>
+      <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 lg:mt-1">{subtitle}</p>
     </CardContent>
   </Card>
 );
@@ -52,14 +52,14 @@ const StatCard = ({ icon: Icon, iconColor, title, value, subtitle, gradient, del
 const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
   const TierIcon = agent.tier.icon;
   const rankStyles = {
-    0: "bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 shadow-yellow-400/50 shadow-lg",
-    1: "bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 shadow-slate-400/30 shadow-md",
-    2: "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 shadow-amber-600/30 shadow-md",
+    0: "bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 shadow-yellow-400/50 shadow-md md:shadow-lg",
+    1: "bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 shadow-slate-400/30 shadow-sm md:shadow-md",
+    2: "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 shadow-amber-600/30 shadow-sm md:shadow-md",
   };
 
   return (
     <div 
-      className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-5 transition-all duration-300 ${
+      className={`flex items-center gap-2 md:gap-3 lg:gap-4 p-2.5 md:p-3 lg:p-5 transition-all duration-300 ${
         isCurrentUser 
           ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-l-4 border-primary" 
           : "hover:bg-muted/50"
@@ -67,11 +67,11 @@ const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* Rank Badge */}
-      <div className={`flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-lg transition-transform hover:scale-110 ${
+      <div className={`flex-shrink-0 w-8 h-8 md:w-9 md:h-9 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl flex items-center justify-center font-bold text-sm md:text-base lg:text-lg transition-transform hover:scale-110 ${
         rankStyles[index] || "bg-muted text-muted-foreground"
       }`}>
         {index === 0 ? (
-          <Crown className="w-6 h-6 text-white drop-shadow" />
+          <Crown className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-white drop-shadow" />
         ) : index === 1 ? (
           <span className="text-slate-600 font-black">2</span>
         ) : index === 2 ? (
@@ -83,33 +83,33 @@ const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
 
       {/* Agent Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className={`font-bold truncate ${isCurrentUser ? "text-primary" : "text-foreground"}`}>
+        <div className="flex items-center gap-1.5 md:gap-2">
+          <p className={`font-bold text-sm md:text-base truncate ${isCurrentUser ? "text-primary" : "text-foreground"}`}>
             {agent.name}
           </p>
           {isCurrentUser && (
-            <span className="text-[10px] px-2 py-0.5 bg-primary/20 text-primary rounded-full font-medium">YOU</span>
+            <span className="text-[8px] md:text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">YOU</span>
           )}
           {index === 0 && (
-            <Sparkles className="w-4 h-4 text-yellow-500 animate-pulse" />
+            <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-yellow-500 animate-pulse" />
           )}
         </div>
-        <div className="flex items-center gap-2 mt-1">
-          <div className={`w-5 h-5 rounded-md bg-gradient-to-br ${agent.tier.color} flex items-center justify-center`}>
-            <TierIcon className="w-3 h-3 text-white" />
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <div className={`w-4 h-4 md:w-5 md:h-5 rounded-md bg-gradient-to-br ${agent.tier.color} flex items-center justify-center`}>
+            <TierIcon className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
           </div>
-          <span className="text-xs text-muted-foreground font-medium">{agent.tier.name}</span>
+          <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{agent.tier.name}</span>
         </div>
       </div>
 
       {/* Stats */}
       <div className="text-right">
-        <p className="font-bold text-foreground text-lg">{formatCurrency(agent.weeklyRevenue)}</p>
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">This Week</p>
+        <p className="font-bold text-foreground text-sm md:text-base lg:text-lg">{formatCurrency(agent.weeklyRevenue)}</p>
+        <p className="text-[8px] md:text-[10px] uppercase tracking-wider text-muted-foreground font-medium">This Week</p>
       </div>
-      <div className="text-right min-w-[90px] sm:min-w-[110px] hidden sm:block">
-        <p className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(agent.projectedAnnual)}</p>
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Annual</p>
+      <div className="text-right min-w-[70px] md:min-w-[90px] lg:min-w-[110px] hidden md:block">
+        <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm md:text-base">{formatCurrency(agent.projectedAnnual)}</p>
+        <p className="text-[8px] md:text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Annual</p>
       </div>
     </div>
   );
@@ -537,43 +537,43 @@ const StatsPage = () => {
         </div>
 
         {/* Single Scrollable Content - No Tabs */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-5 lg:space-y-6">
           
           {/* Your Current Tier - Hero Section */}
           <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
-            <div className={`p-5 sm:p-6 bg-gradient-to-r ${currentTier.color}`}>
+            <div className={`p-3 md:p-4 lg:p-6 bg-gradient-to-r ${currentTier.color}`}>
               <div className="flex items-center justify-between text-white">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="p-3 sm:p-4 rounded-2xl bg-white/20 backdrop-blur">
-                    <currentTier.icon className="w-8 h-8 sm:w-10 sm:h-10" />
+                <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
+                  <div className="p-2 md:p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-white/20 backdrop-blur">
+                    <currentTier.icon className="w-6 h-6 md:w-7 md:h-7 lg:w-10 lg:h-10" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm opacity-90 font-medium">Your Current Tier</p>
-                    <h2 className="text-2xl sm:text-3xl font-black">{currentTier.name}</h2>
-                    <p className="text-xs sm:text-sm opacity-90 mt-0.5">{currentTier.bonus}</p>
+                    <p className="text-[10px] md:text-xs lg:text-sm opacity-90 font-medium">Your Current Tier</p>
+                    <h2 className="text-lg md:text-xl lg:text-3xl font-black">{currentTier.name}</h2>
+                    <p className="text-[10px] md:text-xs lg:text-sm opacity-90">{currentTier.bonus}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs sm:text-sm opacity-90">Revenue</p>
-                  <p className="text-xl sm:text-3xl font-black">{formatCurrency(currentAgentRevenue)}</p>
+                  <p className="text-[10px] md:text-xs lg:text-sm opacity-90">Revenue</p>
+                  <p className="text-base md:text-lg lg:text-3xl font-black">{formatCurrency(currentAgentRevenue)}</p>
                 </div>
               </div>
             </div>
             
             {/* Progress to Next Tier */}
             {nextTier && (
-              <div className="p-4 sm:p-5 bg-muted/30">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <ChevronUp className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-semibold">Next: {nextTier.name}</span>
+              <div className="p-3 md:p-4 lg:p-5 bg-muted/30">
+                <div className="flex items-center justify-between mb-1.5 md:mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <ChevronUp className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+                    <span className="text-xs md:text-sm font-semibold">Next: {nextTier.name}</span>
                   </div>
-                  <span className="text-xs sm:text-sm text-muted-foreground font-medium">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+                  <span className="text-[10px] md:text-xs lg:text-sm text-muted-foreground font-medium">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
                 </div>
                 <div className="relative">
-                  <Progress value={tierProgress} className="h-3 sm:h-4 rounded-full" />
+                  <Progress value={tierProgress} className="h-2.5 md:h-3 lg:h-4 rounded-full" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[10px] sm:text-xs font-bold text-white drop-shadow">{formatPercent(tierProgress)}</span>
+                    <span className="text-[9px] md:text-[10px] lg:text-xs font-bold text-white drop-shadow">{formatPercent(tierProgress)}</span>
                   </div>
                 </div>
               </div>
@@ -582,11 +582,11 @@ const StatsPage = () => {
 
           {/* Key Performance Metrics */}
           <div>
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
+            <h3 className="text-sm md:text-base lg:text-lg font-bold mb-2 md:mb-3 lg:mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               Performance Metrics
             </h3>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-2.5 lg:gap-4">
               <StatCard
                 icon={DollarSign}
                 iconColor="bg-emerald-500"
@@ -627,7 +627,7 @@ const StatsPage = () => {
           </div>
 
           {/* Secondary Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-2.5 lg:gap-4">
             <StatCard
               icon={Calendar}
               iconColor="bg-rose-500"
@@ -667,22 +667,22 @@ const StatsPage = () => {
           </div>
 
           {/* Weekly Leaderboard */}
-          <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
-            <CardHeader className="border-b bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5 pb-4">
+          <Card className="border-0 shadow-lg md:shadow-xl bg-background/50 backdrop-blur overflow-hidden">
+            <CardHeader className="border-b bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5 py-2.5 md:py-3 lg:py-4 px-3 md:px-4 lg:px-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg">
-                    <Trophy className="w-5 h-5 text-white" />
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-lg lg:rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md lg:shadow-lg">
+                    <Trophy className="w-4 h-4 md:w-5 md:h-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg sm:text-xl font-bold">Weekly Leaderboard</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground">{tenant?.name || "Team"} Rankings</p>
+                    <CardTitle className="text-sm md:text-base lg:text-xl font-bold">Weekly Leaderboard</CardTitle>
+                    <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">{tenant?.name || "Team"} Rankings</p>
                   </div>
                 </div>
                 {myRank > 0 && (
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Your Rank</p>
-                    <p className="text-2xl font-black text-primary">#{myRank}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">Your Rank</p>
+                    <p className="text-lg md:text-xl lg:text-2xl font-black text-primary">#{myRank}</p>
                   </div>
                 )}
               </div>
@@ -702,13 +702,13 @@ const StatsPage = () => {
 
           {/* Commission Tiers - Horizontal Scroll */}
           <div>
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-500" />
+            <h3 className="text-sm md:text-base lg:text-lg font-bold mb-2 md:mb-3 lg:mb-4 flex items-center gap-2">
+              <Star className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
               Commission Tiers
             </h3>
             
-            <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible">
-              <div className="flex gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-max sm:min-w-0">
+            <div className="overflow-x-auto pb-2 md:pb-3 lg:pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible">
+              <div className="flex gap-2 md:grid md:grid-cols-3 lg:grid-cols-3 min-w-max md:min-w-0">
                 {PROMOTION_TIERS.map((tier) => {
                   const TierIcon = tier.icon;
                   const isCurrentTier = tier.name === currentTier.name;
@@ -718,34 +718,34 @@ const StatsPage = () => {
                   return (
                     <Card 
                       key={tier.name}
-                      className={`border-0 transition-all duration-300 flex-shrink-0 w-[260px] sm:w-auto ${
+                      className={`border-0 transition-all duration-300 flex-shrink-0 w-[200px] md:w-auto ${
                         isCurrentTier 
-                          ? "ring-2 ring-primary shadow-xl shadow-primary/20" 
+                          ? "ring-2 ring-primary shadow-lg shadow-primary/20" 
                           : isAchieved 
-                            ? "shadow-lg bg-card" 
-                            : "shadow-md bg-muted/30 opacity-60"
+                            ? "shadow-md bg-card" 
+                            : "shadow-sm bg-muted/30 opacity-60"
                       }`}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2.5 rounded-xl bg-gradient-to-br ${tier.color} shadow-lg flex-shrink-0 ${isLocked ? 'grayscale' : ''}`}>
-                            <TierIcon className="w-6 h-6 text-white" />
+                      <CardContent className="p-2.5 md:p-3 lg:p-4">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className={`p-1.5 md:p-2 lg:p-2.5 rounded-lg lg:rounded-xl bg-gradient-to-br ${tier.color} shadow-md lg:shadow-lg flex-shrink-0 ${isLocked ? 'grayscale' : ''}`}>
+                            <TierIcon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-white" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-sm">{tier.name}</h4>
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <h4 className="font-bold text-xs md:text-sm">{tier.name}</h4>
                               {isCurrentTier && (
-                                <span className="text-[9px] px-1.5 py-0.5 bg-primary text-primary-foreground rounded-full font-semibold">YOU</span>
+                                <span className="text-[8px] md:text-[9px] px-1 md:px-1.5 py-0.5 bg-primary text-primary-foreground rounded-full font-semibold">YOU</span>
                               )}
                             </div>
-                            <p className="text-[11px] text-muted-foreground">{tier.bonus}</p>
+                            <p className="text-[9px] md:text-[10px] lg:text-[11px] text-muted-foreground">{tier.bonus}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs font-semibold">
+                            <p className="text-[10px] md:text-xs font-semibold">
                               {tier.maxRevenue === Infinity ? `${formatCurrency(tier.minRevenue)}+` : formatCurrency(tier.minRevenue)}
                             </p>
                             {isLocked && (
-                              <p className="text-[10px] text-muted-foreground">{formatCurrency(tier.minRevenue - currentAgentRevenue)} to go</p>
+                              <p className="text-[8px] md:text-[10px] text-muted-foreground">{formatCurrency(tier.minRevenue - currentAgentRevenue)} to go</p>
                             )}
                           </div>
                         </div>
