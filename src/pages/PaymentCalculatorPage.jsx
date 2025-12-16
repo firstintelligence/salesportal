@@ -13,9 +13,33 @@ const PaymentCalculatorPage = () => {
   const location = useLocation();
   const customer = location.state?.customer;
   const [purchaseAmount, setPurchaseAmount] = useState(5250);
+  const [purchaseAmountDisplay, setPurchaseAmountDisplay] = useState('$5,250.00');
   const [interestRate, setInterestRate] = useState(9.99);
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
   const [promoTerm, setPromoTerm] = useState(36);
+
+  const formatInputCurrency = (value) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(value);
+  };
+
+  const handlePurchaseAmountChange = (e) => {
+    const rawValue = e.target.value.replace(/[^0-9.]/g, '');
+    const numValue = parseFloat(rawValue) || 0;
+    setPurchaseAmount(numValue);
+    setPurchaseAmountDisplay(rawValue);
+  };
+
+  const handlePurchaseAmountBlur = () => {
+    setPurchaseAmountDisplay(formatInputCurrency(purchaseAmount));
+  };
+
+  const handlePurchaseAmountFocus = () => {
+    setPurchaseAmountDisplay(purchaseAmount.toString());
+  };
 
   const interestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
@@ -76,38 +100,36 @@ const PaymentCalculatorPage = () => {
               <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-semibold text-sm">Special promo</span>
             </div>
 
-            {/* Promo Rate Display */}
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
-              <h2 className="text-3xl md:text-4xl font-bold text-emerald-700 dark:text-emerald-400">
-                {interestRate}% APR for {promoTerm} Months
-              </h2>
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Estimated Monthly Payments</h3>
+            {/* Estimated Monthly Payments - Main Focus */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Estimated Monthly Payments</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
-                  <p className="text-sm text-emerald-700 dark:text-emerald-400 mb-1">Promo Period</p>
-                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(promoPayment)}</p>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1">{interestRate}% for {promoTerm} months</p>
+                {/* Promo Period - highlighted but with dark text */}
+                <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-5 border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-sm text-foreground/70 mb-1">Promo Period</p>
+                  <p className="text-3xl font-bold text-foreground">{formatCurrency(promoPayment)}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{interestRate}% for {promoTerm} months</p>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
-                  <p className="text-sm text-muted-foreground mb-1">After Promo</p>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(regularPayment)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{regularRate}% for {remainingMonths} months</p>
+                {/* After Promo - subtle/muted styling */}
+                <div className="rounded-lg p-5 border border-border/50">
+                  <p className="text-sm text-muted-foreground/70 mb-1">After Promo</p>
+                  <p className="text-2xl font-medium text-muted-foreground">{formatCurrency(regularPayment)}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-2">{regularRate}% for {remainingMonths} months</p>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-border pt-6 space-y-4">
-              {/* Purchase Amount Input - inline like others */}
+              {/* Purchase Amount Input - formatted currency */}
               <div className="flex justify-between items-center">
                 <Label htmlFor="purchaseAmount">Purchase Amount</Label>
                 <Input
                   id="purchaseAmount"
-                  type="number"
-                  value={purchaseAmount}
-                  onChange={(e) => setPurchaseAmount(parseFloat(e.target.value) || 0)}
+                  type="text"
+                  value={purchaseAmountDisplay}
+                  onChange={handlePurchaseAmountChange}
+                  onBlur={handlePurchaseAmountBlur}
+                  onFocus={handlePurchaseAmountFocus}
                   className="w-40 text-right font-semibold"
                 />
               </div>
@@ -164,10 +186,6 @@ const PaymentCalculatorPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="12">12 months</SelectItem>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
-                    <SelectItem value="48">48 months</SelectItem>
                     <SelectItem value="12">12 months</SelectItem>
                     <SelectItem value="24">24 months</SelectItem>
                     <SelectItem value="36">36 months</SelectItem>
