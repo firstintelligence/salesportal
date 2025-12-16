@@ -2,7 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import BaseTemplate from './BaseTemplate';
-
+import { formatPhoneNumber } from '../../utils/inputFormatting';
 import { getProductDescription } from '../../utils/productDescriptions';
 
 const Template4 = ({ data }) => {
@@ -100,7 +100,7 @@ const Template4 = ({ data }) => {
                   {billTo.province && `, ${billTo.province}`}
                   {billTo.postalCode && ` ${billTo.postalCode}`}
                 </p>
-                <p className="text-xs">{billTo.phone || ""}</p>
+                <p className="text-xs">{formatPhoneNumber(billTo.phone) || ""}</p>
                 <p className="text-xs">{billTo.email || ""}</p>
               </div>
               <div className="bg-gray-100 p-3 rounded" style={{backgroundColor: '#f8f9fa'}}>
