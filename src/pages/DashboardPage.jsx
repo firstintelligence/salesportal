@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, DollarSign, Search, FileText, ClipboardCheck, PhoneCall, Check } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -114,12 +114,32 @@ const DashboardPage = () => {
     }).format(numAmount);
   };
 
-  const getProgressColor = (tpvStatus) => {
+  const getStatusConfig = (tpvStatus) => {
     const status = tpvStatus?.toLowerCase();
-    if (status === 'completed') return 'border-l-emerald-500 bg-gradient-to-r from-emerald-50/50 to-transparent dark:from-emerald-950/20';
-    if (status === 'pending' || status === 'initiated') return 'border-l-amber-500 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20';
-    if (status === 'failed') return 'border-l-red-500 bg-gradient-to-r from-red-50/50 to-transparent dark:from-red-950/20';
-    return 'border-l-slate-300 dark:border-l-slate-600';
+    if (status === 'completed') return {
+      border: 'border-l-emerald-500',
+      bg: 'bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-950/30 dark:to-teal-950/20',
+      badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+      label: 'Verified'
+    };
+    if (status === 'pending' || status === 'initiated') return {
+      border: 'border-l-amber-500',
+      bg: 'bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-amber-950/30 dark:to-orange-950/20',
+      badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
+      label: 'Pending'
+    };
+    if (status === 'failed') return {
+      border: 'border-l-red-500',
+      bg: 'bg-gradient-to-br from-red-50 to-rose-50/50 dark:from-red-950/30 dark:to-rose-950/20',
+      badge: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+      label: 'Failed'
+    };
+    return {
+      border: 'border-l-slate-300 dark:border-l-slate-600',
+      bg: 'bg-card',
+      badge: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+      label: 'New'
+    };
   };
 
   const handleCreateDeal = async () => {
@@ -206,16 +226,16 @@ const DashboardPage = () => {
       <TooltipTrigger asChild>
         <button
           onClick={onClick}
-          className={`relative w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+          className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
             completed 
-              ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30' 
-              : 'bg-slate-200/80 dark:bg-slate-700/80 text-slate-400 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-slate-600'
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' 
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105'
           }`}
         >
-          {completed ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
+          {completed ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
         </button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="text-xs">
+      <TooltipContent side="top" className="text-xs font-medium">
         {label}
       </TooltipContent>
     </Tooltip>
@@ -224,77 +244,82 @@ const DashboardPage = () => {
   // CRITICAL: Block rendering until tenant is fully loaded to prevent cross-tenant data exposure
   if (tenantLoading || !tenant?.id) {
     return (
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          </div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
-        <div className="px-4 py-3">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/landing")}
-                className="rounded-full h-9 w-9"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">
-                  {agentId === "MM23" ? "All Deals" : "My Deals"}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="gap-1.5 rounded-full h-9 px-4">
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">New</span>
-                  </Button>
-                </DialogTrigger>
-              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4">
+      <div className="glass-effect border-b border-border/50 sticky top-0 z-10">
+        <div className="px-4 py-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/landing")}
+              className="rounded-xl h-10 w-10 hover:bg-primary/10"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-foreground tracking-tight">
+                {agentId === "MM23" ? "All Deals" : "My Deals"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
+              </p>
+            </div>
+            
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="default" className="gap-2 rounded-xl h-10 px-5 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25">
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline font-medium">New Deal</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto mx-4 rounded-2xl">
                 <DialogHeader>
-                  <DialogTitle>Create New Deal</DialogTitle>
+                  <DialogTitle className="text-xl">Create New Deal</DialogTitle>
                   <DialogDescription>
-                    Enter customer information
+                    Enter customer information to get started
                   </DialogDescription>
                 </DialogHeader>
                 
-                <div className="grid gap-3 py-4">
+                <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="first_name" className="text-xs">First Name *</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="first_name" className="text-xs font-medium">First Name *</Label>
                       <Input
                         id="first_name"
                         value={newDeal.first_name}
                         onChange={(e) => setNewDeal({ ...newDeal, first_name: capitalizeWords(e.target.value) })}
                         placeholder="John"
-                        className="h-9"
+                        className="h-10 rounded-xl"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="last_name" className="text-xs">Last Name *</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="last_name" className="text-xs font-medium">Last Name *</Label>
                       <Input
                         id="last_name"
                         value={newDeal.last_name}
                         onChange={(e) => setNewDeal({ ...newDeal, last_name: capitalizeWords(e.target.value) })}
                         placeholder="Smith"
-                        className="h-9"
+                        className="h-10 rounded-xl"
                       />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="phone" className="text-xs">Phone *</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-xs font-medium">Phone *</Label>
                       <Input
                         id="phone"
                         value={newDeal.phone}
@@ -314,51 +339,51 @@ const DashboardPage = () => {
                           setNewDeal({ ...newDeal, phone: formatted });
                         }}
                         placeholder="(416) 555-1234"
-                        className="h-9"
+                        className="h-10 rounded-xl"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="email" className="text-xs">Email</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs font-medium">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         value={newDeal.email}
                         onChange={(e) => setNewDeal({ ...newDeal, email: e.target.value })}
                         placeholder="john@example.com"
-                        className="h-9"
+                        className="h-10 rounded-xl"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-1.5">
-                    <Label htmlFor="address" className="text-xs">Address *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="address" className="text-xs font-medium">Address *</Label>
+                    <Input
+                      id="address"
+                      value={newDeal.address}
+                      onChange={(e) => setNewDeal({ ...newDeal, address: capitalizeWords(e.target.value) })}
+                      placeholder="123 Main Street"
+                      className="h-10 rounded-xl"
+                    />
+                  </div>
+                    
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="city" className="text-xs font-medium">City</Label>
                       <Input
-                        id="address"
-                        value={newDeal.address}
-                        onChange={(e) => setNewDeal({ ...newDeal, address: capitalizeWords(e.target.value) })}
-                        placeholder="123 Main Street"
-                        className="h-9"
+                        id="city"
+                        value={newDeal.city}
+                        onChange={(e) => setNewDeal({ ...newDeal, city: capitalizeWords(e.target.value) })}
+                        placeholder="Toronto"
+                        className="h-10 rounded-xl"
                       />
                     </div>
-                    
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="city" className="text-xs">City</Label>
-                        <Input
-                          id="city"
-                          value={newDeal.city}
-                          onChange={(e) => setNewDeal({ ...newDeal, city: capitalizeWords(e.target.value) })}
-                          placeholder="Toronto"
-                          className="h-9"
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="province" className="text-xs">Province</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="province" className="text-xs font-medium">Province</Label>
                       <Select
                         value={newDeal.province}
                         onValueChange={(value) => setNewDeal({ ...newDeal, province: value })}
                       >
-                        <SelectTrigger className="h-9 text-sm">
+                        <SelectTrigger className="h-10 rounded-xl">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -378,8 +403,8 @@ const DashboardPage = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="postal_code" className="text-xs">Postal</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="postal_code" className="text-xs font-medium">Postal</Label>
                       <Input
                         id="postal_code"
                         value={newDeal.postal_code}
@@ -389,18 +414,18 @@ const DashboardPage = () => {
                           setNewDeal({ ...newDeal, postal_code: formatted });
                         }}
                         placeholder="M5V 1A1"
-                        className="h-9"
+                        className="h-10 rounded-xl"
                       />
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setIsCreateDialogOpen(false)}>
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl">
                     Cancel
                   </Button>
-                  <Button size="sm" onClick={handleCreateDeal}>
-                    Create
+                  <Button onClick={handleCreateDeal} className="rounded-xl bg-primary hover:bg-primary/90">
+                    Create Deal
                   </Button>
                 </div>
               </DialogContent>
@@ -409,36 +434,44 @@ const DashboardPage = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder="Search customers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-slate-100 dark:bg-slate-800 border-0 rounded-lg"
+              className="pl-11 h-11 bg-muted/50 border-0 rounded-xl focus:bg-card focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-3 pb-6">
+      <div className="p-4 pb-8">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <div className="flex items-center justify-center py-24">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Loading deals...</p>
+            </div>
           </div>
         ) : filteredDeals.length === 0 ? (
-          <Card className="border-dashed border-2 bg-white dark:bg-slate-900">
-            <CardContent className="py-12 text-center">
-              <User className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground text-sm">No customers found</p>
+          <Card className="border-dashed border-2 bg-card/50 rounded-2xl">
+            <CardContent className="py-16 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-center mb-4">
+                <User className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <p className="text-muted-foreground font-medium">No customers found</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Create a new deal to get started</p>
             </CardContent>
           </Card>
         ) : (
           <TooltipProvider delayDuration={300}>
-            <div className="space-y-2">
-              {filteredDeals.map((customer) => {
+            <div className="space-y-3">
+              {filteredDeals.map((customer, index) => {
                 const latestTpv = customer.tpv_requests?.[0];
                 const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
                 const fullName = customer.first_name && customer.last_name 
@@ -446,6 +479,7 @@ const DashboardPage = () => {
                   : "Unnamed";
                 const salesPrice = formatCurrency(latestTpv?.sales_price);
                 const tpvCompleted = latestTpv?.status?.toLowerCase() === 'completed';
+                const statusConfig = getStatusConfig(latestTpv?.status);
                 // Mock states for loan and checklist - these would come from actual data
                 const loanCompleted = false;
                 const checklistCompleted = false;
@@ -453,53 +487,61 @@ const DashboardPage = () => {
                 return (
                   <Card 
                     key={customer.id}
-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md bg-white dark:bg-slate-900 border-0 border-l-4 rounded-lg overflow-hidden ${getProgressColor(latestTpv?.status)}`}
+                    className={`cursor-pointer transition-all duration-300 hover:scale-[1.01] card-elevated border-0 border-l-4 rounded-2xl overflow-hidden ${statusConfig.border} ${statusConfig.bg}`}
                     onClick={() => navigate(`/customer/${customer.id}`)}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <CardContent className="p-3">
-                      {/* Top Row - Name, Agent, Price */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <h3 className="font-medium text-foreground text-sm truncate">
-                            {fullName}
-                          </h3>
-                          {displayAgent && (
-                            <span className="text-[10px] text-muted-foreground bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded shrink-0">
-                              {displayAgent}
+                    <CardContent className="p-4">
+                      {/* Top Row - Name, Status Badge, Price */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-foreground text-base truncate">
+                              {fullName}
+                            </h3>
+                            {displayAgent && (
+                              <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0">
+                                {displayAgent}
+                              </span>
+                            )}
+                          </div>
+                          {latestTpv && (
+                            <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusConfig.badge}`}>
+                              <Sparkles className="w-2.5 h-2.5 mr-1" />
+                              {statusConfig.label}
                             </span>
                           )}
                         </div>
                         {salesPrice && (
-                          <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm shrink-0 ml-2">
-                            {salesPrice}
-                          </span>
+                          <div className="text-right shrink-0">
+                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">
+                              {salesPrice}
+                            </span>
+                          </div>
                         )}
                       </div>
 
                       {/* Middle Row - Details */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          <span className="font-mono">{formatPhoneNumber(customer.phone)}</span>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5" />
+                          <span className="font-mono text-xs">{formatPhoneNumber(customer.phone)}</span>
                         </div>
-                        <span className="text-slate-300 dark:text-slate-700">•</span>
-                        <div className="flex items-center gap-1 truncate">
-                          <MapPin className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{customer.city || customer.address}</span>
+                        <div className="flex items-center gap-1.5 truncate">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate text-xs">{customer.city || customer.address}</span>
                         </div>
-                        {latestTpv?.products && (
-                          <>
-                            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
-                            <div className="hidden sm:flex items-center gap-1 truncate">
-                              <Package className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{latestTpv.products}</span>
-                            </div>
-                          </>
-                        )}
                       </div>
+                      
+                      {latestTpv?.products && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 bg-muted/50 px-3 py-2 rounded-lg">
+                          <Package className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate font-medium">{latestTpv.products}</span>
+                        </div>
+                      )}
 
                       {/* Bottom Row - Action Buttons */}
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
                         <div className="flex items-center gap-2">
                           <ActionButton 
                             completed={tpvCompleted}
@@ -522,10 +564,10 @@ const DashboardPage = () => {
                         </div>
                         
                         {/* Progress indicator */}
-                        <div className="flex items-center gap-1">
-                          <div className={`w-1.5 h-1.5 rounded-full ${tpvCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-1.5 h-1.5 rounded-full ${loanCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-1.5 h-1.5 rounded-full ${checklistCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                        <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1.5 rounded-full">
+                          <div className={`w-2 h-2 rounded-full transition-colors ${tpvCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors ${loanCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors ${checklistCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
                         </div>
                       </div>
                     </CardContent>
