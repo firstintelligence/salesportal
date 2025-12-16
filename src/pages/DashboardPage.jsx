@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { formatPhoneNumber } from "@/utils/phoneFormat";
+import { formatPhoneNumber, formatPostalCode, capitalizeWords } from "@/utils/inputFormatting";
 import { useTenant } from "@/contexts/TenantContext";
 
 const DashboardPage = () => {
@@ -276,7 +276,7 @@ const DashboardPage = () => {
                       <Input
                         id="first_name"
                         value={newDeal.first_name}
-                        onChange={(e) => setNewDeal({ ...newDeal, first_name: e.target.value })}
+                        onChange={(e) => setNewDeal({ ...newDeal, first_name: capitalizeWords(e.target.value) })}
                         placeholder="John"
                         className="h-9"
                       />
@@ -286,7 +286,7 @@ const DashboardPage = () => {
                       <Input
                         id="last_name"
                         value={newDeal.last_name}
-                        onChange={(e) => setNewDeal({ ...newDeal, last_name: e.target.value })}
+                        onChange={(e) => setNewDeal({ ...newDeal, last_name: capitalizeWords(e.target.value) })}
                         placeholder="Smith"
                         className="h-9"
                       />
@@ -333,25 +333,25 @@ const DashboardPage = () => {
                   
                   <div className="space-y-1.5">
                     <Label htmlFor="address" className="text-xs">Address *</Label>
-                    <Input
-                      id="address"
-                      value={newDeal.address}
-                      onChange={(e) => setNewDeal({ ...newDeal, address: e.target.value })}
-                      placeholder="123 Main Street"
-                      className="h-9"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="city" className="text-xs">City</Label>
                       <Input
-                        id="city"
-                        value={newDeal.city}
-                        onChange={(e) => setNewDeal({ ...newDeal, city: e.target.value })}
-                        placeholder="Toronto"
+                        id="address"
+                        value={newDeal.address}
+                        onChange={(e) => setNewDeal({ ...newDeal, address: capitalizeWords(e.target.value) })}
+                        placeholder="123 Main Street"
                         className="h-9"
                       />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="city" className="text-xs">City</Label>
+                        <Input
+                          id="city"
+                          value={newDeal.city}
+                          onChange={(e) => setNewDeal({ ...newDeal, city: capitalizeWords(e.target.value) })}
+                          placeholder="Toronto"
+                          className="h-9"
+                        />
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="province" className="text-xs">Province</Label>

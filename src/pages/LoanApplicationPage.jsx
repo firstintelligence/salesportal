@@ -22,6 +22,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import AddressAutocomplete from "../components/AddressAutocomplete";
+import { capitalizeWords, formatPostalCode, formatPhoneNumber } from "@/utils/inputFormatting";
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
@@ -109,7 +110,16 @@ const LoanApplicationPage = () => {
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Apply formatting based on field type
+    let formattedValue = value;
+    if (['firstName', 'lastName', 'middleName', 'address', 'city', 'employerAddress', 'employerCity', 'businessName', 'positionTitle'].includes(name)) {
+      formattedValue = capitalizeWords(value);
+    } else if (name === 'postalCode') {
+      formattedValue = formatPostalCode(value);
+    } else if (['homePhone', 'mobilePhone'].includes(name)) {
+      formattedValue = formatPhoneNumber(value);
+    }
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
   
   const handleSelectChange = (name, value) => {
