@@ -39,19 +39,19 @@ const canadianProvinces = [
 const productGroups = [
   {
     label: "Heating & Cooling",
-    products: ["Air Conditioner", "Furnace", "Heat Pump", "Boiler", "Air Handler", "Ductless Mini Split"]
+    products: ["Heat Pump", "Furnace", "Air Conditioner", "Ductless Mini Split", "Air Handler", "Boiler"]
   },
   {
-    label: "Water",
-    products: ["Water Heater", "Tankless Water Heater", "Water Softener"]
+    label: "Hot Water",
+    products: ["Tankless Water Heater", "Hybrid Water Heater", "PV Water Heater", "CV Water Heater", "Electric Water Heater"]
   },
   {
-    label: "Air Quality",
-    products: ["Air Purifier", "Humidifier", "Dehumidifier", "UV Air Filter", "Carbon Filter"]
+    label: "Water Filtration",
+    products: ["UV Water Filter", "Carbon Filter", "Water Softener"]
   },
   {
-    label: "Water Quality",
-    products: ["UV Water Filter"]
+    label: "Air Filtration",
+    products: ["UV Air Filter", "Air Purifier", "EAC", "HEPA Filter", "HRV"]
   },
   {
     label: "Insulation",
@@ -59,11 +59,11 @@ const productGroups = [
   },
   {
     label: "Energy",
-    products: ["Home Battery", "Thermostat"]
+    products: ["Home Battery", "Solar Panels"]
   },
   {
     label: "Services",
-    products: ["Duct Cleaning", "Maintenance Plan"]
+    products: ["Duct Cleaning", "Maintenance Plan", "Plumbing Repairs", "Electrical Work", "Sheet Metal"]
   }
 ];
 
