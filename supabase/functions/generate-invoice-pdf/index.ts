@@ -188,10 +188,9 @@ serve(async (req) => {
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
               // Draw signature centered in the signature field area
-              // Adjusted position and size to match invoice signature appearance
               firstPage.drawImage(signatureImage, {
-                x: 95,
-                y: 95,
+                x: 115,
+                y: 80,
                 width: 200,
                 height: 50,
               });
