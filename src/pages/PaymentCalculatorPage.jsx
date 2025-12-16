@@ -247,6 +247,7 @@ const PaymentCalculatorPage = () => {
                     className="flex items-center justify-center gap-2"
                     onClick={() => navigate("/invoice-generator", { 
                       state: { 
+                        customer,
                         fromCalculator: true,
                         calculatorData: {
                           purchaseAmount,
@@ -268,6 +269,7 @@ const PaymentCalculatorPage = () => {
                     className="flex items-center justify-center gap-2"
                     onClick={() => navigate("/loan-application", { 
                       state: { 
+                        customer,
                         fromCalculator: true,
                         calculatorData: {
                           purchaseAmount,
@@ -285,8 +287,9 @@ const PaymentCalculatorPage = () => {
                   <Button
                     variant="outline"
                     className="flex items-center justify-center gap-2"
-                    onClick={() => navigate("/tpv", { 
+                    onClick={() => navigate("/tpv-ai", { 
                       state: { 
+                        customer,
                         fromCalculator: true,
                         calculatorData: {
                           purchaseAmount,
