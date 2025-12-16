@@ -121,31 +121,85 @@ serve(async (req) => {
         if (form) {
           const fields = form.getFields();
           
-          for (const field of fields) {
-            const fieldName = field.getName();
-            const fieldType = field.constructor.name;
-            console.log(`Processing field: "${fieldName}" (${fieldType})`);
-            
+          // Fill known fields by exact name
+          try {
+            const companyField = form.getTextField('Company Name');
+            companyField.setText(companyName);
+            console.log(`Set "Company Name" to: ${companyName}`);
+          } catch (e) {
+            console.log('Could not set Company Name field:', e.message);
+          }
+          
+          try {
+            const firstNameField = form.getTextField('First Name');
+            firstNameField.setText(firstName || '');
+            console.log(`Set "First Name" to: ${firstName}`);
+          } catch (e) {
+            console.log('Could not set First Name field:', e.message);
+          }
+          
+          try {
+            const lastNameField = form.getTextField('Last Name');
+            lastNameField.setText(lastName || '');
+            console.log(`Set "Last Name" to: ${lastName}`);
+          } catch (e) {
+            console.log('Could not set Last Name field:', e.message);
+          }
+          
+          try {
+            const dateField = form.getTextField('Month_es_:date');
+            dateField.setText(currentDate);
+            console.log(`Set "Month_es_:date" to: ${currentDate}`);
+          } catch (e) {
+            console.log('Could not set date field:', e.message);
+          }
+          
+          try {
+            const purposeField = form.getTextField('Purpose');
+            purposeField.setText('HVAC / Home Comfort Equipment');
+            console.log(`Set "Purpose" to: HVAC / Home Comfort Equipment`);
+          } catch (e) {
+            console.log('Could not set Purpose field:', e.message);
+          }
+          
+          // Handle signature field
+          if (signature && signature.startsWith('data:image')) {
             try {
-              if (fieldType === 'PDFTextField') {
-                const textField = form.getTextField(fieldName);
-                
-                // Match field names (case-insensitive, partial match)
-                const lowerName = fieldName.toLowerCase();
-                
-                if (lowerName.includes('company') || lowerName.includes('business')) {
-                  textField.setText(companyName);
-                  console.log(`Set company field "${fieldName}" to: ${companyName}`);
-                } else if (lowerName.includes('your name') || lowerName.includes('print')) {
-                  textField.setText(customerName);
-                  console.log(`Set customer name field "${fieldName}" to: ${customerName}`);
-                } else if (lowerName.includes('date') && !lowerName.includes('update')) {
-                  textField.setText(currentDate);
-                  console.log(`Set date field "${fieldName}" to: ${currentDate}`);
-                }
+              const signatureBase64 = signature.split(',')[1];
+              const signatureBytes = base64ToUint8Array(signatureBase64);
+              const signatureImage = await cpaPdf.embedPng(signatureBytes);
+              
+              // Get signature field position and draw image there
+              const sigField = form.getField('Signature_es_:signer:signatureblock');
+              const widgets = sigField.acroField.getWidgets();
+              if (widgets.length > 0) {
+                const widget = widgets[0];
+                const rect = widget.getRectangle();
+                firstPage.drawImage(signatureImage, {
+                  x: rect.x,
+                  y: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                });
+                console.log('Signature embedded at field position');
               }
-            } catch (fieldError) {
-              console.log(`Error setting field "${fieldName}":`, fieldError);
+            } catch (sigError) {
+              console.log('Error embedding signature in field, trying fallback position:', sigError.message);
+              // Fallback to approximate position
+              try {
+                const signatureBase64 = signature.split(',')[1];
+                const signatureBytes = base64ToUint8Array(signatureBase64);
+                const signatureImage = await cpaPdf.embedPng(signatureBytes);
+                firstPage.drawImage(signatureImage, {
+                  x: 100,
+                  y: 105,
+                  width: 120,
+                  height: 35,
+                });
+                console.log('Signature embedded at fallback position');
+              } catch (fallbackError) {
+                console.log('Signature fallback also failed:', fallbackError.message);
+              }
             }
           }
           
@@ -187,28 +241,6 @@ serve(async (req) => {
             font: helveticaFont,
             color: rgb(0, 0, 0),
           });
-        }
-
-        // Handle signature - if signature exists, embed it as image
-        if (signature && signature.startsWith('data:image')) {
-          try {
-            const signatureBase64 = signature.split(',')[1];
-            const signatureBytes = base64ToUint8Array(signatureBase64);
-            const signatureImage = await cpaPdf.embedPng(signatureBytes);
-            
-            // Position signature in the signature area (approximate position)
-            const sigWidth = 120;
-            const sigHeight = 35;
-            firstPage.drawImage(signatureImage, {
-              x: 100,
-              y: 105,
-              width: sigWidth,
-              height: sigHeight,
-            });
-            console.log('Signature embedded successfully');
-          } catch (sigError) {
-            console.log('Error embedding signature:', sigError);
-          }
         }
 
         // Create the final merged PDF
