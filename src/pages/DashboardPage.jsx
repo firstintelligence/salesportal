@@ -134,10 +134,12 @@ const DashboardPage = () => {
       }
 
       const currentAgentId = localStorage.getItem("agentId");
+      const customerId = crypto.randomUUID();
       
-      const { data: customer, error } = await supabase
+      const { error } = await supabase
         .from("customers")
         .insert([{
+          id: customerId,
           first_name: newDeal.first_name.trim(),
           last_name: newDeal.last_name.trim(),
           phone: newDeal.phone.trim(),
@@ -148,9 +150,7 @@ const DashboardPage = () => {
           postal_code: newDeal.postal_code.trim() || null,
           tenant_id: tenant.id, // CRITICAL: Associate customer with current tenant
           agent_id: currentAgentId // Track which agent created this customer
-        }])
-        .select()
-        .single();
+        }]);
 
       if (error) throw error;
 
@@ -167,7 +167,7 @@ const DashboardPage = () => {
         postal_code: ""
       });
 
-      navigate(`/customer/${customer.id}`);
+      navigate(`/customer/${customerId}`);
     } catch (error) {
       console.error("Error creating deal:", error);
       toast.error("Failed to create new deal");
