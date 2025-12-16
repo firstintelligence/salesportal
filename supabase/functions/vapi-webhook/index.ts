@@ -49,7 +49,9 @@ serve(async (req) => {
       const callStatus = webhookData.endedReason || webhookData.message?.endedReason || callData?.endedReason || 'unknown';
       const customerName = metadata?.customerName || 'Unknown';
       const address = metadata?.address || 'Unknown';
-      const callSuccessful = callStatus === 'assistant-ended-call' || callStatus === 'completed';
+      // Consider call successful if it ended normally (not due to errors or failures)
+      const failureReasons = ['failed', 'no-answer', 'busy', 'voicemail', 'error', 'machine-detected', 'silence-timed-out', 'phone-call-provider-closed-websocket'];
+      const callSuccessful = !failureReasons.includes(callStatus.toLowerCase());
       const vapiCallId = callData?.id;
       const callDuration = callData?.duration || 0;
       // Extract recording URL from VAPI webhook (message.recordingUrl or message.artifact.recording)
