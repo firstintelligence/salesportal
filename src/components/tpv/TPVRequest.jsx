@@ -413,14 +413,14 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
               {/* Financing */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Financing Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="salesPrice">Sales Price *</Label>
                     <Input
                       id="salesPrice"
                       value={formData.salesPrice}
                       onChange={(e) => handleInputChange("salesPrice", e.target.value)}
-                      placeholder="$5,000.00"
+                      placeholder="$5,000"
                     />
                   </div>
                   <div className="space-y-2">
@@ -430,7 +430,7 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                       onValueChange={(value) => handleInputChange("interestRate", value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select rate" />
+                        <SelectValue placeholder="Rate" />
                       </SelectTrigger>
                       <SelectContent>
                         {interestRates.map((rate) => (
@@ -441,17 +441,14 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="promotionalTerm">Promotional Term</Label>
+                    <Label htmlFor="promotionalTerm">Promo Term</Label>
                     <Select
                       value={formData.promotionalTerm}
                       onValueChange={(value) => handleInputChange("promotionalTerm", value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select term" />
+                        <SelectValue placeholder="Term" />
                       </SelectTrigger>
                       <SelectContent>
                         {promotionalTerms.map((term) => (
@@ -463,13 +460,13 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="amortization">Amortization Period</Label>
+                    <Label htmlFor="amortization">Amortization</Label>
                     <Select
                       value={formData.amortization}
                       onValueChange={(value) => handleInputChange("amortization", value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select period" />
+                        <SelectValue placeholder="Period" />
                       </SelectTrigger>
                       <SelectContent>
                         {amortizationPeriods.map((period) => (
@@ -481,13 +478,13 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="monthlyPayment">Monthly Payment</Label>
+                    <Label htmlFor="monthlyPayment">Monthly Pay</Label>
                     <Input
                       id="monthlyPayment"
                       value={formData.monthlyPayment ? `$${formData.monthlyPayment}` : ""}
                       readOnly
                       className="bg-muted"
-                      placeholder="Calculated automatically"
+                      placeholder="Auto"
                     />
                   </div>
                 </div>
