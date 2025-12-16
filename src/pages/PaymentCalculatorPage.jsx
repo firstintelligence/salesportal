@@ -21,7 +21,7 @@ const PaymentCalculatorPage = () => {
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
   ];
 
-  const regularRate = 16.99;
+  const regularRate = 13.99;
   const remainingMonths = 60 - promoTerm;
 
   // Get available terms for current interest rate
@@ -86,15 +86,15 @@ const PaymentCalculatorPage = () => {
             <div className="border-t border-border pt-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Estimated Monthly Payments</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
-                  <p className="text-sm text-muted-foreground mb-1">Promo Period</p>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(promoPayment)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{interestRate}% for {promoTerm} months</p>
+                <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400 mb-1">Promo Period</p>
+                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(promoPayment)}</p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1">{interestRate}% for {promoTerm} months</p>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
                   <p className="text-sm text-muted-foreground mb-1">After Promo</p>
                   <p className="text-2xl font-bold text-foreground">{formatCurrency(regularPayment)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{regularRate}% for remaining term</p>
+                  <p className="text-xs text-muted-foreground mt-1">{regularRate}% for {remainingMonths} months</p>
                 </div>
               </div>
             </div>
