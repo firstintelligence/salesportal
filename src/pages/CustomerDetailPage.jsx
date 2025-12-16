@@ -1,13 +1,27 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, Calculator, Plus, DollarSign } from "lucide-react";
+import { 
+  ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
+  Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
+  CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useTenant } from "@/contexts/TenantContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const CustomerDetailPage = () => {
   const navigate = useNavigate();
@@ -18,8 +32,8 @@ const CustomerDetailPage = () => {
   const [checklists, setChecklists] = useState([]);
   const [invoiceProfile, setInvoiceProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
-  // Tenant-specific localStorage key for invoice profiles
   const tenantSlug = tenant?.slug;
 
   useEffect(() => {
@@ -29,7 +43,6 @@ const CustomerDetailPage = () => {
       return;
     }
     
-    // Wait for tenant to load before fetching data
     if (tenantLoading || !tenantSlug) return;
     
     fetchCustomerData();
@@ -38,7 +51,6 @@ const CustomerDetailPage = () => {
 
   const loadInvoiceProfile = () => {
     if (!tenantSlug) return;
-    // Use tenant-scoped key for complete isolation
     const savedProfile = localStorage.getItem(`invoice_profile_${tenantSlug}_${customerId}`);
     if (savedProfile) {
       setInvoiceProfile(JSON.parse(savedProfile));
@@ -49,12 +61,11 @@ const CustomerDetailPage = () => {
     try {
       setLoading(true);
 
-      // CRITICAL: Verify customer belongs to current tenant for data isolation
       const { data: customerData, error: customerError } = await supabase
         .from("customers")
         .select("*")
         .eq("id", customerId)
-        .eq("tenant_id", tenant.id) // CRITICAL: Filter by tenant for security
+        .eq("tenant_id", tenant.id)
         .single();
 
       if (customerError) {
@@ -64,7 +75,6 @@ const CustomerDetailPage = () => {
       }
       setCustomer(customerData);
 
-      // Fetch TPV requests (filtered by customer which is already tenant-filtered)
       const { data: tpvData, error: tpvError } = await supabase
         .from("tpv_requests")
         .select("*")
@@ -74,7 +84,6 @@ const CustomerDetailPage = () => {
       if (tpvError) throw tpvError;
       setTpvRequests(tpvData || []);
 
-      // Fetch installation checklists
       const { data: checklistData, error: checklistError } = await supabase
         .from("installation_checklists")
         .select("*")
@@ -91,7 +100,32 @@ const CustomerDetailPage = () => {
     }
   };
 
-  // Get TPV data for prefilling tools
+  const handleDeleteCustomer = async () => {
+    try {
+      setDeleting(true);
+      
+      const { error } = await supabase
+        .from("customers")
+        .delete()
+        .eq("id", customerId);
+
+      if (error) throw error;
+
+      // Clean up localStorage
+      if (tenantSlug) {
+        localStorage.removeItem(`invoice_profile_${tenantSlug}_${customerId}`);
+      }
+
+      toast.success("Customer deleted successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      toast.error("Failed to delete customer");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const getLatestTpvData = () => {
     const latestTpv = tpvRequests[0];
     return latestTpv ? {
@@ -132,7 +166,25 @@ const CustomerDetailPage = () => {
     });
   };
 
+  const navigateToChecklist = () => {
+    const latestTpv = tpvRequests[0];
+    if (latestTpv) {
+      navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv } });
+    } else {
+      toast.error("Complete a TPV request first to create an installation checklist.");
+    }
+  };
+
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -146,15 +198,28 @@ const CustomerDetailPage = () => {
   const formatCurrency = (amount) => {
     if (!amount) return "N/A";
     const numAmount = parseFloat(amount);
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-CA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'CAD',
     }).format(numAmount);
+  };
+
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case 'completed':
+        return { icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950', border: 'border-emerald-200 dark:border-emerald-800' };
+      case 'pending':
+        return { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950', border: 'border-amber-200 dark:border-amber-800' };
+      case 'initiated':
+        return { icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950', border: 'border-blue-200 dark:border-blue-800' };
+      default:
+        return { icon: AlertCircle, color: 'text-slate-600', bg: 'bg-slate-50 dark:bg-slate-950', border: 'border-slate-200 dark:border-slate-800' };
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -162,8 +227,8 @@ const CustomerDetailPage = () => {
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4">
+        <div className="max-w-4xl mx-auto">
           <Button variant="outline" onClick={() => navigate("/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
@@ -178,266 +243,275 @@ const CustomerDetailPage = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <Button variant="outline" onClick={() => navigate("/dashboard")} className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
-        </Button>
+  const latestTpv = tpvRequests[0];
+  const hasCompletedTpv = tpvRequests.some(t => t.status === 'completed');
 
-        {/* Customer Information */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-2xl">
-              {customer.first_name && customer.last_name 
-                ? `${customer.first_name} ${customer.last_name}`
-                : "Customer Profile"}
-            </CardTitle>
-            <CardDescription>Customer details and activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Header */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Dashboard
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Customer</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete {customer.first_name} {customer.last_name}? This action cannot be undone and will remove all associated data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleDeleteCustomer}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={deleting}
+                  >
+                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Customer Profile Card */}
+        <Card className="overflow-hidden">
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                <p className="text-base">{customer.phone}</p>
-              </div>
-              {customer.email && (
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p className="text-base">{customer.email}</p>
+                <h1 className="text-2xl font-bold text-foreground">
+                  {customer.first_name} {customer.last_name}
+                </h1>
+                <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Phone className="w-4 h-4" />
+                    {customer.phone}
+                  </span>
+                  {customer.email && (
+                    <span className="flex items-center gap-1.5">
+                      <Mail className="w-4 h-4" />
+                      {customer.email}
+                    </span>
+                  )}
                 </div>
-              )}
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Address</p>
-                <p className="text-base">
+                <div className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
                   {customer.address}
                   {customer.city && `, ${customer.city}`}
                   {customer.province && `, ${customer.province}`}
                   {customer.postal_code && ` ${customer.postal_code}`}
-                </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Customer Since</p>
-                <p className="text-base">{formatDate(customer.created_at)}</p>
-              </div>
-            </div>
-            
-            {/* Invoice Profile Summary (if saved) */}
-            {invoiceProfile && (
-              <>
-                <div className="bg-primary/5 rounded-lg p-4 border border-primary/10">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-5 h-5 text-primary" />
-                      <span className="font-semibold">Invoice Profile</span>
-                    </div>
+              <div className="text-right">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5" />
+                  Added {formatDate(customer.created_at)}
+                </div>
+                {invoiceProfile && (
+                  <div className="mt-2">
                     <Badge variant="secondary" className="text-xs">
-                      Saved {new Date(invoiceProfile.savedAt).toLocaleDateString()}
+                      <DollarSign className="w-3 h-3 mr-1" />
+                      {formatCurrency(invoiceProfile.grandTotal)}
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Products</p>
-                      <p className="font-medium">{invoiceProfile.items?.length || 0} items</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Subtotal</p>
-                      <p className="font-medium">{formatCurrency(invoiceProfile.subTotal)}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Tax</p>
-                      <p className="font-medium">{formatCurrency(invoiceProfile.taxAmount)}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Total</p>
-                      <p className="font-semibold text-primary">{formatCurrency(invoiceProfile.grandTotal)}</p>
-                    </div>
-                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-col h-auto py-3 gap-1.5"
+                onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
+              >
+                <FileText className="w-4 h-4" />
+                <span className="text-xs">{invoiceProfile ? 'Edit Invoice' : 'Invoice'}</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-col h-auto py-3 gap-1.5"
+                onClick={navigateToTpv}
+              >
+                <Phone className="w-4 h-4" />
+                <span className="text-xs">TPV</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-col h-auto py-3 gap-1.5"
+                onClick={navigateToLoanApplication}
+              >
+                <CreditCard className="w-4 h-4" />
+                <span className="text-xs">Loan</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-col h-auto py-3 gap-1.5"
+                onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
+              >
+                <Calculator className="w-4 h-4" />
+                <span className="text-xs">Calculator</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={`flex-col h-auto py-3 gap-1.5 ${!hasCompletedTpv ? 'opacity-50' : ''}`}
+                onClick={navigateToChecklist}
+              >
+                <ClipboardCheck className="w-4 h-4" />
+                <span className="text-xs">Checklist</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Activity Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Activity</h2>
+            {tpvRequests.length === 0 && checklists.length === 0 && (
+              <Button size="sm" onClick={navigateToTpv}>
+                <Plus className="w-4 h-4 mr-1.5" />
+                Start TPV
+              </Button>
+            )}
+          </div>
+
+          {tpvRequests.length === 0 && checklists.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                  <Phone className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <Separator className="my-6" />
-              </>
-            )}
-            
-            <Separator className="my-6" />
-            
-            {/* Deal Action Buttons */}
+                <p className="text-muted-foreground mb-4">No activity yet. Start a TPV verification to begin.</p>
+              </CardContent>
+            </Card>
+          ) : (
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Deal Actions</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  {invoiceProfile ? 'Edit Invoice' : 'Create Invoice'}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={navigateToLoanApplication}
-                >
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Loan Application
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
-                >
-                  <Calculator className="w-4 h-4 mr-2" />
-                  Payment Calculator
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={navigateToTpv}
-                >
-                  <Phone className="w-4 h-4 mr-2" />
-                  Request TPV
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    const latestTpv = tpvRequests[0];
-                    if (latestTpv) {
-                      navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv } });
-                    } else {
-                      toast.error("No TPV request found. Please create a TPV request first.");
-                    }
-                  }}
-                >
-                  <ClipboardCheck className="w-4 h-4 mr-2" />
-                  Installation Checklist
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              {/* TPV Requests */}
+              {tpvRequests.map((tpv) => {
+                const statusConfig = getStatusConfig(tpv.status);
+                const StatusIcon = statusConfig.icon;
+                
+                return (
+                  <Card key={tpv.id} className={`${statusConfig.bg} ${statusConfig.border} border`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-full ${statusConfig.bg}`}>
+                            <Phone className={`w-4 h-4 ${statusConfig.color}`} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">TPV Verification</p>
+                            <p className="text-xs text-muted-foreground">{formatDateTime(tpv.created_at)}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className={`${statusConfig.color} ${statusConfig.border} capitalize`}>
+                          <StatusIcon className="w-3 h-3 mr-1" />
+                          {tpv.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs">Products</p>
+                          <p className="font-medium truncate">{tpv.products || "N/A"}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs">Sale Price</p>
+                          <p className="font-medium">{formatCurrency(tpv.sales_price)}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs">Monthly</p>
+                          <p className="font-medium">{formatCurrency(tpv.monthly_payment)}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs">Rate</p>
+                          <p className="font-medium">{tpv.interest_rate ? `${tpv.interest_rate}%` : "N/A"}</p>
+                        </div>
+                      </div>
 
-        {/* TPV Requests */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5" />
-                <CardTitle>TPV Verification</CardTitle>
-              </div>
-              <Button 
-                size="sm" 
-                onClick={() => navigate('/tpv-request', { state: { customer } })}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New TPV
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {tpvRequests.length === 0 ? (
-              <p className="text-muted-foreground text-center py-6">No TPV requests found. Create one to get started.</p>
-            ) : (
-              <div className="space-y-4">
-                {tpvRequests.map((tpv) => (
-                  <div key={tpv.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-semibold">TPV Request</p>
-                        <p className="text-sm text-muted-foreground">{formatDate(tpv.created_at)}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        tpv.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                      }`}>
-                        {tpv.status}
-                      </span>
-                    </div>
-                    <Separator className="my-2" />
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Products</p>
-                        <p>{tpv.products || "N/A"}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Sales Price</p>
-                        <p>{formatCurrency(tpv.sales_price)}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Interest Rate</p>
-                        <p>{tpv.interest_rate ? `${tpv.interest_rate}%` : "N/A"}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Monthly Payment</p>
-                        <p>{formatCurrency(tpv.monthly_payment)}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                      {tpv.recording_url && (
+                        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                          <a 
+                            href={tpv.recording_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+                          >
+                            <PlayCircle className="w-3.5 h-3.5" />
+                            Listen to Recording
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
 
-        {/* Installation Checklists */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ClipboardCheck className="w-5 h-5" />
-                <CardTitle>Installation Checklists</CardTitle>
-              </div>
-              <Button 
-                size="sm" 
-                onClick={() => {
-                  const latestTpv = tpvRequests[0];
-                  if (latestTpv) {
-                    navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv } });
-                  } else {
-                    toast.error("No TPV request found. Please create a TPV request first.");
-                  }
-                }}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Checklist
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {checklists.length === 0 ? (
-              <p className="text-muted-foreground text-center py-6">No installation checklists found. Create one after completing TPV.</p>
-            ) : (
-              <div className="space-y-4">
-                {checklists.map((checklist) => (
-                  <div 
+              {/* Installation Checklists */}
+              {checklists.map((checklist) => {
+                const statusConfig = getStatusConfig(checklist.status);
+                const StatusIcon = statusConfig.icon;
+                
+                return (
+                  <Card 
                     key={checklist.id} 
-                    className="border rounded-lg p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+                    className={`${statusConfig.bg} ${statusConfig.border} border cursor-pointer hover:shadow-md transition-shadow`}
                     onClick={() => navigate(`/installation-checklist/${checklist.id}`)}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-semibold">Installation Checklist</p>
-                        <p className="text-sm text-muted-foreground">{formatDate(checklist.created_at)}</p>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-full ${statusConfig.bg}`}>
+                            <ClipboardCheck className={`w-4 h-4 ${statusConfig.color}`} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">Installation Checklist</p>
+                            <p className="text-xs text-muted-foreground">
+                              {checklist.submitted_at 
+                                ? `Submitted ${formatDateTime(checklist.submitted_at)}`
+                                : `Created ${formatDateTime(checklist.created_at)}`
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`${statusConfig.color} ${statusConfig.border} capitalize`}>
+                            <StatusIcon className="w-3 h-3 mr-1" />
+                            {checklist.status}
+                          </Badge>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                        </div>
                       </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        checklist.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                      }`}>
-                        {checklist.status}
-                      </span>
-                    </div>
-                    <div className="text-sm">
-                      <p className="text-muted-foreground">Agent: {checklist.agent_id}</p>
-                      {checklist.submitted_at && (
-                        <p className="text-muted-foreground">Submitted: {formatDate(checklist.submitted_at)}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
