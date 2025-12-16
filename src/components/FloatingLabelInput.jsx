@@ -1,22 +1,5 @@
 import React from 'react';
-
-// Capitalize first letter of each word
-const capitalizeWords = (str) => {
-  if (!str) return str;
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
-};
-
-// Format Canadian postal code: uppercase, space after 3rd char (e.g., A1A 1A1)
-const formatPostalCode = (str) => {
-  if (!str) return str;
-  // Remove all spaces and uppercase
-  const cleaned = str.replace(/\s/g, '').toUpperCase();
-  // Add space after 3rd character if length > 3
-  if (cleaned.length > 3) {
-    return cleaned.slice(0, 3) + ' ' + cleaned.slice(3, 6);
-  }
-  return cleaned;
-};
+import { capitalizeWords, formatPostalCode } from '../utils/inputFormatting';
 
 const FloatingLabelInput = ({ 
   id, 

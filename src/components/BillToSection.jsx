@@ -3,7 +3,7 @@ import FloatingLabelInput from './FloatingLabelInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import AddressLookupService from '../utils/addressLookupService';
-import { formatPhoneNumber } from '../utils/phoneFormat';
+import { formatPhoneNumber } from '../utils/inputFormatting';
 
 const BillToSection = ({ billTo, handleInputChange }) => {
   const provinces = [

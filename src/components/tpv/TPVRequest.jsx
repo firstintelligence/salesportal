@@ -17,6 +17,7 @@ import { ArrowLeft, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import InputMask from "react-input-mask";
 import { useTenant } from "@/contexts/TenantContext";
+import { capitalizeWords, formatPostalCode } from "@/utils/inputFormatting";
 
 const canadianProvinces = [
   { value: "AB", label: "Alberta" },
@@ -156,7 +157,12 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
   }, [formData.salesPrice, formData.interestRate, formData.amortization]);
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Apply formatting based on field type
+    let formattedValue = value;
+    if (['firstName', 'lastName', 'address', 'city'].includes(field)) {
+      formattedValue = capitalizeWords(value);
+    }
+    setFormData(prev => ({ ...prev, [field]: formattedValue }));
   };
 
   const handleProductToggle = (product) => {
