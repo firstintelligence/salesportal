@@ -1,8 +1,31 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PDFDocument, rgb, StandardFonts } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Format date as "Month DD, YYYY"
+const formatDateFull = (date: Date): string => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  return `${month} ${day}, ${year}`;
+};
+
+// Decode base64 string to Uint8Array
+const base64ToUint8Array = (base64: string): Uint8Array => {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
 };
 
 serve(async (req) => {
@@ -11,16 +34,18 @@ serve(async (req) => {
   }
 
   try {
-    const { html, invoiceData } = await req.json();
+    const { html, invoiceData, tenantInfo, cpaBill59FormBase64 } = await req.json();
     
     console.log('Starting PDF generation with PDFShift');
+    console.log('Tenant info:', tenantInfo);
+    console.log('CPA Bill 59 Form provided:', !!cpaBill59FormBase64);
 
     const apiKey = Deno.env.get('PDFSHIFT_API_KEY');
     if (!apiKey) {
       throw new Error('PDFSHIFT_API_KEY not configured');
     }
 
-    // Call PDFShift API
+    // Step 1: Generate the invoice PDF from HTML
     const pdfShiftResponse = await fetch('https://api.pdfshift.io/v3/convert/pdf', {
       method: 'POST',
       headers: {
@@ -46,8 +71,165 @@ serve(async (req) => {
       throw new Error(`PDFShift API error: ${pdfShiftResponse.status}`);
     }
 
-    const pdfBuffer = await pdfShiftResponse.arrayBuffer();
-    console.log('PDF generated successfully, size:', pdfBuffer.byteLength, 'bytes');
+    const invoicePdfBytes = await pdfShiftResponse.arrayBuffer();
+    console.log('Invoice PDF generated successfully, size:', invoicePdfBytes.byteLength, 'bytes');
+
+    // Step 2: Create CPA Bill 59 Form as first page
+    let finalPdfBytes: Uint8Array;
+
+    if (!cpaBill59FormBase64) {
+      console.warn('No CPA Bill 59 Form provided, proceeding without it');
+      finalPdfBytes = new Uint8Array(invoicePdfBytes);
+    } else {
+      try {
+        // Decode the base64 PDF
+        const formPdfBytes = base64ToUint8Array(cpaBill59FormBase64);
+        console.log('CPA Bill 59 form decoded, size:', formPdfBytes.byteLength, 'bytes');
+
+        // Load the CPA form PDF
+        const cpaPdf = await PDFDocument.load(formPdfBytes);
+        const helveticaFont = await cpaPdf.embedFont(StandardFonts.Helvetica);
+        
+        // Try to get form fields
+        let form;
+        try {
+          form = cpaPdf.getForm();
+          const fields = form.getFields();
+          console.log('Available form fields:', fields.map(f => `${f.getName()} (${f.constructor.name})`));
+        } catch (formError) {
+          console.log('No form fields found or error getting form:', formError);
+          form = null;
+        }
+
+        // Extract customer info
+        const { firstName, lastName, signature } = invoiceData.billTo || {};
+        const customerName = firstName && lastName ? `${firstName} ${lastName}` : (invoiceData.billTo?.name || '');
+        const companyName = tenantInfo?.name || "George's Plumbing and Heating";
+        const currentDate = formatDateFull(new Date());
+        
+        console.log('Customer Name:', customerName);
+        console.log('Company Name:', companyName);
+        console.log('Current Date:', currentDate);
+
+        // Get the first page for drawing
+        const pages = cpaPdf.getPages();
+        const firstPage = pages[0];
+        const { width, height } = firstPage.getSize();
+        console.log('Page size:', width, 'x', height);
+
+        // Try to fill form fields if they exist
+        if (form) {
+          const fields = form.getFields();
+          
+          for (const field of fields) {
+            const fieldName = field.getName();
+            const fieldType = field.constructor.name;
+            console.log(`Processing field: "${fieldName}" (${fieldType})`);
+            
+            try {
+              if (fieldType === 'PDFTextField') {
+                const textField = form.getTextField(fieldName);
+                
+                // Match field names (case-insensitive, partial match)
+                const lowerName = fieldName.toLowerCase();
+                
+                if (lowerName.includes('company') || lowerName.includes('business')) {
+                  textField.setText(companyName);
+                  console.log(`Set company field "${fieldName}" to: ${companyName}`);
+                } else if (lowerName.includes('your name') || lowerName.includes('print')) {
+                  textField.setText(customerName);
+                  console.log(`Set customer name field "${fieldName}" to: ${customerName}`);
+                } else if (lowerName.includes('date') && !lowerName.includes('update')) {
+                  textField.setText(currentDate);
+                  console.log(`Set date field "${fieldName}" to: ${currentDate}`);
+                }
+              }
+            } catch (fieldError) {
+              console.log(`Error setting field "${fieldName}":`, fieldError);
+            }
+          }
+          
+          // Flatten the form to make fields non-editable
+          try {
+            form.flatten();
+            console.log('Form flattened successfully');
+          } catch (flattenError) {
+            console.log('Error flattening form:', flattenError);
+          }
+        } else {
+          // If no form fields, draw text directly on the page
+          console.log('Drawing text directly on page (no form fields)');
+          
+          // These positions are approximate - may need adjustment based on actual PDF layout
+          // Company name field (approximate position)
+          firstPage.drawText(companyName, {
+            x: 280,
+            y: 355,
+            size: 10,
+            font: helveticaFont,
+            color: rgb(0, 0, 0),
+          });
+          
+          // Customer name field (approximate position)
+          firstPage.drawText(customerName, {
+            x: 100,
+            y: 147,
+            size: 10,
+            font: helveticaFont,
+            color: rgb(0, 0, 0),
+          });
+          
+          // Date field (approximate position)
+          firstPage.drawText(currentDate, {
+            x: 450,
+            y: 147,
+            size: 10,
+            font: helveticaFont,
+            color: rgb(0, 0, 0),
+          });
+        }
+
+        // Handle signature - if signature exists, embed it as image
+        if (signature && signature.startsWith('data:image')) {
+          try {
+            const signatureBase64 = signature.split(',')[1];
+            const signatureBytes = base64ToUint8Array(signatureBase64);
+            const signatureImage = await cpaPdf.embedPng(signatureBytes);
+            
+            // Position signature in the signature area (approximate position)
+            const sigWidth = 120;
+            const sigHeight = 35;
+            firstPage.drawImage(signatureImage, {
+              x: 100,
+              y: 105,
+              width: sigWidth,
+              height: sigHeight,
+            });
+            console.log('Signature embedded successfully');
+          } catch (sigError) {
+            console.log('Error embedding signature:', sigError);
+          }
+        }
+
+        // Create the final merged PDF
+        const mergedPdf = await PDFDocument.create();
+        
+        // Copy all pages from CPA form (should be 1 page)
+        const cpaPages = await mergedPdf.copyPages(cpaPdf, cpaPdf.getPageIndices());
+        cpaPages.forEach(page => mergedPdf.addPage(page));
+
+        // Load and copy all pages from invoice PDF
+        const invoicePdf = await PDFDocument.load(invoicePdfBytes);
+        const invoicePages = await mergedPdf.copyPages(invoicePdf, invoicePdf.getPageIndices());
+        invoicePages.forEach(page => mergedPdf.addPage(page));
+
+        finalPdfBytes = await mergedPdf.save();
+        console.log('Final merged PDF size:', finalPdfBytes.byteLength, 'bytes');
+      } catch (formError) {
+        console.error('Error processing CPA form, proceeding without it:', formError);
+        finalPdfBytes = new Uint8Array(invoicePdfBytes);
+      }
+    }
 
     // Generate filename
     const { number } = invoiceData.invoice;
@@ -60,7 +242,7 @@ serve(async (req) => {
     const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
     const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
 
-    return new Response(pdfBuffer, {
+    return new Response(finalPdfBytes, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/pdf',

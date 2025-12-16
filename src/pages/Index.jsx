@@ -766,7 +766,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
           notes,
           selectedCurrency
         };
-        await generatePDF(formData, 4); // Using template 4
+        await generatePDF(formData, 4, tenantSlug); // Using template 4
       } catch (error) {
         console.error('Error generating PDF:', error);
       } finally {
