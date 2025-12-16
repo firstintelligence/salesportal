@@ -126,7 +126,7 @@ serve(async (req) => {
           try {
             const companyField = form.getTextField('Company Name');
             companyField.setText(companyName);
-            companyField.setFontSize(10);
+            companyField.setFontSize(12);
             companyField.updateAppearances(helveticaBoldFont);
             console.log(`Set "Company Name" to: ${companyName} (bold)`);
           } catch (e) {
@@ -136,7 +136,7 @@ serve(async (req) => {
           try {
             const firstNameField = form.getTextField('First Name');
             firstNameField.setText(firstName || '');
-            firstNameField.setFontSize(10);
+            firstNameField.setFontSize(12);
             console.log(`Set "First Name" to: ${firstName}`);
           } catch (e) {
             console.log('Could not set First Name field:', e.message);
@@ -145,7 +145,7 @@ serve(async (req) => {
           try {
             const lastNameField = form.getTextField('Last Name');
             lastNameField.setText(lastName || '');
-            lastNameField.setFontSize(10);
+            lastNameField.setFontSize(12);
             console.log(`Set "Last Name" to: ${lastName}`);
           } catch (e) {
             console.log('Could not set Last Name field:', e.message);
@@ -154,7 +154,7 @@ serve(async (req) => {
           try {
             const dateField = form.getTextField('Month_es_:date');
             dateField.setText(currentDate);
-            dateField.setFontSize(10);
+            dateField.setFontSize(12);
             console.log(`Set "Month_es_:date" to: ${currentDate}`);
           } catch (e) {
             console.log('Could not set date field:', e.message);
@@ -162,8 +162,8 @@ serve(async (req) => {
           
           try {
             const purposeField = form.getTextField('Purpose');
-            purposeField.setText('for the supply and/or installation of one or more of the products/services listed above.');
-            purposeField.setFontSize(10);
+            purposeField.setText('For the supply and/or installation of one or more of the products/services listed above.');
+            purposeField.setFontSize(12);
             purposeField.updateAppearances(helveticaBoldFont);
             console.log(`Set "Purpose" field (bold)`);
           } catch (e) {
