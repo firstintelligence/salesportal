@@ -359,7 +359,7 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                         <SelectContent>
                           {canadianProvinces.map((prov) => (
                             <SelectItem key={prov.value} value={prov.value}>
-                              {prov.label}
+                              {prov.value}
                             </SelectItem>
                           ))}
                         </SelectContent>

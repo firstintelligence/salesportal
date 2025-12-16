@@ -362,19 +362,19 @@ const DashboardPage = () => {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="AB">Alberta</SelectItem>
-                          <SelectItem value="BC">British Columbia</SelectItem>
-                          <SelectItem value="MB">Manitoba</SelectItem>
-                          <SelectItem value="NB">New Brunswick</SelectItem>
-                          <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                          <SelectItem value="NS">Nova Scotia</SelectItem>
-                          <SelectItem value="NT">Northwest Territories</SelectItem>
-                          <SelectItem value="NU">Nunavut</SelectItem>
-                          <SelectItem value="ON">Ontario</SelectItem>
-                          <SelectItem value="PE">Prince Edward Island</SelectItem>
-                          <SelectItem value="QC">Quebec</SelectItem>
-                          <SelectItem value="SK">Saskatchewan</SelectItem>
-                          <SelectItem value="YT">Yukon</SelectItem>
+                          <SelectItem value="AB">AB</SelectItem>
+                          <SelectItem value="BC">BC</SelectItem>
+                          <SelectItem value="MB">MB</SelectItem>
+                          <SelectItem value="NB">NB</SelectItem>
+                          <SelectItem value="NL">NL</SelectItem>
+                          <SelectItem value="NS">NS</SelectItem>
+                          <SelectItem value="NT">NT</SelectItem>
+                          <SelectItem value="NU">NU</SelectItem>
+                          <SelectItem value="ON">ON</SelectItem>
+                          <SelectItem value="PE">PE</SelectItem>
+                          <SelectItem value="QC">QC</SelectItem>
+                          <SelectItem value="SK">SK</SelectItem>
+                          <SelectItem value="YT">YT</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

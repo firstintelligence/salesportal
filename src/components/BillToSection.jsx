@@ -87,7 +87,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             <SelectContent>
               {provinces.map((prov) => (
                 <SelectItem key={prov.code} value={prov.code} className="text-sm">
-                  {prov.name}
+                  {prov.code}
                 </SelectItem>
               ))}
             </SelectContent>
