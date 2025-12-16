@@ -1,6 +1,7 @@
 import { supabase } from '../integrations/supabase/client';
+import { getTenantCompanyInfo } from './tenantLogos';
 
-export const generatePDF = async (invoiceData, templateNumber) => {
+export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges') => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('Starting server-side PDF generation...');
@@ -127,11 +128,32 @@ export const generatePDF = async (invoiceData, templateNumber) => {
       root.unmount();
       document.body.removeChild(pdfContainer);
       
+      // Get tenant company info for CPA Bill 59 form
+      const tenantInfo = getTenantCompanyInfo(tenantSlug);
+      
+      // Fetch the CPA Bill 59 form PDF and convert to base64
+      let cpaBill59FormBase64 = null;
+      try {
+        const formResponse = await fetch('/templates/CPA_Bill_59_Form_Fillable.pdf');
+        if (formResponse.ok) {
+          const formArrayBuffer = await formResponse.arrayBuffer();
+          const formBytes = new Uint8Array(formArrayBuffer);
+          cpaBill59FormBase64 = btoa(String.fromCharCode(...formBytes));
+          console.log('CPA Bill 59 form loaded, size:', formBytes.length, 'bytes');
+        } else {
+          console.warn('Could not fetch CPA Bill 59 form');
+        }
+      } catch (formError) {
+        console.warn('Error loading CPA Bill 59 form:', formError);
+      }
+      
       // Call the edge function to generate PDF with PDFShift
       const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
         body: {
           html,
-          invoiceData
+          invoiceData,
+          tenantInfo,
+          cpaBill59FormBase64
         }
       });
 
