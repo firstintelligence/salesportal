@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { formatPhoneNumber, formatPostalCode, capitalizeWords } from "@/utils/inputFormatting";
@@ -353,13 +354,29 @@ const DashboardPage = () => {
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="province" className="text-xs">Province</Label>
-                      <Input
-                        id="province"
+                      <Select
                         value={newDeal.province}
-                        onChange={(e) => setNewDeal({ ...newDeal, province: e.target.value })}
-                        placeholder="ON"
-                        className="h-9"
-                      />
+                        onValueChange={(value) => setNewDeal({ ...newDeal, province: value })}
+                      >
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AB">Alberta</SelectItem>
+                          <SelectItem value="BC">British Columbia</SelectItem>
+                          <SelectItem value="MB">Manitoba</SelectItem>
+                          <SelectItem value="NB">New Brunswick</SelectItem>
+                          <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
+                          <SelectItem value="NS">Nova Scotia</SelectItem>
+                          <SelectItem value="NT">Northwest Territories</SelectItem>
+                          <SelectItem value="NU">Nunavut</SelectItem>
+                          <SelectItem value="ON">Ontario</SelectItem>
+                          <SelectItem value="PE">Prince Edward Island</SelectItem>
+                          <SelectItem value="QC">Quebec</SelectItem>
+                          <SelectItem value="SK">Saskatchewan</SelectItem>
+                          <SelectItem value="YT">Yukon</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="postal_code" className="text-xs">Postal</Label>
