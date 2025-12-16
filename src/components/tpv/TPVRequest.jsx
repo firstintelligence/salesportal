@@ -68,8 +68,8 @@ const productGroups = [
 ];
 
 const interestRates = [
-  "0.00%", "4.99%", "5.99%", "6.99%", "7.99%", "8.99%", "9.99%", 
-  "10.99%", "11.99%", "12.99%", "13.99%", "14.99%"
+  "0.00%", "2.99%", "3.99%", "4.99%", "5.99%", "6.99%", "7.99%", "8.99%", "9.99%", 
+  "10.99%", "11.99%", "12.99%", "13.99%", "16.99%"
 ];
 
 const promotionalTerms = [
@@ -78,8 +78,8 @@ const promotionalTerms = [
 ];
 
 const amortizationPeriods = [
-  "60 months", "72 months", "84 months", "96 months", 
-  "108 months", "120 months", "144 months", "180 months", "240 months"
+  "12 months", "24 months", "36 months", "48 months", "60 months", "72 months", "84 months", "96 months", 
+  "108 months", "120 months", "132 months", "144 months", "180 months", "240 months"
 ];
 
 const TPVRequest = ({ onBack, preloadedCustomer }) => {

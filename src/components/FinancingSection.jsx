@@ -6,7 +6,7 @@ import { calculateMonthlyPayment } from '../utils/financingCalculations';
 import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombination } from '../utils/dealerFeeCalculations';
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
-    0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
+    0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
   ];
 
   const monthlyPayment = calculateMonthlyPayment(
@@ -116,7 +116,17 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
                 <SelectValue className="text-left" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="12">12 months</SelectItem>
+                <SelectItem value="24">24 months</SelectItem>
+                <SelectItem value="36">36 months</SelectItem>
+                <SelectItem value="48">48 months</SelectItem>
+                <SelectItem value="60">60 months</SelectItem>
+                <SelectItem value="72">72 months</SelectItem>
+                <SelectItem value="84">84 months</SelectItem>
+                <SelectItem value="96">96 months</SelectItem>
+                <SelectItem value="108">108 months</SelectItem>
                 <SelectItem value="120">120 months</SelectItem>
+                <SelectItem value="132">132 months</SelectItem>
                 <SelectItem value="144">144 months</SelectItem>
                 <SelectItem value="180">180 months</SelectItem>
                 <SelectItem value="240">240 months</SelectItem>
