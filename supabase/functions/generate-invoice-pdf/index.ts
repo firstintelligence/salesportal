@@ -125,6 +125,7 @@ serve(async (req) => {
           try {
             const companyField = form.getTextField('Company Name');
             companyField.setText(companyName);
+            companyField.setFontSize(10);
             console.log(`Set "Company Name" to: ${companyName}`);
           } catch (e) {
             console.log('Could not set Company Name field:', e.message);
@@ -133,6 +134,7 @@ serve(async (req) => {
           try {
             const firstNameField = form.getTextField('First Name');
             firstNameField.setText(firstName || '');
+            firstNameField.setFontSize(10);
             console.log(`Set "First Name" to: ${firstName}`);
           } catch (e) {
             console.log('Could not set First Name field:', e.message);
@@ -141,6 +143,7 @@ serve(async (req) => {
           try {
             const lastNameField = form.getTextField('Last Name');
             lastNameField.setText(lastName || '');
+            lastNameField.setFontSize(10);
             console.log(`Set "Last Name" to: ${lastName}`);
           } catch (e) {
             console.log('Could not set Last Name field:', e.message);
@@ -149,6 +152,7 @@ serve(async (req) => {
           try {
             const dateField = form.getTextField('Month_es_:date');
             dateField.setText(currentDate);
+            dateField.setFontSize(10);
             console.log(`Set "Month_es_:date" to: ${currentDate}`);
           } catch (e) {
             console.log('Could not set date field:', e.message);
@@ -156,59 +160,42 @@ serve(async (req) => {
           
           try {
             const purposeField = form.getTextField('Purpose');
-            purposeField.setText('HVAC / Home Comfort Equipment');
-            console.log(`Set "Purpose" to: HVAC / Home Comfort Equipment`);
+            purposeField.setText('for the supply and/or installation of one or more of the products/services listed above.');
+            purposeField.setFontSize(10);
+            console.log(`Set "Purpose" field`);
           } catch (e) {
             console.log('Could not set Purpose field:', e.message);
           }
           
-          // Handle signature field
+          // Flatten the form BEFORE drawing signature so fields are committed
+          try {
+            form.flatten();
+            console.log('Form flattened successfully');
+          } catch (flattenError) {
+            console.log('Error flattening form:', flattenError);
+          }
+          
+          // Handle signature - draw directly on page after flattening
           if (signature && signature.startsWith('data:image')) {
             try {
               const signatureBase64 = signature.split(',')[1];
               const signatureBytes = base64ToUint8Array(signatureBase64);
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
-              // Get signature field position and draw image there
-              const sigField = form.getField('Signature_es_:signer:signatureblock');
-              const widgets = sigField.acroField.getWidgets();
-              if (widgets.length > 0) {
-                const widget = widgets[0];
-                const rect = widget.getRectangle();
-                firstPage.drawImage(signatureImage, {
-                  x: rect.x,
-                  y: rect.y,
-                  width: rect.width,
-                  height: rect.height,
-                });
-                console.log('Signature embedded at field position');
-              }
+              // Draw signature at approximate position (bottom left signature area)
+              // Typical CPA form signature position
+              firstPage.drawImage(signatureImage, {
+                x: 72,
+                y: 115,
+                width: 150,
+                height: 40,
+              });
+              console.log('Signature embedded on page');
             } catch (sigError) {
-              console.log('Error embedding signature in field, trying fallback position:', sigError.message);
-              // Fallback to approximate position
-              try {
-                const signatureBase64 = signature.split(',')[1];
-                const signatureBytes = base64ToUint8Array(signatureBase64);
-                const signatureImage = await cpaPdf.embedPng(signatureBytes);
-                firstPage.drawImage(signatureImage, {
-                  x: 100,
-                  y: 105,
-                  width: 120,
-                  height: 35,
-                });
-                console.log('Signature embedded at fallback position');
-              } catch (fallbackError) {
-                console.log('Signature fallback also failed:', fallbackError.message);
-              }
+              console.log('Error embedding signature:', sigError.message);
             }
-          }
-          
-          // Flatten the form to make fields non-editable
-          try {
-            form.flatten();
-            console.log('Form flattened successfully');
-          } catch (flattenError) {
-            console.log('Error flattening form:', flattenError);
+          } else {
+            console.log('No signature provided or invalid format');
           }
         } else {
           // If no form fields, draw text directly on the page
