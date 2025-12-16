@@ -34,6 +34,17 @@ serve(async (req) => {
       throw new Error('Invalid agent ID');
     }
 
+    // Tenant-specific VAPI assistant IDs
+    const TENANT_VAPI_ASSISTANTS: Record<string, string> = {
+      'georges': '33a8b0b6-2fc0-4f1f-9f01-02712d52a676',
+      'polaron': '1599d49b-3aca-43a7-8bec-ad4faac11913',
+    };
+
+    // Get the VAPI assistant ID based on tenant slug (default to georges)
+    const tenantSlug = formData.tenantSlug || 'georges';
+    const assistantId = TENANT_VAPI_ASSISTANTS[tenantSlug] || TENANT_VAPI_ASSISTANTS['georges'];
+    console.log('Using VAPI assistant ID for tenant:', tenantSlug, assistantId);
+
     // Format phone number for VAPI (add +1 country code and remove formatting)
     const cleanPhone = formData.phoneNumber.replace(/\D/g, ''); // Remove all non-digits
     const formattedPhone = `+1${cleanPhone}`; // Add country code
@@ -45,7 +56,7 @@ serve(async (req) => {
       customer: {
         number: formattedPhone, // Customer's phone number with country code
       },
-      assistantId: formData.assistantId, // The VAPI assistant/agent ID
+      assistantId: assistantId, // Tenant-specific VAPI assistant ID
       assistantOverrides: {
         variableValues: {
           // Map all form fields to variables the agent can use

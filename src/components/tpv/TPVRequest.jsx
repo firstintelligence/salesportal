@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import InputMask from "react-input-mask";
+import { useTenant } from "@/contexts/TenantContext";
 
 const canadianProvinces = [
   { value: "AB", label: "Alberta" },
@@ -67,6 +68,7 @@ const amortizationPeriods = [
 
 const TPVRequest = ({ onBack, preloadedCustomer }) => {
   const navigate = useNavigate();
+  const { tenant } = useTenant();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(() => {
     // If preloaded customer data exists, use it
@@ -173,7 +175,7 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
     try {
       const payload = {
         agentId,
-        assistantId: "33a8b0b6-2fc0-4f1f-9f01-02712d52a676",
+        tenantSlug: tenant?.slug || 'georges',
         firstName: formData.firstName,
         lastName: formData.lastName,
         customerName: `${formData.firstName} ${formData.lastName}`,
