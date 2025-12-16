@@ -79,13 +79,14 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         const data = imageData.data;
         
         // Convert white/near-white pixels to transparent
+        // Use a lower threshold to catch all white and off-white pixels
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
           const g = data[i + 1];
           const b = data[i + 2];
           
-          // If pixel is white or near-white, make it transparent
-          if (r > 240 && g > 240 && b > 240) {
+          // If pixel is white or near-white (threshold 200), make it transparent
+          if (r > 200 && g > 200 && b > 200) {
             data[i + 3] = 0; // Set alpha to 0 (transparent)
           }
         }
@@ -170,7 +171,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
           <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-primary/50" />
           <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-primary/50" />
 
-          {/* Canvas container */}
+          {/* Canvas container - white bg on container only, not canvas */}
           <div className="border-2 border-border rounded-lg bg-white overflow-hidden shadow-inner flex justify-center">
             {canvasSize.width > 0 && (
               <SignatureCanvas
@@ -182,11 +183,10 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
                   style: { 
                     width: canvasSize.width,
                     height: Math.min(canvasSize.height, 300),
-                    touchAction: 'none',
-                    backgroundColor: 'white' // Visual background only, not in exported image
+                    touchAction: 'none'
                   }
                 }}
-                backgroundColor="rgba(0,0,0,0)"
+                backgroundColor="white"
                 penColor="black"
                 minWidth={1.5}
                 maxWidth={3}
