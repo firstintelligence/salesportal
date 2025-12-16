@@ -82,7 +82,7 @@ const amortizationPeriods = [
   "108 months", "120 months", "132 months", "144 months", "180 months", "240 months"
 ];
 
-const TPVRequest = ({ onBack, preloadedCustomer }) => {
+const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
   const navigate = useNavigate();
   const { tenant } = useTenant();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,11 +99,33 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
         province: preloadedCustomer.province || "",
         postalCode: preloadedCustomer.postal_code || "",
         products: [],
-        salesPrice: "",
-        interestRate: "",
-        promotionalTerm: "",
-        amortization: "",
-        monthlyPayment: "",
+        salesPrice: preloadedCalculatorData ? `$${preloadedCalculatorData.purchaseAmount.toLocaleString()}` : "",
+        interestRate: preloadedCalculatorData ? `${preloadedCalculatorData.interestRate}%` : "",
+        promotionalTerm: preloadedCalculatorData ? `${preloadedCalculatorData.promoTerm} months` : "",
+        amortization: preloadedCalculatorData ? `${preloadedCalculatorData.amortizationPeriod} months` : "",
+        monthlyPayment: preloadedCalculatorData ? preloadedCalculatorData.promoPayment?.toFixed(2) || "" : "",
+      };
+    }
+    
+    // If calculator data exists without customer, use it
+    if (preloadedCalculatorData) {
+      const saved = localStorage.getItem("tpvFormData");
+      const savedData = saved ? JSON.parse(saved) : {};
+      return {
+        firstName: savedData.firstName || "",
+        lastName: savedData.lastName || "",
+        phoneNumber: savedData.phoneNumber || "",
+        email: savedData.email || "",
+        address: savedData.address || "",
+        city: savedData.city || "",
+        province: savedData.province || "",
+        postalCode: savedData.postalCode || "",
+        products: savedData.products || [],
+        salesPrice: `$${preloadedCalculatorData.purchaseAmount.toLocaleString()}`,
+        interestRate: `${preloadedCalculatorData.interestRate}%`,
+        promotionalTerm: `${preloadedCalculatorData.promoTerm} months`,
+        amortization: `${preloadedCalculatorData.amortizationPeriod} months`,
+        monthlyPayment: preloadedCalculatorData.promoPayment?.toFixed(2) || "",
       };
     }
     
