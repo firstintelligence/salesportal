@@ -465,7 +465,7 @@ const TPVRequest = ({ onBack, preloadedCustomer }) => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 {isSubmitting ? "Initiating Call..." : "Initiate TPV Call"}
               </Button>
