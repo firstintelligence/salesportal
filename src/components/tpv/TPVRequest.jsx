@@ -327,60 +327,61 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address">Street Address *</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                    placeholder="123 Main Street"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
+                    <Label htmlFor="address">Street Address *</Label>
                     <Input
-                      id="city"
-                      value={formData.city}
-                      onChange={(e) => handleInputChange("city", e.target.value)}
-                      placeholder="Toronto"
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange("address", e.target.value)}
+                      placeholder="123 Main Street"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="province">Province *</Label>
-                    <Select
-                      value={formData.province}
-                      onValueChange={(value) => handleInputChange("province", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select province" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {canadianProvinces.map((prov) => (
-                          <SelectItem key={prov.value} value={prov.value}>
-                            {prov.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postal Code *</Label>
-                    <InputMask
-                      mask="a9a 9a9"
-                      value={formData.postalCode}
-                      onChange={(e) => handleInputChange("postalCode", e.target.value.toUpperCase())}
-                    >
-                      {(inputProps) => (
-                        <Input
-                          {...inputProps}
-                          id="postalCode"
-                          placeholder="M5V 1A1"
-                          className="uppercase"
-                        />
-                      )}
-                    </InputMask>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City *</Label>
+                      <Input
+                        id="city"
+                        value={formData.city}
+                        onChange={(e) => handleInputChange("city", e.target.value)}
+                        placeholder="Toronto"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="province">Province *</Label>
+                      <Select
+                        value={formData.province}
+                        onValueChange={(value) => handleInputChange("province", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {canadianProvinces.map((prov) => (
+                            <SelectItem key={prov.value} value={prov.value}>
+                              {prov.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="postalCode">Postal Code *</Label>
+                      <InputMask
+                        mask="a9a 9a9"
+                        value={formData.postalCode}
+                        onChange={(e) => handleInputChange("postalCode", e.target.value.toUpperCase())}
+                      >
+                        {(inputProps) => (
+                          <Input
+                            {...inputProps}
+                            id="postalCode"
+                            placeholder="M5V 1A1"
+                            className="uppercase"
+                          />
+                        )}
+                      </InputMask>
+                    </div>
                   </div>
                 </div>
               </div>
