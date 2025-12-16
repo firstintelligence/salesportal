@@ -89,6 +89,7 @@ serve(async (req) => {
         // Load the CPA form PDF
         const cpaPdf = await PDFDocument.load(formPdfBytes);
         const helveticaFont = await cpaPdf.embedFont(StandardFonts.Helvetica);
+        const helveticaBoldFont = await cpaPdf.embedFont(StandardFonts.HelveticaBold);
         
         // Try to get form fields
         let form;
@@ -126,7 +127,8 @@ serve(async (req) => {
             const companyField = form.getTextField('Company Name');
             companyField.setText(companyName);
             companyField.setFontSize(10);
-            console.log(`Set "Company Name" to: ${companyName}`);
+            companyField.updateAppearances(helveticaBoldFont);
+            console.log(`Set "Company Name" to: ${companyName} (bold)`);
           } catch (e) {
             console.log('Could not set Company Name field:', e.message);
           }
@@ -162,7 +164,8 @@ serve(async (req) => {
             const purposeField = form.getTextField('Purpose');
             purposeField.setText('for the supply and/or installation of one or more of the products/services listed above.');
             purposeField.setFontSize(10);
-            console.log(`Set "Purpose" field`);
+            purposeField.updateAppearances(helveticaBoldFont);
+            console.log(`Set "Purpose" field (bold)`);
           } catch (e) {
             console.log('Could not set Purpose field:', e.message);
           }
