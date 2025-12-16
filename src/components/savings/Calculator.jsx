@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown, Play, X } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown, Play, X, ChevronDown, Calculator as CalcIcon } from "lucide-react";
 
 const CATEGORIES = [
   { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500", bgColor: "bg-red-500", borderColor: "border-red-500" },
@@ -14,6 +16,20 @@ const CATEGORIES = [
   { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-300 to-yellow-500", bgColor: "bg-yellow-400", borderColor: "border-yellow-400" },
   { id: "battery", name: "Home Battery", icon: Battery, color: "from-green-500 to-emerald-500", bgColor: "bg-green-500", borderColor: "border-green-500" },
 ];
+
+// TOU (Time-of-Use) rates in $/kWh - Summer rates
+const TOU_RATES = {
+  onPeak: 0.158,    // On-peak rate
+  midPeak: 0.122,   // Mid-peak rate
+  offPeak: 0.087,   // Off-peak rate
+};
+
+// ULO (Ultra-Low Overnight) rates in $/kWh
+const ULO_RATES = {
+  onPeak: 0.28,     // Ultra-high peak rate
+  midPeak: 0.122,   // Mid-peak rate
+  offPeak: 0.028,   // Ultra-low overnight rate
+};
 
 // Calculate monthly payment with 2.99% interest over 240 months
 const calculateMonthlyPayment = (principal) => {
@@ -25,6 +41,196 @@ const calculateMonthlyPayment = (principal) => {
   
   const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
   return Math.round(payment * 100) / 100;
+};
+
+// Battery Calculator Component - inspired by the reference screenshot
+const BatteryCalculator = ({ onSavingsCalculated }) => {
+  const [months, setMonths] = useState([
+    { onPeak: 0, midPeak: 0, offPeak: 0 },
+    { onPeak: 0, midPeak: 0, offPeak: 0 },
+    { onPeak: 0, midPeak: 0, offPeak: 0 },
+  ]);
+  const [calculated, setCalculated] = useState(false);
+  const [results, setResults] = useState(null);
+
+  const handleInputChange = (monthIndex, field, value) => {
+    const newMonths = [...months];
+    newMonths[monthIndex][field] = parseFloat(value) || 0;
+    setMonths(newMonths);
+  };
+
+  const calculateSavings = () => {
+    const monthlyResults = months.map((month) => {
+      const touCost = (month.onPeak * TOU_RATES.onPeak) + 
+                      (month.midPeak * TOU_RATES.midPeak) + 
+                      (month.offPeak * TOU_RATES.offPeak);
+      
+      // With battery: shift on-peak usage to off-peak (ULO overnight charging)
+      const uloCost = (month.onPeak * ULO_RATES.offPeak) + // On-peak shifted to off-peak
+                      (month.midPeak * ULO_RATES.midPeak) + 
+                      (month.offPeak * ULO_RATES.offPeak);
+      
+      const savings = touCost - uloCost;
+      const totalUsage = month.onPeak + month.midPeak + month.offPeak;
+      
+      return { touCost, uloCost, savings, totalUsage };
+    });
+
+    const validMonths = monthlyResults.filter(m => m.totalUsage > 0);
+    
+    if (validMonths.length === 0) {
+      setResults(null);
+      setCalculated(false);
+      return;
+    }
+
+    const totalUsage = validMonths.reduce((sum, m) => sum + m.totalUsage, 0);
+    const totalTouCost = validMonths.reduce((sum, m) => sum + m.touCost, 0);
+    const totalUloCost = validMonths.reduce((sum, m) => sum + m.uloCost, 0);
+    const avgMonthlySavings = (totalTouCost - totalUloCost) / validMonths.length;
+    
+    // Calculate daily peak usage for battery sizing
+    const avgDailyPeakUsage = (months.reduce((sum, m) => sum + m.onPeak, 0) / validMonths.length) / 30;
+    
+    // Recommend battery size (round up to nearest 5 kWh)
+    const recommendedBattery = Math.ceil(avgDailyPeakUsage / 5) * 5 || 10;
+
+    const calculatedResults = {
+      totalUsage: totalUsage / validMonths.length,
+      touCost: totalTouCost / validMonths.length,
+      uloCost: totalUloCost / validMonths.length,
+      avgMonthlySavings,
+      peakHrsDailyAvg: avgDailyPeakUsage,
+      recommendedBattery,
+      monthlyResults,
+    };
+
+    setResults(calculatedResults);
+    setCalculated(true);
+    
+    if (onSavingsCalculated) {
+      onSavingsCalculated(Math.round(avgMonthlySavings));
+    }
+  };
+
+  const resetCalculator = () => {
+    setMonths([
+      { onPeak: 0, midPeak: 0, offPeak: 0 },
+      { onPeak: 0, midPeak: 0, offPeak: 0 },
+      { onPeak: 0, midPeak: 0, offPeak: 0 },
+    ]);
+    setCalculated(false);
+    setResults(null);
+    if (onSavingsCalculated) {
+      onSavingsCalculated(0);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <h3 className="text-xl font-bold text-slate-800 dark:text-white">Electricity Savings Calculator</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Note: delivery charges are not calculated here.</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">Enter your electricity usage (at least 1 month, up to 3 months):</p>
+      </div>
+
+      {/* Month Input Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {months.map((month, index) => (
+          <div key={index} className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 space-y-3">
+            <h4 className="font-semibold text-green-700 dark:text-green-400">Month {index + 1}</h4>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-600 dark:text-slate-400">On-Peak (kWh):</Label>
+                <Input
+                  type="number"
+                  value={month.onPeak || ''}
+                  onChange={(e) => handleInputChange(index, 'onPeak', e.target.value)}
+                  placeholder="0"
+                  className="h-9 bg-white dark:bg-slate-900 text-sm"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-600 dark:text-slate-400">Mid-Peak (kWh):</Label>
+                <Input
+                  type="number"
+                  value={month.midPeak || ''}
+                  onChange={(e) => handleInputChange(index, 'midPeak', e.target.value)}
+                  placeholder="0"
+                  className="h-9 bg-white dark:bg-slate-900 text-sm"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-600 dark:text-slate-400">Off-Peak (kWh):</Label>
+              <Input
+                type="number"
+                value={month.offPeak || ''}
+                onChange={(e) => handleInputChange(index, 'offPeak', e.target.value)}
+                placeholder="0"
+                className="h-9 bg-white dark:bg-slate-900 text-sm"
+              />
+            </div>
+
+            {calculated && results?.monthlyResults[index] && results.monthlyResults[index].totalUsage > 0 && (
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-600">
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                  Monthly Savings: ${results.monthlyResults[index].savings.toFixed(2)}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Summary Card */}
+      {calculated && results && (
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-500 rounded-xl p-5 space-y-3">
+          <h4 className="text-lg font-bold text-slate-800 dark:text-white">Summary</h4>
+          
+          <div className="grid grid-cols-2 gap-y-2 text-sm">
+            <span className="text-green-700 dark:text-green-400 font-medium">Total Usage:</span>
+            <span className="text-slate-700 dark:text-slate-300">{results.totalUsage.toFixed(0)} kWh</span>
+            
+            <span className="text-green-700 dark:text-green-400 font-medium">TOU Cost:</span>
+            <span className="text-slate-700 dark:text-slate-300">${results.touCost.toFixed(2)}</span>
+            
+            <span className="text-green-700 dark:text-green-400 font-medium">ULO Cost:</span>
+            <span className="text-slate-700 dark:text-slate-300">${results.uloCost.toFixed(2)}</span>
+            
+            <span className="text-green-700 dark:text-green-400 font-medium">Avg Monthly Savings:</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">${results.avgMonthlySavings.toFixed(2)}</span>
+            
+            <span className="text-green-700 dark:text-green-400 font-medium">Peak Hrs Daily Avg:</span>
+            <span className="text-slate-700 dark:text-slate-300">{results.peakHrsDailyAvg.toFixed(1)} kWh</span>
+            
+            <span className="text-green-700 dark:text-green-400 font-medium">Smart Battery Required:</span>
+            <span className="text-slate-700 dark:text-slate-300 font-bold">{results.recommendedBattery} kWh</span>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex justify-center gap-4">
+        <Button 
+          onClick={calculateSavings}
+          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8"
+        >
+          <CalcIcon className="w-4 h-4 mr-2" />
+          Calculate
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={resetCalculator}
+          className="px-8"
+        >
+          Reset
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 // Visual illustration components for each category
@@ -275,62 +481,82 @@ const categoryVideos = {
     title: "How Heat Pumps Save You Money",
     description: "Learn how modern heat pumps deliver 3-4x more heating efficiency than traditional furnaces",
     thumbnail: "https://img.youtube.com/vi/7J52mDjZzto/maxresdefault.jpg",
-    videoId: "7J52mDjZzto", // Heat pump explainer
+    videoId: "7J52mDjZzto",
   },
   insulation: {
     title: "The Power of Proper Insulation",
     description: "See how attic and wall insulation keeps your home comfortable year-round",
     thumbnail: "https://img.youtube.com/vi/wEoG4K7xpA4/maxresdefault.jpg",
-    videoId: "wEoG4K7xpA4", // Insulation explainer
+    videoId: "wEoG4K7xpA4",
   },
   hotwater: {
     title: "Heat Pump Water Heaters Explained",
     description: "Discover why heat pump water heaters are 3x more efficient than traditional tanks",
     thumbnail: "https://img.youtube.com/vi/bBc_GwOzEFY/maxresdefault.jpg",
-    videoId: "bBc_GwOzEFY", // HPWH explainer
+    videoId: "bBc_GwOzEFY",
   },
   solar: {
     title: "Solar Panels: Your Home Power Plant",
     description: "See how solar panels generate free electricity from sunlight",
     thumbnail: "https://img.youtube.com/vi/xKxrkht7CpY/maxresdefault.jpg",
-    videoId: "xKxrkht7CpY", // Solar explainer
+    videoId: "xKxrkht7CpY",
   },
   battery: {
     title: "Home Batteries & Energy Independence",
     description: "Learn how batteries store solar energy and provide backup power",
     thumbnail: "https://img.youtube.com/vi/pxP0Cu00sZs/maxresdefault.jpg",
-    videoId: "pxP0Cu00sZs", // Battery explainer
+    videoId: "pxP0Cu00sZs",
   },
 };
 
-// Video Card Component
-const VideoExplainer = ({ video, color, onPlay }) => (
-  <div 
-    onClick={onPlay}
-    className="relative bg-slate-900 rounded-2xl overflow-hidden cursor-pointer group hover:shadow-2xl transition-all duration-300"
-  >
-    <div className="relative aspect-video">
-      <img 
-        src={video.thumbnail} 
-        alt={video.title}
-        className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
-      />
-      {/* Play button overlay */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-r ${color} flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform`}>
-          <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+// Collapsible Video Button Component
+const CollapsibleVideoSection = ({ video, color, onPlay }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <Button 
+          variant="outline" 
+          className={`w-full justify-between border-2 ${isOpen ? 'border-slate-400' : 'border-slate-200 dark:border-slate-700'} hover:border-slate-400 transition-colors`}
+        >
+          <span className="flex items-center gap-2">
+            <Play className="w-4 h-4" />
+            Watch Explainer Video
+          </span>
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-3">
+        <div 
+          onClick={onPlay}
+          className="relative bg-slate-900 rounded-2xl overflow-hidden cursor-pointer group hover:shadow-2xl transition-all duration-300"
+        >
+          <div className="relative aspect-video">
+            <img 
+              src={video.thumbnail} 
+              alt={video.title}
+              className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
+            />
+            {/* Play button overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-r ${color} flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform`}>
+                <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+              </div>
+            </div>
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          </div>
+          {/* Video info */}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <p className="text-white font-semibold text-sm md:text-base">{video.title}</p>
+            <p className="text-white/70 text-xs md:text-sm mt-1">{video.description}</p>
+          </div>
         </div>
-      </div>
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-    </div>
-    {/* Video info */}
-    <div className="absolute bottom-0 left-0 right-0 p-4">
-      <p className="text-white font-semibold text-sm md:text-base">{video.title}</p>
-      <p className="text-white/70 text-xs md:text-sm mt-1">{video.description}</p>
-    </div>
-  </div>
-);
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
 
 export function Calculator() {
   const [data, setData] = useState({
@@ -659,23 +885,19 @@ export function Calculator() {
           </div>
 
           <CardContent className="p-6 space-y-6">
-            {/* Visual Illustration */}
-            <IllustrationComponent savings={currentSavings.monthly} />
+            {/* Battery Tab gets special calculator */}
+            {activeTab === "battery" ? (
+              <BatteryCalculator onSavingsCalculated={(savings) => {
+                // Update battery savings dynamically if needed
+              }} />
+            ) : (
+              <>
+                {/* Visual Illustration for non-battery categories */}
+                <IllustrationComponent savings={currentSavings.monthly} />
+              </>
+            )}
 
-            {/* Video Explainer Section */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                <Play className="w-4 h-4" />
-                Watch Explainer Video
-              </h4>
-              <VideoExplainer 
-                video={currentVideo} 
-                color={currentCategory.color}
-                onPlay={() => handlePlayVideo(currentVideo)}
-              />
-            </div>
-
-            {/* Financial Breakdown */}
+            {/* Financial Breakdown - show for all categories */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Monthly Breakdown */}
               <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
@@ -790,6 +1012,13 @@ export function Calculator() {
                 {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
               </p>
             </div>
+
+            {/* Video Explainer Section - Moved to bottom and collapsed by default */}
+            <CollapsibleVideoSection 
+              video={currentVideo} 
+              color={currentCategory.color}
+              onPlay={() => handlePlayVideo(currentVideo)}
+            />
           </CardContent>
         </Card>
       </div>
