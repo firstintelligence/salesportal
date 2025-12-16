@@ -168,11 +168,7 @@ const CustomerDetailPage = () => {
 
   const navigateToChecklist = () => {
     const latestTpv = tpvRequests[0];
-    if (latestTpv) {
-      navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv } });
-    } else {
-      toast.error("Complete a TPV request first to create an installation checklist.");
-    }
+    navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv || null } });
   };
 
   const formatDate = (dateString) => {
@@ -244,7 +240,7 @@ const CustomerDetailPage = () => {
   }
 
   const latestTpv = tpvRequests[0];
-  const hasCompletedTpv = tpvRequests.some(t => t.status === 'completed');
+  
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -375,7 +371,7 @@ const CustomerDetailPage = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                className={`flex-col h-auto py-3 gap-1.5 ${!hasCompletedTpv ? 'opacity-50' : ''}`}
+                className="flex-col h-auto py-3 gap-1.5"
                 onClick={navigateToChecklist}
               >
                 <ClipboardCheck className="w-4 h-4" />
