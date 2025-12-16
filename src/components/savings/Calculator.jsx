@@ -900,16 +900,17 @@ export function Calculator() {
           </div>
 
           <CardContent className="p-6 space-y-6">
+            {/* How it Works - Visual Illustration for all categories */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">How it Works</h4>
+              <IllustrationComponent savings={currentSavings.monthly} />
+            </div>
+
             {/* Battery Tab gets special calculator */}
-            {activeTab === "battery" ? (
+            {activeTab === "battery" && (
               <BatteryCalculator onSavingsCalculated={(savings) => {
                 // Update battery savings dynamically if needed
               }} />
-            ) : (
-              <>
-                {/* Visual Illustration for non-battery categories */}
-                <IllustrationComponent savings={currentSavings.monthly} />
-              </>
             )}
 
             {/* Financial Breakdown - hide for battery tab */}
