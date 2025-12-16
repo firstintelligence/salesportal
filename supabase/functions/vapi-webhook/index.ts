@@ -168,12 +168,18 @@ serve(async (req) => {
           // Products list
           const products = tpvRecord.products || 'N/A';
           
-          // Payment details
-          const salesPrice = tpvRecord.sales_price ? `$${tpvRecord.sales_price}` : 'N/A';
+          // Payment details - format with commas
+          const formatWithCommas = (value: string) => {
+            const num = parseFloat(value);
+            if (isNaN(num)) return value;
+            return num.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          };
+          
+          const salesPrice = tpvRecord.sales_price ? `$${formatWithCommas(tpvRecord.sales_price)}` : 'N/A';
           const interestRate = tpvRecord.interest_rate || 'N/A';
           const promoTerm = tpvRecord.promotional_term || 'N/A';
           const amortization = tpvRecord.amortization || 'N/A';
-          const monthlyPayment = tpvRecord.monthly_payment ? `$${tpvRecord.monthly_payment}` : 'N/A';
+          const monthlyPayment = tpvRecord.monthly_payment ? `$${formatWithCommas(tpvRecord.monthly_payment)}` : 'N/A';
           
           message = `${statusText}
 
@@ -188,7 +194,7 @@ serve(async (req) => {
 • Interest: ${interestRate}
 • Promo Term: ${promoTerm}
 • Amortization: ${amortization}
-• Monthly: ${monthlyPayment}`;
+• Monthly Payment: ${monthlyPayment}`;
 
           // Add recording link if available
           if (recordingUrl) {
