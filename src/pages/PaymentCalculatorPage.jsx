@@ -209,10 +209,6 @@ const PaymentCalculatorPage = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="12">12 months</SelectItem>
-                      <SelectItem value="24">24 months</SelectItem>
-                      <SelectItem value="36">36 months</SelectItem>
-                      <SelectItem value="48">48 months</SelectItem>
                       <SelectItem value="60">60 months</SelectItem>
                       <SelectItem value="72">72 months</SelectItem>
                       <SelectItem value="84">84 months</SelectItem>
