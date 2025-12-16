@@ -9,6 +9,7 @@ const InvoiceGeneratorPage = () => {
   const location = useLocation();
   const customer = location.state?.customer;
   const invoiceProfile = location.state?.invoiceProfile;
+  const calculatorData = location.state?.calculatorData;
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -37,7 +38,7 @@ const InvoiceGeneratorPage = () => {
           {customer?.id ? 'Back to Customer' : 'Back to Tools'}
         </Button>
       </div>
-      <Index preloadedCustomer={customer} preloadedInvoiceProfile={invoiceProfile} />
+      <Index preloadedCustomer={customer} preloadedInvoiceProfile={invoiceProfile} preloadedCalculatorData={calculatorData} />
     </div>
   );
 };

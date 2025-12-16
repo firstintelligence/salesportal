@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft, Info, FileText, ClipboardList, Phone } from "lucide-react";
 import { calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
 import { getAvailableTermsForRate } from "@/utils/dealerFeeCalculations";
 
@@ -236,6 +236,72 @@ const PaymentCalculatorPage = () => {
                   <Info className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <span className="font-semibold text-foreground">{formatCurrency(adminFee)}</span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="border-t border-border pt-6 space-y-3">
+                <p className="text-sm text-muted-foreground mb-3">Continue with this financing:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center gap-2"
+                    onClick={() => navigate("/invoice", { 
+                      state: { 
+                        fromCalculator: true,
+                        calculatorData: {
+                          purchaseAmount,
+                          interestRate,
+                          amortizationPeriod,
+                          promoTerm,
+                          promoPayment,
+                          regularPayment,
+                          loanAmount
+                        }
+                      }
+                    })}
+                  >
+                    <FileText className="h-4 w-4" />
+                    Create Invoice
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center gap-2"
+                    onClick={() => navigate("/loan-application", { 
+                      state: { 
+                        fromCalculator: true,
+                        calculatorData: {
+                          purchaseAmount,
+                          interestRate,
+                          amortizationPeriod,
+                          promoTerm,
+                          loanAmount
+                        }
+                      }
+                    })}
+                  >
+                    <ClipboardList className="h-4 w-4" />
+                    Loan Application
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center gap-2"
+                    onClick={() => navigate("/tpv", { 
+                      state: { 
+                        fromCalculator: true,
+                        calculatorData: {
+                          purchaseAmount,
+                          interestRate,
+                          amortizationPeriod,
+                          promoTerm,
+                          promoPayment
+                        }
+                      }
+                    })}
+                  >
+                    <Phone className="h-4 w-4" />
+                    Request TPV
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

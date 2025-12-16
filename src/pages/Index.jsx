@@ -86,7 +86,7 @@ const noteOptions = [
   "We appreciate your trust in us. If you ever need assistance with your order, please visit our website or call customer service. We’re here to help!",
 ];
 
-const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
+const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculatorData }) => {
   const navigate = useNavigate();
   const { tenant, loading: tenantLoading } = useTenant();
   
@@ -126,13 +126,13 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
       number: "",
     };
   });
-  const [financing, setFinancing] = useState({
+  const [financing, setFinancing] = useState(() => ({
     financeCompany: "Financeit Canada Inc.",
-    loanAmount: 0,
-    amortizationPeriod: 180,
-    loanTerm: 24,
-    interestRate: 0
-  });
+    loanAmount: preloadedCalculatorData?.loanAmount || 0,
+    amortizationPeriod: preloadedCalculatorData?.amortizationPeriod || 180,
+    loanTerm: preloadedCalculatorData?.promoTerm || 24,
+    interestRate: preloadedCalculatorData?.interestRate || 0
+  }));
   const [rebatesIncentives, setRebatesIncentives] = useState({
     federalRebate: 0,
     provincialRebate: 0,
@@ -146,9 +146,20 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile }) => {
     email: tenantCompanyInfo?.email || "",
     logo: tenantLogo || null
   });
-  const [items, setItems] = useState([
-    { id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }
-  ]);
+  const [items, setItems] = useState(() => {
+    if (preloadedCalculatorData?.purchaseAmount) {
+      return [{ 
+        id: crypto.randomUUID(), 
+        quantity: 1, 
+        amount: preloadedCalculatorData.purchaseAmount, 
+        total: preloadedCalculatorData.purchaseAmount, 
+        name: "Equipment & Installation", 
+        description: "", 
+        productId: "" 
+      }];
+    }
+    return [{ id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }];
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [taxPercentage, settaxPercentage] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);

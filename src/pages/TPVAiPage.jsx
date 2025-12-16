@@ -6,6 +6,7 @@ const TPVAiPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const customer = location.state?.customer;
+  const calculatorData = location.state?.calculatorData;
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) {
@@ -13,7 +14,7 @@ const TPVAiPage = () => {
     }
   }, [navigate]);
 
-  return <TPVRequest onBack={() => navigate("/landing")} preloadedCustomer={customer} />;
+  return <TPVRequest onBack={() => navigate("/landing")} preloadedCustomer={customer} preloadedCalculatorData={calculatorData} />;
 };
 
 export default TPVAiPage;
