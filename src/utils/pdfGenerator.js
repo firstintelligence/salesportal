@@ -138,13 +138,20 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         if (formResponse.ok) {
           const formArrayBuffer = await formResponse.arrayBuffer();
           const formBytes = new Uint8Array(formArrayBuffer);
-          cpaBill59FormBase64 = btoa(String.fromCharCode(...formBytes));
-          console.log('CPA Bill 59 form loaded, size:', formBytes.length, 'bytes');
+          // Use chunked approach for large files (spread operator has stack limits)
+          let binary = '';
+          const chunkSize = 8192;
+          for (let i = 0; i < formBytes.length; i += chunkSize) {
+            const chunk = formBytes.subarray(i, i + chunkSize);
+            binary += String.fromCharCode.apply(null, chunk);
+          }
+          cpaBill59FormBase64 = btoa(binary);
+          console.log('CPA Bill 59 form loaded successfully, size:', formBytes.length, 'bytes, base64 length:', cpaBill59FormBase64.length);
         } else {
-          console.warn('Could not fetch CPA Bill 59 form');
+          console.warn('Could not fetch CPA Bill 59 form, status:', formResponse.status);
         }
       } catch (formError) {
-        console.warn('Error loading CPA Bill 59 form:', formError);
+        console.error('Error loading CPA Bill 59 form:', formError);
       }
       
       // Call the edge function to generate PDF with PDFShift
