@@ -46,34 +46,46 @@ const calculateMonthlyPayment = (principal) => {
 // Battery Calculator Component - inspired by the reference screenshot
 const BatteryCalculator = ({ onSavingsCalculated }) => {
   const [months, setMonths] = useState([
-    { onPeak: 0, midPeak: 0, offPeak: 0 },
-    { onPeak: 0, midPeak: 0, offPeak: 0 },
-    { onPeak: 0, midPeak: 0, offPeak: 0 },
+    { onPeak: '', midPeak: '', offPeak: '' },
+    { onPeak: '', midPeak: '', offPeak: '' },
+    { onPeak: '', midPeak: '', offPeak: '' },
   ]);
   const [calculated, setCalculated] = useState(false);
   const [results, setResults] = useState(null);
 
   const handleInputChange = (monthIndex, field, value) => {
     const newMonths = [...months];
-    newMonths[monthIndex][field] = parseFloat(value) || 0;
+    newMonths[monthIndex][field] = value;
     setMonths(newMonths);
+  };
+
+  const hasAnyInput = () => {
+    return months.some(m => 
+      (m.onPeak !== '' && parseFloat(m.onPeak) > 0) || 
+      (m.midPeak !== '' && parseFloat(m.midPeak) > 0) || 
+      (m.offPeak !== '' && parseFloat(m.offPeak) > 0)
+    );
   };
 
   const calculateSavings = () => {
     const monthlyResults = months.map((month) => {
-      const touCost = (month.onPeak * TOU_RATES.onPeak) + 
-                      (month.midPeak * TOU_RATES.midPeak) + 
-                      (month.offPeak * TOU_RATES.offPeak);
+      const onPeak = parseFloat(month.onPeak) || 0;
+      const midPeak = parseFloat(month.midPeak) || 0;
+      const offPeak = parseFloat(month.offPeak) || 0;
+      
+      const touCost = (onPeak * TOU_RATES.onPeak) + 
+                      (midPeak * TOU_RATES.midPeak) + 
+                      (offPeak * TOU_RATES.offPeak);
       
       // With battery: shift on-peak usage to off-peak (ULO overnight charging)
-      const uloCost = (month.onPeak * ULO_RATES.offPeak) + // On-peak shifted to off-peak
-                      (month.midPeak * ULO_RATES.midPeak) + 
-                      (month.offPeak * ULO_RATES.offPeak);
+      const uloCost = (onPeak * ULO_RATES.offPeak) + // On-peak shifted to off-peak
+                      (midPeak * ULO_RATES.midPeak) + 
+                      (offPeak * ULO_RATES.offPeak);
       
       const savings = touCost - uloCost;
-      const totalUsage = month.onPeak + month.midPeak + month.offPeak;
+      const totalUsage = onPeak + midPeak + offPeak;
       
-      return { touCost, uloCost, savings, totalUsage };
+      return { touCost, uloCost, savings, totalUsage, onPeak };
     });
 
     const validMonths = monthlyResults.filter(m => m.totalUsage > 0);
@@ -90,7 +102,7 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
     const avgMonthlySavings = (totalTouCost - totalUloCost) / validMonths.length;
     
     // Calculate daily peak usage for battery sizing
-    const avgDailyPeakUsage = (months.reduce((sum, m) => sum + m.onPeak, 0) / validMonths.length) / 30;
+    const avgDailyPeakUsage = (validMonths.reduce((sum, m) => sum + m.onPeak, 0) / validMonths.length) / 30;
     
     // Recommend battery size (round up to nearest 5 kWh)
     const recommendedBattery = Math.ceil(avgDailyPeakUsage / 5) * 5 || 10;
@@ -115,9 +127,9 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
 
   const resetCalculator = () => {
     setMonths([
-      { onPeak: 0, midPeak: 0, offPeak: 0 },
-      { onPeak: 0, midPeak: 0, offPeak: 0 },
-      { onPeak: 0, midPeak: 0, offPeak: 0 },
+      { onPeak: '', midPeak: '', offPeak: '' },
+      { onPeak: '', midPeak: '', offPeak: '' },
+      { onPeak: '', midPeak: '', offPeak: '' },
     ]);
     setCalculated(false);
     setResults(null);
@@ -127,57 +139,57 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h3 className="text-xl font-bold text-slate-800 dark:text-white">Electricity Savings Calculator</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Note: delivery charges are not calculated here.</p>
+    <div className="space-y-5">
+      <div className="text-center space-y-1">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white">Electricity Savings Calculator</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Note: delivery charges are not calculated here.</p>
         <p className="text-sm text-slate-600 dark:text-slate-300">Enter your electricity usage (at least 1 month, up to 3 months):</p>
       </div>
 
-      {/* Month Input Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Month Input Cards - Condensed Layout */}
+      <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto">
         {months.map((month, index) => (
-          <div key={index} className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 space-y-3">
-            <h4 className="font-semibold text-green-700 dark:text-green-400">Month {index + 1}</h4>
+          <div key={index} className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-lg p-3 space-y-2">
+            <h4 className="font-semibold text-green-700 dark:text-green-400 text-sm text-center">Month {index + 1}</h4>
             
-            <div className="grid grid-cols-2 gap-2">
+            {/* Stacked inputs - one column */}
+            <div className="space-y-2">
               <div className="space-y-1">
-                <Label className="text-xs text-slate-600 dark:text-slate-400">On-Peak (kWh):</Label>
+                <Label className="text-xs text-slate-600 dark:text-slate-400">On-Peak (kWh)</Label>
                 <Input
                   type="number"
-                  value={month.onPeak || ''}
+                  value={month.onPeak}
                   onChange={(e) => handleInputChange(index, 'onPeak', e.target.value)}
                   placeholder="0"
-                  className="h-9 bg-white dark:bg-slate-900 text-sm"
+                  className="h-8 bg-white dark:bg-slate-900 text-sm"
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-600 dark:text-slate-400">Mid-Peak (kWh):</Label>
+                <Label className="text-xs text-slate-600 dark:text-slate-400">Mid-Peak (kWh)</Label>
                 <Input
                   type="number"
-                  value={month.midPeak || ''}
+                  value={month.midPeak}
                   onChange={(e) => handleInputChange(index, 'midPeak', e.target.value)}
                   placeholder="0"
-                  className="h-9 bg-white dark:bg-slate-900 text-sm"
+                  className="h-8 bg-white dark:bg-slate-900 text-sm"
                 />
               </div>
-            </div>
-            
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-600 dark:text-slate-400">Off-Peak (kWh):</Label>
-              <Input
-                type="number"
-                value={month.offPeak || ''}
-                onChange={(e) => handleInputChange(index, 'offPeak', e.target.value)}
-                placeholder="0"
-                className="h-9 bg-white dark:bg-slate-900 text-sm"
-              />
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-600 dark:text-slate-400">Off-Peak (kWh)</Label>
+                <Input
+                  type="number"
+                  value={month.offPeak}
+                  onChange={(e) => handleInputChange(index, 'offPeak', e.target.value)}
+                  placeholder="0"
+                  className="h-8 bg-white dark:bg-slate-900 text-sm"
+                />
+              </div>
             </div>
 
             {calculated && results?.monthlyResults[index] && results.monthlyResults[index].totalUsage > 0 && (
               <div className="pt-2 border-t border-slate-200 dark:border-slate-600">
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                  Monthly Savings: ${results.monthlyResults[index].savings.toFixed(2)}
+                <p className="text-xs font-medium text-green-600 dark:text-green-400 text-center">
+                  Savings: ${results.monthlyResults[index].savings.toFixed(2)}
                 </p>
               </div>
             )}
@@ -185,10 +197,29 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
         ))}
       </div>
 
-      {/* Summary Card */}
+      {/* Action Buttons */}
+      <div className="flex justify-center gap-3">
+        <Button 
+          onClick={calculateSavings}
+          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6"
+          disabled={!hasAnyInput()}
+        >
+          <CalcIcon className="w-4 h-4 mr-2" />
+          Calculate
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={resetCalculator}
+          className="px-6"
+        >
+          Reset
+        </Button>
+      </div>
+
+      {/* Summary Card - Only shows after calculation */}
       {calculated && results && (
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-500 rounded-xl p-5 space-y-3">
-          <h4 className="text-lg font-bold text-slate-800 dark:text-white">Summary</h4>
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-500 rounded-xl p-4 space-y-3 max-w-xl mx-auto">
+          <h4 className="text-lg font-bold text-slate-800 dark:text-white text-center">Summary</h4>
           
           <div className="grid grid-cols-2 gap-y-2 text-sm">
             <span className="text-green-700 dark:text-green-400 font-medium">Total Usage:</span>
@@ -204,31 +235,13 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
             <span className="text-emerald-600 dark:text-emerald-400 font-bold">${results.avgMonthlySavings.toFixed(2)}</span>
             
             <span className="text-green-700 dark:text-green-400 font-medium">Peak Hrs Daily Avg:</span>
-            <span className="text-slate-700 dark:text-slate-300">{results.peakHrsDailyAvg.toFixed(1)} kWh</span>
+            <span className="text-slate-700 dark:text-slate-300">{results.peakHrsDailyAvg.toFixed(2)} kWh</span>
             
             <span className="text-green-700 dark:text-green-400 font-medium">Smart Battery Required:</span>
             <span className="text-slate-700 dark:text-slate-300 font-bold">{results.recommendedBattery} kWh</span>
           </div>
         </div>
       )}
-
-      {/* Action Buttons */}
-      <div className="flex justify-center gap-4">
-        <Button 
-          onClick={calculateSavings}
-          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8"
-        >
-          <CalcIcon className="w-4 h-4 mr-2" />
-          Calculate
-        </Button>
-        <Button 
-          variant="outline" 
-          onClick={resetCalculator}
-          className="px-8"
-        >
-          Reset
-        </Button>
-      </div>
     </div>
   );
 };
@@ -504,8 +517,8 @@ const categoryVideos = {
   battery: {
     title: "Home Batteries & Energy Independence",
     description: "Learn how batteries store solar energy and provide backup power",
-    thumbnail: "https://img.youtube.com/vi/pxP0Cu00sZs/maxresdefault.jpg",
-    videoId: "pxP0Cu00sZs",
+    thumbnail: "https://img.youtube.com/vi/IbSITcnL2YE/maxresdefault.jpg",
+    videoId: "IbSITcnL2YE",
   },
 };
 
@@ -869,18 +882,20 @@ export function Calculator() {
                 <p className="text-white/80 text-sm max-w-md">{currentSavings.description}</p>
               </div>
               
-              <div className="flex gap-4">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
-                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Total Savings</p>
-                  <p className="text-3xl font-bold text-white">${currentSavings.totalMonthly}</p>
-                  <p className="text-white/60 text-xs">/month</p>
+              {activeTab !== "battery" && (
+                <div className="flex gap-4">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
+                    <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Total Savings</p>
+                    <p className="text-3xl font-bold text-white">${currentSavings.totalMonthly}</p>
+                    <p className="text-white/60 text-xs">/month</p>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
+                    <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Equipment</p>
+                    <p className="text-3xl font-bold text-white">${currentSavings.monthlyPayment}</p>
+                    <p className="text-white/60 text-xs">/month</p>
+                  </div>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center min-w-[120px]">
-                  <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Equipment</p>
-                  <p className="text-3xl font-bold text-white">${currentSavings.monthlyPayment}</p>
-                  <p className="text-white/60 text-xs">/month</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -897,69 +912,71 @@ export function Calculator() {
               </>
             )}
 
-            {/* Financial Breakdown - show for all categories */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Monthly Breakdown */}
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
-                <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
-                  Monthly Breakdown
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Energy Savings</span>
-                    <span className="text-lg font-bold text-emerald-500">+${currentSavings.monthly}</span>
-                  </div>
-                  {currentSavings.oespRebate > 0 && (
+            {/* Financial Breakdown - hide for battery tab */}
+            {activeTab !== "battery" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Monthly Breakdown */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
+                  <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Monthly Breakdown
+                  </h4>
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-600 dark:text-slate-400">OESP Rebate</span>
-                      <span className="text-lg font-bold text-emerald-500">+${currentSavings.oespRebate}</span>
+                      <span className="text-slate-600 dark:text-slate-400">Energy Savings</span>
+                      <span className="text-lg font-bold text-emerald-500">+${currentSavings.monthly}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Equipment Payment</span>
-                    <span className="text-lg font-bold text-slate-700 dark:text-slate-300">-${currentSavings.monthlyPayment}</span>
-                  </div>
-                  <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
+                    {currentSavings.oespRebate > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-600 dark:text-slate-400">OESP Rebate</span>
+                        <span className="text-lg font-bold text-emerald-500">+${currentSavings.oespRebate}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-700 dark:text-slate-300 font-medium">Net Monthly</span>
-                      <span className={`text-xl font-bold ${currentSavings.netMonthly >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                        {currentSavings.netMonthly >= 0 ? '+' : ''}${currentSavings.netMonthly}
+                      <span className="text-slate-600 dark:text-slate-400">Equipment Payment</span>
+                      <span className="text-lg font-bold text-slate-700 dark:text-slate-300">-${currentSavings.monthlyPayment}</span>
+                    </div>
+                    <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">Net Monthly</span>
+                        <span className={`text-xl font-bold ${currentSavings.netMonthly >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {currentSavings.netMonthly >= 0 ? '+' : ''}${currentSavings.netMonthly.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-3">*2.99% APR over 240 months</p>
+                </div>
+
+                {/* Long-term Value */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
+                  <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
+                    <Leaf className="w-4 h-4" />
+                    Long-term Value
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 dark:text-slate-400">Equipment Cost</span>
+                      <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
+                        ${currentSavings.cost.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 dark:text-slate-400">20-Year Savings</span>
+                      <span className="text-lg font-bold text-emerald-500">
+                        ${(currentSavings.yearly * 20).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 dark:text-slate-400">Net Benefit (20yr)</span>
+                      <span className="text-lg font-bold text-emerald-500">
+                        ${((currentSavings.yearly * 20) - (currentSavings.monthlyPayment * 240)).toLocaleString()}
                       </span>
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 mt-3">*2.99% APR over 240 months</p>
               </div>
-
-              {/* Long-term Value */}
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6">
-                <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
-                  <Leaf className="w-4 h-4" />
-                  Long-term Value
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Equipment Cost</span>
-                    <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
-                      ${currentSavings.cost.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">20-Year Savings</span>
-                    <span className="text-lg font-bold text-emerald-500">
-                      ${(currentSavings.yearly * 20).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Net Benefit (20yr)</span>
-                    <span className="text-lg font-bold text-emerald-500">
-                      ${((currentSavings.yearly * 20) - (currentSavings.monthlyPayment * 240)).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Category-specific inputs */}
             {activeTab === "hvac" && (
