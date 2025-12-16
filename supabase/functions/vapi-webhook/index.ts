@@ -69,9 +69,11 @@ serve(async (req) => {
         recordingUrl
       });
 
-      // Update database with call results
+      // Update database with call results and fetch full record
       const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
       const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+      let tpvRecord: any = null;
 
       if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
         try {
@@ -86,13 +88,14 @@ serve(async (req) => {
               recording_url: recordingUrl,
             })
             .eq('vapi_call_id', vapiCallId)
-            .select('id')
+            .select('*')
             .single();
 
           if (updateError) {
             console.error('Failed to update TPV request in database:', updateError);
           } else {
             console.log('TPV request updated in database successfully');
+            tpvRecord = updateData;
             
             // Trigger Google Sheets sync with the updated record ID
             try {
@@ -136,8 +139,68 @@ serve(async (req) => {
       }
 
       if (phoneNumbersToNotify.size > 0) {
-        const statusText = callSuccessful ? 'TPV Completed' : 'TPV Failed';
-        const message = `${statusText}\n\nCustomer: ${customerName}\nAddress: ${address}`;
+        const statusText = callSuccessful ? '✅ TPV COMPLETED' : '❌ TPV FAILED';
+        
+        // Build detailed message using tpvRecord if available
+        let message = statusText;
+        
+        if (tpvRecord) {
+          // Customer name
+          const fullName = tpvRecord.first_name && tpvRecord.last_name 
+            ? `${tpvRecord.first_name} ${tpvRecord.last_name}`
+            : tpvRecord.customer_name || customerName;
+          
+          // Full Canadian address format
+          const addressParts = [
+            tpvRecord.customer_address,
+            tpvRecord.city,
+            tpvRecord.province,
+            tpvRecord.postal_code
+          ].filter(Boolean);
+          const fullAddress = addressParts.join(', ');
+          
+          // Format phone number
+          const phone = tpvRecord.customer_phone || '';
+          const formattedPhone = phone.length === 10 
+            ? `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`
+            : phone;
+          
+          // Products list
+          const products = tpvRecord.products || 'N/A';
+          
+          // Payment details
+          const salesPrice = tpvRecord.sales_price ? `$${tpvRecord.sales_price}` : 'N/A';
+          const interestRate = tpvRecord.interest_rate || 'N/A';
+          const promoTerm = tpvRecord.promotional_term || 'N/A';
+          const amortization = tpvRecord.amortization || 'N/A';
+          const monthlyPayment = tpvRecord.monthly_payment ? `$${tpvRecord.monthly_payment}` : 'N/A';
+          
+          message = `${statusText}
+
+👤 Customer: ${fullName}
+📞 Phone: ${formattedPhone}
+📍 Address: ${fullAddress}
+
+📦 Products: ${products}
+
+💰 Payment Details:
+• Amount: ${salesPrice}
+• Interest: ${interestRate}
+• Promo Term: ${promoTerm}
+• Amortization: ${amortization}
+• Monthly: ${monthlyPayment}`;
+
+          // Add recording link if available
+          if (recordingUrl) {
+            message += `\n\n🎙️ Recording: ${recordingUrl}`;
+          }
+        } else {
+          // Fallback to basic message if no record found
+          message = `${statusText}\n\nCustomer: ${customerName}\nAddress: ${address}`;
+          if (recordingUrl) {
+            message += `\n\n🎙️ Recording: ${recordingUrl}`;
+          }
+        }
 
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
         const twilioAuth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
