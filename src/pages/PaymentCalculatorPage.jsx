@@ -17,6 +17,9 @@ const PaymentCalculatorPage = () => {
   const [interestRate, setInterestRate] = useState(9.99);
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
   const [promoTerm, setPromoTerm] = useState(36);
+  const [show240Warning, setShow240Warning] = useState(false);
+
+  const is240Available = purchaseAmount >= 10000;
 
   const formatInputCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
@@ -56,6 +59,25 @@ const PaymentCalculatorPage = () => {
       navigate("/");
     }
   }, [navigate]);
+
+  // Reset to 180 if 240 selected but amount drops below 10K
+  useEffect(() => {
+    if (amortizationPeriod === 240 && purchaseAmount < 10000) {
+      setAmortizationPeriod(180);
+      setShow240Warning(true);
+      setTimeout(() => setShow240Warning(false), 3000);
+    }
+  }, [purchaseAmount, amortizationPeriod]);
+
+  const handleAmortizationChange = (value) => {
+    const newPeriod = parseInt(value);
+    if (newPeriod === 240 && purchaseAmount < 10000) {
+      setShow240Warning(true);
+      setTimeout(() => setShow240Warning(false), 3000);
+      return;
+    }
+    setAmortizationPeriod(newPeriod);
+  };
 
   const loanAmount = calculateLoanAmount(purchaseAmount);
   const adminFee = loanAmount - purchaseAmount;
@@ -179,29 +201,36 @@ const PaymentCalculatorPage = () => {
               </div>
 
               {/* Amortization Period Select */}
-              <div className="flex justify-between items-center">
-                <Label>Amortization Period</Label>
-                <Select value={amortizationPeriod.toString()} onValueChange={(value) => setAmortizationPeriod(parseInt(value))}>
-                  <SelectTrigger className="w-40 font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">12 months</SelectItem>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
-                    <SelectItem value="48">48 months</SelectItem>
-                    <SelectItem value="60">60 months</SelectItem>
-                    <SelectItem value="72">72 months</SelectItem>
-                    <SelectItem value="84">84 months</SelectItem>
-                    <SelectItem value="96">96 months</SelectItem>
-                    <SelectItem value="108">108 months</SelectItem>
-                    <SelectItem value="120">120 months</SelectItem>
-                    <SelectItem value="132">132 months</SelectItem>
-                    <SelectItem value="144">144 months</SelectItem>
-                    <SelectItem value="180">180 months</SelectItem>
-                    <SelectItem value="240">240 months</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label>Amortization Period</Label>
+                  <Select value={amortizationPeriod.toString()} onValueChange={handleAmortizationChange}>
+                    <SelectTrigger className="w-40 font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="12">12 months</SelectItem>
+                      <SelectItem value="24">24 months</SelectItem>
+                      <SelectItem value="36">36 months</SelectItem>
+                      <SelectItem value="48">48 months</SelectItem>
+                      <SelectItem value="60">60 months</SelectItem>
+                      <SelectItem value="72">72 months</SelectItem>
+                      <SelectItem value="84">84 months</SelectItem>
+                      <SelectItem value="96">96 months</SelectItem>
+                      <SelectItem value="108">108 months</SelectItem>
+                      <SelectItem value="120">120 months</SelectItem>
+                      <SelectItem value="132">132 months</SelectItem>
+                      <SelectItem value="144">144 months</SelectItem>
+                      <SelectItem value="180">180 months</SelectItem>
+                      <SelectItem value="240" disabled={!is240Available} className={!is240Available ? "text-muted-foreground/50" : ""}>
+                        240 months
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {show240Warning && (
+                  <p className="text-xs text-amber-600 text-right">240 months requires $10,000+</p>
+                )}
               </div>
 
               {/* Administration Fee */}
