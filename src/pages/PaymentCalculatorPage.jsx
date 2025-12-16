@@ -245,7 +245,7 @@ const PaymentCalculatorPage = () => {
                   <Button
                     variant="outline"
                     className="flex items-center justify-center gap-2"
-                    onClick={() => navigate("/invoice", { 
+                    onClick={() => navigate("/invoice-generator", { 
                       state: { 
                         fromCalculator: true,
                         calculatorData: {
