@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -21,75 +22,75 @@ const LandingPage = () => {
   const tools = [
     {
       title: "Dashboard",
+      subtitle: "Manage your deals",
       icon: LayoutDashboard,
       path: "/dashboard",
-      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-      iconColor: "text-indigo-500",
-      accentBg: "bg-indigo-100 dark:bg-indigo-900/50",
+      gradient: "bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/30",
+      iconBg: "bg-indigo-500",
     },
     {
       title: "Appointments",
+      subtitle: "View your schedule",
       icon: Calendar,
       path: "/appointments",
-      bgColor: "bg-rose-50 dark:bg-rose-950/30",
-      iconColor: "text-rose-500",
-      accentBg: "bg-rose-100 dark:bg-rose-900/50",
+      gradient: "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30",
+      iconBg: "bg-rose-500",
     },
     {
       title: "Stats",
+      subtitle: "Track performance",
       icon: Trophy,
       path: "/stats",
-      bgColor: "bg-amber-50 dark:bg-amber-950/30",
-      iconColor: "text-amber-500",
-      accentBg: "bg-amber-100 dark:bg-amber-900/50",
+      gradient: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30",
+      iconBg: "bg-amber-500",
     },
     {
       title: "Savings Calculator",
+      subtitle: "Calculate savings",
       icon: Calculator,
       path: "/savings-calculator",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-      iconColor: "text-emerald-500",
-      accentBg: "bg-emerald-100 dark:bg-emerald-900/50",
+      gradient: "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30",
+      iconBg: "bg-emerald-500",
     },
     {
       title: "Payment Calculator",
+      subtitle: "Financing options",
       icon: DollarSign,
       path: "/payment-calculator",
-      bgColor: "bg-violet-50 dark:bg-violet-950/30",
-      iconColor: "text-violet-500",
-      accentBg: "bg-violet-100 dark:bg-violet-900/50",
+      gradient: "bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/40 dark:to-purple-950/30",
+      iconBg: "bg-violet-500",
     },
     {
       title: "Invoice Generator",
+      subtitle: "Create invoices",
       icon: FileText,
       path: "/invoice-generator",
-      bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
-      iconColor: "text-cyan-500",
-      accentBg: "bg-cyan-100 dark:bg-cyan-900/50",
+      gradient: "bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/40 dark:to-sky-950/30",
+      iconBg: "bg-cyan-500",
     },
     {
       title: "Loan Application",
+      subtitle: "Apply for financing",
       icon: CreditCard,
       path: "/loan-application",
-      bgColor: "bg-lime-50 dark:bg-lime-950/30",
-      iconColor: "text-lime-600",
-      accentBg: "bg-lime-100 dark:bg-lime-900/50",
+      gradient: "bg-gradient-to-br from-lime-50 to-green-50 dark:from-lime-950/40 dark:to-green-950/30",
+      iconBg: "bg-lime-600",
     },
     {
       title: "TPV AI",
+      subtitle: "Verification calls",
       icon: Phone,
       path: "/tpv-ai",
-      bgColor: "bg-red-50 dark:bg-red-950/30",
-      iconColor: "text-red-500",
-      accentBg: "bg-red-100 dark:bg-red-900/50",
+      gradient: "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/40 dark:to-rose-950/30",
+      iconBg: "bg-red-500",
     },
     {
       title: "Installation Checklist",
+      subtitle: "Document installs",
       icon: ClipboardCheck,
       path: "/installation-checklist",
-      bgColor: "bg-teal-50 dark:bg-teal-950/30",
-      iconColor: "text-teal-500",
-      accentBg: "bg-teal-100 dark:bg-teal-900/50",
+      gradient: "bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/40 dark:to-cyan-950/30",
+      iconBg: "bg-teal-500",
     },
   ];
 
@@ -97,29 +98,32 @@ const LandingPage = () => {
   const companyName = tenant?.name || "Sales Portal";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 p-4 pt-10 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-background p-4 pt-8 sm:p-6 lg:p-8">
+      {/* Decorative background */}
+      <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent dark:from-primary/5 dark:via-purple-500/3 pointer-events-none" />
+      
+      <div className="relative max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-8 sm:mb-14">
+        <div className="text-center mb-10 sm:mb-14">
           {tenantLogo && (
             <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50">
+              <div className="p-4 glass-effect rounded-2xl shadow-xl">
                 <img 
                   src={tenantLogo} 
                   alt={companyName}
-                  className="h-14 sm:h-18 lg:h-20 object-contain"
+                  className="h-14 sm:h-16 lg:h-20 object-contain"
                 />
               </div>
             </div>
           )}
           
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight mb-3">
             {companyName}
           </h1>
           
           {agentProfile && (
-            <p className="text-lg sm:text-xl font-medium text-foreground/80 mb-1">
-              Welcome, {agentProfile.first_name}
+            <p className="text-xl sm:text-2xl font-semibold text-foreground/80 mb-2">
+              Welcome back, {agentProfile.first_name}
             </p>
           )}
           
@@ -128,43 +132,44 @@ const LandingPage = () => {
           </p>
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 lg:gap-5">
-          {tools.map((tool) => (
-            <div
+        {/* Tools Grid - StatCard Style */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {tools.map((tool, index) => (
+            <Card
               key={tool.path}
               onClick={() => navigate(tool.path)}
               className={`
-                group relative cursor-pointer rounded-xl sm:rounded-2xl overflow-hidden
-                ${tool.bgColor}
-                border border-slate-200/50 dark:border-slate-700/50
-                shadow-sm sm:shadow-md
+                relative overflow-hidden border-0 cursor-pointer
+                shadow-lg hover:shadow-xl
                 transition-all duration-300 ease-out
-                hover:scale-[1.03] hover:-translate-y-1
-                hover:shadow-lg sm:hover:shadow-xl
-                active:scale-[0.97]
-                aspect-[5/2] sm:aspect-square
+                hover:scale-[1.02] hover:-translate-y-1
+                active:scale-[0.98]
+                ${tool.gradient}
               `}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              {/* Large background icon - now colored */}
-              <div className="absolute -right-2 -bottom-2 sm:-right-4 sm:-bottom-4 opacity-20 transition-all duration-500 group-hover:opacity-30 group-hover:scale-110">
-                <tool.icon className={`w-16 h-16 sm:w-28 sm:h-28 lg:w-36 lg:h-36 ${tool.iconColor}`} strokeWidth={1} />
+              {/* Large background icon - top right corner */}
+              <div className="absolute top-0 right-0 w-24 h-24 sm:w-28 sm:h-28 opacity-[0.08] pointer-events-none">
+                <tool.icon className="w-full h-full" strokeWidth={1} />
               </div>
               
-              {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-2.5 sm:p-4 lg:p-5">
-                <div className={`w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl ${tool.accentBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-                  <tool.icon className={`w-3.5 h-3.5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${tool.iconColor}`} strokeWidth={2} />
-                </div>
-                
-                <h2 className="text-[10px] sm:text-sm lg:text-base font-semibold text-slate-900 dark:text-slate-100 leading-tight">
+              <CardHeader className="pb-2 pt-4 sm:pt-5">
+                <CardTitle className="text-sm font-medium text-foreground/70 flex items-center gap-2">
+                  <div className={`p-2 rounded-xl ${tool.iconBg} shadow-lg`}>
+                    <tool.icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="pb-4 sm:pb-5">
+                <p className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
                   {tool.title}
-                </h2>
-              </div>
-              
-              {/* Subtle shine effect on hover */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700 pointer-events-none" />
-            </div>
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  {tool.subtitle}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
