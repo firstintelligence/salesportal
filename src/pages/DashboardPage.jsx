@@ -299,7 +299,21 @@ const DashboardPage = () => {
                       <Input
                         id="phone"
                         value={newDeal.phone}
-                        onChange={(e) => setNewDeal({ ...newDeal, phone: e.target.value })}
+                        onChange={(e) => {
+                          const input = e.target.value;
+                          const digits = input.replace(/\D/g, '').slice(0, 10);
+                          let formatted = '';
+                          if (digits.length > 0) {
+                            formatted = '(' + digits.slice(0, 3);
+                            if (digits.length > 3) {
+                              formatted += ') ' + digits.slice(3, 6);
+                              if (digits.length > 6) {
+                                formatted += '-' + digits.slice(6);
+                              }
+                            }
+                          }
+                          setNewDeal({ ...newDeal, phone: formatted });
+                        }}
                         placeholder="(416) 555-1234"
                         className="h-9"
                       />
