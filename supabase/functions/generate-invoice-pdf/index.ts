@@ -187,13 +187,13 @@ serve(async (req) => {
               const signatureBytes = base64ToUint8Array(signatureBase64);
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
-              // Draw signature at approximate position (bottom left signature area)
-              // Typical CPA form signature position
+              // Draw signature centered in the signature field area
+              // Adjusted position and size to match invoice signature appearance
               firstPage.drawImage(signatureImage, {
-                x: 72,
-                y: 115,
-                width: 150,
-                height: 40,
+                x: 95,
+                y: 95,
+                width: 200,
+                height: 50,
               });
               console.log('Signature embedded on page');
             } catch (sigError) {
