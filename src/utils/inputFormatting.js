@@ -33,7 +33,12 @@ export const formatPostalCode = (str) => {
  */
 export const formatPhoneNumber = (str) => {
   if (!str) return str;
-  const digits = str.replace(/\D/g, '').slice(0, 10);
+  let digits = str.replace(/\D/g, '');
+  // Strip leading country code "1" if present (11 digits starting with 1)
+  if (digits.length === 11 && digits.startsWith('1')) {
+    digits = digits.slice(1);
+  }
+  digits = digits.slice(0, 10);
   let formatted = '';
   if (digits.length > 0) {
     formatted = '(' + digits.slice(0, 3);
