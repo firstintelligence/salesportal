@@ -18,10 +18,10 @@ const PaymentCalculatorPage = () => {
   const [promoTerm, setPromoTerm] = useState(36);
 
   const interestRates = [
-    0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99
+    0, 0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
   ];
 
-  const regularRate = 13.99;
+  const regularRate = 16.99;
   const remainingMonths = 60 - promoTerm;
 
   // Get available terms for current interest rate
@@ -60,51 +60,55 @@ const PaymentCalculatorPage = () => {
       </div>
 
       <div className="container max-w-2xl mx-auto p-4 md:p-6">
-        <div className="bg-card rounded-lg shadow-lg border border-border overflow-hidden">
+        <div className="bg-card rounded-xl shadow-lg border border-border overflow-hidden">
           {/* Header */}
           <div className="p-6 pb-4">
-            <h1 className="text-2xl font-bold text-foreground">Installment loan estimate</h1>
+            <h1 className="text-2xl font-bold text-foreground">Monthly Payment Calculator</h1>
           </div>
 
           {/* Green Progress Bar */}
-          <div className="h-2 bg-emerald-500"></div>
+          <div className="h-1.5 bg-emerald-500"></div>
 
           {/* Content */}
           <div className="p-6 space-y-6">
             {/* Special Promo Badge */}
             <div className="flex justify-end">
-              <span className="text-yellow-600 font-semibold text-sm">Special promo</span>
+              <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-semibold text-sm">Special promo</span>
             </div>
 
             {/* Promo Rate Display */}
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+              <h2 className="text-3xl md:text-4xl font-bold text-emerald-700 dark:text-emerald-400">
                 {interestRate}% APR for {promoTerm} Months
               </h2>
             </div>
 
             <div className="border-t border-border pt-6">
-              <h3 className="text-xl font-semibold text-foreground mb-4">Monthly payment</h3>
-              <div className="space-y-2">
-                <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(promoPayment)} <span className="text-base font-normal">({interestRate}% for {promoTerm} months)</span>
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(regularPayment)} <span className="text-base font-normal">({regularRate}% for {remainingMonths} months)</span>
-                </p>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Estimated Monthly Payments</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
+                  <p className="text-sm text-muted-foreground mb-1">Promo Period</p>
+                  <p className="text-2xl font-bold text-foreground">{formatCurrency(promoPayment)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{interestRate}% for {promoTerm} months</p>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
+                  <p className="text-sm text-muted-foreground mb-1">After Promo</p>
+                  <p className="text-2xl font-bold text-foreground">{formatCurrency(regularPayment)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{regularRate}% for remaining term</p>
+                </div>
               </div>
             </div>
 
             <div className="border-t border-border pt-6 space-y-4">
-              {/* Purchase Amount Input */}
-              <div className="space-y-2">
-                <Label htmlFor="purchaseAmount">Purchase amount</Label>
+              {/* Purchase Amount Input - inline like others */}
+              <div className="flex justify-between items-center">
+                <Label htmlFor="purchaseAmount">Purchase Amount</Label>
                 <Input
                   id="purchaseAmount"
                   type="number"
                   value={purchaseAmount}
                   onChange={(e) => setPurchaseAmount(parseFloat(e.target.value) || 0)}
-                  className="text-right font-semibold"
+                  className="w-40 text-right font-semibold"
                 />
               </div>
 
@@ -125,28 +129,7 @@ const PaymentCalculatorPage = () => {
                 </Select>
               </div>
 
-              {/* Amortization Period Select */}
-              <div className="flex justify-between items-center">
-                <Label>Amortization period</Label>
-                <Select value={amortizationPeriod.toString()} onValueChange={(value) => setAmortizationPeriod(parseInt(value))}>
-                  <SelectTrigger className="w-40 font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">12 months</SelectItem>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
-                    <SelectItem value="48">48 months</SelectItem>
-                    <SelectItem value="60">60 months</SelectItem>
-                    <SelectItem value="84">84 months</SelectItem>
-                    <SelectItem value="120">120 months</SelectItem>
-                    <SelectItem value="180">180 months</SelectItem>
-                    <SelectItem value="240">240 months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Promo Term Select */}
+              {/* Promo Term Select - moved above amortization */}
               <div className="flex justify-between items-center">
                 <Label>Promo Term</Label>
                 <Select value={promoTerm.toString()} onValueChange={(value) => setPromoTerm(parseInt(value))}>
@@ -173,21 +156,35 @@ const PaymentCalculatorPage = () => {
                 </Select>
               </div>
 
-              {/* Administration Fee */}
+              {/* Amortization Period Select */}
               <div className="flex justify-between items-center">
+                <Label>Amortization Period</Label>
+                <Select value={amortizationPeriod.toString()} onValueChange={(value) => setAmortizationPeriod(parseInt(value))}>
+                  <SelectTrigger className="w-40 font-semibold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="12">12 months</SelectItem>
+                    <SelectItem value="24">24 months</SelectItem>
+                    <SelectItem value="36">36 months</SelectItem>
+                    <SelectItem value="48">48 months</SelectItem>
+                    <SelectItem value="60">60 months</SelectItem>
+                    <SelectItem value="84">84 months</SelectItem>
+                    <SelectItem value="120">120 months</SelectItem>
+                    <SelectItem value="180">180 months</SelectItem>
+                    <SelectItem value="240">240 months</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Administration Fee */}
+              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Label>Administration fee</Label>
+                  <Label className="text-muted-foreground">Administration Fee</Label>
                   <Info className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <span className="font-semibold">{formatCurrency(adminFee)}</span>
+                <span className="font-semibold text-foreground">{formatCurrency(adminFee)}</span>
               </div>
-            </div>
-
-            {/* Learn More Link */}
-            <div className="flex justify-end pt-4">
-              <a href="#" className="text-primary font-semibold hover:underline">
-                Learn more
-              </a>
             </div>
           </div>
         </div>
