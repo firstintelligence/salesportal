@@ -72,7 +72,32 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       if (isEmpty) {
         onSave(null);
       } else {
-        const dataUrl = signatureRef.current.toDataURL('image/png');
+        // Get the canvas and process it to make white pixels transparent
+        const canvas = signatureRef.current.getCanvas();
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Convert white/near-white pixels to transparent
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          
+          // If pixel is white or near-white, make it transparent
+          if (r > 240 && g > 240 && b > 240) {
+            data[i + 3] = 0; // Set alpha to 0 (transparent)
+          }
+        }
+        
+        // Create a new canvas for the transparent signature
+        const transparentCanvas = document.createElement('canvas');
+        transparentCanvas.width = canvas.width;
+        transparentCanvas.height = canvas.height;
+        const transparentCtx = transparentCanvas.getContext('2d');
+        transparentCtx.putImageData(imageData, 0, 0);
+        
+        const dataUrl = transparentCanvas.toDataURL('image/png');
         onSave(dataUrl);
       }
     }
