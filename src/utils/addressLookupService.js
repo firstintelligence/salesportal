@@ -1,92 +1,33 @@
-// Address lookup service for real postal code validation
-// Using Google Maps Geocoding API as primary service
+// Address lookup service using edge function for postal code validation
+import { supabase } from "@/integrations/supabase/client";
 
 class AddressLookupService {
-  // Using Google Maps Geocoding API as primary service
   static async lookupPostalCode(address, city, province) {
     if (!address || !city || !province) {
       throw new Error('Address, city, and province are required');
     }
 
-    const fullAddress = `${address}, ${city}, ${province}, Canada`;
-    
     try {
-      // Primary service: Google Maps Geocoding API
-      const googleResult = await this.tryGoogleMaps(fullAddress);
-      if (googleResult) return googleResult;
+      // Use edge function for postal code lookup (server-side Google API call)
+      const { data, error } = await supabase.functions.invoke('lookup-postal-code', {
+        body: { address, city, province }
+      });
 
-      // Fallback: Use province-based estimation if API fails
+      if (error) {
+        console.error('Edge function error:', error);
+        return this.generateEstimatedPostalCode(city, province);
+      }
+
+      if (data?.postalCode) {
+        console.log('Postal code found via', data.source, ':', data.postalCode);
+        return data.postalCode;
+      }
+
+      // Fallback to estimation if no postal code found
       return this.generateEstimatedPostalCode(city, province);
     } catch (error) {
       console.error('Address lookup failed:', error);
-      // Fallback to estimated postal code
       return this.generateEstimatedPostalCode(city, province);
-    }
-  }
-
-  static async tryGoogleMaps(fullAddress) {
-    try {
-      // Google Places API key (publishable, restricted by HTTP referrer)
-      const apiKey = 'AIzaSyAHKtdY7NwgxelISC-bek6hgjww3XyJRnQ';
-
-      const encodedAddress = encodeURIComponent(fullAddress);
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&components=country:CA&key=${apiKey}`
-      );
-
-      if (!response.ok) {
-        return await this.tryNominatim(fullAddress);
-      }
-
-      const data = await response.json();
-      
-      if (data.status === 'OK' && data.results && data.results.length > 0) {
-        const result = data.results[0];
-        const postalComponent = result.address_components?.find(
-          (component) => component.types.includes('postal_code')
-        );
-        
-        if (postalComponent) {
-          const postalCode = postalComponent.long_name;
-          if (this.isValidCanadianPostalCode(postalCode)) {
-            return postalCode.replace(/\s/g, '').toUpperCase().replace(/(.{3})(.{3})/, '$1 $2');
-          }
-        }
-      }
-      
-      // Fallback to Nominatim if Google doesn't return postal code
-      return await this.tryNominatim(fullAddress);
-    } catch (error) {
-      console.error('Google Geocoding lookup failed:', error);
-      return await this.tryNominatim(fullAddress);
-    }
-  }
-
-  static async tryNominatim(fullAddress) {
-    try {
-      const encodedAddress = encodeURIComponent(fullAddress);
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&countrycodes=ca&limit=1&addressdetails=1`,
-        {
-          headers: {
-            'User-Agent': 'InvoiceApp/1.0 (address-lookup)',
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Nominatim API error');
-
-      const data = await response.json();
-      if (data && data.length > 0 && data[0].address) {
-        const postalCode = data[0].address.postcode;
-        if (postalCode && this.isValidCanadianPostalCode(postalCode)) {
-          return postalCode.replace(/\s/g, '').toUpperCase().replace(/(.{3})(.{3})/, '$1 $2');
-        }
-      }
-      return null;
-    } catch (error) {
-      console.error('Nominatim lookup failed:', error);
-      return null;
     }
   }
 
@@ -162,7 +103,6 @@ class AddressLookupService {
     if (cityPostalRanges[cityKey]) {
       const range = cityPostalRanges[cityKey];
       const startCode = range[0];
-      const endCode = range[1];
       
       // Generate a postal code within the range
       const firstChar = startCode[0];
