@@ -575,6 +575,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     const today = getTodayInToronto();
     const dueDate = format(addDays(new Date(today), 7), 'yyyy-MM-dd');
     
+    // Reset the hasLoadedInitialData flag so the form doesn't try to reload old data
+    hasLoadedInitialData.current = false;
+    
     setBillTo({ 
       firstName: "", 
       lastName: "", 
@@ -621,6 +624,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     if (formDataKey) {
       localStorage.removeItem(formDataKey);
     }
+    
+    // Mark as loaded again so we don't accidentally overwrite with stale localStorage
+    hasLoadedInitialData.current = true;
   };
 
   // Save customer profile to dashboard
