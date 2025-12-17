@@ -79,7 +79,28 @@ serve(async (req) => {
 
     if (!cpaBill59FormBase64) {
       console.warn('No CPA Bill 59 Form provided, proceeding without it');
-      finalPdfBytes = new Uint8Array(invoicePdfBytes);
+      // Still add page numbers even without CPA form
+      const invoicePdf = await PDFDocument.load(invoicePdfBytes);
+      const allPages = invoicePdf.getPages();
+      const totalPages = allPages.length;
+      const pageNumberFont = await invoicePdf.embedFont(StandardFonts.Helvetica);
+      
+      for (let i = 0; i < totalPages; i++) {
+        const page = allPages[i];
+        const { width } = page.getSize();
+        const pageNumberText = `Page ${i + 1} of ${totalPages}`;
+        const textWidth = pageNumberFont.widthOfTextAtSize(pageNumberText, 10);
+        
+        page.drawText(pageNumberText, {
+          x: (width - textWidth) / 2,
+          y: 20,
+          size: 10,
+          font: pageNumberFont,
+          color: rgb(0, 0, 0),
+        });
+      }
+      console.log(`Added page numbers to ${totalPages} pages (no CPA form)`);
+      finalPdfBytes = await invoicePdf.save();
     } else {
       try {
         // Decode the base64 PDF
@@ -245,6 +266,28 @@ serve(async (req) => {
         const invoicePdf = await PDFDocument.load(invoicePdfBytes);
         const invoicePages = await mergedPdf.copyPages(invoicePdf, invoicePdf.getPageIndices());
         invoicePages.forEach(page => mergedPdf.addPage(page));
+
+        // Add page numbers to all pages
+        const allPages = mergedPdf.getPages();
+        const totalPages = allPages.length;
+        const pageNumberFont = await mergedPdf.embedFont(StandardFonts.Helvetica);
+        
+        for (let i = 0; i < totalPages; i++) {
+          const page = allPages[i];
+          const { width, height } = page.getSize();
+          const pageNumberText = `Page ${i + 1} of ${totalPages}`;
+          const textWidth = pageNumberFont.widthOfTextAtSize(pageNumberText, 10);
+          
+          // Draw page number centered at bottom of page
+          page.drawText(pageNumberText, {
+            x: (width - textWidth) / 2,
+            y: 20,
+            size: 10,
+            font: pageNumberFont,
+            color: rgb(0, 0, 0),
+          });
+        }
+        console.log(`Added page numbers to ${totalPages} pages`);
 
         finalPdfBytes = await mergedPdf.save();
         console.log('Final merged PDF size:', finalPdfBytes.byteLength, 'bytes');
