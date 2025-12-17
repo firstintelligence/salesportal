@@ -1102,9 +1102,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                   return Array.from({ length: numberOfPages }, (_, pageIndex) => {
                     return (
                       <div key={pageIndex} className="relative">
-                        {/* Page container with shadow and border - clips to exact 8.5x11 */}
+                        {/* Page container sized to exact 8.5x11 proportions */}
                         <div 
-                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm overflow-hidden" 
+                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm" 
                           style={{ 
                             width: `${scaledWidth}px`,
                             height: `${scaledHeight}px`,
@@ -1116,52 +1116,31 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                               transform: `scale(${previewScale})`,
                               transformOrigin: 'top left',
                               width: `${pageWidth}px`,
-                              height: `${pageHeight}px`,
                             }}
                           >
-                            {/* Content clipper - clips at exact page boundary before scaling */}
-                            <div
-                              style={{
-                                width: `${pageWidth}px`,
-                                height: `${pageHeight}px`,
-                                overflow: 'hidden',
-                                position: 'relative',
+                            <InvoiceTemplate
+                              data={{
+                                invoice,
+                                billTo,
+                                shipTo,
+                                items,
+                                financing,
+                                rebatesIncentives,
+                                yourCompany,
+                                isInvoice,
+                                subTotal,
+                                grandTotal,
+                                taxAmount,
+                                taxPercentage,
+                                notes,
+                                selectedCurrency,
+                                pageNumber: pageIndex + 1,
+                                totalPages: numberOfPages,
+                                signature: savedSignatureDataUrl,
+                                coApplicantSignature: coApplicantSignatureDataUrl,
                               }}
-                            >
-                              {/* Content offset for pagination */}
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  top: `-${pageIndex * pageHeight}px`,
-                                  left: 0,
-                                  width: `${pageWidth}px`,
-                                }}
-                              >
-                                <InvoiceTemplate
-                                  data={{
-                                    invoice,
-                                    billTo,
-                                    shipTo,
-                                    items,
-                                    financing,
-                                    rebatesIncentives,
-                                    yourCompany,
-                                    isInvoice,
-                                    subTotal,
-                                    grandTotal,
-                                    taxAmount,
-                                    taxPercentage,
-                                    notes,
-                                    selectedCurrency,
-                                    pageNumber: pageIndex + 1,
-                                    totalPages: numberOfPages,
-                                    signature: savedSignatureDataUrl,
-                                    coApplicantSignature: coApplicantSignatureDataUrl,
-                                  }}
-                                  templateNumber={4}
-                                />
-                              </div>
-                            </div>
+                              templateNumber={4}
+                            />
                           </div>
                           {/* Page indicator - only show if multiple pages */}
                           {numberOfPages > 1 && (
