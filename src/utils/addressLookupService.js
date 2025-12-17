@@ -26,32 +26,41 @@ class AddressLookupService {
 
   static async tryGoogleMaps(fullAddress) {
     try {
-      // Note: In production, you would need a Google Maps API key
-      // For now, using a free alternative that provides Canadian postal codes
+      const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+      if (!apiKey) {
+        console.warn('Google API key not found, falling back to Nominatim');
+        return await this.tryNominatim(fullAddress);
+      }
+
       const encodedAddress = encodeURIComponent(fullAddress);
       const response = await fetch(
-        `https://api.geocode.earth/v1/search?text=${encodedAddress}&boundary.country=CA&size=1&api_key=ge-demo`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&components=country:CA&key=${apiKey}`
       );
 
       if (!response.ok) {
-        // Fallback to Nominatim if geocode.earth fails
         return await this.tryNominatim(fullAddress);
       }
 
       const data = await response.json();
-      if (data && data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        const postalCode = feature.properties.postalcode;
-        if (postalCode && this.isValidCanadianPostalCode(postalCode)) {
-          return postalCode.replace(/\s/g, '').toUpperCase().replace(/(.{3})(.{3})/, '$1 $2');
+      
+      if (data.status === 'OK' && data.results && data.results.length > 0) {
+        const result = data.results[0];
+        const postalComponent = result.address_components?.find(
+          (component) => component.types.includes('postal_code')
+        );
+        
+        if (postalComponent) {
+          const postalCode = postalComponent.long_name;
+          if (this.isValidCanadianPostalCode(postalCode)) {
+            return postalCode.replace(/\s/g, '').toUpperCase().replace(/(.{3})(.{3})/, '$1 $2');
+          }
         }
       }
       
-      // Fallback to Nominatim
+      // Fallback to Nominatim if Google doesn't return postal code
       return await this.tryNominatim(fullAddress);
     } catch (error) {
-      console.error('Google Maps lookup failed:', error);
-      // Fallback to Nominatim
+      console.error('Google Geocoding lookup failed:', error);
       return await this.tryNominatim(fullAddress);
     }
   }
