@@ -35,6 +35,7 @@ serve(async (req) => {
       'AW11': '+10000000003', // Placeholder - update with real number
       'MA11': '+19059043544',
       'MW11': '+10000000005', // Placeholder - update with real number
+      'WLead6': '+14168398267',
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
