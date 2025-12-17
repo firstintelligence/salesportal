@@ -1110,36 +1110,58 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                             height: `${scaledHeight}px`,
                           }}
                         >
+                          {/* Scaling wrapper */}
                           <div
-                            className="origin-top-left"
                             style={{
+                              transform: `scale(${previewScale})`,
+                              transformOrigin: 'top left',
                               width: `${pageWidth}px`,
-                              transform: `scale(${previewScale}) translateY(-${pageIndex * pageHeight}px)`,
+                              height: `${pageHeight}px`,
                             }}
                           >
-                            <InvoiceTemplate
-                              data={{
-                                invoice,
-                                billTo,
-                                shipTo,
-                                items,
-                                financing,
-                                rebatesIncentives,
-                                yourCompany,
-                                isInvoice,
-                                subTotal,
-                                grandTotal,
-                                taxAmount,
-                                taxPercentage,
-                                notes,
-                                selectedCurrency,
-                                pageNumber: pageIndex + 1,
-                                totalPages: numberOfPages,
-                                signature: savedSignatureDataUrl,
-                                coApplicantSignature: coApplicantSignatureDataUrl,
+                            {/* Content clipper - clips at exact page boundary before scaling */}
+                            <div
+                              style={{
+                                width: `${pageWidth}px`,
+                                height: `${pageHeight}px`,
+                                overflow: 'hidden',
+                                position: 'relative',
                               }}
-                              templateNumber={4}
-                            />
+                            >
+                              {/* Content offset for pagination */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: `-${pageIndex * pageHeight}px`,
+                                  left: 0,
+                                  width: `${pageWidth}px`,
+                                }}
+                              >
+                                <InvoiceTemplate
+                                  data={{
+                                    invoice,
+                                    billTo,
+                                    shipTo,
+                                    items,
+                                    financing,
+                                    rebatesIncentives,
+                                    yourCompany,
+                                    isInvoice,
+                                    subTotal,
+                                    grandTotal,
+                                    taxAmount,
+                                    taxPercentage,
+                                    notes,
+                                    selectedCurrency,
+                                    pageNumber: pageIndex + 1,
+                                    totalPages: numberOfPages,
+                                    signature: savedSignatureDataUrl,
+                                    coApplicantSignature: coApplicantSignatureDataUrl,
+                                  }}
+                                  templateNumber={4}
+                                />
+                              </div>
+                            </div>
                           </div>
                           {/* Page indicator - only show if multiple pages */}
                           {numberOfPages > 1 && (
