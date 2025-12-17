@@ -40,7 +40,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       await new Promise((resolve) => {
         root.render(
           React.createElement(React.Fragment, null,
-            React.createElement(Template, { data: invoiceData }),
+            React.createElement(Template, { data: invoiceData, showTermsAndConditions: true }),
             React.createElement(ConsumerProtectionActPage, { companyInfo })
           )
         );

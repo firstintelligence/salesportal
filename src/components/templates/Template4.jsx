@@ -5,7 +5,7 @@ import BaseTemplate from './BaseTemplate';
 import { formatPhoneNumber } from '../../utils/inputFormatting';
 import { getProductDescription } from '../../utils/productDescriptions';
 
-const Template4 = ({ data }) => {
+const Template4 = ({ data, showTermsAndConditions = true }) => {
   const { 
     billTo = {}, 
     shipTo = {}, 
@@ -298,7 +298,8 @@ const Template4 = ({ data }) => {
           </div>
         )}
 
-        {/* Terms and Conditions - Always on a new page after invoice content */}
+        {/* Terms and Conditions - Only shown in PDF mode, not in preview */}
+        {showTermsAndConditions && (
         <div style={{pageBreakBefore: 'always'}}>
             {/* Page 2 Header */}
             <div className="flex justify-between items-start mb-6 pt-4">
@@ -367,7 +368,8 @@ const Template4 = ({ data }) => {
                 </div>
               )}
               {!data.billTo?.coApplicantName && <div></div>}
-            </div>
+          </div>
+        )}
           </div>
 
         {/* Continuation page header - for pages beyond page 1 that are not the last page */}

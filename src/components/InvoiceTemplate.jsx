@@ -6,7 +6,7 @@ const InvoiceTemplate = ({ data, templateNumber, showConsumerProtectionPage = fa
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <Template data={data} />
+      <Template data={data} showTermsAndConditions={false} />
     </div>
   );
 };
