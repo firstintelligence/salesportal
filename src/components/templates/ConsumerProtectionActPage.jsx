@@ -4,16 +4,16 @@ const ConsumerProtectionActPage = ({ companyInfo }) => {
   const { name, address, phone, email } = companyInfo || {};
 
   return (
-    <div
+    <div 
       className="bg-white mx-auto"
       style={{ 
         width: "794px", 
-        minHeight: "1123px",
+        height: "1123px",
         padding: "48px 54px",
         boxSizing: "border-box",
         pageBreakBefore: "always",
-        pageBreakAfter: "avoid",
-        fontFamily: "Arial, sans-serif"
+        fontFamily: "Arial, sans-serif",
+        overflow: "hidden"
       }}
     >
       <h2 style={{ 

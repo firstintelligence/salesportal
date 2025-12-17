@@ -24,6 +24,13 @@ import { useTenant } from "@/contexts/TenantContext";
 import { getTenantCompanyInfo, getTenantLogo } from "@/utils/tenantLogos";
 import { formatPhoneNumber } from "@/utils/inputFormatting";
 
+// Helper function to get today's date in Toronto timezone
+const getTodayInToronto = () => {
+  const now = new Date();
+  const torontoTime = toZonedTime(now, 'America/Toronto');
+  return format(torontoTime, 'yyyy-MM-dd');
+};
+
 // Helper function to get province tax name
 const getProvinceTaxName = (provinceCode) => {
   const taxNames = {
