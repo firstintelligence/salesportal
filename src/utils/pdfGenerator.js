@@ -35,10 +35,11 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       } : null;
       
       // Create React root and render both template and Consumer Protection Act page
+      // Use React.Fragment to avoid extra wrapper div that could cause blank pages
       const root = createRoot(pdfContainer);
       await new Promise((resolve) => {
         root.render(
-          React.createElement('div', null,
+          React.createElement(React.Fragment, null,
             React.createElement(Template, { data: invoiceData }),
             React.createElement(ConsumerProtectionActPage, { companyInfo })
           )
@@ -119,24 +120,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       
       inlineEssentialStyles(pdfContainer.firstElementChild);
       
-      const html = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body { font-family: Arial, sans-serif; background: white; }
-              p { display: block; margin-bottom: 0.25rem; }
-              div { display: block; }
-              h1, h2, h3, h4, h5, h6 { display: block; }
-            </style>
-          </head>
-          <body>
-            ${pdfContainer.innerHTML}
-          </body>
-        </html>
-      `;
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:white;margin:0;padding:0;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
       
       // Cleanup DOM
       root.unmount();
