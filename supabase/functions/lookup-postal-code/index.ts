@@ -26,11 +26,11 @@ serve(async (req) => {
     const fullAddress = `${address}, ${city}, ${province}, Canada`;
     const encodedAddress = encodeURIComponent(fullAddress);
     
-    // Use Google Geocoding API
-    const apiKey = Deno.env.get('VITE_GOOGLE_PLACES_API_KEY');
+    // Use Google Geocoding API (server-side key without referrer restrictions)
+    const apiKey = Deno.env.get('GOOGLE_GEOCODING_API_KEY');
     
     if (!apiKey) {
-      console.error('Google Places API key not configured');
+      console.error('GOOGLE_GEOCODING_API_KEY not configured');
       return new Response(
         JSON.stringify({ error: 'API key not configured', postalCode: null }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
