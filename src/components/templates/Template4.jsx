@@ -368,9 +368,9 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 </div>
               )}
               {!data.billTo?.coApplicantName && <div></div>}
+            </div>
           </div>
         )}
-          </div>
 
         {/* Continuation page header - for pages beyond page 1 that are not the last page */}
         {!isFirstPage && !isLastPage && (
