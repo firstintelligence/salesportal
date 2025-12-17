@@ -91,9 +91,10 @@ serve(async (req) => {
         const pageNumberText = `Page ${i + 1} of ${totalPages}`;
         const textWidth = pageNumberFont.widthOfTextAtSize(pageNumberText, 10);
         
+        // Draw page number at bottom right of page
         page.drawText(pageNumberText, {
-          x: (width - textWidth) / 2,
-          y: 20,
+          x: width - textWidth - 30,
+          y: 15,
           size: 10,
           font: pageNumberFont,
           color: rgb(0, 0, 0),
@@ -208,12 +209,12 @@ serve(async (req) => {
               const signatureBytes = base64ToUint8Array(signatureBase64);
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
-              // Draw signature centered in the signature field area - larger to match other pages
+              // Draw signature - smaller to match invoice pages, moved up
               firstPage.drawImage(signatureImage, {
                 x: 80,
-                y: 60,
-                width: 280,
-                height: 70,
+                y: 80,
+                width: 150,
+                height: 40,
               });
               console.log('Signature embedded on page');
             } catch (sigError) {
@@ -274,14 +275,14 @@ serve(async (req) => {
         
         for (let i = 0; i < totalPages; i++) {
           const page = allPages[i];
-          const { width, height } = page.getSize();
+          const { width } = page.getSize();
           const pageNumberText = `Page ${i + 1} of ${totalPages}`;
           const textWidth = pageNumberFont.widthOfTextAtSize(pageNumberText, 10);
           
-          // Draw page number centered at bottom of page
+          // Draw page number at bottom right of page
           page.drawText(pageNumberText, {
-            x: (width - textWidth) / 2,
-            y: 20,
+            x: width - textWidth - 30,
+            y: 15,
             size: 10,
             font: pageNumberFont,
             color: rgb(0, 0, 0),

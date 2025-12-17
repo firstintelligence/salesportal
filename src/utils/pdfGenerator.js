@@ -19,16 +19,30 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         font-family: Arial, sans-serif;
       `;
       
-      // Get the template and render it
+      // Get the template and Consumer Protection Act page, then render them
       const { getTemplate } = await import('../utils/templateRegistry');
+      const ConsumerProtectionActPage = (await import('../components/templates/ConsumerProtectionActPage')).default;
       const Template = getTemplate(templateNumber);
       const React = (await import('react')).default;
       const { createRoot } = await import('react-dom/client');
       
-      // Create React root and render
+      // Extract company info for Consumer Protection Act page
+      const companyInfo = invoiceData?.yourCompany ? {
+        name: invoiceData.yourCompany.name,
+        address: invoiceData.yourCompany.address,
+        phone: invoiceData.yourCompany.phone,
+        email: invoiceData.yourCompany.email
+      } : null;
+      
+      // Create React root and render both template and Consumer Protection Act page
       const root = createRoot(pdfContainer);
       await new Promise((resolve) => {
-        root.render(React.createElement(Template, { data: invoiceData }));
+        root.render(
+          React.createElement('div', null,
+            React.createElement(Template, { data: invoiceData }),
+            React.createElement(ConsumerProtectionActPage, { companyInfo })
+          )
+        );
         setTimeout(resolve, 500); // Wait for rendering
       });
       
