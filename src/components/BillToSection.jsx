@@ -106,7 +106,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             type="button"
             variant="outline"
             size="sm"
-            className="absolute right-1 top-1 bottom-1 px-2 text-xs"
+            className="absolute right-[3px] top-1/2 -translate-y-1/2 h-[calc(100%-6px)] px-2 text-xs"
             onClick={async () => {
               try {
                 const postalCode = await AddressLookupService.lookupPostalCode(
