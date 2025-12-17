@@ -26,11 +26,8 @@ class AddressLookupService {
 
   static async tryGoogleMaps(fullAddress) {
     try {
-      const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
-      if (!apiKey) {
-        console.warn('Google API key not found, falling back to Nominatim');
-        return await this.tryNominatim(fullAddress);
-      }
+      // Google Places API key (publishable, restricted by HTTP referrer)
+      const apiKey = 'AIzaSyAHKtdY7NwgxelISC-bek6hgjww3XyJRnQ';
 
       const encodedAddress = encodeURIComponent(fullAddress);
       const response = await fetch(
