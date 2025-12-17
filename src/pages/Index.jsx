@@ -1096,15 +1096,15 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                   
                   const numberOfPages = Math.max(1, Math.ceil(totalContentHeight / pageHeight));
                   
+                  const scaledWidth = pageWidth * previewScale;
+                  const scaledHeight = pageHeight * previewScale;
+                  
                   return Array.from({ length: numberOfPages }, (_, pageIndex) => {
-                    const scaledWidth = pageWidth * previewScale;
-                    const scaledHeight = pageHeight * previewScale;
-
                     return (
                       <div key={pageIndex} className="relative">
-                        {/* Page container with shadow and border for visual separation */}
+                        {/* Page container with shadow and border - clips to exact 8.5x11 */}
                         <div 
-                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm" 
+                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm overflow-hidden" 
                           style={{ 
                             width: `${scaledWidth}px`,
                             height: `${scaledHeight}px`,
@@ -1114,8 +1114,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                             className="origin-top-left"
                             style={{
                               width: `${pageWidth}px`,
-                              height: `${pageHeight}px`,
-                              transform: `scale(${previewScale})`,
+                              transform: `scale(${previewScale}) translateY(-${pageIndex * pageHeight}px)`,
                             }}
                           >
                             <InvoiceTemplate
