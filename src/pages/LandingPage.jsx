@@ -105,21 +105,22 @@ const LandingPage = () => {
       <div className="relative max-w-5xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-10 sm:mb-14">
-          {tenantLogo && (
+          {tenantLogo ? (
             <div className="flex justify-center mb-6">
-              <div className="p-4 glass-effect rounded-2xl shadow-xl">
+              <div className="p-4 glass-effect rounded-2xl shadow-xl bg-transparent">
                 <img 
                   src={tenantLogo} 
                   alt={companyName}
                   className="h-14 sm:h-16 lg:h-20 object-contain"
+                  style={{ mixBlendMode: 'multiply' }}
                 />
               </div>
             </div>
+          ) : (
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight mb-3">
+              {companyName}
+            </h1>
           )}
-          
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight mb-3">
-            {companyName}
-          </h1>
           
           {agentProfile && (
             <p className="text-xl sm:text-2xl font-semibold text-foreground/80 mb-2">
@@ -133,7 +134,7 @@ const LandingPage = () => {
         </div>
 
         {/* Tools Grid - StatCard Style */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {tools.map((tool, index) => (
             <Card
               key={tool.path}
