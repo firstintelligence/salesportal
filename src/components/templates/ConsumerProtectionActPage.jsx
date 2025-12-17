@@ -8,12 +8,12 @@ const ConsumerProtectionActPage = ({ companyInfo }) => {
       className="bg-white mx-auto"
       style={{ 
         width: "794px", 
-        height: "1123px",
         padding: "48px 54px",
         boxSizing: "border-box",
         pageBreakBefore: "always",
-        fontFamily: "Arial, sans-serif",
-        overflow: "hidden"
+        pageBreakAfter: "avoid",
+        pageBreakInside: "avoid",
+        fontFamily: "Arial, sans-serif"
       }}
     >
       <h2 style={{ 

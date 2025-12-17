@@ -120,7 +120,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       
       inlineEssentialStyles(pdfContainer.firstElementChild);
       
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:white;margin:0;padding:0;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;}html,body{margin:0;padding:0;background:white;}body{font-family:Arial,sans-serif;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
       
       // Cleanup DOM
       root.unmount();
