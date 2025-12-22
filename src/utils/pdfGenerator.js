@@ -181,6 +181,37 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       
       const fullAddress = `${address}, ${city}, ${province} ${postalCode}`;
       const fileName = `${customerName} - ${fullAddress} - ${number}.pdf`;
+      
+      // Generate a unique document ID
+      const documentId = signingContext?.documentId || crypto.randomUUID();
+      
+      // Upload PDF to storage for future access
+      let documentUrl = null;
+      try {
+        const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9\-_.]/g, '_');
+        const storagePath = `${documentId}/${sanitizedFileName}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(storagePath, pdfBlob, {
+            contentType: 'application/pdf',
+            upsert: true
+          });
+        
+        if (uploadError) {
+          console.error('Error uploading document to storage:', uploadError);
+        } else {
+          // Get public URL
+          const { data: urlData } = supabase.storage
+            .from('documents')
+            .getPublicUrl(storagePath);
+          
+          documentUrl = urlData?.publicUrl || null;
+          console.log('Document uploaded to storage:', documentUrl);
+        }
+      } catch (storageError) {
+        console.error('Error with document storage:', storageError);
+      }
 
       // Create download link
       const url = window.URL.createObjectURL(pdfBlob);
@@ -195,9 +226,6 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       // Record document signature if signing context is provided
       if (signingContext) {
         try {
-          // Generate a document ID based on invoice number or create a new UUID
-          const documentId = signingContext.documentId || crypto.randomUUID();
-          
           await recordDocumentSignature({
             documentType: signingContext.documentType || 'invoice',
             documentId: documentId,
@@ -205,7 +233,8 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
             customerName: signingContext.customerName || `${invoiceData.billTo?.firstName || ''} ${invoiceData.billTo?.lastName || ''}`.trim(),
             agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
             tenantId: signingContext.tenantId || null,
-            signatureType: signingContext.signatureType || 'customer'
+            signatureType: signingContext.signatureType || 'customer',
+            documentUrl: documentUrl
           });
           
           // If there's a co-applicant signature, record that too
@@ -217,7 +246,8 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
               customerName: invoiceData.billTo?.coApplicantName || 'Co-Applicant',
               agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
               tenantId: signingContext.tenantId || null,
-              signatureType: 'co_applicant'
+              signatureType: 'co_applicant',
+              documentUrl: documentUrl
             });
           }
         } catch (sigError) {

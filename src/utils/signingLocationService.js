@@ -84,7 +84,8 @@ export const recordDocumentSignature = async ({
   customerName = null,
   agentId,
   tenantId = null,
-  signatureType = 'customer'
+  signatureType = 'customer',
+  documentUrl = null
 }) => {
   try {
     // Capture location data
@@ -100,6 +101,7 @@ export const recordDocumentSignature = async ({
       tenant_id: tenantId,
       signature_type: signatureType,
       signed_at: new Date().toISOString(),
+      document_url: documentUrl,
       ...locationData
     };
     
