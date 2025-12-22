@@ -159,6 +159,7 @@ export type Database = {
           customer_name: string | null
           document_id: string
           document_type: string
+          document_url: string | null
           id: string
           ip_address: string | null
           isp: string | null
@@ -182,6 +183,7 @@ export type Database = {
           customer_name?: string | null
           document_id: string
           document_type: string
+          document_url?: string | null
           id?: string
           ip_address?: string | null
           isp?: string | null
@@ -205,6 +207,7 @@ export type Database = {
           customer_name?: string | null
           document_id?: string
           document_type?: string
+          document_url?: string | null
           id?: string
           ip_address?: string | null
           isp?: string | null

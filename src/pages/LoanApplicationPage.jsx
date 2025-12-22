@@ -517,8 +517,37 @@ const LoanApplicationPage = () => {
         useObjectStreams: false
       });
       
-      // Open the PDF in browser instead of downloading
+      // Generate document ID and upload to storage
+      const documentId = crypto.randomUUID();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      let documentUrl = null;
+      
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const fileName = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
+        const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9\-_.]/g, '_');
+        const storagePath = `${documentId}/${sanitizedFileName}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(storagePath, blob, {
+            contentType: 'application/pdf',
+            upsert: true
+          });
+        
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('documents')
+            .getPublicUrl(storagePath);
+          
+          documentUrl = urlData?.publicUrl || null;
+          console.log('Loan application uploaded to storage:', documentUrl);
+        }
+      } catch (storageError) {
+        console.error('Error with document storage:', storageError);
+      }
+      
+      // Open the PDF in browser instead of downloading
       const url = URL.createObjectURL(blob);
       
       // Open in new tab/window on mobile and desktop
@@ -539,12 +568,13 @@ const LoanApplicationPage = () => {
       try {
         await recordDocumentSignature({
           documentType: 'loan_application',
-          documentId: crypto.randomUUID(),
+          documentId: documentId,
           customerId: customer?.id || null,
           customerName: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
           agentId: localStorage.getItem('agentId') || 'unknown',
           tenantId: null,
-          signatureType: 'customer'
+          signatureType: 'customer',
+          documentUrl: documentUrl
         });
       } catch (sigError) {
         console.error('Error recording document signature:', sigError);

@@ -470,8 +470,9 @@ const CustomerDetailPage = () => {
                         </div>
                       </div>
 
-                      {tpv.recording_url && (
-                        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      {/* Actions: Recording and Generate Invoice */}
+                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3 flex-wrap">
+                        {tpv.recording_url && (
                           <a 
                             href={tpv.recording_url} 
                             target="_blank" 
@@ -482,8 +483,34 @@ const CustomerDetailPage = () => {
                             Listen to Recording
                             <ExternalLink className="w-3 h-3" />
                           </a>
-                        </div>
-                      )}
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Navigate to invoice generator with this TPV's data prefilled
+                            navigate('/invoice-generator', { 
+                              state: { 
+                                customer,
+                                invoiceProfile,
+                                calculatorData: {
+                                  products: tpv.products,
+                                  salesPrice: tpv.sales_price,
+                                  interestRate: tpv.interest_rate,
+                                  monthlyPayment: tpv.monthly_payment,
+                                  amortization: tpv.amortization,
+                                  promotionalTerm: tpv.promotional_term
+                                }
+                              } 
+                            });
+                          }}
+                        >
+                          <FileText className="w-3 h-3 mr-1" />
+                          Generate Invoice
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 );
@@ -614,11 +641,24 @@ const CustomerDetailPage = () => {
                       </div>
                     </div>
 
-                    {/* Agent Info */}
-                    <div className="text-xs text-muted-foreground">
-                      <span>Signed by: {sig.customer_name || 'Unknown'}</span>
-                      <span className="mx-2">•</span>
-                      <span>Agent: {sig.agent_id}</span>
+                    {/* Download Button and Agent Info */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-muted-foreground">
+                        <span>Signed by: {sig.customer_name || 'Unknown'}</span>
+                        <span className="mx-2">•</span>
+                        <span>Agent: {sig.agent_id}</span>
+                      </div>
+                      {sig.document_url && (
+                        <a
+                          href={sig.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Download PDF
+                        </a>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
