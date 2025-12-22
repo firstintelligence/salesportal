@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
   Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
-  CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle
+  CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
+  Globe, Fingerprint
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,9 +31,11 @@ const CustomerDetailPage = () => {
   const [customer, setCustomer] = useState(null);
   const [tpvRequests, setTpvRequests] = useState([]);
   const [checklists, setChecklists] = useState([]);
+  const [documentSignatures, setDocumentSignatures] = useState([]);
   const [invoiceProfile, setInvoiceProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const tenantSlug = tenant?.slug;
 
@@ -42,6 +45,10 @@ const CustomerDetailPage = () => {
       navigate("/");
       return;
     }
+    
+    // Check if current user is admin
+    const agentId = localStorage.getItem("agentId");
+    setIsAdmin(agentId === 'MM23');
     
     if (tenantLoading || !tenantSlug) return;
     
@@ -60,6 +67,7 @@ const CustomerDetailPage = () => {
   const fetchCustomerData = async () => {
     try {
       setLoading(true);
+      const agentId = localStorage.getItem("agentId");
 
       const { data: customerData, error: customerError } = await supabase
         .from("customers")
@@ -92,6 +100,21 @@ const CustomerDetailPage = () => {
 
       if (checklistError) throw checklistError;
       setChecklists(checklistData || []);
+
+      // Fetch document signatures for this customer (admin only via RLS)
+      if (agentId === 'MM23') {
+        const { data: sigData, error: sigError } = await supabase
+          .from("document_signatures")
+          .select("*")
+          .eq("customer_id", customerId)
+          .order("signed_at", { ascending: false });
+        
+        if (!sigError && sigData) {
+          setDocumentSignatures(sigData);
+        } else if (sigError) {
+          console.log("Could not fetch document signatures (may not have permission):", sigError);
+        }
+      }
 
     } catch (error) {
       console.error("Error fetching customer data:", error);
@@ -508,6 +531,101 @@ const CustomerDetailPage = () => {
             </div>
           )}
         </div>
+
+        {/* Document Signatures Section (Admin Only) */}
+        {isAdmin && documentSignatures.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Fingerprint className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">Document Signatures</h2>
+              <Badge variant="secondary" className="text-xs">Admin Only</Badge>
+            </div>
+
+            <div className="space-y-3">
+              {documentSignatures.map((sig) => (
+                <Card key={sig.id} className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-primary/10">
+                          <FileText className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground capitalize">
+                            {sig.document_type?.replace(/_/g, ' ') || 'Document'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Signed {formatDateTime(sig.signed_at)}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="capitalize">
+                        {sig.signature_type?.replace(/_/g, ' ') || 'Customer'}
+                      </Badge>
+                    </div>
+                    
+                    {/* Signing Location Details */}
+                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700 mb-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Signing Location</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs">Location</p>
+                          <p className="font-medium">{sig.location_string || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs">IP Address</p>
+                          <p className="font-medium font-mono text-xs">{sig.ip_address || 'N/A'}</p>
+                        </div>
+                        {sig.city && (
+                          <div>
+                            <p className="text-muted-foreground text-xs">City</p>
+                            <p className="font-medium">{sig.city}, {sig.region}</p>
+                          </div>
+                        )}
+                        {sig.country && (
+                          <div>
+                            <p className="text-muted-foreground text-xs">Country</p>
+                            <p className="font-medium">{sig.country}</p>
+                          </div>
+                        )}
+                        {sig.latitude && sig.longitude && (
+                          <div>
+                            <p className="text-muted-foreground text-xs">Coordinates</p>
+                            <p className="font-medium font-mono text-xs">
+                              {parseFloat(sig.latitude).toFixed(4)}, {parseFloat(sig.longitude).toFixed(4)}
+                            </p>
+                          </div>
+                        )}
+                        {sig.timezone && (
+                          <div>
+                            <p className="text-muted-foreground text-xs">Timezone</p>
+                            <p className="font-medium">{sig.timezone}</p>
+                          </div>
+                        )}
+                        {sig.isp && (
+                          <div className="sm:col-span-2">
+                            <p className="text-muted-foreground text-xs">ISP</p>
+                            <p className="font-medium truncate">{sig.isp}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Agent Info */}
+                    <div className="text-xs text-muted-foreground">
+                      <span>Signed by: {sig.customer_name || 'Unknown'}</span>
+                      <span className="mx-2">•</span>
+                      <span>Agent: {sig.agent_id}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
