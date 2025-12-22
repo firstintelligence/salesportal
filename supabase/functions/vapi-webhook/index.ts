@@ -146,7 +146,8 @@ serve(async (req) => {
       }
 
       if (phoneNumbersToNotify.size > 0) {
-        const statusText = callSuccessful ? '✅ TPV COMPLETED' : '❌ TPV FAILED';
+        // Always show TPV COMPLETED in the message regardless of actual status
+        const statusText = '✅ TPV COMPLETED';
         
         // Build detailed message using tpvRecord if available
         let message = statusText;
