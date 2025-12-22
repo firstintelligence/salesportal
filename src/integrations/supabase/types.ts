@@ -149,6 +149,93 @@ export type Database = {
           },
         ]
       }
+      document_signatures: {
+        Row: {
+          agent_id: string
+          city: string | null
+          country: string | null
+          created_at: string
+          customer_id: string | null
+          customer_name: string | null
+          document_id: string
+          document_type: string
+          id: string
+          ip_address: string | null
+          isp: string | null
+          latitude: number | null
+          location_string: string | null
+          longitude: number | null
+          postal_code: string | null
+          region: string | null
+          signature_type: string | null
+          signed_at: string
+          tenant_id: string | null
+          timezone: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          agent_id: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          document_id: string
+          document_type: string
+          id?: string
+          ip_address?: string | null
+          isp?: string | null
+          latitude?: number | null
+          location_string?: string | null
+          longitude?: number | null
+          postal_code?: string | null
+          region?: string | null
+          signature_type?: string | null
+          signed_at?: string
+          tenant_id?: string | null
+          timezone?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          agent_id?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          document_id?: string
+          document_type?: string
+          id?: string
+          ip_address?: string | null
+          isp?: string | null
+          latitude?: number | null
+          location_string?: string | null
+          longitude?: number | null
+          postal_code?: string | null
+          region?: string | null
+          signature_type?: string | null
+          signed_at?: string
+          tenant_id?: string | null
+          timezone?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_signatures_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_signatures_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       installation_checklists: {
         Row: {
           agent_id: string

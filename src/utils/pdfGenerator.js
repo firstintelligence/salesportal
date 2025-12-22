@@ -1,7 +1,8 @@
 import { supabase } from '../integrations/supabase/client';
 import { getTenantCompanyInfo } from './tenantLogos';
+import { recordDocumentSignature } from './signingLocationService';
 
-export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges') => {
+export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges', signingContext = null) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('Starting server-side PDF generation...');
@@ -190,6 +191,40 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+
+      // Record document signature if signing context is provided
+      if (signingContext) {
+        try {
+          // Generate a document ID based on invoice number or create a new UUID
+          const documentId = signingContext.documentId || crypto.randomUUID();
+          
+          await recordDocumentSignature({
+            documentType: signingContext.documentType || 'invoice',
+            documentId: documentId,
+            customerId: signingContext.customerId || null,
+            customerName: signingContext.customerName || `${invoiceData.billTo?.firstName || ''} ${invoiceData.billTo?.lastName || ''}`.trim(),
+            agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
+            tenantId: signingContext.tenantId || null,
+            signatureType: signingContext.signatureType || 'customer'
+          });
+          
+          // If there's a co-applicant signature, record that too
+          if (invoiceData.coApplicantSignature) {
+            await recordDocumentSignature({
+              documentType: signingContext.documentType || 'invoice',
+              documentId: documentId,
+              customerId: signingContext.customerId || null,
+              customerName: invoiceData.billTo?.coApplicantName || 'Co-Applicant',
+              agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
+              tenantId: signingContext.tenantId || null,
+              signatureType: 'co_applicant'
+            });
+          }
+        } catch (sigError) {
+          console.error('Error recording document signature:', sigError);
+          // Don't fail PDF generation if signature recording fails
+        }
+      }
 
       console.log('PDF downloaded successfully');
       resolve();

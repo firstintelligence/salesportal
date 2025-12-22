@@ -794,7 +794,19 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           signature: savedSignatureDataUrl,
           coApplicantSignature: coApplicantSignatureDataUrl
         };
-        await generatePDF(formData, 4, tenantSlug); // Using template 4
+        
+        // Build signing context for document signature recording
+        const signingContext = {
+          documentType: isInvoice ? 'invoice' : 'quote',
+          documentId: crypto.randomUUID(),
+          customerId: null, // Will be set if customer exists
+          customerName: `${billTo.firstName || ''} ${billTo.lastName || ''}`.trim(),
+          agentId: localStorage.getItem('agentId') || 'unknown',
+          tenantId: tenant?.id || null,
+          signatureType: 'customer'
+        };
+        
+        await generatePDF(formData, 4, tenantSlug, signingContext);
       } catch (error) {
         console.error('Error generating PDF:', error);
       } finally {

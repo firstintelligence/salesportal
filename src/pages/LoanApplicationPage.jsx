@@ -23,6 +23,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import AddressAutocomplete from "../components/AddressAutocomplete";
 import { capitalizeWords, formatPostalCode, formatPhoneNumber } from "@/utils/inputFormatting";
+import { recordDocumentSignature } from "@/utils/signingLocationService";
+
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
@@ -531,6 +533,22 @@ const LoanApplicationPage = () => {
         link.download = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
         link.click();
         URL.revokeObjectURL(url);
+      }
+      
+      // Record document signature for the loan application
+      try {
+        await recordDocumentSignature({
+          documentType: 'loan_application',
+          documentId: crypto.randomUUID(),
+          customerId: customer?.id || null,
+          customerName: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
+          agentId: localStorage.getItem('agentId') || 'unknown',
+          tenantId: null,
+          signatureType: 'customer'
+        });
+      } catch (sigError) {
+        console.error('Error recording document signature:', sigError);
+        // Don't fail the process if signature recording fails
       }
       
       toast.success('PDF generated successfully!');
