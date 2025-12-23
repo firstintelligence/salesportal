@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -115,7 +115,7 @@ const LandingPage = () => {
               size="sm"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
             </Button>
             

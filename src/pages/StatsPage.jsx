@@ -512,22 +512,14 @@ const StatsPage = () => {
           </div>
         </header>
 
-        {/* Page Title */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/20">
-              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Stats
-            </h1>
+        {/* Compact Title - only show agent name when specific agent selected */}
+        {selectedAgent !== "all" && (
+          <div className="mb-4 sm:mb-5">
+            <p className="text-sm text-muted-foreground">
+              {agentNames[selectedAgent] || selectedAgent}'s Performance
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground ml-12 sm:ml-14">
-            {selectedAgent === "all" 
-              ? `${tenant?.name || "Team"} Performance` 
-              : `${agentNames[selectedAgent] || selectedAgent}'s Dashboard`}
-          </p>
-        </div>
+        )}
 
         {/* Content */}
         <div className="space-y-5 sm:space-y-6">
