@@ -209,14 +209,38 @@ serve(async (req) => {
               const signatureBytes = base64ToUint8Array(signatureBase64);
               const signatureImage = await cpaPdf.embedPng(signatureBytes);
               
-              // Draw signature - smaller to match invoice pages, moved up
+              // Get original signature dimensions and preserve aspect ratio
+              const origWidth = signatureImage.width;
+              const origHeight = signatureImage.height;
+              const aspectRatio = origWidth / origHeight;
+              
+              // Target max dimensions for signature on CPA form
+              const maxWidth = 180;
+              const maxHeight = 60;
+              
+              let drawWidth: number;
+              let drawHeight: number;
+              
+              // Calculate dimensions preserving aspect ratio
+              if (origWidth / maxWidth > origHeight / maxHeight) {
+                // Width is the limiting factor
+                drawWidth = maxWidth;
+                drawHeight = maxWidth / aspectRatio;
+              } else {
+                // Height is the limiting factor
+                drawHeight = maxHeight;
+                drawWidth = maxHeight * aspectRatio;
+              }
+              
+              // Position signature in the signature area of CPA form
+              // The signature field is typically near the bottom left
               firstPage.drawImage(signatureImage, {
                 x: 80,
-                y: 80,
-                width: 150,
-                height: 40,
+                y: 75,
+                width: drawWidth,
+                height: drawHeight,
               });
-              console.log('Signature embedded on page');
+              console.log(`Signature embedded on page: original ${origWidth}x${origHeight}, drawn ${drawWidth.toFixed(0)}x${drawHeight.toFixed(0)}`);
             } catch (sigError) {
               console.log('Error embedding signature:', sigError.message);
             }
