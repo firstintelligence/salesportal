@@ -62,14 +62,19 @@ const PaymentCalculatorPage = () => {
     }
   }, [navigate]);
 
-  // Reset to 180 if 240 selected but amount drops below 10K
+  // Auto-select highest available amortization based on purchase amount
   useEffect(() => {
-    if (amortizationPeriod === 240 && purchaseAmount < 10000) {
+    if (purchaseAmount >= 10000) {
+      setAmortizationPeriod(240);
+    } else {
+      // If currently at 240 and amount drops below 10K, reset to 180
+      if (amortizationPeriod === 240) {
+        setShow240Warning(true);
+        setTimeout(() => setShow240Warning(false), 3000);
+      }
       setAmortizationPeriod(180);
-      setShow240Warning(true);
-      setTimeout(() => setShow240Warning(false), 3000);
     }
-  }, [purchaseAmount, amortizationPeriod]);
+  }, [purchaseAmount]);
 
   const handleAmortizationChange = (value) => {
     const newPeriod = parseInt(value);
