@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/select';
 import { Building2 } from 'lucide-react';
 
-const TenantSwitcher = () => {
+// Inline version for use within page headers
+export const TenantSwitcherInline = ({ className = '' }) => {
   const { tenant, agentProfile, switchTenant, loading: contextLoading } = useTenant();
   const [tenants, setTenants] = useState([]);
   const [tenantsLoading, setTenantsLoading] = useState(true);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
-  // Check super admin status from database
   useEffect(() => {
     const checkSuperAdmin = async () => {
       if (contextLoading || !agentProfile?.agent_id) {
@@ -40,7 +40,6 @@ const TenantSwitcher = () => {
     checkSuperAdmin();
   }, [contextLoading, agentProfile?.agent_id]);
 
-  // Fetch tenants only if super admin
   useEffect(() => {
     const fetchTenants = async () => {
       if (!isSuperAdmin) {
@@ -61,36 +60,39 @@ const TenantSwitcher = () => {
     fetchTenants();
   }, [isSuperAdmin]);
 
-  // Only show for super admins after loading
   if (contextLoading || !isSuperAdmin || tenantsLoading) {
     return null;
   }
 
   return (
-    <div className="fixed top-20 right-4 z-50 md:top-4">
-      <Select
-        value={tenant?.id || ''}
-        onValueChange={(tenantId) => {
-          const selectedTenant = tenants.find(t => t.id === tenantId);
-          if (selectedTenant) {
-            switchTenant(selectedTenant);
-          }
-        }}
-      >
-        <SelectTrigger className="w-[200px] bg-background border-border shadow-lg">
-          <Building2 className="w-4 h-4 mr-2 text-muted-foreground" />
-          <SelectValue placeholder="Select company" />
-        </SelectTrigger>
-        <SelectContent className="bg-background border-border z-[100]">
-          {tenants.map((t) => (
-            <SelectItem key={t.id} value={t.id}>
-              {t.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={tenant?.id || ''}
+      onValueChange={(tenantId) => {
+        const selectedTenant = tenants.find(t => t.id === tenantId);
+        if (selectedTenant) {
+          switchTenant(selectedTenant);
+        }
+      }}
+    >
+      <SelectTrigger className={`w-[160px] sm:w-[180px] bg-background/80 backdrop-blur border-border/50 shadow-sm text-sm ${className}`}>
+        <Building2 className="w-3.5 h-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
+        <SelectValue placeholder="Select company" className="truncate" />
+      </SelectTrigger>
+      <SelectContent className="bg-background border-border z-[100]">
+        {tenants.map((t) => (
+          <SelectItem key={t.id} value={t.id}>
+            {t.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
+};
+
+// Legacy fixed position version - now deprecated, use TenantSwitcherInline instead
+const TenantSwitcher = () => {
+  // Return null - the inline version should be used in page headers instead
+  return null;
 };
 
 export default TenantSwitcher;

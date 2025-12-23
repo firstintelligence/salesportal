@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
+import { TenantSwitcherInline } from "@/components/TenantSwitcher";
 
 // Demo data for Polaron agents
 const POLARON_DEMO_STATS = {
@@ -28,23 +29,21 @@ const PROMOTION_TIERS = [
 
 const StatCard = ({ icon: Icon, iconColor, title, value, subtitle, gradient, delay = 0 }) => (
   <Card 
-    className={`relative overflow-hidden border-0 shadow-md lg:shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${gradient}`}
+    className={`relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 ${gradient}`}
     style={{ animationDelay: `${delay}ms` }}
   >
-    <div className="absolute top-0 right-0 w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 opacity-10">
+    <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 opacity-[0.07]">
       <Icon className="w-full h-full" />
     </div>
-    <CardHeader className="pb-1 pt-3 px-3 md:pb-2 md:pt-4 md:px-4 lg:pt-6 lg:px-6">
-      <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium text-foreground/70 flex items-center gap-1.5 md:gap-2">
-        <div className={`p-1 md:p-1.5 lg:p-2 rounded-md lg:rounded-lg ${iconColor}`}>
-          <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-white" />
+    <CardContent className="p-4 sm:p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <div className={`p-1.5 sm:p-2 rounded-lg ${iconColor}`}>
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
         </div>
-        <span className="truncate">{title}</span>
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="pb-3 px-3 md:pb-4 md:px-4 lg:pb-6 lg:px-6">
-      <p className="text-lg md:text-xl lg:text-3xl font-bold text-foreground tracking-tight">{value}</p>
-      <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 lg:mt-1">{subtitle}</p>
+        <span className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</span>
+      </div>
+      <p className="text-xl sm:text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
     </CardContent>
   </Card>
 );
@@ -52,26 +51,25 @@ const StatCard = ({ icon: Icon, iconColor, title, value, subtitle, gradient, del
 const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
   const TierIcon = agent.tier.icon;
   const rankStyles = {
-    0: "bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 shadow-yellow-400/50 shadow-md md:shadow-lg",
-    1: "bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 shadow-slate-400/30 shadow-sm md:shadow-md",
-    2: "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 shadow-amber-600/30 shadow-sm md:shadow-md",
+    0: "bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 shadow-yellow-400/40 shadow-md",
+    1: "bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 shadow-slate-400/20 shadow-sm",
+    2: "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 shadow-amber-600/20 shadow-sm",
   };
 
   return (
     <div 
-      className={`flex items-center gap-2 md:gap-3 lg:gap-4 p-2.5 md:p-3 lg:p-5 transition-all duration-300 ${
+      className={`flex items-center gap-3 p-3 sm:p-4 transition-all ${
         isCurrentUser 
-          ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-l-4 border-primary" 
-          : "hover:bg-muted/50"
-      } ${index === 0 ? "bg-gradient-to-r from-yellow-500/5 to-transparent" : ""}`}
-      style={{ animationDelay: `${index * 50}ms` }}
+          ? "bg-primary/5 border-l-3 border-primary" 
+          : "hover:bg-muted/30"
+      }`}
     >
       {/* Rank Badge */}
-      <div className={`flex-shrink-0 w-8 h-8 md:w-9 md:h-9 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl flex items-center justify-center font-bold text-sm md:text-base lg:text-lg transition-transform hover:scale-110 ${
+      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center font-bold text-sm ${
         rankStyles[index] || "bg-muted text-muted-foreground"
       }`}>
         {index === 0 ? (
-          <Crown className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-white drop-shadow" />
+          <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
         ) : index === 1 ? (
           <span className="text-slate-600 font-black">2</span>
         ) : index === 2 ? (
@@ -83,33 +81,26 @@ const LeaderboardRow = ({ agent, index, isCurrentUser, formatCurrency }) => {
 
       {/* Agent Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 md:gap-2">
-          <p className={`font-bold text-sm md:text-base truncate ${isCurrentUser ? "text-primary" : "text-foreground"}`}>
+        <div className="flex items-center gap-1.5">
+          <p className={`font-semibold text-sm truncate ${isCurrentUser ? "text-primary" : "text-foreground"}`}>
             {agent.name}
           </p>
           {isCurrentUser && (
-            <span className="text-[8px] md:text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">YOU</span>
-          )}
-          {index === 0 && (
-            <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-yellow-500 animate-pulse" />
+            <span className="text-[9px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">YOU</span>
           )}
         </div>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <div className={`w-4 h-4 md:w-5 md:h-5 rounded-md bg-gradient-to-br ${agent.tier.color} flex items-center justify-center`}>
-            <TierIcon className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
+          <div className={`w-4 h-4 rounded bg-gradient-to-br ${agent.tier.color} flex items-center justify-center`}>
+            <TierIcon className="w-2.5 h-2.5 text-white" />
           </div>
-          <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{agent.tier.name}</span>
+          <span className="text-[10px] text-muted-foreground">{agent.tier.name}</span>
         </div>
       </div>
 
       {/* Stats */}
       <div className="text-right">
-        <p className="font-bold text-foreground text-sm md:text-base lg:text-lg">{formatCurrency(agent.weeklyRevenue)}</p>
-        <p className="text-[8px] md:text-[10px] uppercase tracking-wider text-muted-foreground font-medium">This Week</p>
-      </div>
-      <div className="text-right min-w-[70px] md:min-w-[90px] lg:min-w-[110px] hidden md:block">
-        <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm md:text-base">{formatCurrency(agent.projectedAnnual)}</p>
-        <p className="text-[8px] md:text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Annual</p>
+        <p className="font-bold text-foreground text-sm">{formatCurrency(agent.weeklyRevenue)}</p>
+        <p className="text-[9px] uppercase tracking-wide text-muted-foreground">This Week</p>
       </div>
     </div>
   );
@@ -483,44 +474,29 @@ const StatsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Header Background */}
-      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-br from-primary/20 via-purple-500/10 to-transparent dark:from-primary/10 dark:via-purple-500/5 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-br from-primary/15 via-purple-500/5 to-transparent dark:from-primary/10 dark:via-purple-500/5 pointer-events-none" />
       
-      <div className="relative max-w-6xl mx-auto p-4 sm:p-6">
-        {/* Navigation */}
-        <div className="flex items-center gap-4 mb-6">
+      <div className="relative max-w-5xl mx-auto px-4 py-4 sm:px-6 sm:py-6">
+        {/* Navigation Header */}
+        <header className="flex items-center justify-between mb-6 sm:mb-8">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate("/landing")}
-            className="text-muted-foreground hover:text-foreground hover:bg-background/50 backdrop-blur"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
+            <ArrowLeft className="w-4 h-4 mr-1.5" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
-        </div>
-
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/25">
-                  <Trophy className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
-                  Stats
-                </h1>
-              </div>
-              <p className="text-muted-foreground">
-                {selectedAgent === "all" 
-                  ? `${tenant?.name || "Team"} Performance Overview` 
-                  : `${agentNames[selectedAgent] || selectedAgent}'s Performance Dashboard`}
-              </p>
-            </div>
+          
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Tenant Switcher - for super admins */}
+            <TenantSwitcherInline />
             
+            {/* Agent Selector */}
             {(isSuperAdmin || tenantAgents.length > 1) && (
               <Select value={selectedAgent} onValueChange={handleAgentChange}>
-                <SelectTrigger className="w-[200px] bg-background/50 backdrop-blur border-border/50">
+                <SelectTrigger className="w-[140px] sm:w-[180px] bg-background/80 backdrop-blur border-border/50 text-sm">
                   <SelectValue placeholder="Select agent" />
                 </SelectTrigger>
                 <SelectContent>
@@ -534,160 +510,121 @@ const StatsPage = () => {
               </Select>
             )}
           </div>
+        </header>
+
+        {/* Page Title */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/20">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Stats
+            </h1>
+          </div>
+          <p className="text-sm text-muted-foreground ml-12 sm:ml-14">
+            {selectedAgent === "all" 
+              ? `${tenant?.name || "Team"} Performance` 
+              : `${agentNames[selectedAgent] || selectedAgent}'s Dashboard`}
+          </p>
         </div>
 
-        {/* Single Scrollable Content - No Tabs */}
-        <div className="space-y-4 md:space-y-5 lg:space-y-6">
+        {/* Content */}
+        <div className="space-y-5 sm:space-y-6">
           
-          {/* Your Current Tier - Hero Section */}
-          <Card className="border-0 shadow-xl bg-background/50 backdrop-blur overflow-hidden">
-            <div className={`p-3 md:p-4 lg:p-6 bg-gradient-to-r ${currentTier.color}`}>
+          {/* Your Current Tier - Simplified */}
+          <Card className="border-0 shadow-lg overflow-hidden">
+            <div className={`p-4 sm:p-5 bg-gradient-to-r ${currentTier.color}`}>
               <div className="flex items-center justify-between text-white">
-                <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
-                  <div className="p-2 md:p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-white/20 backdrop-blur">
-                    <currentTier.icon className="w-6 h-6 md:w-7 md:h-7 lg:w-10 lg:h-10" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-white/20 backdrop-blur">
+                    <currentTier.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
                   <div>
-                    <p className="text-[10px] md:text-xs lg:text-sm opacity-90 font-medium">Your Current Tier</p>
-                    <h2 className="text-lg md:text-xl lg:text-3xl font-black">{currentTier.name}</h2>
-                    <p className="text-[10px] md:text-xs lg:text-sm opacity-90">{currentTier.bonus}</p>
+                    <p className="text-xs opacity-80">Current Tier</p>
+                    <h2 className="text-xl sm:text-2xl font-bold">{currentTier.name}</h2>
+                    <p className="text-xs opacity-80">{currentTier.bonus}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] md:text-xs lg:text-sm opacity-90">Revenue</p>
-                  <p className="text-base md:text-lg lg:text-3xl font-black">{formatCurrency(currentAgentRevenue)}</p>
+                  <p className="text-xs opacity-80">Revenue</p>
+                  <p className="text-xl sm:text-2xl font-bold">{formatCurrency(currentAgentRevenue)}</p>
                 </div>
               </div>
             </div>
             
-            {/* Progress to Next Tier */}
             {nextTier && (
-              <div className="p-3 md:p-4 lg:p-5 bg-muted/30">
-                <div className="flex items-center justify-between mb-1.5 md:mb-2">
+              <div className="p-3 sm:p-4 bg-muted/20">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <ChevronUp className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-                    <span className="text-xs md:text-sm font-semibold">Next: {nextTier.name}</span>
+                    <ChevronUp className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-xs sm:text-sm font-medium">Next: {nextTier.name}</span>
                   </div>
-                  <span className="text-[10px] md:text-xs lg:text-sm text-muted-foreground font-medium">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+                  <span className="text-xs text-muted-foreground">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
                 </div>
-                <div className="relative">
-                  <Progress value={tierProgress} className="h-2.5 md:h-3 lg:h-4 rounded-full" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[9px] md:text-[10px] lg:text-xs font-bold text-white drop-shadow">{formatPercent(tierProgress)}</span>
-                  </div>
-                </div>
+                <Progress value={tierProgress} className="h-2 rounded-full" />
               </div>
             )}
           </Card>
 
-          {/* Key Performance Metrics */}
-          <div>
-            <h3 className="text-sm md:text-base lg:text-lg font-bold mb-2 md:mb-3 lg:mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              Performance Metrics
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-2.5 lg:gap-4">
-              <StatCard
-                icon={DollarSign}
-                iconColor="bg-emerald-500"
-                title="Total Revenue"
-                value={formatCurrency(metrics?.totalRevenue || 0)}
-                subtitle={`${metrics?.totalDeals || 0} deals closed`}
-                gradient="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30"
-                delay={0}
-              />
-              <StatCard
-                icon={Target}
-                iconColor="bg-blue-500"
-                title="Avg Deal Value"
-                value={formatCurrency(metrics?.averageDealValue || 0)}
-                subtitle={`${formatNumber(metrics?.unitsPerDeal || 0)} units/deal`}
-                gradient="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
-                delay={50}
-              />
-              <StatCard
-                icon={Percent}
-                iconColor="bg-purple-500"
-                title="Closing Rate"
-                value={formatPercent(metrics?.closingRate || 0)}
-                subtitle={`${metrics?.totalAppointments || 0} appointments`}
-                gradient="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30"
-                delay={100}
-              />
-              <StatCard
-                icon={Award}
-                iconColor="bg-amber-500"
-                title="Monthly Revenue"
-                value={formatCurrency(metrics?.thisMonthRevenue || 0)}
-                subtitle={`${metrics?.thisMonthDeals || 0} deals this month`}
-                gradient="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30"
-                delay={150}
-              />
-            </div>
-          </div>
-
-          {/* Secondary Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-2.5 lg:gap-4">
+          {/* Key Metrics - Clean 2x2 Grid */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <StatCard
-              icon={Calendar}
-              iconColor="bg-rose-500"
-              title="Days Active"
-              value={metrics?.daysActive || 0}
-              subtitle="Sales period"
-              gradient="bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-red-950/30"
-              delay={200}
+              icon={DollarSign}
+              iconColor="bg-emerald-500"
+              title="Total Revenue"
+              value={formatCurrency(metrics?.totalRevenue || 0)}
+              subtitle={`${metrics?.totalDeals || 0} deals closed`}
+              gradient="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30"
             />
             <StatCard
-              icon={Users}
-              iconColor="bg-cyan-500"
-              title="Rev/Appointment"
-              value={formatCurrency(metrics?.revenuePerAppointment || 0)}
-              subtitle="Per appointment"
-              gradient="bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/30 dark:to-sky-950/30"
-              delay={250}
+              icon={Target}
+              iconColor="bg-blue-500"
+              title="Avg Deal Value"
+              value={formatCurrency(metrics?.averageDealValue || 0)}
+              subtitle={`${formatNumber(metrics?.unitsPerDeal || 0)} units/deal`}
+              gradient="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
             />
             <StatCard
-              icon={Package}
-              iconColor="bg-violet-500"
-              title="Presentation Rate"
-              value={formatPercent(metrics?.presentationRate || 0)}
-              subtitle="Presented to customers"
-              gradient="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30"
-              delay={300}
+              icon={Percent}
+              iconColor="bg-purple-500"
+              title="Closing Rate"
+              value={formatPercent(metrics?.closingRate || 0)}
+              subtitle={`${metrics?.totalAppointments || 0} appointments`}
+              gradient="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30"
             />
             <StatCard
-              icon={TrendingUp}
-              iconColor="bg-green-500"
-              title="Projected Annual"
-              value={formatCurrency(metrics?.projectedAnnualEarnings || 0)}
-              subtitle="At 10% commission"
-              gradient="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30"
-              delay={350}
+              icon={Award}
+              iconColor="bg-amber-500"
+              title="This Month"
+              value={formatCurrency(metrics?.thisMonthRevenue || 0)}
+              subtitle={`${metrics?.thisMonthDeals || 0} deals`}
+              gradient="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30"
             />
           </div>
 
           {/* Weekly Leaderboard */}
-          <Card className="border-0 shadow-lg md:shadow-xl bg-background/50 backdrop-blur overflow-hidden">
-            <CardHeader className="border-b bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5 py-2.5 md:py-3 lg:py-4 px-3 md:px-4 lg:px-6">
+          <Card className="border-0 shadow-lg overflow-hidden">
+            <CardHeader className="border-b bg-muted/30 py-3 sm:py-4 px-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 md:gap-3">
-                  <div className="p-1.5 md:p-2 rounded-lg lg:rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md lg:shadow-lg">
-                    <Trophy className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md">
+                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-sm md:text-base lg:text-xl font-bold">Weekly Leaderboard</CardTitle>
-                    <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">{tenant?.name || "Team"} Rankings</p>
+                    <CardTitle className="text-sm sm:text-base font-bold">Leaderboard</CardTitle>
+                    <p className="text-xs text-muted-foreground">{tenant?.name || "Team"}</p>
                   </div>
                 </div>
                 {myRank > 0 && (
                   <div className="text-right">
-                    <p className="text-[10px] md:text-xs text-muted-foreground">Your Rank</p>
-                    <p className="text-lg md:text-xl lg:text-2xl font-black text-primary">#{myRank}</p>
+                    <p className="text-xs text-muted-foreground">Your Rank</p>
+                    <p className="text-lg sm:text-xl font-bold text-primary">#{myRank}</p>
                   </div>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="p-0 divide-y divide-border/50">
+            <CardContent className="p-0 divide-y divide-border/30">
               {leaderboard.map((agent, index) => (
                 <LeaderboardRow
                   key={agent.id}

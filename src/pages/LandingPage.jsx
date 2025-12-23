@@ -5,6 +5,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TenantSwitcherInline } from "@/components/TenantSwitcher";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -102,8 +103,11 @@ const LandingPage = () => {
             )}
           </div>
           
-          {/* Dashboard & Stats buttons - Right */}
+          {/* Right side controls */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Tenant Switcher - for super admins */}
+            <TenantSwitcherInline />
+            
             {/* Dashboard - subtle button */}
             <Button
               onClick={() => navigate("/dashboard")}
