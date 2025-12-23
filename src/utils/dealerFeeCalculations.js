@@ -3,23 +3,15 @@ const dealerFeeRates = {
   // Free Program
   '13.99-0': 0,
   
-  // Short term promotional rates
+  // 0% Interest promotional rates
   '0-3': 3.99,
   '0-6': 9.49,
   '0-9': 12.99,
-  '0-12': 16.49,
-  
-  // Standard promotional rates  
-  '0-12': 14.99,
-  '0-24': 20.99,
-  '0-36': 23.99,
-  '0-48': 26.99,
-  '0-60': 31.99,
-  
-  // 0% Interest promotional rates
   '0-12': 13.49,
   '0-24': 20.49,
   '0-36': 24.49,
+  '0-48': 26.99,
+  '0-60': 31.99,
   
   // 2.99% Interest rates
   '2.99-12': 12.99,
