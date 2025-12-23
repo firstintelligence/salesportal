@@ -5,7 +5,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TenantSwitcherInline } from "@/components/TenantSwitcher";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -103,31 +103,32 @@ const LandingPage = () => {
             )}
           </div>
           
-          {/* Right side controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Tenant Switcher - for super admins */}
-            <TenantSwitcherInline />
-            
-            {/* Dashboard - subtle button */}
+          {/* Right side controls - consistent button styles */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Dashboard */}
             <Button
               onClick={() => navigate("/dashboard")}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
               <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
             </Button>
             
-            {/* Stats/Trophy Button */}
+            {/* Stats */}
             <Button
               onClick={() => navigate("/stats")}
               variant="ghost"
               size="sm"
-              className="relative group p-2 sm:p-2.5 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/30 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-800/50 dark:hover:to-orange-800/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Stats</span>
             </Button>
+            
+            {/* Profile dropdown with tenant switcher inside */}
+            <ProfileDropdown />
           </div>
         </div>
       </header>

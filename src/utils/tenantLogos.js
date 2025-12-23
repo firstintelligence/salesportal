@@ -1,4 +1,4 @@
-import polaronLogo from '@/assets/polaron-logo.png';
+import polaronLogo from '@/assets/polaron-logo-transparent.png';
 
 const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
