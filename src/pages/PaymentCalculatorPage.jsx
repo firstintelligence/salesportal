@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Info, FileText, ClipboardList, Phone } from "lucide-react";
 import { calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
-import { getAvailableTermsForRate } from "@/utils/dealerFeeCalculations";
+import { getAvailableTermsForRate, calculateDealerFee, isValidRateTermCombination } from "@/utils/dealerFeeCalculations";
 
 const PaymentCalculatorPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const PaymentCalculatorPage = () => {
   const [amortizationPeriod, setAmortizationPeriod] = useState(180);
   const [promoTerm, setPromoTerm] = useState(36);
   const [show240Warning, setShow240Warning] = useState(false);
+  const [showContractorFees, setShowContractorFees] = useState(false);
 
   const is240Available = purchaseAmount >= 10000;
 
@@ -83,6 +85,10 @@ const PaymentCalculatorPage = () => {
   const adminFee = loanAmount - purchaseAmount;
   const promoPayment = calculateMonthlyPayment(loanAmount, interestRate, amortizationPeriod);
   const regularPayment = calculateMonthlyPayment(loanAmount, regularRate, amortizationPeriod);
+  
+  // Dealer fee calculation
+  const dealerFee = calculateDealerFee(interestRate, promoTerm, loanAmount);
+  const isValidCombination = isValidRateTermCombination(interestRate, promoTerm);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -237,6 +243,38 @@ const PaymentCalculatorPage = () => {
                 </div>
                 <span className="font-semibold text-foreground">{formatCurrency(adminFee)}</span>
               </div>
+
+              {/* Show Contractor Fees Toggle */}
+              <div className="flex justify-between items-center">
+                <Label className="text-muted-foreground">Show Contractor Fees</Label>
+                <Switch
+                  checked={showContractorFees}
+                  onCheckedChange={setShowContractorFees}
+                />
+              </div>
+
+              {/* Dealer Fee - only shown when toggle is on */}
+              {showContractorFees && isValidCombination && (
+                <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg px-4 py-3 border border-amber-200 dark:border-amber-800">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-amber-700 dark:text-amber-400">Dealer Fee ({dealerFee.percentage}%)</Label>
+                    </div>
+                    <span className="font-semibold text-amber-700 dark:text-amber-400">{formatCurrency(dealerFee.amount)}</span>
+                  </div>
+                  <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                    Net to dealer: {formatCurrency(loanAmount - dealerFee.amount)}
+                  </p>
+                </div>
+              )}
+
+              {showContractorFees && !isValidCombination && (
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg px-4 py-3 border border-border">
+                  <p className="text-sm text-muted-foreground">
+                    No dealer fee rate available for {interestRate}% @ {promoTerm} months
+                  </p>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="border-t border-border pt-6 space-y-3">
