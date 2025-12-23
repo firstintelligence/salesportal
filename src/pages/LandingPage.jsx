@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy, ChevronRight } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -19,15 +20,8 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
+  // Main tools in sequence
   const tools = [
-    {
-      title: "Dashboard",
-      subtitle: "Manage your deals",
-      icon: LayoutDashboard,
-      path: "/dashboard",
-      gradient: "bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/30",
-      iconBg: "bg-indigo-500",
-    },
     {
       title: "Appointments",
       subtitle: "View your schedule",
@@ -35,14 +29,6 @@ const LandingPage = () => {
       path: "/appointments",
       gradient: "bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30",
       iconBg: "bg-rose-500",
-    },
-    {
-      title: "Stats",
-      subtitle: "Track performance",
-      icon: Trophy,
-      path: "/stats",
-      gradient: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30",
-      iconBg: "bg-amber-500",
     },
     {
       title: "Savings Calculator",
@@ -98,80 +84,126 @@ const LandingPage = () => {
   const companyName = tenant?.name || "Sales Portal";
 
   return (
-    <div className="min-h-screen bg-background p-4 pt-8 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-background">
       {/* Decorative background */}
       <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent dark:from-primary/5 dark:via-purple-500/3 pointer-events-none" />
       
-      <div className="relative max-w-5xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-10 sm:mb-14">
-          {tenantLogo ? (
-            <div className="flex justify-center mb-6">
-              <div className="p-4 glass-effect rounded-2xl shadow-xl bg-transparent">
+      {/* Top Navigation Bar */}
+      <header className="relative z-10 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* Logo/Company - Left */}
+          <div className="flex items-center gap-3">
+            {tenantLogo && (
+              <div className="p-2 glass-effect rounded-xl shadow-md bg-transparent">
                 <img 
                   src={tenantLogo} 
                   alt={companyName}
-                  className="h-14 sm:h-16 lg:h-20 object-contain"
+                  className="h-8 sm:h-10 object-contain"
                   style={{ mixBlendMode: 'multiply' }}
                 />
               </div>
-            </div>
-          ) : (
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight mb-3">
-              {companyName}
-            </h1>
-          )}
+            )}
+          </div>
           
-          {agentProfile && (
-            <p className="text-xl sm:text-2xl font-semibold text-foreground/80 mb-2">
-              Welcome back, {agentProfile.first_name}
-            </p>
-          )}
-          
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Select a tool to get started
-          </p>
+          {/* Stats/Trophy Button - Right */}
+          <Button
+            onClick={() => navigate("/stats")}
+            variant="ghost"
+            size="sm"
+            className="relative group p-2 sm:p-3 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/30 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-800/50 dark:hover:to-orange-800/40 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-400" />
+            <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background animate-pulse" />
+          </Button>
         </div>
+      </header>
+      
+      <div className="relative px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Welcome Section */}
+          <div className="text-center mb-6 sm:mb-8 lg:mb-10 pt-4 sm:pt-6">
+            {agentProfile && (
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1">
+                Welcome back, {agentProfile.first_name}
+              </p>
+            )}
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Select a tool to get started
+            </p>
+          </div>
 
-        {/* Tools Grid - StatCard Style */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-          {tools.map((tool, index) => (
-            <Card
-              key={tool.path}
-              onClick={() => navigate(tool.path)}
-              className={`
-                relative overflow-hidden border-0 cursor-pointer
-                shadow-lg hover:shadow-xl
-                transition-all duration-300 ease-out
-                hover:scale-[1.02] hover:-translate-y-1
-                active:scale-[0.98]
-                ${tool.gradient}
-              `}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              {/* Large background icon - top right corner */}
-              <div className="absolute top-0 right-0 w-24 h-24 sm:w-28 sm:h-28 opacity-[0.08] pointer-events-none">
-                <tool.icon className="w-full h-full" strokeWidth={1} />
+          {/* Dashboard Card - Prominent, separate from tools */}
+          <Card
+            onClick={() => navigate("/dashboard")}
+            className="relative overflow-hidden border-0 cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 ease-out hover:scale-[1.01] active:scale-[0.99] bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 dark:from-indigo-600 dark:via-violet-600 dark:to-purple-700 mb-6 sm:mb-8 lg:mb-10"
+          >
+            {/* Large background icon */}
+            <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 opacity-10 pointer-events-none translate-x-4 -translate-y-4">
+              <LayoutDashboard className="w-full h-full text-white" strokeWidth={1} />
+            </div>
+            
+            <CardContent className="p-5 sm:p-6 lg:p-8 flex items-center justify-between">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="p-3 sm:p-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
+                  <LayoutDashboard className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" strokeWidth={2} />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
+                    Dashboard
+                  </h2>
+                  <p className="text-sm sm:text-base text-white/80 mt-0.5">
+                    Manage your deals & customers
+                  </p>
+                </div>
               </div>
-              
-              <CardHeader className="pb-2 pt-4 sm:pt-5">
-                <CardTitle className="text-sm font-medium text-foreground/70 flex items-center gap-2">
-                  <div className={`p-2 rounded-xl ${tool.iconBg} shadow-lg`}>
-                    <tool.icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-white/60 group-hover:text-white transition-colors" />
+            </CardContent>
+          </Card>
+
+          {/* Section Label */}
+          <div className="flex items-center gap-3 mb-4 sm:mb-5">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Sales Tools
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+          </div>
+
+          {/* Tools Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {tools.map((tool, index) => (
+              <Card
+                key={tool.path}
+                onClick={() => navigate(tool.path)}
+                className={`
+                  relative overflow-hidden border-0 cursor-pointer
+                  shadow-lg hover:shadow-xl
+                  transition-all duration-300 ease-out
+                  hover:scale-[1.03] hover:-translate-y-1
+                  active:scale-[0.97]
+                  ${tool.gradient}
+                `}
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                {/* Large background icon - top right corner */}
+                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 opacity-[0.08] pointer-events-none">
+                  <tool.icon className="w-full h-full" strokeWidth={1} />
+                </div>
+                
+                <CardContent className="p-3 sm:p-4 lg:p-5">
+                  <div className={`p-2 sm:p-2.5 rounded-xl ${tool.iconBg} shadow-lg w-fit mb-2 sm:mb-3`}>
+                    <tool.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
                   </div>
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent className="pb-4 sm:pb-5">
-                <p className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
-                  {tool.title}
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  {tool.subtitle}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                  <p className="text-base sm:text-lg lg:text-xl font-bold text-foreground tracking-tight leading-tight">
+                    {tool.title}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1 line-clamp-1">
+                    {tool.subtitle}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
