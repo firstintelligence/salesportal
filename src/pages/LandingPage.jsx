@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy, ChevronRight } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, LayoutDashboard, Calendar, Trophy } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -94,36 +94,46 @@ const LandingPage = () => {
           {/* Logo/Company - Left */}
           <div className="flex items-center gap-3">
             {tenantLogo && (
-              <div className="p-2 glass-effect rounded-xl shadow-md bg-transparent">
-                <img 
-                  src={tenantLogo} 
-                  alt={companyName}
-                  className="h-8 sm:h-10 object-contain"
-                  style={{ mixBlendMode: 'multiply' }}
-                />
-              </div>
+              <img 
+                src={tenantLogo} 
+                alt={companyName}
+                className="h-10 sm:h-12 object-contain"
+              />
             )}
           </div>
           
-          {/* Stats/Trophy Button - Right */}
-          <Button
-            onClick={() => navigate("/stats")}
-            variant="ghost"
-            size="sm"
-            className="relative group p-2 sm:p-3 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/30 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-800/50 dark:hover:to-orange-800/40 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-          >
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-400" />
-            <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background animate-pulse" />
-          </Button>
+          {/* Dashboard & Stats buttons - Right */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Dashboard - subtle button */}
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            >
+              <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
+            </Button>
+            
+            {/* Stats/Trophy Button */}
+            <Button
+              onClick={() => navigate("/stats")}
+              variant="ghost"
+              size="sm"
+              className="relative group p-2 sm:p-2.5 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/30 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-800/50 dark:hover:to-orange-800/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
+            >
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+            </Button>
+          </div>
         </div>
       </header>
       
       <div className="relative px-4 pb-8 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Welcome Section */}
-          <div className="text-center mb-6 sm:mb-8 lg:mb-10 pt-4 sm:pt-6">
+          <div className="text-center mb-8 sm:mb-10 lg:mb-12 pt-6 sm:pt-8 lg:pt-10">
             {agentProfile && (
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1">
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
                 Welcome back, {agentProfile.first_name}
               </p>
             )}
@@ -132,45 +142,8 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Dashboard Card - Prominent, separate from tools */}
-          <Card
-            onClick={() => navigate("/dashboard")}
-            className="relative overflow-hidden border-0 cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 ease-out hover:scale-[1.01] active:scale-[0.99] bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 dark:from-indigo-600 dark:via-violet-600 dark:to-purple-700 mb-6 sm:mb-8 lg:mb-10"
-          >
-            {/* Large background icon */}
-            <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 opacity-10 pointer-events-none translate-x-4 -translate-y-4">
-              <LayoutDashboard className="w-full h-full text-white" strokeWidth={1} />
-            </div>
-            
-            <CardContent className="p-5 sm:p-6 lg:p-8 flex items-center justify-between">
-              <div className="flex items-center gap-4 sm:gap-5">
-                <div className="p-3 sm:p-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
-                  <LayoutDashboard className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" strokeWidth={2} />
-                </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                    Dashboard
-                  </h2>
-                  <p className="text-sm sm:text-base text-white/80 mt-0.5">
-                    Manage your deals & customers
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-white/60 group-hover:text-white transition-colors" />
-            </CardContent>
-          </Card>
-
-          {/* Section Label */}
-          <div className="flex items-center gap-3 mb-4 sm:mb-5">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Sales Tools
-            </span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-          </div>
-
-          {/* Tools Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+          {/* Tools Grid - Main Focus */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
             {tools.map((tool, index) => (
               <Card
                 key={tool.path}
@@ -186,18 +159,18 @@ const LandingPage = () => {
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 {/* Large background icon - top right corner */}
-                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 opacity-[0.08] pointer-events-none">
+                <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 opacity-[0.08] pointer-events-none">
                   <tool.icon className="w-full h-full" strokeWidth={1} />
                 </div>
                 
-                <CardContent className="p-3 sm:p-4 lg:p-5">
-                  <div className={`p-2 sm:p-2.5 rounded-xl ${tool.iconBg} shadow-lg w-fit mb-2 sm:mb-3`}>
-                    <tool.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
+                <CardContent className="p-4 sm:p-5 lg:p-6">
+                  <div className={`p-2.5 sm:p-3 rounded-xl ${tool.iconBg} shadow-lg w-fit mb-3 sm:mb-4`}>
+                    <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
                   </div>
-                  <p className="text-base sm:text-lg lg:text-xl font-bold text-foreground tracking-tight leading-tight">
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tracking-tight leading-tight">
                     {tool.title}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1 line-clamp-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-1.5">
                     {tool.subtitle}
                   </p>
                 </CardContent>
