@@ -131,19 +131,21 @@ const PaymentCalculatorPage = () => {
             {/* Estimated Monthly Payments - Main Focus */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-foreground">Estimated Monthly Payments</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`grid grid-cols-1 ${promoTerm < 60 ? 'md:grid-cols-2' : ''} gap-4`}>
                 {/* Promo Period - highlighted but with dark text */}
                 <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-5 border border-emerald-200 dark:border-emerald-800">
                   <p className="text-sm text-foreground/70 mb-1">Promo Period</p>
                   <p className="text-3xl font-bold text-foreground">{formatCurrency(promoPayment)}</p>
                   <p className="text-xs text-muted-foreground mt-2">{interestRate}% for {promoTerm} months</p>
                 </div>
-                {/* After Promo - subtle/muted styling */}
-                <div className="rounded-lg p-5 border border-border/50">
-                  <p className="text-sm text-muted-foreground/70 mb-1">After Promo</p>
-                  <p className="text-2xl font-medium text-muted-foreground">{formatCurrency(regularPayment)}</p>
-                  <p className="text-xs text-muted-foreground/70 mt-2">{regularRate}% for {remainingMonths} months</p>
-                </div>
+                {/* After Promo - only show if promo term is less than 60 months */}
+                {promoTerm < 60 && (
+                  <div className="rounded-lg p-5 border border-border/50">
+                    <p className="text-sm text-muted-foreground/70 mb-1">After Promo</p>
+                    <p className="text-2xl font-medium text-muted-foreground">{formatCurrency(regularPayment)}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-2">{regularRate}% for {remainingMonths} months</p>
+                  </div>
+                )}
               </div>
             </div>
 
