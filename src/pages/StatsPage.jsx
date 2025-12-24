@@ -515,9 +515,6 @@ const StatsPage = () => {
           </Button>
           
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Tenant Switcher - for super admins */}
-            <TenantSwitcherInline />
-            
             {/* Agent Selector */}
             {(isSuperAdmin || tenantAgents.length > 1) && (
               <Select value={selectedAgent} onValueChange={handleAgentChange}>
