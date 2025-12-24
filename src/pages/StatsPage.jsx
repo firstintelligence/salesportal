@@ -524,7 +524,7 @@ const StatsPage = () => {
         )}
 
         {/* Content */}
-        <div className="space-y-5 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-5">
           
           {/* Your Current Tier - Compact */}
           <Card className="border-0 shadow-md overflow-hidden">
@@ -558,59 +558,143 @@ const StatsPage = () => {
             )}
           </Card>
 
-          {/* Key Metrics - Clean 2x2 Grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {/* Commission Tiers - Compact Horizontal Scroll */}
+          <div className="overflow-x-auto -mx-4 px-4">
+            <div className="flex gap-2 min-w-max pb-1">
+              {PROMOTION_TIERS.map((tier) => {
+                const TierIcon = tier.icon;
+                const isCurrentTier = tier.name === currentTier.name;
+                const isAchieved = currentAgentRevenue >= tier.minRevenue;
+                
+                return (
+                  <div 
+                    key={tier.name}
+                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${
+                      isCurrentTier 
+                        ? "bg-primary/10 ring-1 ring-primary" 
+                        : isAchieved 
+                          ? "bg-muted/50" 
+                          : "bg-muted/20 opacity-50"
+                    }`}
+                  >
+                    <div className={`p-1 rounded bg-gradient-to-br ${tier.color} ${!isAchieved ? 'grayscale' : ''}`}>
+                      <TierIcon className="w-3 h-3 text-white" />
+                    </div>
+                    <span className={`text-[10px] font-medium ${isCurrentTier ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {tier.name}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Gamification Alert - Rank Up Challenge */}
+          {(() => {
+            const myIndex = leaderboard.findIndex(a => a.id === agentId);
+            if (myIndex > 0 && myIndex < leaderboard.length) {
+              const aheadAgent = leaderboard[myIndex - 1];
+              const myAgent = leaderboard[myIndex];
+              const gap = aheadAgent.weeklyRevenue - myAgent.weeklyRevenue;
+              return (
+                <Card className="border-0 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 shadow-sm">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500">
+                        <ChevronUp className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground">Rank Up Challenge</p>
+                        <p className="text-xs text-muted-foreground">
+                          Sell <span className="font-bold text-amber-600 dark:text-amber-400">{formatCurrency(gap + 1)}</span> more this week to pass <span className="font-medium">{aheadAgent.name}</span> for #{myIndex}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">Current</p>
+                        <p className="text-sm font-bold text-primary">#{myIndex + 1}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+            if (myIndex === 0) {
+              const secondAgent = leaderboard[1];
+              const lead = myAgent?.weeklyRevenue - (secondAgent?.weeklyRevenue || 0);
+              return (
+                <Card className="border-0 bg-gradient-to-r from-yellow-500/10 via-amber-500/10 to-orange-500/10 shadow-sm">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500">
+                        <Crown className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground">You're #1!</p>
+                        <p className="text-xs text-muted-foreground">
+                          {secondAgent ? `Leading by ${formatCurrency(lead)} over ${secondAgent.name}` : "Keep up the great work!"}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <Sparkles className="w-5 h-5 text-amber-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+            return null;
+          })()}
+
+          {/* Performance Metrics Grid */}
+          <div className="grid grid-cols-2 gap-3">
             <StatCard
-              icon={DollarSign}
-              iconColor="bg-emerald-500"
-              title="Total Revenue"
-              value={formatCurrency(metrics?.totalRevenue || 0)}
-              subtitle={`${metrics?.totalDeals || 0} deals closed`}
-              gradient="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30"
-            />
-            <StatCard
-              icon={Target}
-              iconColor="bg-blue-500"
-              title="Avg Deal Value"
-              value={formatCurrency(metrics?.averageDealValue || 0)}
-              subtitle={`${formatNumber(metrics?.unitsPerDeal || 0)} units/deal`}
-              gradient="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
-            />
-            <StatCard
-              icon={Percent}
-              iconColor="bg-purple-500"
-              title="Closing Rate"
-              value={formatPercent(metrics?.closingRate || 0)}
-              subtitle={`${metrics?.totalAppointments || 0} appointments`}
-              gradient="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30"
-            />
-            <StatCard
-              icon={Award}
+              icon={Calendar}
               iconColor="bg-amber-500"
               title="This Week"
               value={formatCurrency(metrics?.thisWeekRevenue || 0)}
               subtitle={`${metrics?.thisWeekDeals || 0} deals`}
               gradient="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30"
             />
+            <StatCard
+              icon={TrendingUp}
+              iconColor="bg-blue-500"
+              title="This Month"
+              value={formatCurrency((metrics?.thisWeekRevenue || 0) * 4.33)}
+              subtitle={`~${Math.round((metrics?.thisWeekDeals || 0) * 4.33)} deals pace`}
+              gradient="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
+            />
+            <StatCard
+              icon={DollarSign}
+              iconColor="bg-emerald-500"
+              title="All Time"
+              value={formatCurrency(metrics?.totalRevenue || 0)}
+              subtitle={`${metrics?.totalDeals || 0} deals closed`}
+              gradient="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30"
+            />
+            <StatCard
+              icon={Award}
+              iconColor="bg-purple-500"
+              title="Yearly Pace"
+              value={formatCurrency(metrics?.projectedAnnualEarnings || 0)}
+              subtitle={`Est. commission`}
+              gradient="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30"
+            />
           </div>
 
           {/* Weekly Leaderboard */}
           <Card className="border-0 shadow-lg overflow-hidden">
-            <CardHeader className="border-b bg-muted/30 py-3 sm:py-4 px-4">
+            <CardHeader className="border-b bg-gradient-to-r from-yellow-500/10 to-amber-500/10 py-3 px-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md">
-                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 shadow">
+                    <Trophy className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <CardTitle className="text-sm sm:text-base font-bold">Leaderboard</CardTitle>
-                    <p className="text-xs text-muted-foreground">{tenant?.name || "Team"}</p>
-                  </div>
+                  <CardTitle className="text-sm font-bold">Weekly Leaderboard</CardTitle>
                 </div>
                 {myRank > 0 && (
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Your Rank</p>
-                    <p className="text-lg sm:text-xl font-bold text-primary">#{myRank}</p>
+                    <p className="text-[10px] text-muted-foreground">Your Rank</p>
+                    <p className="text-lg font-bold text-primary">#{myRank}</p>
                   </div>
                 )}
               </div>
@@ -627,63 +711,6 @@ const StatsPage = () => {
               ))}
             </CardContent>
           </Card>
-
-          {/* Commission Tiers - Horizontal Scroll */}
-          <div>
-            <h3 className="text-sm md:text-base lg:text-lg font-bold mb-2 md:mb-3 lg:mb-4 flex items-center gap-2">
-              <Star className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-              Commission Tiers
-            </h3>
-            
-            <div className="overflow-x-auto pb-2 md:pb-3 lg:pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible">
-              <div className="flex gap-2 md:grid md:grid-cols-3 lg:grid-cols-3 min-w-max md:min-w-0">
-                {PROMOTION_TIERS.map((tier) => {
-                  const TierIcon = tier.icon;
-                  const isCurrentTier = tier.name === currentTier.name;
-                  const isAchieved = currentAgentRevenue >= tier.minRevenue;
-                  const isLocked = !isAchieved;
-                  
-                  return (
-                    <Card 
-                      key={tier.name}
-                      className={`border-0 transition-all duration-300 flex-shrink-0 w-[200px] md:w-auto ${
-                        isCurrentTier 
-                          ? "ring-2 ring-primary shadow-lg shadow-primary/20" 
-                          : isAchieved 
-                            ? "shadow-md bg-card" 
-                            : "shadow-sm bg-muted/30 opacity-60"
-                      }`}
-                    >
-                      <CardContent className="p-2.5 md:p-3 lg:p-4">
-                        <div className="flex items-center gap-2 md:gap-3">
-                          <div className={`p-1.5 md:p-2 lg:p-2.5 rounded-lg lg:rounded-xl bg-gradient-to-br ${tier.color} shadow-md lg:shadow-lg flex-shrink-0 ${isLocked ? 'grayscale' : ''}`}>
-                            <TierIcon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <h4 className="font-bold text-xs md:text-sm">{tier.name}</h4>
-                              {isCurrentTier && (
-                                <span className="text-[8px] md:text-[9px] px-1 md:px-1.5 py-0.5 bg-primary text-primary-foreground rounded-full font-semibold">YOU</span>
-                              )}
-                            </div>
-                            <p className="text-[9px] md:text-[10px] lg:text-[11px] text-muted-foreground">{tier.bonus}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[10px] md:text-xs font-semibold">
-                              {tier.maxRevenue === Infinity ? `${formatCurrency(tier.minRevenue)}+` : formatCurrency(tier.minRevenue)}
-                            </p>
-                            {isLocked && (
-                              <p className="text-[8px] md:text-[10px] text-muted-foreground">{formatCurrency(tier.minRevenue - currentAgentRevenue)} to go</p>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
