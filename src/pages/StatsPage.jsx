@@ -694,6 +694,55 @@ const StatsPage = () => {
             return null;
           })()}
 
+          {/* Upcoming Payout Cheque */}
+          <div className="relative bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-950/40 dark:via-green-950/30 dark:to-teal-950/40 rounded-xl p-4 border-2 border-dashed border-emerald-300 dark:border-emerald-700 shadow-lg overflow-hidden">
+            {/* Decorative background pattern */}
+            <div className="absolute inset-0 opacity-[0.03]">
+              <div className="absolute inset-0" style={{ 
+                backgroundImage: 'repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)',
+                backgroundSize: '10px 10px'
+              }} />
+            </div>
+            
+            {/* Cheque header */}
+            <div className="relative flex items-center justify-between mb-3">
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 font-semibold">This Week's Commission</p>
+                <p className="text-[10px] text-muted-foreground">Upcoming Payout</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[8px] uppercase tracking-wide text-muted-foreground">Date</p>
+                <p className="text-[10px] font-mono text-foreground">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              </div>
+            </div>
+            
+            {/* Pay to line */}
+            <div className="relative mb-2">
+              <p className="text-[8px] uppercase tracking-wide text-muted-foreground mb-0.5">Pay to the order of</p>
+              <div className="border-b border-emerald-300 dark:border-emerald-600 pb-1">
+                <p className="text-sm font-semibold text-foreground">{agentNames[agentId] || 'Agent'}</p>
+              </div>
+            </div>
+            
+            {/* Amount box */}
+            <div className="relative flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-[8px] uppercase tracking-wide text-muted-foreground mb-1">Amount (10% of ${formatCurrency(metrics?.thisWeekRevenue || 0).replace('$', '')} production)</p>
+                <div className="inline-flex items-baseline gap-1 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1.5 rounded-lg shadow-md">
+                  <span className="text-lg font-bold">{formatCurrency((metrics?.thisWeekRevenue || 0) * 0.10)}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <DollarSign className="w-8 h-8 text-emerald-200 dark:text-emerald-800" />
+              </div>
+            </div>
+            
+            {/* Memo line */}
+            <div className="relative mt-3 pt-2 border-t border-emerald-200 dark:border-emerald-800">
+              <p className="text-[8px] uppercase tracking-wide text-muted-foreground">Memo: Weekly Sales Commission</p>
+            </div>
+          </div>
+
           {/* Performance Metrics Grid */}
           <div className="grid grid-cols-2 gap-3">
             <StatCard
