@@ -117,6 +117,32 @@ const StatsPage = () => {
   const [allTpvRequests, setAllTpvRequests] = useState([]);
   const [tenantAgents, setTenantAgents] = useState([]);
   const [agentNames, setAgentNames] = useState({});
+  
+  // Scroll state for tier carousel
+  const tierScrollRef = React.useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const checkTierScroll = React.useCallback(() => {
+    if (tierScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tierScrollRef.current;
+      setShowLeftArrow(scrollLeft > 5);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTierScroll();
+    window.addEventListener('resize', checkTierScroll);
+    return () => window.removeEventListener('resize', checkTierScroll);
+  }, [checkTierScroll]);
+
+  const scrollTiers = (direction) => {
+    if (tierScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -120 : 120;
+      tierScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const storedAgentId = localStorage.getItem("agentId");
@@ -559,89 +585,60 @@ const StatsPage = () => {
           </Card>
 
           {/* Commission Tiers - Compact Horizontal Scroll */}
-          {(() => {
-            const scrollRef = React.useRef(null);
-            const [showLeftArrow, setShowLeftArrow] = React.useState(false);
-            const [showRightArrow, setShowRightArrow] = React.useState(false);
-
-            const checkScroll = () => {
-              if (scrollRef.current) {
-                const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-                setShowLeftArrow(scrollLeft > 5);
-                setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
-              }
-            };
-
-            React.useEffect(() => {
-              checkScroll();
-              window.addEventListener('resize', checkScroll);
-              return () => window.removeEventListener('resize', checkScroll);
-            }, []);
-
-            const scroll = (direction) => {
-              if (scrollRef.current) {
-                const scrollAmount = direction === 'left' ? -120 : 120;
-                scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-              }
-            };
-
-            return (
-              <div className="relative flex items-center gap-1">
-                {/* Left Arrow */}
-                {showLeftArrow && (
-                  <button 
-                    onClick={() => scroll('left')}
-                    className="flex-shrink-0 p-1 rounded-full bg-muted/50 hover:bg-muted transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                )}
-                
-                {/* Scrollable Tiers */}
-                <div 
-                  ref={scrollRef}
-                  onScroll={checkScroll}
-                  className="flex-1 overflow-x-auto scrollbar-hide"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  <div className="flex gap-2 min-w-max py-1 px-0.5">
-                    {PROMOTION_TIERS.map((tier) => {
-                      const TierIcon = tier.icon;
-                      const isCurrentTier = tier.name === currentTier.name;
-                      
-                      return (
-                        <div 
-                          key={tier.name}
-                          className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg transition-all ${
-                            isCurrentTier 
-                              ? "bg-gradient-to-br from-primary/15 to-primary/5 shadow-sm" 
-                              : "opacity-40 grayscale"
-                          }`}
-                        >
-                          <div className={`p-1.5 rounded-md bg-gradient-to-br ${tier.color} ${!isCurrentTier ? 'opacity-60' : 'shadow-md'}`}>
-                            <TierIcon className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span className={`text-xs font-semibold ${isCurrentTier ? 'text-foreground' : 'text-muted-foreground'}`}>
-                            {tier.name}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Right Arrow */}
-                {showRightArrow && (
-                  <button 
-                    onClick={() => scroll('right')}
-                    className="flex-shrink-0 p-1 rounded-full bg-muted/50 hover:bg-muted transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                )}
+          <div className="relative flex items-center gap-1">
+            {/* Left Arrow */}
+            {showLeftArrow && (
+              <button 
+                onClick={() => scrollTiers('left')}
+                className="flex-shrink-0 p-1 rounded-full bg-muted/50 hover:bg-muted transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+            
+            {/* Scrollable Tiers */}
+            <div 
+              ref={tierScrollRef}
+              onScroll={checkTierScroll}
+              className="flex-1 overflow-x-auto scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <div className="flex gap-2 min-w-max py-1 px-0.5">
+                {PROMOTION_TIERS.map((tier) => {
+                  const TierIcon = tier.icon;
+                  const isCurrentTier = tier.name === currentTier.name;
+                  
+                  return (
+                    <div 
+                      key={tier.name}
+                      className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg transition-all ${
+                        isCurrentTier 
+                          ? "bg-gradient-to-br from-primary/15 to-primary/5 shadow-sm" 
+                          : "opacity-40 grayscale"
+                      }`}
+                    >
+                      <div className={`p-1.5 rounded-md bg-gradient-to-br ${tier.color} ${!isCurrentTier ? 'opacity-60' : 'shadow-md'}`}>
+                        <TierIcon className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <span className={`text-xs font-semibold ${isCurrentTier ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {tier.name}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })()}
+            </div>
+
+            {/* Right Arrow */}
+            {showRightArrow && (
+              <button 
+                onClick={() => scrollTiers('right')}
+                className="flex-shrink-0 p-1 rounded-full bg-muted/50 hover:bg-muted transition-colors"
+              >
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+          </div>
 
           {/* Gamification Alert - Rank Up Challenge */}
           {(() => {
