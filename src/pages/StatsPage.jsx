@@ -684,12 +684,7 @@ const StatsPage = () => {
           <Card className="border-0 shadow-lg overflow-hidden">
             <CardHeader className="border-b bg-gradient-to-r from-yellow-500/10 to-amber-500/10 py-3 px-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 shadow">
-                    <Trophy className="w-4 h-4 text-white" />
-                  </div>
-                  <CardTitle className="text-sm font-bold">Weekly Leaderboard</CardTitle>
-                </div>
+                <CardTitle className="text-sm font-bold">Weekly Leaderboard</CardTitle>
                 {myRank > 0 && (
                   <div className="text-right">
                     <p className="text-[10px] text-muted-foreground">Your Rank</p>
