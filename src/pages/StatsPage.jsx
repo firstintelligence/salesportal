@@ -204,8 +204,8 @@ const StatsPage = () => {
           presentationRate: 85,
           projectedAnnualEarnings: (totalRevenue * 0.10 / 30) * 365,
           avgDealCycleTime: 3.2,
-          thisMonthDeals: totalDeals,
-          thisMonthRevenue: weeklyRevenue * 4,
+          thisWeekDeals: Math.round(totalDeals / 4),
+          thisWeekRevenue: weeklyRevenue,
           daysActive: 30,
         });
         setAllTpvRequests([]);
@@ -241,8 +241,8 @@ const StatsPage = () => {
         presentationRate: 85,
         projectedAnnualEarnings: (stats.totalRevenue * 0.10 / 30) * 365,
         avgDealCycleTime: 3.2,
-        thisMonthDeals: stats.deals,
-        thisMonthRevenue: stats.weeklyRevenue * 4,
+        thisWeekDeals: Math.round(stats.deals / 4),
+        thisWeekRevenue: stats.weeklyRevenue,
         daysActive: 30,
       });
     } else if (isPolaron && value === "all") {
@@ -262,8 +262,8 @@ const StatsPage = () => {
         presentationRate: 85,
         projectedAnnualEarnings: (totalRevenue * 0.10 / 30) * 365,
         avgDealCycleTime: 3.2,
-        thisMonthDeals: totalDeals,
-        thisMonthRevenue: weeklyRevenue * 4,
+        thisWeekDeals: Math.round(totalDeals / 4),
+        thisWeekRevenue: weeklyRevenue,
         daysActive: 30,
       });
     } else {
@@ -413,9 +413,11 @@ const StatsPage = () => {
     const avgDealCycleTime = totalDeals > 1 ? daysActive / totalDeals : 0;
 
     const now = new Date();
-    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const thisMonthDeals = completedDeals.filter(d => new Date(d.created_at) >= thisMonthStart);
-    const thisMonthRevenue = thisMonthDeals.reduce((sum, deal) => {
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    const thisWeekDeals = completedDeals.filter(d => new Date(d.created_at) >= weekStart);
+    const thisWeekRevenue = thisWeekDeals.reduce((sum, deal) => {
       const price = parseFloat(deal.sales_price?.replace(/[^0-9.-]+/g, "") || 0);
       return sum + price;
     }, 0);
@@ -432,8 +434,8 @@ const StatsPage = () => {
       presentationRate,
       projectedAnnualEarnings,
       avgDealCycleTime,
-      thisMonthDeals: thisMonthDeals.length,
-      thisMonthRevenue,
+      thisWeekDeals: thisWeekDeals.length,
+      thisWeekRevenue,
       daysActive,
     };
   };
@@ -524,37 +526,34 @@ const StatsPage = () => {
         {/* Content */}
         <div className="space-y-5 sm:space-y-6">
           
-          {/* Your Current Tier - Simplified */}
-          <Card className="border-0 shadow-lg overflow-hidden">
-            <div className={`p-4 sm:p-5 bg-gradient-to-r ${currentTier.color}`}>
+          {/* Your Current Tier - Compact */}
+          <Card className="border-0 shadow-md overflow-hidden">
+            <div className={`p-3 bg-gradient-to-r ${currentTier.color}`}>
               <div className="flex items-center justify-between text-white">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 sm:p-3 rounded-xl bg-white/20 backdrop-blur">
-                    <currentTier.icon className="w-6 h-6 sm:w-7 sm:h-7" />
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-white/20 backdrop-blur">
+                    <currentTier.icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs opacity-80">Current Tier</p>
-                    <h2 className="text-xl sm:text-2xl font-bold">{currentTier.name}</h2>
-                    <p className="text-xs opacity-80">{currentTier.bonus}</p>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base font-bold">{currentTier.name}</h2>
+                      <span className="text-[10px] opacity-80 bg-white/10 px-1.5 py-0.5 rounded">{currentTier.bonus}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs opacity-80">Revenue</p>
-                  <p className="text-xl sm:text-2xl font-bold">{formatCurrency(currentAgentRevenue)}</p>
+                  <p className="text-base font-bold">{formatCurrency(currentAgentRevenue)}</p>
                 </div>
               </div>
             </div>
             
             {nextTier && (
-              <div className="p-3 sm:p-4 bg-muted/20">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <ChevronUp className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-xs sm:text-sm font-medium">Next: {nextTier.name}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
+              <div className="p-2 bg-muted/20">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">Next: {nextTier.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{formatCurrency(nextTier.minRevenue - currentAgentRevenue)} to go</span>
                 </div>
-                <Progress value={tierProgress} className="h-2 rounded-full" />
+                <Progress value={tierProgress} className="h-1.5 rounded-full" />
               </div>
             )}
           </Card>
@@ -588,9 +587,9 @@ const StatsPage = () => {
             <StatCard
               icon={Award}
               iconColor="bg-amber-500"
-              title="This Month"
-              value={formatCurrency(metrics?.thisMonthRevenue || 0)}
-              subtitle={`${metrics?.thisMonthDeals || 0} deals`}
+              title="This Week"
+              value={formatCurrency(metrics?.thisWeekRevenue || 0)}
+              subtitle={`${metrics?.thisWeekDeals || 0} deals`}
               gradient="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30"
             />
           </div>
