@@ -29,21 +29,18 @@ const PROMOTION_TIERS = [
 
 const StatCard = ({ icon: Icon, iconColor, title, value, subtitle, gradient, delay = 0 }) => (
   <Card 
-    className={`relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 ${gradient}`}
+    className={`relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 ${gradient}`}
     style={{ animationDelay: `${delay}ms` }}
   >
-    <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 opacity-[0.07]">
-      <Icon className="w-full h-full" />
-    </div>
-    <CardContent className="p-4 sm:p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <div className={`p-1.5 sm:p-2 rounded-lg ${iconColor}`}>
-          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+    <CardContent className="p-3">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</span>
+        <div className={`p-1 rounded ${iconColor}`}>
+          <Icon className="w-3 h-3 text-white" />
         </div>
-        <span className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</span>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      <p className="text-lg sm:text-xl font-bold text-foreground">{value}</p>
+      <p className="text-[10px] text-muted-foreground">{subtitle}</p>
     </CardContent>
   </Card>
 );
