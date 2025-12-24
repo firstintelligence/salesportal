@@ -785,7 +785,7 @@ export function Calculator() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-600 dark:text-slate-400">
               Current Insulation Quality
             </Label>
@@ -795,14 +795,20 @@ export function Calculator() {
               max={5}
               min={1}
               step={1}
-              className="w-full"
+              className={`w-full ${
+                data.insulation === 1 ? '[&_[role=slider]]:bg-slate-400 [&_.bg-primary]:bg-slate-400' :
+                data.insulation === 2 ? '[&_[role=slider]]:bg-pink-300 [&_.bg-primary]:bg-pink-300' :
+                data.insulation === 3 ? '[&_[role=slider]]:bg-pink-400 [&_.bg-primary]:bg-pink-400' :
+                data.insulation === 4 ? '[&_[role=slider]]:bg-pink-500 [&_.bg-primary]:bg-pink-500' :
+                '[&_[role=slider]]:bg-pink-600 [&_.bg-primary]:bg-pink-600'
+              }`}
             />
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>Poor</span>
-              <span>Fair</span>
-              <span>Good</span>
-              <span>Very Good</span>
-              <span>Excellent</span>
+            <div className="grid grid-cols-5 text-xs text-slate-500 text-center">
+              <span className={data.insulation === 1 ? 'font-semibold text-slate-700' : ''}>Poor</span>
+              <span className={data.insulation === 2 ? 'font-semibold text-pink-500' : ''}>Fair</span>
+              <span className={data.insulation === 3 ? 'font-semibold text-pink-500' : ''}>Good</span>
+              <span className={data.insulation === 4 ? 'font-semibold text-pink-600' : ''}>Great</span>
+              <span className={data.insulation === 5 ? 'font-semibold text-pink-700' : ''}>Excellent</span>
             </div>
           </div>
 
