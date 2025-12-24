@@ -692,53 +692,88 @@ const StatsPage = () => {
           })()}
 
           {/* Upcoming Payout Cheque */}
-          <div className="relative bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-950/40 dark:via-green-950/30 dark:to-teal-950/40 rounded-xl p-4 border-2 border-dashed border-emerald-300 dark:border-emerald-700 shadow-lg overflow-hidden">
-            {/* Decorative background pattern */}
-            <div className="absolute inset-0 opacity-[0.03]">
-              <div className="absolute inset-0" style={{ 
-                backgroundImage: 'repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)',
-                backgroundSize: '10px 10px'
-              }} />
-            </div>
+          {(() => {
+            // Calculate next Friday
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 7 - dayOfWeek + 5;
+            const nextFriday = new Date(today);
+            nextFriday.setDate(today.getDate() + (daysUntilFriday === 0 ? 7 : daysUntilFriday));
+            const fridayDate = nextFriday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            const chequeAmount = (metrics?.thisWeekRevenue || 0) * 0.10;
             
-            {/* Cheque header */}
-            <div className="relative flex items-center justify-between mb-3">
-              <div>
-                <p className="text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 font-semibold">This Week's Commission</p>
-                <p className="text-[10px] text-muted-foreground">Upcoming Payout</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[8px] uppercase tracking-wide text-muted-foreground">Date</p>
-                <p className="text-[10px] font-mono text-foreground">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-              </div>
-            </div>
-            
-            {/* Pay to line */}
-            <div className="relative mb-2">
-              <p className="text-[8px] uppercase tracking-wide text-muted-foreground mb-0.5">Pay to the order of</p>
-              <div className="border-b border-emerald-300 dark:border-emerald-600 pb-1">
-                <p className="text-sm font-semibold text-foreground">{agentNames[agentId] || 'Agent'}</p>
-              </div>
-            </div>
-            
-            {/* Amount box */}
-            <div className="relative flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-[8px] uppercase tracking-wide text-muted-foreground mb-1">Amount (10% of ${formatCurrency(metrics?.thisWeekRevenue || 0).replace('$', '')} production)</p>
-                <div className="inline-flex items-baseline gap-1 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1.5 rounded-lg shadow-md">
-                  <span className="text-lg font-bold">{formatCurrency((metrics?.thisWeekRevenue || 0) * 0.10)}</span>
+            return (
+              <div className="relative bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100 dark:from-amber-950/50 dark:via-yellow-950/40 dark:to-amber-900/50 rounded-lg overflow-hidden shadow-xl border border-amber-200 dark:border-amber-700">
+                {/* Top decorative border */}
+                <div className="h-2 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400" />
+                
+                {/* Guilloche pattern background */}
+                <div className="absolute inset-0 opacity-[0.04]" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                }} />
+                
+                <div className="relative p-4 sm:p-5">
+                  {/* Bank header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-200 tracking-wide">COMMISSION PAYOUT</p>
+                      <p className="text-[9px] text-amber-600 dark:text-amber-400 font-medium">Weekly Sales Earnings</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pay Date</p>
+                      <p className="text-xs font-bold font-mono text-amber-800 dark:text-amber-200">{fridayDate}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Pay to line */}
+                  <div className="mb-3">
+                    <p className="text-[8px] uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">Pay to the order of</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-base sm:text-lg font-bold text-amber-900 dark:text-amber-100 flex-1 border-b-2 border-amber-300 dark:border-amber-600 pb-1 font-serif italic">
+                        {agentNames[agentId] || 'Agent'}
+                      </p>
+                      {/* Amount box */}
+                      <div className="border-2 border-amber-400 dark:border-amber-500 bg-white/60 dark:bg-amber-950/60 px-3 py-1.5 rounded">
+                        <p className="text-lg sm:text-xl font-black text-amber-800 dark:text-amber-200 font-mono">
+                          {formatCurrency(chequeAmount)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Written amount */}
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[10px] sm:text-xs text-amber-700 dark:text-amber-300 font-serif italic flex-1 border-b border-amber-200 dark:border-amber-700 pb-1">
+                        {chequeAmount >= 1000 
+                          ? `${Math.floor(chequeAmount / 1000)} thousand ${Math.round(chequeAmount % 1000)} dollars`
+                          : `${Math.round(chequeAmount)} dollars`
+                        } and 00/100
+                      </p>
+                      <p className="text-[9px] text-amber-500 dark:text-amber-500 uppercase tracking-wide">Dollars</p>
+                    </div>
+                  </div>
+                  
+                  {/* Memo and signature */}
+                  <div className="flex items-end justify-between pt-2">
+                    <div className="flex-1">
+                      <p className="text-[8px] uppercase tracking-wider text-amber-500 dark:text-amber-500 mb-0.5">Memo</p>
+                      <p className="text-[10px] text-amber-700 dark:text-amber-300 border-b border-amber-200 dark:border-amber-700 pb-1 inline-block pr-8">
+                        10% of {formatCurrency(metrics?.thisWeekRevenue || 0)} production
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="border-b-2 border-amber-400 dark:border-amber-500 w-24 mb-0.5" />
+                      <p className="text-[7px] uppercase tracking-wider text-amber-500 dark:text-amber-500">Authorized Signature</p>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Bottom decorative border */}
+                <div className="h-1.5 bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300" />
               </div>
-              <div className="text-right">
-                <DollarSign className="w-8 h-8 text-emerald-200 dark:text-emerald-800" />
-              </div>
-            </div>
-            
-            {/* Memo line */}
-            <div className="relative mt-3 pt-2 border-t border-emerald-200 dark:border-emerald-800">
-              <p className="text-[8px] uppercase tracking-wide text-muted-foreground">Memo: Weekly Sales Commission</p>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Performance Metrics Grid */}
           <div className="grid grid-cols-2 gap-3">
