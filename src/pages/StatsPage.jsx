@@ -559,8 +559,8 @@ const StatsPage = () => {
           </Card>
 
           {/* Commission Tiers - Compact Horizontal Scroll */}
-          <div className="overflow-x-auto -mx-4 px-4">
-            <div className="flex gap-2 min-w-max pb-1">
+          <div className="overflow-x-auto -mx-4 px-4 py-1">
+            <div className="flex gap-2 min-w-max">
               {PROMOTION_TIERS.map((tier) => {
                 const TierIcon = tier.icon;
                 const isCurrentTier = tier.name === currentTier.name;
@@ -569,18 +569,16 @@ const StatsPage = () => {
                 return (
                   <div 
                     key={tier.name}
-                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all ${
+                    className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg transition-all ${
                       isCurrentTier 
-                        ? "bg-primary/10 ring-1 ring-primary" 
-                        : isAchieved 
-                          ? "bg-muted/50" 
-                          : "bg-muted/20 opacity-50"
+                        ? "bg-gradient-to-br from-primary/15 to-primary/5 shadow-sm" 
+                        : "opacity-40 grayscale"
                     }`}
                   >
-                    <div className={`p-1 rounded bg-gradient-to-br ${tier.color} ${!isAchieved ? 'grayscale' : ''}`}>
-                      <TierIcon className="w-3 h-3 text-white" />
+                    <div className={`p-1.5 rounded-md bg-gradient-to-br ${tier.color} ${!isCurrentTier ? 'opacity-60' : 'shadow-md'}`}>
+                      <TierIcon className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className={`text-[10px] font-medium ${isCurrentTier ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <span className={`text-xs font-semibold ${isCurrentTier ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {tier.name}
                     </span>
                   </div>
