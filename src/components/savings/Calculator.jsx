@@ -713,14 +713,15 @@ export function Calculator() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-600 dark:text-slate-400">Square Footage</Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div>
               <select
                 value={data.squareFootage}
                 onChange={(e) => setData({ ...data, squareFootage: e.target.value })}
-                className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                aria-label="Square Footage"
               >
+                <option value="" disabled>Square Footage</option>
                 <option value="under-1000">Under 1,000 sq ft</option>
                 <option value="1000-1500">1,000 - 1,500 sq ft</option>
                 <option value="1500-2000">1,500 - 2,000 sq ft</option>
@@ -731,13 +732,14 @@ export function Calculator() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-600 dark:text-slate-400">Heating Source</Label>
+            <div>
               <select
                 value={data.heatingSource}
                 onChange={(e) => setData({ ...data, heatingSource: e.target.value })}
-                className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                aria-label="Heating Source"
               >
+                <option value="" disabled>Heating Source</option>
                 <option value="gas">Natural Gas</option>
                 <option value="electricity">Electricity</option>
                 <option value="oil">Oil</option>
@@ -745,52 +747,41 @@ export function Calculator() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-600 dark:text-slate-400">Heating System</Label>
+            <div>
               <select
                 value={data.heatingSystem}
                 onChange={(e) => setData({ ...data, heatingSystem: e.target.value })}
-                className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                aria-label="Heating System"
               >
+                <option value="" disabled>Heating System</option>
                 <option value="furnace">Furnace</option>
                 <option value="boiler">Boiler/Radiators</option>
                 <option value="baseboard">Baseboard Only</option>
                 <option value="both">Furnace & Baseboard</option>
               </select>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Monthly {data.heatingSource === "gas" ? "Gas" : data.heatingSource === "electricity" ? "Electric Heat" : data.heatingSource === "oil" ? "Oil" : "Propane"} Bill
-              </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                <Input
-                  type="number"
-                  value={data.gasBill}
-                  onChange={(e) => setData({ ...data, gasBill: Number(e.target.value) })}
-                  className="pl-7 h-11 rounded-xl border-slate-200 dark:border-slate-700"
-                />
-              </div>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs md:text-sm">$</span>
+              <Input
+                type="number"
+                value={data.gasBill}
+                onChange={(e) => setData({ ...data, gasBill: Number(e.target.value) })}
+                className="pl-6 h-10 md:h-11 rounded-xl border-slate-200 dark:border-slate-700 text-xs md:text-sm"
+                placeholder={`Monthly ${data.heatingSource === "gas" ? "Gas" : data.heatingSource === "electricity" ? "Electric" : data.heatingSource === "oil" ? "Oil" : "Propane"} Bill`}
+              />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                Monthly Electricity Bill
-              </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                <Input
-                  type="number"
-                  value={data.electricityBill}
-                  onChange={(e) => setData({ ...data, electricityBill: Number(e.target.value) })}
-                  className="pl-7 h-11 rounded-xl border-slate-200 dark:border-slate-700"
-                />
-              </div>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs md:text-sm">$</span>
+              <Input
+                type="number"
+                value={data.electricityBill}
+                onChange={(e) => setData({ ...data, electricityBill: Number(e.target.value) })}
+                className="pl-6 h-10 md:h-11 rounded-xl border-slate-200 dark:border-slate-700 text-xs md:text-sm"
+                placeholder="Monthly Electric Bill"
+              />
             </div>
           </div>
 
