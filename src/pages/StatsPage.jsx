@@ -619,8 +619,9 @@ const StatsPage = () => {
               );
             }
             if (myIndex === 0) {
+              const currentAgent = leaderboard[0];
               const secondAgent = leaderboard[1];
-              const lead = myAgent?.weeklyRevenue - (secondAgent?.weeklyRevenue || 0);
+              const lead = currentAgent?.weeklyRevenue - (secondAgent?.weeklyRevenue || 0);
               return (
                 <Card className="border-0 bg-gradient-to-r from-yellow-500/10 via-amber-500/10 to-orange-500/10 shadow-sm">
                   <CardContent className="p-3">
