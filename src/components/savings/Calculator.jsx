@@ -161,7 +161,7 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
                   value={month.onPeak}
                   onChange={(e) => handleInputChange(index, 'onPeak', e.target.value)}
                   placeholder="kWh"
-                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-[10px] placeholder:text-slate-300 dark:placeholder:text-slate-500"
                 />
               </div>
               <div>
@@ -171,7 +171,7 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
                   value={month.midPeak}
                   onChange={(e) => handleInputChange(index, 'midPeak', e.target.value)}
                   placeholder="kWh"
-                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-[10px] placeholder:text-slate-300 dark:placeholder:text-slate-500"
                 />
               </div>
               <div>
@@ -181,7 +181,7 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
                   value={month.offPeak}
                   onChange={(e) => handleInputChange(index, 'offPeak', e.target.value)}
                   placeholder="kWh"
-                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-[10px] placeholder:text-slate-300 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
