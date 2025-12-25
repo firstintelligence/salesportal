@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown, Play, X, ChevronDown, Calculator as CalcIcon } from "lucide-react";
 
 const CATEGORIES = [
-  { id: "hvac", name: "Heating & Cooling", icon: Wind, color: "from-red-500 to-rose-500", bgColor: "bg-red-500", borderColor: "border-red-500" },
+  { id: "hvac", name: "Heating & Cooling", icon: ThermometerSun, color: "from-red-500 to-rose-500", bgColor: "bg-red-500", borderColor: "border-red-500" },
   { id: "insulation", name: "Insulation", icon: Home, color: "from-[#FF69B4] to-[#FF1493]", bgColor: "bg-[#FF69B4]", borderColor: "border-[#FF69B4]" },
   { id: "hotwater", name: "Hot Water", icon: Droplet, color: "from-blue-500 to-cyan-500", bgColor: "bg-blue-500", borderColor: "border-blue-500" },
   { id: "solar", name: "Solar Panels", icon: Sun, color: "from-yellow-300 to-yellow-500", bgColor: "bg-yellow-400", borderColor: "border-yellow-400" },
