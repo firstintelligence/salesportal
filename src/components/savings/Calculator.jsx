@@ -1029,16 +1029,47 @@ export function Calculator() {
               </div>
             )}
 
-            {/* Incentives */}
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-              <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Available Incentives</h4>
-              <p className="text-sm text-amber-700 dark:text-amber-500">
-                {activeTab === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
-                {activeTab === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
-                {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for tankless water heaters"}
-                {activeTab === "solar" && "Federal grants + Ontario rebates available for solar installations"}
-                {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
-              </p>
+            {/* Incentives - Coupon Style */}
+            <div className="relative overflow-hidden">
+              <div className="flex items-stretch">
+                {/* Left perforated edge */}
+                <div className="w-4 bg-amber-100 dark:bg-amber-900/40 flex flex-col justify-around py-2">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="w-2 h-2 bg-slate-50 dark:bg-slate-900 rounded-full -ml-1" />
+                  ))}
+                </div>
+                
+                {/* Coupon body */}
+                <div className="flex-1 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 dark:from-amber-900/30 dark:via-amber-800/20 dark:to-amber-900/30 border-y-2 border-dashed border-amber-300 dark:border-amber-700 px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Available Incentive</span>
+                        <div className="h-px flex-1 bg-amber-300 dark:bg-amber-700" />
+                      </div>
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                        {activeTab === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
+                        {activeTab === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
+                        {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for tankless water heaters"}
+                        {activeTab === "solar" && "Federal grants + Ontario rebates available for solar installations"}
+                        {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
+                      </p>
+                    </div>
+                    <Button 
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-5 py-2 rounded-lg shadow-md shrink-0"
+                    >
+                      Redeem
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Right perforated edge */}
+                <div className="w-4 bg-amber-100 dark:bg-amber-900/40 flex flex-col justify-around py-2">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="w-2 h-2 bg-slate-50 dark:bg-slate-900 rounded-full -mr-1 ml-auto" />
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Video Explainer Section - Moved to bottom and collapsed by default */}
