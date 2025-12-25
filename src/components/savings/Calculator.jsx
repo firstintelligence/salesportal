@@ -701,45 +701,44 @@ export function Calculator() {
     <div className="space-y-6">
       {/* Home Details Section */}
       <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
-              <Home className="w-6 h-6 text-white" />
+        <CardHeader className="pb-3 pt-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+              <Home className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <div>
-              <CardTitle className="text-xl">Your Home Details</CardTitle>
-              <CardDescription>Tell us about your property to calculate accurate savings</CardDescription>
-            </div>
+            <CardTitle className="text-base md:text-lg">Your Home Details</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-            <div>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+            <div className="space-y-1">
+              <Label className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">Square Footage</Label>
               <select
                 value={data.squareFootage}
                 onChange={(e) => setData({ ...data, squareFootage: e.target.value })}
-                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-9 md:h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 aria-label="Square Footage"
               >
-                <option value="" disabled>Square Footage</option>
-                <option value="under-1000">Under 1,000 sq ft</option>
-                <option value="1000-1500">1,000 - 1,500 sq ft</option>
-                <option value="1500-2000">1,500 - 2,000 sq ft</option>
-                <option value="2000-2500">2,000 - 2,500 sq ft</option>
-                <option value="2500-3000">2,500 - 3,000 sq ft</option>
-                <option value="3000-4000">3,000 - 4,000 sq ft</option>
-                <option value="over-4000">Over 4,000 sq ft</option>
+                <option value="" disabled>Select</option>
+                <option value="under-1000">Under 1,000</option>
+                <option value="1000-1500">1,000-1,500</option>
+                <option value="1500-2000">1,500-2,000</option>
+                <option value="2000-2500">2,000-2,500</option>
+                <option value="2500-3000">2,500-3,000</option>
+                <option value="3000-4000">3,000-4,000</option>
+                <option value="over-4000">Over 4,000</option>
               </select>
             </div>
 
-            <div>
+            <div className="space-y-1">
+              <Label className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">Heating Source</Label>
               <select
                 value={data.heatingSource}
                 onChange={(e) => setData({ ...data, heatingSource: e.target.value })}
-                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-9 md:h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 aria-label="Heating Source"
               >
-                <option value="" disabled>Heating Source</option>
+                <option value="" disabled>Select</option>
                 <option value="gas">Natural Gas</option>
                 <option value="electricity">Electricity</option>
                 <option value="oil">Oil</option>
@@ -747,41 +746,50 @@ export function Calculator() {
               </select>
             </div>
 
-            <div>
+            <div className="space-y-1">
+              <Label className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">Heating System</Label>
               <select
                 value={data.heatingSystem}
                 onChange={(e) => setData({ ...data, heatingSystem: e.target.value })}
-                className="flex h-10 md:h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex h-9 md:h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 aria-label="Heating System"
               >
-                <option value="" disabled>Heating System</option>
+                <option value="" disabled>Select</option>
                 <option value="furnace">Furnace</option>
-                <option value="boiler">Boiler/Radiators</option>
-                <option value="baseboard">Baseboard Only</option>
-                <option value="both">Furnace & Baseboard</option>
+                <option value="boiler">Boiler</option>
+                <option value="baseboard">Baseboard</option>
+                <option value="both">Both</option>
               </select>
             </div>
 
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs md:text-sm">$</span>
-              <Input
-                type="number"
-                value={data.gasBill}
-                onChange={(e) => setData({ ...data, gasBill: Number(e.target.value) })}
-                className="pl-6 h-10 md:h-11 rounded-xl border-slate-200 dark:border-slate-700 text-xs md:text-sm"
-                placeholder={`Monthly ${data.heatingSource === "gas" ? "Gas" : data.heatingSource === "electricity" ? "Electric" : data.heatingSource === "oil" ? "Oil" : "Propane"} Bill`}
-              />
+            <div className="space-y-1">
+              <Label className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">
+                {data.heatingSource === "gas" ? "Gas" : data.heatingSource === "electricity" ? "Electric" : data.heatingSource === "oil" ? "Oil" : "Propane"} Bill
+              </Label>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                <Input
+                  type="number"
+                  value={data.gasBill}
+                  onChange={(e) => setData({ ...data, gasBill: Number(e.target.value) })}
+                  className="pl-5 h-9 md:h-10 rounded-lg border-slate-200 dark:border-slate-700 text-xs md:text-sm"
+                  placeholder="Monthly"
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs md:text-sm">$</span>
-              <Input
-                type="number"
-                value={data.electricityBill}
-                onChange={(e) => setData({ ...data, electricityBill: Number(e.target.value) })}
-                className="pl-6 h-10 md:h-11 rounded-xl border-slate-200 dark:border-slate-700 text-xs md:text-sm"
-                placeholder="Monthly Electric Bill"
-              />
+            <div className="space-y-1">
+              <Label className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">Electric Bill</Label>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                <Input
+                  type="number"
+                  value={data.electricityBill}
+                  onChange={(e) => setData({ ...data, electricityBill: Number(e.target.value) })}
+                  className="pl-5 h-9 md:h-10 rounded-lg border-slate-200 dark:border-slate-700 text-xs md:text-sm"
+                  placeholder="Monthly"
+                />
+              </div>
             </div>
           </div>
 
@@ -812,29 +820,26 @@ export function Calculator() {
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                  Ontario Electricity Support Program (OESP)
+          <div className="p-2 md:p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <Label className="text-xs md:text-sm font-medium text-emerald-700 dark:text-emerald-400 leading-tight block">
+                  OESP Rebate
                 </Label>
-                <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
-                  Monthly bill credits for eligible households
+                <p className="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-500 leading-tight">
+                  Bill credits for eligible households
                 </p>
               </div>
               <Switch
                 checked={data.oesp}
                 onCheckedChange={(checked) => setData({ ...data, oesp: checked })}
-                className="data-[state=checked]:bg-emerald-500"
+                className="data-[state=checked]:bg-emerald-500 shrink-0"
               />
             </div>
             {data.oesp && (
-              <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-700">
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                  <span className="font-semibold">+$55/month rebate applied.</span>
-                </p>
-                <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-1 italic">
-                  *This is an average amount. The actual rebate ranges from $35/month to $75/month depending on income level and number of people living in the home.
+              <div className="mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-700">
+                <p className="text-[10px] md:text-xs text-emerald-700 dark:text-emerald-400">
+                  <span className="font-semibold">+$55/month rebate applied</span> (ranges $35-$75)
                 </p>
               </div>
             )}
@@ -853,14 +858,14 @@ export function Calculator() {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 transition-all relative ${
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 py-2 md:py-3 px-1 md:px-2 transition-all relative ${
                   isActive 
                     ? `bg-gradient-to-r ${category.color} text-white shadow-lg z-10` 
                     : "bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300"
-                } ${index === 0 ? 'rounded-tl-2xl' : ''} ${index === CATEGORIES.length - 1 ? 'rounded-tr-2xl' : ''}`}
+                } ${index === 0 ? 'rounded-tl-xl md:rounded-tl-2xl' : ''} ${index === CATEGORIES.length - 1 ? 'rounded-tr-xl md:rounded-tr-2xl' : ''}`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-xs font-medium whitespace-nowrap">{category.name}</span>
+                <Icon className="w-5 h-5 md:w-5 md:h-5" />
+                <span className="hidden md:block text-xs font-medium whitespace-nowrap">{category.name}</span>
               </button>
             );
           })}
