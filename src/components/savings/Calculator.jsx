@@ -147,49 +147,49 @@ const BatteryCalculator = ({ onSavingsCalculated }) => {
       </div>
 
       {/* Month Input Cards - Condensed Layout */}
-      <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto">
+      <div className="grid grid-cols-3 gap-2 md:gap-3 max-w-xl mx-auto">
         {months.map((month, index) => (
-          <div key={index} className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-lg p-3 space-y-2">
-            <h4 className="font-semibold text-green-700 dark:text-green-400 text-sm text-center">Month {index + 1}</h4>
+          <div key={index} className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-lg p-2 md:p-3 space-y-1.5 md:space-y-2">
+            <h4 className="font-semibold text-green-700 dark:text-green-400 text-xs md:text-sm text-center">Month {index + 1}</h4>
             
-            {/* Stacked inputs - one column */}
-            <div className="space-y-2">
-              <div className="space-y-1">
-                <Label className="text-xs text-slate-600 dark:text-slate-400">On-Peak (kWh)</Label>
+            {/* Stacked inputs - compact on mobile */}
+            <div className="space-y-1.5">
+              <div>
+                <Label className="text-[10px] md:text-xs text-slate-600 dark:text-slate-400">On-Peak</Label>
                 <Input
                   type="number"
                   value={month.onPeak}
                   onChange={(e) => handleInputChange(index, 'onPeak', e.target.value)}
-                  placeholder="0"
-                  className="h-8 bg-white dark:bg-slate-900 text-sm"
+                  placeholder="kWh"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs text-slate-600 dark:text-slate-400">Mid-Peak (kWh)</Label>
+              <div>
+                <Label className="text-[10px] md:text-xs text-slate-600 dark:text-slate-400">Mid-Peak</Label>
                 <Input
                   type="number"
                   value={month.midPeak}
                   onChange={(e) => handleInputChange(index, 'midPeak', e.target.value)}
-                  placeholder="0"
-                  className="h-8 bg-white dark:bg-slate-900 text-sm"
+                  placeholder="kWh"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
                 />
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs text-slate-600 dark:text-slate-400">Off-Peak (kWh)</Label>
+              <div>
+                <Label className="text-[10px] md:text-xs text-slate-600 dark:text-slate-400">Off-Peak</Label>
                 <Input
                   type="number"
                   value={month.offPeak}
                   onChange={(e) => handleInputChange(index, 'offPeak', e.target.value)}
-                  placeholder="0"
-                  className="h-8 bg-white dark:bg-slate-900 text-sm"
+                  placeholder="kWh"
+                  className="h-7 md:h-8 bg-white dark:bg-slate-900 text-xs md:text-sm placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             {calculated && results?.monthlyResults[index] && results.monthlyResults[index].totalUsage > 0 && (
-              <div className="pt-2 border-t border-slate-200 dark:border-slate-600">
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 text-center">
-                  Savings: ${results.monthlyResults[index].savings.toFixed(2)}
+              <div className="pt-1.5 md:pt-2 border-t border-slate-200 dark:border-slate-600">
+                <p className="text-[10px] md:text-xs font-medium text-green-600 dark:text-green-400 text-center">
+                  Saves: ${results.monthlyResults[index].savings.toFixed(2)}
                 </p>
               </div>
             )}
