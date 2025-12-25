@@ -347,6 +347,9 @@ const HotWaterIllustration = ({ savings }) => (
           <div className="w-12 h-14 bg-slate-400 rounded-lg relative">
             <Flame className="w-6 h-6 text-orange-500 absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-pulse" />
           </div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+            <span className="text-[8px] text-white font-bold">24/7</span>
+          </div>
         </div>
         <p className="text-xs text-slate-500 font-medium">Gas Tank</p>
         <p className="text-sm font-bold text-red-500">Always On</p>
@@ -358,30 +361,35 @@ const HotWaterIllustration = ({ savings }) => (
         <span className="text-xs text-blue-600 font-bold mt-1">UPGRADE</span>
       </div>
       
-      {/* Heat Pump Water Heater */}
+      {/* Tankless Water Heater */}
       <div className="text-center">
         <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-2 relative">
-          <div className="w-12 h-14 bg-blue-400 rounded-lg relative">
-            <Droplet className="w-6 h-6 text-white absolute top-1 left-1/2 transform -translate-x-1/2" />
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-cyan-400 rounded-t-lg flex items-center justify-center">
-              <Wind className="w-4 h-4 text-white" />
-            </div>
+          <div className="w-14 h-10 bg-blue-500 rounded-lg relative flex items-center justify-center">
+            <Droplet className="w-5 h-5 text-white" />
+            <Flame className="w-4 h-4 text-orange-400 absolute -bottom-1 left-1/2 transform -translate-x-1/2" />
           </div>
         </div>
-        <p className="text-xs text-slate-500 font-medium">HP Water Heater</p>
+        <p className="text-xs text-slate-500 font-medium">Tankless</p>
         <p className="text-sm font-bold text-blue-500">-${savings}/mo</p>
       </div>
     </div>
     
-    {/* Efficiency comparison */}
-    <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+    {/* On-demand explanation */}
+    <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+      <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
+        <span className="font-semibold">On-Demand Hot Water:</span> Only heats water when you need it, eliminating standby heat loss from keeping a tank hot 24/7
+      </p>
+    </div>
+    
+    {/* Comparison */}
+    <div className="mt-3 grid grid-cols-2 gap-2 text-center">
       <div className="bg-slate-200 dark:bg-slate-700 rounded-lg p-2">
-        <p className="text-xs text-slate-500">Old Efficiency</p>
-        <p className="text-lg font-bold text-slate-600 dark:text-slate-300">60%</p>
+        <p className="text-xs text-slate-500">Tank (Always On)</p>
+        <p className="text-sm font-bold text-red-500">Wasted Energy</p>
       </div>
       <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-2">
-        <p className="text-xs text-blue-500">New Efficiency</p>
-        <p className="text-lg font-bold text-blue-600">300%+</p>
+        <p className="text-xs text-blue-500">Tankless (On Demand)</p>
+        <p className="text-sm font-bold text-blue-600">No Waste</p>
       </div>
     </div>
   </div>
@@ -503,8 +511,8 @@ const categoryVideos = {
     videoId: "wEoG4K7xpA4",
   },
   hotwater: {
-    title: "Heat Pump Water Heaters Explained",
-    description: "Discover why heat pump water heaters are 3x more efficient than traditional tanks",
+    title: "Tankless Water Heaters Explained",
+    description: "Discover why tankless water heaters save money with on-demand hot water",
     thumbnail: "https://img.youtube.com/vi/bBc_GwOzEFY/maxresdefault.jpg",
     videoId: "bBc_GwOzEFY",
   },
@@ -633,8 +641,8 @@ export function Calculator() {
         break;
       
       case "hotwater":
-        monthlySavings = heatingSource !== "electricity" ? Math.round(gasBill * 0.3) : Math.round(electricityBill * 0.2);
-        description = "Heat pump water heater efficiency";
+        monthlySavings = heatingSource !== "electricity" ? Math.round(gasBill * 0.25) : Math.round(electricityBill * 0.15);
+        description = "Tankless on-demand water heating eliminates standby loss";
         break;
       
       case "solar":
@@ -1027,7 +1035,7 @@ export function Calculator() {
               <p className="text-sm text-amber-700 dark:text-amber-500">
                 {activeTab === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
                 {activeTab === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
-                {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for heat pump water heaters"}
+                {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for tankless water heaters"}
                 {activeTab === "solar" && "Federal grants + Ontario rebates available for solar installations"}
                 {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
               </p>
