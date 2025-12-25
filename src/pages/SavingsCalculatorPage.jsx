@@ -26,7 +26,7 @@ const SavingsCalculatorPage = () => {
             <ArrowLeft className="mr-1 h-4 w-4" />
             <span className="hidden sm:inline">Back</span>
           </Button>
-          <h1 className="text-sm md:text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
             Energy Savings Calculator
           </h1>
           <div className="w-8 md:w-16" /> {/* Spacer for centering */}
