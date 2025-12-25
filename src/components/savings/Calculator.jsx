@@ -832,12 +832,12 @@ export function Calculator() {
                 '[&_[role=slider]]:bg-pink-600 [&_.bg-primary]:bg-pink-600'
               }`}
             />
-            <div className="grid grid-cols-5 text-xs text-slate-500 text-center">
-              <span className={data.insulation === 1 ? 'font-semibold text-slate-700' : ''}>Poor</span>
-              <span className={data.insulation === 2 ? 'font-semibold text-pink-500' : ''}>Fair</span>
-              <span className={data.insulation === 3 ? 'font-semibold text-pink-500' : ''}>Good</span>
-              <span className={data.insulation === 4 ? 'font-semibold text-pink-600' : ''}>Great</span>
-              <span className={data.insulation === 5 ? 'font-semibold text-pink-700' : ''}>Excellent</span>
+            <div className="grid grid-cols-5 text-xs text-slate-500">
+              <span className={`text-left ${data.insulation === 1 ? 'font-semibold text-slate-700' : ''}`}>Poor</span>
+              <span className={`text-center ${data.insulation === 2 ? 'font-semibold text-pink-500' : ''}`}>Fair</span>
+              <span className={`text-center ${data.insulation === 3 ? 'font-semibold text-pink-500' : ''}`}>Good</span>
+              <span className={`text-center ${data.insulation === 4 ? 'font-semibold text-pink-600' : ''}`}>Great</span>
+              <span className={`text-right ${data.insulation === 5 ? 'font-semibold text-pink-700' : ''}`}>Excellent</span>
             </div>
           </div>
 
