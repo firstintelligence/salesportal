@@ -14,7 +14,7 @@ const HeatCoolIcon = ({ className }) => (
   <div className={`relative ${className}`} style={{ width: '1.25em', height: '1.25em' }}>
     <Snowflake 
       className="absolute bottom-0 right-0 w-[75%] h-[75%] text-current" 
-      style={{ clipPath: 'polygon(100% 0%, 100% 100%, 0% 100%)' }} 
+      style={{ clipPath: 'polygon(100% 0%, 100% 100%, 0% 100%)', transform: 'rotate(45deg)' }} 
     />
     <Flame className="absolute top-0 left-0 w-[75%] h-[75%] text-current" />
   </div>
