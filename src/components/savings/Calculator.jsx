@@ -9,15 +9,13 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Home, DollarSign, Zap, Wind, Sun, Battery, Droplet, TrendingDown, Leaf, ThermometerSun, Flame, Snowflake, ArrowRight, ArrowDown, Play, X, ChevronDown, Calculator as CalcIcon } from "lucide-react";
 
-// Custom Heat/Cool icon - flame top-left, snowflake bottom-right (clipped to show ~60%)
+// Custom Heat/Cool icon - flame top-left, snowflake bottom-right (clipped to southeast half)
 const HeatCoolIcon = ({ className }) => (
   <div className={`relative ${className}`} style={{ width: '1.25em', height: '1.25em' }}>
-    <div 
-      className="absolute bottom-0 right-0 w-[75%] h-[75%] overflow-hidden"
-      style={{ clipPath: 'polygon(60% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 40%)', transform: 'rotate(45deg)' }}
-    >
-      <Snowflake className="w-full h-full text-current" />
-    </div>
+    <Snowflake 
+      className="absolute bottom-0 right-0 w-[75%] h-[75%] text-current" 
+      style={{ clipPath: 'polygon(100% 0%, 100% 100%, 0% 100%)' }} 
+    />
     <Flame className="absolute top-0 left-0 w-[75%] h-[75%] text-current" />
   </div>
 );
