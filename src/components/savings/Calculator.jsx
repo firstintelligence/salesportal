@@ -909,7 +909,14 @@ export function Calculator() {
             </div>
           </div>
 
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-4 md:p-6 space-y-4 md:space-y-6">
+            {/* Video Explainer Section - At top, collapsed by default */}
+            <CollapsibleVideoSection 
+              video={currentVideo} 
+              color={currentCategory.color}
+              onPlay={() => handlePlayVideo(currentVideo)}
+            />
+
             {/* How it Works - Visual Illustration for all categories */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">How it Works</h4>
@@ -1029,55 +1036,33 @@ export function Calculator() {
               </div>
             )}
 
-            {/* Incentives - Coupon Style */}
-            <div className="relative overflow-hidden">
-              <div className="flex items-stretch">
-                {/* Left perforated edge */}
-                <div className="w-4 bg-amber-100 dark:bg-amber-900/40 flex flex-col justify-around py-2">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="w-2 h-2 bg-slate-50 dark:bg-slate-900 rounded-full -ml-1" />
-                  ))}
+            {/* Incentives - Compact Coupon Style */}
+            <div className="flex items-center bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 dark:from-amber-900/20 dark:via-yellow-900/10 dark:to-amber-900/20 border border-dashed border-amber-400 dark:border-amber-600 rounded-lg overflow-hidden">
+              {/* Scissors icon */}
+              <div className="px-2 border-r border-dashed border-amber-400 dark:border-amber-600 self-stretch flex items-center">
+                <span className="text-amber-500 text-sm">✂️</span>
+              </div>
+              
+              {/* Coupon content */}
+              <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">Rebate Available</p>
+                  <p className="text-xs md:text-sm font-medium text-amber-800 dark:text-amber-300 truncate">
+                    {activeTab === "hvac" && "Up to $6,500 Ontario + federal grants"}
+                    {activeTab === "insulation" && "Up to $5,000 Greener Homes Grant"}
+                    {activeTab === "hotwater" && "Up to $5,000 for tankless heaters"}
+                    {activeTab === "solar" && "Federal + Ontario solar rebates"}
+                    {activeTab === "battery" && "Up to $5,000 battery rebate"}
+                  </p>
                 </div>
-                
-                {/* Coupon body */}
-                <div className="flex-1 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 dark:from-amber-900/30 dark:via-amber-800/20 dark:to-amber-900/30 border-y-2 border-dashed border-amber-300 dark:border-amber-700 px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Available Incentive</span>
-                        <div className="h-px flex-1 bg-amber-300 dark:bg-amber-700" />
-                      </div>
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-                        {activeTab === "hvac" && "Up to $6,500 Ontario rebate for heat pumps + federal grants"}
-                        {activeTab === "insulation" && "Up to $5,000 through the Greener Homes Grant program"}
-                        {activeTab === "hotwater" && "Up to $5,000 Greener Homes Grant for tankless water heaters"}
-                        {activeTab === "solar" && "Federal grants + Ontario rebates available for solar installations"}
-                        {activeTab === "battery" && "Ontario rebates up to $5,000 for home battery storage"}
-                      </p>
-                    </div>
-                    <Button 
-                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-5 py-2 rounded-lg shadow-md shrink-0"
-                    >
-                      Redeem
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Right perforated edge */}
-                <div className="w-4 bg-amber-100 dark:bg-amber-900/40 flex flex-col justify-around py-2">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="w-2 h-2 bg-slate-50 dark:bg-slate-900 rounded-full -mr-1 ml-auto" />
-                  ))}
-                </div>
+                <Button 
+                  size="sm"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs px-3 py-1.5 h-auto rounded-md shadow shrink-0"
+                >
+                  Redeem
+                </Button>
               </div>
             </div>
-
-            {/* Video Explainer Section - Moved to bottom and collapsed by default */}
-            <CollapsibleVideoSection 
-              video={currentVideo} 
-              color={currentCategory.color}
-              onPlay={() => handlePlayVideo(currentVideo)}
-            />
           </CardContent>
         </Card>
       </div>
