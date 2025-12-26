@@ -502,6 +502,7 @@ const ReceiptPage = () => {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 };
