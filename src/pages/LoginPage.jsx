@@ -40,44 +40,50 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="w-full max-w-sm mx-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-8">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-100 via-slate-50 to-white">
+      <div className="w-full max-w-md mx-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-slate-300/50">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
               Sales Portal
             </h1>
-            <p className="text-sm text-slate-500 mt-1">Enter your agent ID to continue</p>
+            <p className="text-slate-500 mt-2">Enter your agent ID to continue</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <Input
-              type="text"
-              value={agentId}
-              onChange={(e) => setAgentId(e.target.value.toUpperCase())}
-              placeholder="Agent ID"
-              className="w-full h-12 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl text-center tracking-widest uppercase focus:bg-white transition-colors"
-              autoFocus
-            />
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <Input
+                type="text"
+                value={agentId}
+                onChange={(e) => setAgentId(e.target.value.toUpperCase())}
+                placeholder="Agent ID"
+                className="w-full h-14 bg-slate-50/50 border-slate-200/80 text-slate-900 placeholder:text-slate-400 rounded-2xl text-center text-lg tracking-[0.3em] uppercase focus:bg-white focus:border-slate-300 focus:ring-2 focus:ring-slate-100 transition-all"
+                autoFocus
+              />
+            </div>
             
             <Button 
               type="submit" 
               disabled={isLoading || !agentId}
-              className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium transition-colors"
+              className="w-full h-14 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-white rounded-2xl font-medium text-base shadow-lg shadow-slate-300/30 hover:shadow-xl hover:shadow-slate-300/40 transition-all duration-200 disabled:opacity-50"
             >
               {isLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 "Sign In"
               )}
             </Button>
           </form>
         </div>
+        
+        <p className="text-center text-sm text-slate-400 mt-6">
+          Secure access for authorized agents
+        </p>
       </div>
     </div>
   );
