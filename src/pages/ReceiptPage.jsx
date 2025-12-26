@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, RefreshCw, FileText, RotateCw } from "lucide-react";
+import { Loader2, RefreshCw, FileText, RotateCw, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Receipt1 from "../components/templates/Receipt1";
 import Receipt2 from "../components/templates/Receipt2";
@@ -191,35 +191,37 @@ const ReceiptPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 relative">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Receipt Generator</h1>
-        <div className="flex items-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
           <Button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className="mr-4"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
           >
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            Receipt Generator
+          </h1>
+          <Button size="sm" onClick={handleDownloadPDF} disabled={isDownloading}>
             {isDownloading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Downloading...
+                <span className="hidden sm:inline">Downloading...</span>
               </>
             ) : (
-              "Download Receipt PDF"
+              <span className="hidden sm:inline">Download PDF</span>
             )}
+            {!isDownloading && <FileText className="sm:hidden h-4 w-4" />}
           </Button>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600"
-            aria-label="Switch to Bill Generator"
-          >
-            <FileText size={24} />
-          </button>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8">
+        <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
           <form>
             <div className="mb-6">

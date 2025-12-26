@@ -104,24 +104,27 @@ const PaymentCalculatorPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-card border-b border-border p-4">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/landing")}
-          className="mb-2"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Tools
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/landing")}
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
+          >
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            Payment Calculator
+          </h1>
+          <div className="w-8 md:w-16" /> {/* Spacer for centering */}
+        </div>
       </div>
 
-      <div className="container max-w-2xl mx-auto p-4 md:p-6">
+      <div className="max-w-2xl mx-auto px-3 md:px-4 py-4 md:py-6">
         <div className="bg-card rounded-xl shadow-lg border border-border overflow-hidden">
-          {/* Header */}
-          <div className="p-6 pb-4">
-            <h1 className="text-2xl font-bold text-foreground">Monthly Payment Calculator</h1>
-          </div>
 
           {/* Green Progress Bar */}
           <div className="h-1.5 bg-emerald-500"></div>
