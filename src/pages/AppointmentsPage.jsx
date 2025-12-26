@@ -220,7 +220,7 @@ const AppointmentsPage = () => {
             <span className="hidden sm:inline">Back</span>
           </Button>
           <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
-            {agentId === "MM23" ? "All Appointments" : "My Appointments"}
+            Appointments
           </h1>
           <div className="w-8 md:w-16" /> {/* Spacer for centering */}
         </div>

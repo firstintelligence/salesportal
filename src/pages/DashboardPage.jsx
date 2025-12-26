@@ -256,27 +256,33 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Header */}
-      <div className="glass-effect border-b border-border/50 sticky top-0 z-10">
-        <div className="px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/landing")}
-              className="rounded-xl h-10 w-10 hover:bg-primary/10"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground tracking-tight">
-                {agentId === "MM23" ? "All Deals" : "My Deals"}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
-              </p>
-            </div>
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/landing")}
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
+          >
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            Dashboard
+          </h1>
+          <div className="w-8 md:w-16" /> {/* Spacer for centering */}
+        </div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground">
+              {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
+            </p>
+          </div>
             
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
@@ -431,10 +437,9 @@ const DashboardPage = () => {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
 
         {/* Search Bar */}
-        <div className="px-4 pb-4">
+        <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -445,10 +450,7 @@ const DashboardPage = () => {
             />
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4 pb-8">
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div className="flex flex-col items-center gap-3">
@@ -577,6 +579,7 @@ const DashboardPage = () => {
             </div>
           </TooltipProvider>
         )}
+      </div>
       </div>
     </div>
   );

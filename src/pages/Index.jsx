@@ -857,9 +857,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               </>
             )}
           </button>
-        </div>
-        <h1 className="text-3xl font-bold">{isInvoice ? 'Invoice Generator' : 'Quote Generator'}</h1>
       </div>
+    </div>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-1 lg:order-1">
           <form>
