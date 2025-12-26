@@ -313,7 +313,6 @@ const InstallationChecklistPage = () => {
           </div>
         )}
       </div>
-      </div>
     </div>
   );
 };
