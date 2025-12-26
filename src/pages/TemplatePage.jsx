@@ -52,33 +52,39 @@ const TemplatePage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <Button variant="ghost" onClick={handleBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
-        </Button>
-        <Button onClick={handleDownloadPDF} disabled={isDownloading}>
-          {isDownloading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Downloading...
-            </>
-          ) : (
-            "Download PDF"
-          )}
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
+          >
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            {formData?.isInvoice ? 'Invoice Preview' : 'Quote Preview'}
+          </h1>
+          <Button size="sm" onClick={handleDownloadPDF} disabled={isDownloading}>
+            {isDownloading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span className="hidden sm:inline">Downloading...</span>
+              </>
+            ) : (
+              "Download PDF"
+            )}
+          </Button>
+        </div>
       </div>
 
-
-      <div className="mb-4 text-center">
-        <h2 className="text-xl font-semibold">
-          {formData?.isInvoice ? 'Invoice Preview' : 'Quote Preview'}
-        </h2>
-      </div>
-
-      <div className="flex justify-center" data-template-preview>
-        <div className="bg-white border shadow-sm">
-          <InvoiceTemplate data={formData} templateNumber={currentTemplate} />
+      <div className="max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8">
+        <div className="flex justify-center" data-template-preview>
+          <div className="bg-white border shadow-sm">
+            <InvoiceTemplate data={formData} templateNumber={currentTemplate} />
+          </div>
         </div>
       </div>
     </div>
