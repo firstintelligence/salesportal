@@ -580,7 +580,6 @@ const DashboardPage = () => {
           </TooltipProvider>
         )}
       </div>
-      </div>
     </div>
   );
 };
