@@ -48,30 +48,20 @@ const LoginPage = () => {
       </div>
 
       <div className="w-full max-w-md mx-6 relative z-10">
-        <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 md:p-10 shadow-2xl">
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-5">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-            <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">
-              Sales Portal
-            </h1>
-            <p className="text-slate-400 text-sm">Enter your agent ID to continue</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-2xl">
+          <div className="text-center mb-6">
+            <p className="text-slate-600 text-sm font-medium">Enter your agent ID to continue</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-300 block pl-1">Agent ID</label>
+              <label className="text-sm font-medium text-slate-700 block pl-1">Agent ID</label>
               <Input
                 type="text"
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value.toUpperCase())}
                 placeholder="Enter your ID"
-                className="w-full h-12 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 rounded-xl text-center text-base tracking-[0.2em] uppercase focus:bg-slate-700 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
+                className="w-full h-12 bg-slate-100 border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl text-center text-base tracking-[0.2em] uppercase focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all duration-200"
                 autoFocus
               />
             </div>
