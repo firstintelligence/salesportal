@@ -1,4 +1,8 @@
 import polaronLogo from '@/assets/polaron-logo-transparent.png';
+import edisonEnergyLogo from '@/assets/edison-energy-logo.svg';
+import energyExpertsLogo from '@/assets/energy-experts-logo.svg';
+import renoProsLogo from '@/assets/reno-pros-logo.svg';
+import provincialEnergyGroupLogo from '@/assets/provincial-energy-group-logo.svg';
 
 const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
@@ -10,6 +14,10 @@ export const getTenantLogo = (tenantSlug) => {
     'maher': null,
     'crown': null,
     'marathon': null,
+    'edison': edisonEnergyLogo,
+    'energyexperts': energyExpertsLogo,
+    'renopros': renoProsLogo,
+    'provincial': provincialEnergyGroupLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -19,6 +27,10 @@ export const getTenantLogo = (tenantSlug) => {
 export const getDefaultLogos = () => ({
   georges: georgesLogo,
   polaron: polaronLogo,
+  edison: edisonEnergyLogo,
+  energyexperts: energyExpertsLogo,
+  renopros: renoProsLogo,
+  provincial: provincialEnergyGroupLogo,
 });
 
 // Tenant company info
@@ -59,11 +71,32 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@marathon-electric.ca",
       invoicePrefix: "MARA"
     },
+    'edison': {
+      name: "Edison Energy",
+      address: "100 King Street West, Toronto, ON M5X 1A9",
+      phone: "",
+      email: "info@edisonenergy.ca",
+      invoicePrefix: "EDSN"
+    },
+    'energyexperts': {
+      name: "Energy Experts",
+      address: "100 King Street West, Toronto, ON M5X 1A9",
+      phone: "",
+      email: "info@energyexperts.io",
+      invoicePrefix: "ENEX"
+    },
+    'renopros': {
+      name: "Reno Pros",
+      address: "100 King Street West, Toronto, ON M5X 1A9",
+      phone: "",
+      email: "info@renopros.io",
+      invoicePrefix: "RENO"
+    },
     'provincial': {
       name: "Provincial Energy Group",
-      address: "",
+      address: "100 King Street West, Toronto, ON M5X 1A9",
       phone: "",
-      email: "",
+      email: "info@provincialenergygroup.com",
       invoicePrefix: "PROV"
     },
   };
@@ -93,6 +126,22 @@ export const getTenantColors = (tenantSlug) => {
     'marathon': {
       primary: 'hsl(280, 68%, 50%)',
       secondary: 'hsl(280, 68%, 40%)',
+    },
+    'edison': {
+      primary: 'hsl(27, 91%, 54%)',
+      secondary: 'hsl(27, 91%, 44%)',
+    },
+    'energyexperts': {
+      primary: 'hsl(217, 91%, 67%)',
+      secondary: 'hsl(217, 91%, 57%)',
+    },
+    'renopros': {
+      primary: 'hsl(195, 100%, 47%)',
+      secondary: 'hsl(195, 100%, 37%)',
+    },
+    'provincial': {
+      primary: 'hsl(199, 98%, 37%)',
+      secondary: 'hsl(199, 98%, 27%)',
     },
   };
   
