@@ -135,7 +135,7 @@ const ProfileDropdown = () => {
             <ChevronDown className="w-3 h-3 opacity-60" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-72">
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium">{agentProfile?.first_name || 'Agent'}</p>
@@ -158,7 +158,7 @@ const ProfileDropdown = () => {
                   <Building2 className="w-4 h-4 mr-2" />
                   <span className="truncate">{tenant?.name || 'Switch Company'}</span>
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-48">
+                <DropdownMenuSubContent className="w-64">
                   {tenants.map((t) => (
                     <DropdownMenuItem
                       key={t.id}
