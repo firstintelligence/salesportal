@@ -83,6 +83,10 @@ const LandingPage = () => {
 
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
   const companyName = tenant?.name || "Sales Portal";
+  
+  console.log('Tenant data:', tenant);
+  console.log('Tenant slug:', tenant?.slug);
+  console.log('Tenant logo result:', tenantLogo);
 
   return (
     <div className="min-h-screen bg-background">
