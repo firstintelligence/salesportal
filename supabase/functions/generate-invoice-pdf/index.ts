@@ -214,9 +214,9 @@ serve(async (req) => {
               const origHeight = signatureImage.height;
               const aspectRatio = origWidth / origHeight;
               
-              // Target max dimensions for signature on CPA form
-              const maxWidth = 180;
-              const maxHeight = 60;
+              // Consistent max dimensions for signature across all pages (60px height at 72 DPI = ~60 points)
+              const maxWidth = 150;
+              const maxHeight = 45;
               
               let drawWidth: number;
               let drawHeight: number;
