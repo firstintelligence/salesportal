@@ -1,10 +1,12 @@
 import polaronLogo from '@/assets/polaron-logo-transparent.png';
-import edisonEnergyLogo from '@/assets/edison-energy-logo.svg';
-import energyExpertsLogo from '@/assets/energy-experts-logo.svg';
-import renoProsLogo from '@/assets/reno-pros-logo.svg';
-import provincialEnergyGroupLogo from '@/assets/provincial-energy-group-logo.svg';
 
 const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
+
+// Use public folder URLs for SVGs (more reliable than ES module imports for SVGs)
+const edisonEnergyLogo = '/assets/edison-energy-logo.svg';
+const energyExpertsLogo = '/assets/energy-experts-logo.svg';
+const renoProsLogo = '/assets/reno-pros-logo.svg';
+const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 
 // Tenant logo mappings
 export const getTenantLogo = (tenantSlug) => {
