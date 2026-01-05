@@ -411,10 +411,7 @@ const ProfitCalculatorPage = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Profit Calculator</h1>
-            <p className="text-sm text-muted-foreground">Compare deal profitability</p>
-          </div>
+          <h1 className="text-lg font-bold text-foreground">Profit Calculator</h1>
         </div>
       </header>
 
