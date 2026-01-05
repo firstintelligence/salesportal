@@ -46,6 +46,7 @@ serve(async (req) => {
     const TENANT_VAPI_ASSISTANTS: Record<string, string> = {
       'georges': '33a8b0b6-2fc0-4f1f-9f01-02712d52a676',
       'polaron': '1599d49b-3aca-43a7-8bec-ad4faac11913',
+      'energy-experts': '89ff92a2-dde7-4902-ae15-a93f22e49e9f',
     };
 
     // Get the VAPI assistant ID based on tenant slug (default to georges)
