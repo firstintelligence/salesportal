@@ -157,6 +157,208 @@ const safeNumber = (val) => {
   return isNaN(num) ? 0 : num;
 };
 
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-CA', {
+    style: 'currency',
+    currency: 'CAD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
+// Mobile comparison row - shared label with two input values
+const ComparisonRow = ({ label, deal1Value, deal2Value, onDeal1Change, onDeal2Change, prefix, isPercent }) => (
+  <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+    <span className="text-[11px] text-muted-foreground truncate">{label}</span>
+    <div className="relative">
+      {prefix && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">{prefix}</span>}
+      <Input
+        type="number"
+        value={deal1Value === 0 ? '' : (deal1Value || '')}
+        onChange={(e) => onDeal1Change(parseFloat(e.target.value) || 0)}
+        className={`${prefix ? 'pl-4' : ''} ${isPercent ? 'pr-5' : ''} text-xs h-7 text-right`}
+        placeholder="0"
+      />
+      {isPercent && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">%</span>}
+    </div>
+    <div className="relative">
+      {prefix && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">{prefix}</span>}
+      <Input
+        type="number"
+        value={deal2Value === 0 ? '' : (deal2Value || '')}
+        onChange={(e) => onDeal2Change(parseFloat(e.target.value) || 0)}
+        className={`${prefix ? 'pl-4' : ''} ${isPercent ? 'pr-5' : ''} text-xs h-7 text-right`}
+        placeholder="0"
+      />
+      {isPercent && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">%</span>}
+    </div>
+  </div>
+);
+
+const calculateDealMetrics = (dealData) => {
+  const dealSize = safeNumber(dealData.dealSize);
+  const equipmentCost = safeNumber(dealData.equipmentCost);
+  const laborCost = safeNumber(dealData.laborCost);
+  const extras = safeNumber(dealData.extras);
+  const dealerFee = safeNumber(dealData.dealerFee);
+  const contractorFee = safeNumber(dealData.contractorFee);
+  const commission = safeNumber(dealData.commission);
+  const marketingFee = safeNumber(dealData.marketingFee);
+
+  const dealerFeeCost = (dealSize * dealerFee) / 100;
+  const amountAfterDealerFee = dealSize - dealerFeeCost;
+  const contractorFeeCost = (amountAfterDealerFee * contractorFee) / 100;
+  const commissionCost = (amountAfterDealerFee * commission) / 100;
+  const marketingFeeCost = (amountAfterDealerFee * marketingFee) / 100;
+  
+  const totalCosts = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
+  const grossProfit = dealSize - totalCosts;
+  const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
+
+  return { dealSize, totalCosts, grossProfit, profitMargin };
+};
+
+// Mobile comparison component
+const MobileComparison = ({ deal1, setDeal1, deal2, setDeal2 }) => {
+  const handlePresetChange = (presetId, setDealData, dealData) => {
+    const preset = productPresets.find(p => p.id === presetId);
+    if (preset) {
+      setDealData({
+        ...dealData,
+        productPreset: presetId,
+        dealSize: preset.salePrice,
+        equipmentCost: preset.equipmentCost,
+        laborCost: preset.laborCost,
+      });
+    }
+  };
+
+  const metrics1 = calculateDealMetrics(deal1);
+  const metrics2 = calculateDealMetrics(deal2);
+
+  const preset1 = productPresets.find(p => p.id === deal1.productPreset);
+  const preset2 = productPresets.find(p => p.id === deal2.productPreset);
+  const image1 = preset1 ? productImages[preset1.category] : null;
+  const image2 = preset2 ? productImages[preset2.category] : null;
+
+  return (
+    <Card className="md:hidden">
+      <CardContent className="p-3 space-y-3">
+        {/* Headers */}
+        <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+          <span className="text-xs font-semibold text-muted-foreground"></span>
+          <span className="text-xs font-bold text-center text-primary">Option 1</span>
+          <span className="text-xs font-bold text-center text-primary">Option 2</span>
+        </div>
+
+        {/* Product Selectors */}
+        <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+          <span className="text-[11px] text-muted-foreground">Product</span>
+          <Select value={deal1.productPreset} onValueChange={(v) => handlePresetChange(v, setDeal1, deal1)}>
+            <SelectTrigger className="h-7 text-[10px] px-2">
+              <SelectValue placeholder="Select..." />
+            </SelectTrigger>
+            <SelectContent>
+              {productPresets.map(preset => (
+                <SelectItem key={preset.id} value={preset.id} className="text-xs">
+                  {preset.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={deal2.productPreset} onValueChange={(v) => handlePresetChange(v, setDeal2, deal2)}>
+            <SelectTrigger className="h-7 text-[10px] px-2">
+              <SelectValue placeholder="Select..." />
+            </SelectTrigger>
+            <SelectContent>
+              {productPresets.map(preset => (
+                <SelectItem key={preset.id} value={preset.id} className="text-xs">
+                  {preset.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Product Images */}
+        {(image1 || image2) && (
+          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+            <span></span>
+            <div className="flex justify-center">
+              {image1 ? (
+                <div className="w-14 h-14 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
+                  <img src={image1} alt={preset1?.name || 'Product'} className="w-full h-full object-contain p-0.5" />
+                </div>
+              ) : <div className="w-14 h-14" />}
+            </div>
+            <div className="flex justify-center">
+              {image2 ? (
+                <div className="w-14 h-14 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
+                  <img src={image2} alt={preset2?.name || 'Product'} className="w-full h-full object-contain p-0.5" />
+                </div>
+              ) : <div className="w-14 h-14" />}
+            </div>
+          </div>
+        )}
+
+        {/* Fixed Costs */}
+        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fixed Costs</p>
+          <ComparisonRow label="Deal Size" deal1Value={deal1.dealSize} deal2Value={deal2.dealSize} onDeal1Change={(v) => setDeal1({...deal1, dealSize: v})} onDeal2Change={(v) => setDeal2({...deal2, dealSize: v})} prefix="$" />
+          <ComparisonRow label="Equipment" deal1Value={deal1.equipmentCost} deal2Value={deal2.equipmentCost} onDeal1Change={(v) => setDeal1({...deal1, equipmentCost: v})} onDeal2Change={(v) => setDeal2({...deal2, equipmentCost: v})} prefix="$" />
+          <ComparisonRow label="Labor" deal1Value={deal1.laborCost} deal2Value={deal2.laborCost} onDeal1Change={(v) => setDeal1({...deal1, laborCost: v})} onDeal2Change={(v) => setDeal2({...deal2, laborCost: v})} prefix="$" />
+          <ComparisonRow label="Extras" deal1Value={deal1.extras} deal2Value={deal2.extras} onDeal1Change={(v) => setDeal1({...deal1, extras: v})} onDeal2Change={(v) => setDeal2({...deal2, extras: v})} prefix="$" />
+        </div>
+
+        {/* Variable Costs */}
+        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Variable Costs</p>
+          <ComparisonRow label="Dealer Fee" deal1Value={deal1.dealerFee} deal2Value={deal2.dealerFee} onDeal1Change={(v) => setDeal1({...deal1, dealerFee: v})} onDeal2Change={(v) => setDeal2({...deal2, dealerFee: v})} isPercent />
+          <ComparisonRow label="Contractor" deal1Value={deal1.contractorFee} deal2Value={deal2.contractorFee} onDeal1Change={(v) => setDeal1({...deal1, contractorFee: v})} onDeal2Change={(v) => setDeal2({...deal2, contractorFee: v})} isPercent />
+          <ComparisonRow label="Commission" deal1Value={deal1.commission} deal2Value={deal2.commission} onDeal1Change={(v) => setDeal1({...deal1, commission: v})} onDeal2Change={(v) => setDeal2({...deal2, commission: v})} isPercent />
+          <ComparisonRow label="Marketing" deal1Value={deal1.marketingFee} deal2Value={deal2.marketingFee} onDeal1Change={(v) => setDeal1({...deal1, marketingFee: v})} onDeal2Change={(v) => setDeal2({...deal2, marketingFee: v})} isPercent />
+        </div>
+
+        {/* Results */}
+        <div className="space-y-1.5 p-3 bg-primary/10 rounded-lg border border-primary/20">
+          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+            <span className="text-[11px] text-muted-foreground">Total Costs</span>
+            <span className="text-xs font-medium text-destructive text-center">{formatCurrency(metrics1.totalCosts)}</span>
+            <span className="text-xs font-medium text-destructive text-center">{formatCurrency(metrics2.totalCosts)}</span>
+          </div>
+          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+            <span className="text-[11px] text-muted-foreground">Revenue</span>
+            <span className="text-xs font-medium text-center">{formatCurrency(metrics1.dealSize)}</span>
+            <span className="text-xs font-medium text-center">{formatCurrency(metrics2.dealSize)}</span>
+          </div>
+          <div className="border-t border-primary/20 my-1.5" />
+          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+            <span className="text-[11px] font-medium flex items-center gap-1">
+              <TrendingUp className="w-3 h-3 text-primary" />
+              Profit
+            </span>
+            <span className={`text-sm font-bold text-center ${metrics1.grossProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              {formatCurrency(metrics1.grossProfit)}
+            </span>
+            <span className={`text-sm font-bold text-center ${metrics2.grossProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              {formatCurrency(metrics2.grossProfit)}
+            </span>
+          </div>
+          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
+            <span className="text-[11px] text-muted-foreground">Margin</span>
+            <span className={`text-xs font-semibold text-center ${metrics1.profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              {metrics1.profitMargin.toFixed(1)}%
+            </span>
+            <span className={`text-xs font-semibold text-center ${metrics2.profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              {metrics2.profitMargin.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
   <div className="flex items-center justify-between gap-2">
     <span className={`text-muted-foreground shrink-0 ${small ? 'text-xs' : 'text-sm'}`}>{label}</span>
@@ -221,15 +423,6 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
   const profitBeforeCommission = dealSize - costsBeforeCommission;
   const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
   const marginBeforeCommission = dealSize > 0 ? (profitBeforeCommission / dealSize) * 100 : 0;
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   return (
     <Card className="h-full">
@@ -394,7 +587,7 @@ const ProfitCalculatorPage = () => {
     const allowedAgents = ['MM23', 'WA4929'];
     
     if (!allowedAgents.includes(agentId)) {
-      navigate('/home');
+      navigate('/landing');
     }
   }, [navigate]);
 
@@ -419,8 +612,17 @@ const ProfitCalculatorPage = () => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+      <main className="max-w-7xl mx-auto px-3 md:px-4 py-4">
+        {/* Mobile View - Side by side comparison */}
+        <MobileComparison 
+          deal1={deal1} 
+          setDeal1={setDeal1} 
+          deal2={deal2} 
+          setDeal2={setDeal2} 
+        />
+        
+        {/* Desktop View - 3 cards */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
           <DealCalculator dealNumber={1} dealData={deal1} setDealData={setDeal1} />
           <DealCalculator dealNumber={2} dealData={deal2} setDealData={setDeal2} />
           <DealCalculator dealNumber={3} dealData={deal3} setDealData={setDeal3} />
