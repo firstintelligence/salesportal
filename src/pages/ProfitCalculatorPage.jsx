@@ -399,21 +399,24 @@ const ProfitCalculatorPage = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
           <Button
             variant="ghost"
-            size="icon"
-            onClick={() => navigate('/home')}
-            className="shrink-0"
+            size="sm"
+            onClick={() => navigate('/landing')}
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
           </Button>
-          <h1 className="text-lg font-bold text-foreground">Profit Calculator</h1>
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            Profit Calculator
+          </h1>
+          <div className="w-8 md:w-16" /> {/* Spacer for centering */}
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-4">
