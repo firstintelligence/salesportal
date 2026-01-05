@@ -6,6 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Import product images
+import heatPumpImg from "@/assets/product-heat-pump.png";
+import furnaceImg from "@/assets/product-furnace.png";
+import tanklessImg from "@/assets/product-tankless.png";
+import waterHeaterImg from "@/assets/product-water-heater.png";
+import insulationImg from "@/assets/product-insulation.png";
+
+// Product images mapping
+const productImages = {
+  'heat-pump': heatPumpImg,
+  'furnace': furnaceImg,
+  'tankless': tanklessImg,
+  'water-heater': waterHeaterImg,
+  'insulation': insulationImg,
+  'custom': null,
+};
+
 // Product presets with cost breakdowns and image categories
 const productPresets = [
   {
@@ -122,16 +139,6 @@ const productPresets = [
   },
 ];
 
-// Product images (transparent/background-less style representations)
-const productImages = {
-  'heat-pump': 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=200&h=200&fit=crop&auto=format',
-  'furnace': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&auto=format',
-  'tankless': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop&auto=format',
-  'water-heater': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop&auto=format',
-  'insulation': 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop&auto=format',
-  'custom': null,
-};
-
 const defaultDealData = {
   productPreset: '',
   dealSize: 0,
@@ -141,13 +148,13 @@ const defaultDealData = {
   dealerFee: 8,
   contractorFee: 15,
   commission: 10,
-  marketingFee: 10,
+  marketingFee: 15,
 };
 
 const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
   <div className="flex items-center justify-between gap-2">
     <span className={`text-muted-foreground shrink-0 ${small ? 'text-xs' : 'text-sm'}`}>{label}</span>
-    <div className="relative w-24">
+    <div className="relative w-28">
       {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">{prefix}</span>}
       <Input
         type="number"
@@ -235,11 +242,11 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
         {/* Product Image */}
         {productImage && (
           <div className="flex justify-center py-2">
-            <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
               <img 
                 src={productImage} 
                 alt={selectedPreset?.name || 'Product'} 
-                className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-screen opacity-80"
+                className="w-full h-full object-contain p-1"
               />
             </div>
           </div>
@@ -259,66 +266,66 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Variable Costs</p>
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs text-muted-foreground">Dealer Fee</span>
-            <div className="flex items-center gap-1">
-              <div className="relative w-16">
+            <div className="flex items-center gap-1.5">
+              <div className="relative w-20">
                 <Input
                   type="number"
                   value={dealData.dealerFee || ''}
                   onChange={(e) => handleInputChange('dealerFee', parseFloat(e.target.value) || 0)}
-                  className="pr-5 text-sm h-7 text-right"
+                  className="pr-6 text-sm h-7 text-right"
                   placeholder="0"
                 />
-                <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
               </div>
-              <span className="text-xs text-muted-foreground w-14 text-right">{formatCurrency(dealerFeeCost)}</span>
+              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(dealerFeeCost)}</span>
             </div>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs text-muted-foreground">Contractor</span>
-            <div className="flex items-center gap-1">
-              <div className="relative w-16">
+            <div className="flex items-center gap-1.5">
+              <div className="relative w-20">
                 <Input
                   type="number"
                   value={dealData.contractorFee || ''}
                   onChange={(e) => handleInputChange('contractorFee', parseFloat(e.target.value) || 0)}
-                  className="pr-5 text-sm h-7 text-right"
+                  className="pr-6 text-sm h-7 text-right"
                   placeholder="0"
                 />
-                <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
               </div>
-              <span className="text-xs text-muted-foreground w-14 text-right">{formatCurrency(contractorFeeCost)}</span>
+              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(contractorFeeCost)}</span>
             </div>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs text-muted-foreground">Commission</span>
-            <div className="flex items-center gap-1">
-              <div className="relative w-16">
+            <div className="flex items-center gap-1.5">
+              <div className="relative w-20">
                 <Input
                   type="number"
                   value={dealData.commission || ''}
                   onChange={(e) => handleInputChange('commission', parseFloat(e.target.value) || 0)}
-                  className="pr-5 text-sm h-7 text-right"
+                  className="pr-6 text-sm h-7 text-right"
                   placeholder="0"
                 />
-                <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
               </div>
-              <span className="text-xs text-muted-foreground w-14 text-right">{formatCurrency(commissionCost)}</span>
+              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(commissionCost)}</span>
             </div>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs text-muted-foreground">Marketing</span>
-            <div className="flex items-center gap-1">
-              <div className="relative w-16">
+            <div className="flex items-center gap-1.5">
+              <div className="relative w-20">
                 <Input
                   type="number"
                   value={dealData.marketingFee || ''}
                   onChange={(e) => handleInputChange('marketingFee', parseFloat(e.target.value) || 0)}
-                  className="pr-5 text-sm h-7 text-right"
+                  className="pr-6 text-sm h-7 text-right"
                   placeholder="0"
                 />
-                <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
               </div>
-              <span className="text-xs text-muted-foreground w-14 text-right">{formatCurrency(marketingFeeCost)}</span>
+              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(marketingFeeCost)}</span>
             </div>
           </div>
         </div>
