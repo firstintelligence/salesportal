@@ -85,7 +85,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       address: "100 King Street West, Toronto, ON M5X 1A9",
       phone: "",
       email: "info@energyexperts.io",
-      invoicePrefix: "ENEX"
+      invoicePrefix: "EE"
     },
     'renopros': {
       name: "Reno Pros",
