@@ -209,9 +209,10 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
   const marketingFee = safeNumber(dealData.marketingFee);
 
   const dealerFeeCost = (dealSize * dealerFee) / 100;
-  const contractorFeeCost = (dealSize * contractorFee) / 100;
-  const commissionCost = (dealSize * commission) / 100;
-  const marketingFeeCost = (dealSize * marketingFee) / 100;
+  const amountAfterDealerFee = dealSize - dealerFeeCost;
+  const contractorFeeCost = (amountAfterDealerFee * contractorFee) / 100;
+  const commissionCost = (amountAfterDealerFee * commission) / 100;
+  const marketingFeeCost = (amountAfterDealerFee * marketingFee) / 100;
   
   const totalCosts = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
   const costsBeforeCommission = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + marketingFeeCost;
