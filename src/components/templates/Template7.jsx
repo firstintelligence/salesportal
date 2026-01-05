@@ -31,7 +31,7 @@ const Template7 = ({ data }) => {
           </div>
           <div className="text-right">
             {yourCompany.logo && (
-              <img src={yourCompany.logo} alt={yourCompany.name} className="h-12 mb-2 ml-auto object-contain" />
+              <img src={yourCompany.logo} alt={yourCompany.name} className={`${yourCompany.logoSize || 'h-12'} mb-2 ml-auto object-contain`} />
             )}
             <h2 className="text-2xl font-bold">
               {yourCompany.name || "Your Company Name"}

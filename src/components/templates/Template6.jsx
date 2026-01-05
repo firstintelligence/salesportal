@@ -12,7 +12,7 @@ const Template6 = ({ data }) => {
         <div className="flex justify-between items-start mb-8">
           <div>
             {yourCompany.logo && (
-              <img src={yourCompany.logo} alt={yourCompany.name} className="h-12 mb-2 object-contain" />
+              <img src={yourCompany.logo} alt={yourCompany.name} className={`${yourCompany.logoSize || 'h-12'} mb-2 object-contain`} />
             )}
             <h2 className="text-2xl font-bold" style={{ color: "#14A8DE" }}>
               {yourCompany.name || "Company Name"}

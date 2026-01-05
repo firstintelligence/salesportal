@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
-import { getTenantLogo } from "@/utils/tenantLogos";
+import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ProfileDropdown from "@/components/ProfileDropdown";
@@ -103,6 +103,7 @@ const LandingPage = () => {
     : baseTools;
 
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
+  const tenantLogoSize = tenant ? getTenantLogoSize(tenant.slug, 'header') : 'h-10 sm:h-12';
   const companyName = tenant?.name || "Sales Portal";
 
   return (
@@ -119,7 +120,7 @@ const LandingPage = () => {
               <img 
                 src={tenantLogo} 
                 alt={companyName}
-                className="h-10 sm:h-12 object-contain"
+                className={`${tenantLogoSize} object-contain`}
               />
             )}
           </div>
