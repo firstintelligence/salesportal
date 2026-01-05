@@ -151,6 +151,12 @@ const defaultDealData = {
   marketingFee: 15,
 };
 
+// Helper to safely get numeric value
+const safeNumber = (val) => {
+  const num = Number(val);
+  return isNaN(num) ? 0 : num;
+};
+
 const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
   <div className="flex items-center justify-between gap-2">
     <span className={`text-muted-foreground shrink-0 ${small ? 'text-xs' : 'text-sm'}`}>{label}</span>
@@ -158,8 +164,11 @@ const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
       {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">{prefix}</span>}
       <Input
         type="number"
-        value={value || ''}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        value={value === 0 ? '' : (value || '')}
+        onChange={(e) => {
+          const val = e.target.value;
+          onChange(val === '' ? 0 : (parseFloat(val) || 0));
+        }}
         className={`${prefix ? 'pl-5' : ''} ${suffix ? 'pr-6' : ''} text-sm h-8 text-right`}
         placeholder="0"
       />
@@ -189,23 +198,28 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
   const selectedPreset = productPresets.find(p => p.id === dealData.productPreset);
   const productImage = selectedPreset ? productImages[selectedPreset.category] : null;
 
-  // Calculate costs
-  const dealerFeeCost = (dealData.dealSize * dealData.dealerFee) / 100;
-  const contractorFeeCost = (dealData.dealSize * dealData.contractorFee) / 100;
-  const commissionCost = (dealData.dealSize * dealData.commission) / 100;
-  const marketingFeeCost = (dealData.dealSize * dealData.marketingFee) / 100;
+  // Calculate costs with safe number conversion
+  const dealSize = safeNumber(dealData.dealSize);
+  const equipmentCost = safeNumber(dealData.equipmentCost);
+  const laborCost = safeNumber(dealData.laborCost);
+  const extras = safeNumber(dealData.extras);
+  const dealerFee = safeNumber(dealData.dealerFee);
+  const contractorFee = safeNumber(dealData.contractorFee);
+  const commission = safeNumber(dealData.commission);
+  const marketingFee = safeNumber(dealData.marketingFee);
+
+  const dealerFeeCost = (dealSize * dealerFee) / 100;
+  const contractorFeeCost = (dealSize * contractorFee) / 100;
+  const commissionCost = (dealSize * commission) / 100;
+  const marketingFeeCost = (dealSize * marketingFee) / 100;
   
-  const totalCosts = 
-    dealData.equipmentCost + 
-    dealData.laborCost + 
-    dealData.extras + 
-    dealerFeeCost + 
-    contractorFeeCost + 
-    commissionCost + 
-    marketingFeeCost;
+  const totalCosts = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
+  const costsBeforeCommission = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + marketingFeeCost;
   
-  const grossProfit = dealData.dealSize - totalCosts;
-  const profitMargin = dealData.dealSize > 0 ? (grossProfit / dealData.dealSize) * 100 : 0;
+  const grossProfit = dealSize - totalCosts;
+  const profitBeforeCommission = dealSize - costsBeforeCommission;
+  const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
+  const marginBeforeCommission = dealSize > 0 ? (profitBeforeCommission / dealSize) * 100 : 0;
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-CA', {
@@ -338,7 +352,7 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Revenue</span>
-            <span className="font-medium">{formatCurrency(dealData.dealSize)}</span>
+            <span className="font-medium">{formatCurrency(dealSize)}</span>
           </div>
           <div className="border-t border-primary/20 my-1.5" />
           <div className="flex justify-between items-center">
@@ -354,6 +368,12 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
             <span className="text-muted-foreground">Margin</span>
             <span className={`font-semibold ${profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {profitMargin.toFixed(1)}%
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-muted-foreground">Margin (before comm.)</span>
+            <span className={`font-semibold ${marginBeforeCommission >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-destructive'}`}>
+              {marginBeforeCommission.toFixed(1)}%
             </span>
           </div>
         </div>
