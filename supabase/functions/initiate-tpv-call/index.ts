@@ -36,6 +36,8 @@ serve(async (req) => {
       'MA11': '+19059043544',
       'MW11': '+10000000005', // Placeholder - update with real number
       'WLead6': '+14168398267',
+      // Energy Experts agents
+      'WA4929': '+16479234929',
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
