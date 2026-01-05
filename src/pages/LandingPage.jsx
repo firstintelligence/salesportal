@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,12 +9,14 @@ import ProfileDropdown from "@/components/ProfileDropdown";
 
 // Admin agents who can see signing certificates
 const SUPER_ADMINS = ['MM23'];
-
+// Agents who can see profit calculator
+const PROFIT_CALC_AGENTS = ['MM23', 'WA4929'];
 const LandingPage = () => {
   const navigate = useNavigate();
   const { tenant, agentProfile, isSuperAdmin } = useTenant();
   const agentId = localStorage.getItem('agentId');
   const isAdmin = SUPER_ADMINS.includes(agentId);
+  const canSeeProfitCalc = PROFIT_CALC_AGENTS.includes(agentId);
   useEffect(() => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
@@ -130,6 +132,19 @@ const LandingPage = () => {
               <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Stats</span>
             </Button>
+            
+            {/* Profit Calculator - Admin + WA4929 Only */}
+            {canSeeProfitCalc && (
+              <Button
+                onClick={() => navigate("/profit-calculator")}
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all duration-200"
+              >
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm font-medium hidden sm:inline">Profit</span>
+              </Button>
+            )}
             
             {/* Signing Certificates - Admin Only */}
             {isAdmin && (
