@@ -20,6 +20,7 @@ import InstallationChecklistPage from "./pages/InstallationChecklistPage";
 import InvoiceRenderPage from "./pages/InvoiceRenderPage";
 import StatsPage from "./pages/StatsPage";
 import SigningCertificatesPage from "./pages/SigningCertificatesPage";
+import ProfitCalculatorPage from "./pages/ProfitCalculatorPage";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const AppContent = () => {
         <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
         <Route path="/stats" element={<StatsPage />} />
         <Route path="/signing-certificates" element={<SigningCertificatesPage />} />
+        <Route path="/profit-calculator" element={<ProfitCalculatorPage />} />
       </Routes>
     </>
   );
