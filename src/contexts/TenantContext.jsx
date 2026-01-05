@@ -19,12 +19,10 @@ export const TenantProvider = ({ children }) => {
 
   const loadTenantData = async (agentId) => {
     try {
+      // First get the agent profile
       const { data: profile, error: profileError } = await supabase
         .from('agent_profiles')
-        .select(`
-          *,
-          tenants (*)
-        `)
+        .select('*')
         .eq('agent_id', agentId)
         .single();
 
@@ -34,13 +32,29 @@ export const TenantProvider = ({ children }) => {
       }
 
       if (profile) {
+        // Then get the tenant separately if tenant_id exists
+        let tenantData = null;
+        if (profile.tenant_id) {
+          const { data: tenant, error: tenantError } = await supabase
+            .from('tenants')
+            .select('*')
+            .eq('id', profile.tenant_id)
+            .single();
+          
+          if (tenantError) {
+            console.error('Error fetching tenant:', tenantError);
+          } else {
+            tenantData = tenant;
+          }
+        }
+
         setAgentProfile(profile);
-        setTenant(profile.tenants);
-        setOriginalTenant(profile.tenants);
+        setTenant(tenantData);
+        setOriginalTenant(tenantData);
         
         localStorage.setItem('agentProfile', JSON.stringify(profile));
-        localStorage.setItem('tenant', JSON.stringify(profile.tenants));
-        localStorage.setItem('originalTenant', JSON.stringify(profile.tenants));
+        localStorage.setItem('tenant', JSON.stringify(tenantData));
+        localStorage.setItem('originalTenant', JSON.stringify(tenantData));
         
         return profile;
       }
