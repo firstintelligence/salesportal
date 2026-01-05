@@ -28,7 +28,7 @@ const LandingPage = () => {
   }, [navigate]);
 
   // Main tools in sequence
-  const tools = [
+  const baseTools = [
     {
       title: "Appointments",
       subtitle: "View your schedule",
@@ -87,6 +87,21 @@ const LandingPage = () => {
     },
   ];
 
+  // Add profit calculator tile if user has permission
+  const tools = canSeeProfitCalc 
+    ? [
+        ...baseTools,
+        {
+          title: "Profit Calculator",
+          subtitle: "Analyze deal margins",
+          icon: TrendingUp,
+          path: "/profit-calculator",
+          gradient: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30",
+          iconBg: "bg-amber-500",
+        },
+      ]
+    : baseTools;
+
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
   const companyName = tenant?.name || "Sales Portal";
 
@@ -133,18 +148,6 @@ const LandingPage = () => {
               <span className="text-sm font-medium hidden sm:inline">Stats</span>
             </Button>
             
-            {/* Profit Calculator - Admin + WA4929 Only */}
-            {canSeeProfitCalc && (
-              <Button
-                onClick={() => navigate("/profit-calculator")}
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all duration-200"
-              >
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-sm font-medium hidden sm:inline">Profit</span>
-              </Button>
-            )}
             
             {/* Signing Certificates - Admin Only */}
             {isAdmin && (
