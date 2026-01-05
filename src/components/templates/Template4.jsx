@@ -5,6 +5,15 @@ import BaseTemplate from './BaseTemplate';
 import { formatPhoneNumber } from '../../utils/inputFormatting';
 import { getProductDescription } from '../../utils/productDescriptions';
 
+// Consistent signature dimensions across all pages
+const SIGNATURE_STYLE = {
+  maxHeight: '60px',
+  height: 'auto',
+  width: 'auto',
+  maxWidth: '200px',
+  objectFit: 'contain'
+};
+
 const Template4 = ({ data, showTermsAndConditions = true }) => {
   const { 
     billTo = {}, 
@@ -22,7 +31,29 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
     isInvoice = false,
     signature = null,
     coApplicantSignature = null,
+    signingLocation = null,
   } = data || {};
+
+  // Format signing location in Canadian format: Address, City, Province (2 letters) XXX XXX
+  const formatSigningLocation = () => {
+    if (!signingLocation) return null;
+    const parts = [];
+    if (signingLocation.city) parts.push(signingLocation.city);
+    if (signingLocation.region) {
+      // Get province abbreviation (first 2 letters or full if already short)
+      const province = signingLocation.region.length <= 2 
+        ? signingLocation.region.toUpperCase() 
+        : signingLocation.region.substring(0, 2).toUpperCase();
+      parts.push(province);
+    }
+    if (signingLocation.postal_code) {
+      // Format postal code: XXX XXX
+      const pc = signingLocation.postal_code.replace(/\s/g, '').toUpperCase();
+      const formattedPC = pc.length === 6 ? `${pc.substring(0, 3)} ${pc.substring(3)}` : pc;
+      parts.push(formattedPC);
+    }
+    return parts.join(', ');
+  };
 
   const customerName = billTo.firstName && billTo.lastName 
     ? `${billTo.firstName} ${billTo.lastName}` 
@@ -270,8 +301,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               <div>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-1 flex items-center">
-                    <img src={signature} alt="Customer Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
+                  <div className="mb-1 flex items-center h-[60px]">
+                    <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -283,8 +314,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <div>
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-1 flex items-center">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
+                    <div className="mb-1 flex items-center h-[60px]">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -295,6 +326,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               )}
               {!data.billTo?.coApplicantName && <div></div>}
             </div>
+            {/* Signing Location Stamp */}
+            {signingLocation && formatSigningLocation() && (
+              <div className="text-center mt-2 pt-2 border-t border-gray-200">
+                <p className="text-[10px] text-gray-500">
+                  Signed at: {formatSigningLocation()}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -344,8 +383,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               <div>
                 <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-2 flex items-center border-b-2 border-gray-400">
-                    <img src={signature} alt="Customer Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
+                  <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[60px]">
+                    <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-2 h-10"></div>
@@ -357,8 +396,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <div>
                   <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-2 flex items-center border-b-2 border-gray-400">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '150px', height: 'auto', width: 'auto', maxWidth: '350px'}} />
+                    <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[60px]">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-2 h-10"></div>
@@ -369,6 +408,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               )}
               {!data.billTo?.coApplicantName && <div></div>}
             </div>
+            {/* Signing Location Stamp */}
+            {signingLocation && formatSigningLocation() && (
+              <div className="text-center mt-4 pt-2 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  Signed at: {formatSigningLocation()}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -400,8 +447,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               <div>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-1 h-12 flex items-center">
-                    <img src={signature} alt="Customer Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
+                  <div className="mb-1 flex items-center h-[60px]">
+                    <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
                   <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -413,8 +460,8 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <div>
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-1 h-12 flex items-center">
-                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={{maxHeight: '48px', height: 'auto', width: 'auto', maxWidth: '150px'}} />
+                    <div className="mb-1 flex items-center h-[60px]">
+                      <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (
                     <div className="border-b-2 border-gray-400 mb-1 h-6"></div>
@@ -425,6 +472,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               )}
               {!data.billTo?.coApplicantName && <div></div>}
             </div>
+            {/* Signing Location Stamp */}
+            {signingLocation && formatSigningLocation() && (
+              <div className="text-center mt-2 pt-2 border-t border-gray-200">
+                <p className="text-[10px] text-gray-500">
+                  Signed at: {formatSigningLocation()}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

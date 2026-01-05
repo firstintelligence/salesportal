@@ -1,11 +1,26 @@
 import { supabase } from '../integrations/supabase/client';
 import { getTenantCompanyInfo } from './tenantLogos';
-import { recordDocumentSignature } from './signingLocationService';
+import { recordDocumentSignature, captureSigningLocation } from './signingLocationService';
 
 export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges', signingContext = null) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('Starting server-side PDF generation...');
+      
+      // Capture signing location BEFORE rendering for stamp on invoice
+      let signingLocation = null;
+      try {
+        signingLocation = await captureSigningLocation();
+        console.log('Captured signing location:', signingLocation.location_string);
+      } catch (locError) {
+        console.error('Error capturing signing location:', locError);
+      }
+      
+      // Add signing location to invoice data for rendering
+      const invoiceDataWithLocation = {
+        ...invoiceData,
+        signingLocation
+      };
       
       // Render invoice to HTML
       const pdfContainer = document.createElement('div');
@@ -28,11 +43,11 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       const { createRoot } = await import('react-dom/client');
       
       // Extract company info for Consumer Protection Act page
-      const companyInfo = invoiceData?.yourCompany ? {
-        name: invoiceData.yourCompany.name,
-        address: invoiceData.yourCompany.address,
-        phone: invoiceData.yourCompany.phone,
-        email: invoiceData.yourCompany.email
+      const companyInfo = invoiceDataWithLocation?.yourCompany ? {
+        name: invoiceDataWithLocation.yourCompany.name,
+        address: invoiceDataWithLocation.yourCompany.address,
+        phone: invoiceDataWithLocation.yourCompany.phone,
+        email: invoiceDataWithLocation.yourCompany.email
       } : null;
       
       // Create React root and render both template and Consumer Protection Act page
@@ -41,7 +56,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       await new Promise((resolve) => {
         root.render(
           React.createElement(React.Fragment, null,
-            React.createElement(Template, { data: invoiceData, showTermsAndConditions: true }),
+            React.createElement(Template, { data: invoiceDataWithLocation, showTermsAndConditions: true }),
             React.createElement(ConsumerProtectionActPage, { companyInfo })
           )
         );
@@ -157,7 +172,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
         body: {
           html,
-          invoiceData,
+          invoiceData: invoiceDataWithLocation,
           tenantInfo,
           cpaBill59FormBase64
         }
@@ -172,8 +187,8 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       const pdfBlob = data;
       
       // Generate filename
-      const { number } = invoiceData.invoice;
-      const { firstName, lastName, name, address, city, province, postalCode } = invoiceData.billTo;
+      const { number } = invoiceDataWithLocation.invoice;
+      const { firstName, lastName, name, address, city, province, postalCode } = invoiceDataWithLocation.billTo;
       
       const customerName = firstName && lastName 
         ? `${firstName} ${lastName}` 
@@ -223,32 +238,61 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      // Record document signature if signing context is provided
-      if (signingContext) {
+      // Record document signature if signing context is provided OR if there's a signature
+      if (signingContext || invoiceDataWithLocation.signature) {
         try {
-          await recordDocumentSignature({
-            documentType: signingContext.documentType || 'invoice',
-            documentId: documentId,
-            customerId: signingContext.customerId || null,
-            customerName: signingContext.customerName || `${invoiceData.billTo?.firstName || ''} ${invoiceData.billTo?.lastName || ''}`.trim(),
-            agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
-            tenantId: signingContext.tenantId || null,
-            signatureType: signingContext.signatureType || 'customer',
-            documentUrl: documentUrl
-          });
+          // Use pre-captured signing location instead of capturing again
+          const signatureRecord = {
+            document_type: signingContext?.documentType || 'invoice',
+            document_id: documentId,
+            customer_id: signingContext?.customerId || null,
+            customer_name: signingContext?.customerName || `${invoiceDataWithLocation.billTo?.firstName || ''} ${invoiceDataWithLocation.billTo?.lastName || ''}`.trim(),
+            agent_id: signingContext?.agentId || localStorage.getItem('agentId') || 'unknown',
+            tenant_id: signingContext?.tenantId || null,
+            signature_type: signingContext?.signatureType || 'customer',
+            signed_at: new Date().toISOString(),
+            document_url: documentUrl,
+            // Use pre-captured location data
+            ip_address: signingLocation?.ip_address || null,
+            latitude: signingLocation?.latitude || null,
+            longitude: signingLocation?.longitude || null,
+            city: signingLocation?.city || null,
+            region: signingLocation?.region || null,
+            country: signingLocation?.country || null,
+            postal_code: signingLocation?.postal_code || null,
+            timezone: signingLocation?.timezone || null,
+            isp: signingLocation?.isp || null,
+            location_string: signingLocation?.location_string || 'Location unavailable',
+            user_agent: navigator.userAgent
+          };
+          
+          const { data: sigData, error: sigError } = await supabase
+            .from('document_signatures')
+            .insert(signatureRecord)
+            .select()
+            .single();
+          
+          if (sigError) {
+            console.error('Error recording document signature:', sigError);
+          } else {
+            console.log('Document signature recorded:', sigData.id);
+          }
           
           // If there's a co-applicant signature, record that too
-          if (invoiceData.coApplicantSignature) {
-            await recordDocumentSignature({
-              documentType: signingContext.documentType || 'invoice',
-              documentId: documentId,
-              customerId: signingContext.customerId || null,
-              customerName: invoiceData.billTo?.coApplicantName || 'Co-Applicant',
-              agentId: signingContext.agentId || localStorage.getItem('agentId') || 'unknown',
-              tenantId: signingContext.tenantId || null,
-              signatureType: 'co_applicant',
-              documentUrl: documentUrl
-            });
+          if (invoiceDataWithLocation.coApplicantSignature) {
+            const coApplicantRecord = {
+              ...signatureRecord,
+              customer_name: invoiceDataWithLocation.billTo?.coApplicantName || 'Co-Applicant',
+              signature_type: 'co_applicant'
+            };
+            
+            const { error: coSigError } = await supabase
+              .from('document_signatures')
+              .insert(coApplicantRecord);
+            
+            if (coSigError) {
+              console.error('Error recording co-applicant signature:', coSigError);
+            }
           }
         } catch (sigError) {
           console.error('Error recording document signature:', sigError);

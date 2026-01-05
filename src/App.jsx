@@ -19,6 +19,7 @@ import PaymentCalculatorPage from "./pages/PaymentCalculatorPage";
 import InstallationChecklistPage from "./pages/InstallationChecklistPage";
 import InvoiceRenderPage from "./pages/InvoiceRenderPage";
 import StatsPage from "./pages/StatsPage";
+import SigningCertificatesPage from "./pages/SigningCertificatesPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const AppContent = () => {
         <Route path="/receipt" element={<ReceiptPage />} />
         <Route path="/installation-checklist" element={<InstallationChecklistPage />} />
         <Route path="/stats" element={<StatsPage />} />
+        <Route path="/signing-certificates" element={<SigningCertificatesPage />} />
       </Routes>
     </>
   );
