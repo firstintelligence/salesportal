@@ -149,3 +149,26 @@ export const getTenantColors = (tenantSlug) => {
   
   return colors[tenantSlug] || colors['georges'];
 };
+
+// Tenant-specific logo sizes (some logos need different sizing)
+export const getTenantLogoSize = (tenantSlug, context = 'header') => {
+  // Default sizes
+  const defaultSizes = {
+    header: 'h-10 sm:h-12',
+    invoice: 'h-12',
+  };
+  
+  // Tenant-specific overrides
+  const overrides = {
+    'energyexperts': {
+      header: 'h-7 sm:h-8',
+      invoice: 'h-8',
+    },
+  };
+  
+  if (overrides[tenantSlug] && overrides[tenantSlug][context]) {
+    return overrides[tenantSlug][context];
+  }
+  
+  return defaultSizes[context] || defaultSizes.header;
+};

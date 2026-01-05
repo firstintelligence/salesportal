@@ -21,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSimplifiedProductList } from "../utils/productNameSimplifier";
 import { toast } from "sonner";
 import { useTenant } from "@/contexts/TenantContext";
-import { getTenantCompanyInfo, getTenantLogo } from "@/utils/tenantLogos";
+import { getTenantCompanyInfo, getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { formatPhoneNumber } from "@/utils/inputFormatting";
 
 // Helper function to get today's date in Toronto timezone
@@ -105,6 +105,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   const tenantSlug = tenant?.slug;
   const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;
   const tenantLogo = tenantSlug ? getTenantLogo(tenantSlug) : null;
+  const tenantLogoSize = tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : 'h-12';
   
   // Tenant-specific localStorage key to ensure complete data isolation
   const formDataKey = tenantSlug ? `formData_${tenantSlug}` : null;
@@ -152,7 +153,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     address: tenantCompanyInfo?.address || "",
     phone: tenantCompanyInfo?.phone || "",
     email: tenantCompanyInfo?.email || "",
-    logo: tenantLogo || null
+    logo: tenantLogo || null,
+    logoSize: tenantLogoSize || 'h-12'
   });
   const [items, setItems] = useState(() => {
     if (preloadedCalculatorData?.purchaseAmount) {
@@ -190,12 +192,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     if (tenant?.slug) {
       const companyInfo = getTenantCompanyInfo(tenant.slug);
       const logo = getTenantLogo(tenant.slug);
+      const logoSize = getTenantLogoSize(tenant.slug, 'invoice');
       setYourCompany({
         name: companyInfo.name,
         address: companyInfo.address,
         phone: companyInfo.phone,
         email: companyInfo.email,
-        logo: logo
+        logo: logo,
+        logoSize: logoSize
       });
     }
   }, [tenant?.slug]);
@@ -303,7 +307,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         address: tenantCompanyInfo.address,
         phone: tenantCompanyInfo.phone,
         email: tenantCompanyInfo.email,
-        logo: tenantLogo
+        logo: tenantLogo,
+        logoSize: tenantLogoSize
       });
       // Ensure all items have unique IDs for proper React reconciliation
       const loadedItems = parsedData.items || [];
@@ -337,7 +342,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         address: tenantCompanyInfo.address,
         phone: tenantCompanyInfo.phone,
         email: tenantCompanyInfo.email,
-        logo: tenantLogo
+        logo: tenantLogo,
+        logoSize: tenantLogoSize
       });
       setInvoice((prev) => ({
         ...prev,
@@ -608,7 +614,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       address: tenantCompanyInfo.address,
       phone: tenantCompanyInfo.phone,
       email: tenantCompanyInfo.email,
-      logo: tenantLogo
+      logo: tenantLogo,
+      logoSize: tenantLogoSize
     });
     setItems([{ id: crypto.randomUUID(), name: "", description: "", quantity: 1, amount: 0, total: 0, productId: "" }]);
     settaxPercentage(getProvincialTax("ON"));

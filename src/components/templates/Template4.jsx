@@ -112,7 +112,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               </div>
               <div className="text-right">
                 {yourCompany.logo && (
-                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className="h-16 mb-1 ml-auto object-contain" />
+                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className={`${yourCompany.logoSize || 'h-16'} mb-1 ml-auto object-contain`} />
                 )}
               </div>
             </div>
@@ -356,7 +356,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               </div>
               <div className="text-right">
                 {yourCompany.logo && (
-                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className="h-16 mb-1 ml-auto object-contain" />
+                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className={`${yourCompany.logoSize || 'h-16'} mb-1 ml-auto object-contain`} />
                 )}
               </div>
             </div>
