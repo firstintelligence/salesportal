@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import { generatePDF } from '../utils/pdfGenerator';
 import { templates } from '../utils/templateRegistry';
+import { useTenant } from "@/contexts/TenantContext";
 
 const TemplatePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { tenant } = useTenant();
   const [formData, setFormData] = useState(null);
   const [currentTemplate, setCurrentTemplate] = useState(1);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -34,7 +36,18 @@ const TemplatePage = () => {
     if (formData && !isDownloading) {
       setIsDownloading(true);
       try {
-        await generatePDF(formData, currentTemplate);
+        // Build signing context for document signature recording
+        const signingContext = {
+          documentType: formData.isInvoice ? 'invoice' : 'quote',
+          documentId: crypto.randomUUID(),
+          customerId: formData.customerId || location.state?.customerId || null,
+          customerName: `${formData.billTo?.firstName || ''} ${formData.billTo?.lastName || ''}`.trim(),
+          agentId: localStorage.getItem('agentId') || 'unknown',
+          tenantId: tenant?.id || null,
+          signatureType: 'customer'
+        };
+        
+        await generatePDF(formData, currentTemplate, tenant?.slug || 'georges', signingContext);
       } catch (error) {
         console.error('Error generating PDF:', error);
       } finally {

@@ -101,18 +101,33 @@ const CustomerDetailPage = () => {
       if (checklistError) throw checklistError;
       setChecklists(checklistData || []);
 
-      // Fetch document signatures for this customer (admin only via RLS)
+      // Fetch document signatures for this customer (admin can see all signatures)
       if (agentId === 'MM23') {
+        // First try by customer_id
         const { data: sigData, error: sigError } = await supabase
           .from("document_signatures")
           .select("*")
           .eq("customer_id", customerId)
           .order("signed_at", { ascending: false });
         
-        if (!sigError && sigData) {
+        if (!sigError && sigData && sigData.length > 0) {
           setDocumentSignatures(sigData);
-        } else if (sigError) {
-          console.log("Could not fetch document signatures (may not have permission):", sigError);
+        } else {
+          // Fallback: try matching by customer name if no customer_id match
+          if (customerData) {
+            const customerFullName = `${customerData.first_name || ''} ${customerData.last_name || ''}`.trim();
+            if (customerFullName) {
+              const { data: sigByName, error: sigByNameError } = await supabase
+                .from("document_signatures")
+                .select("*")
+                .ilike("customer_name", `%${customerFullName}%`)
+                .order("signed_at", { ascending: false });
+              
+              if (!sigByNameError && sigByName) {
+                setDocumentSignatures(sigByName);
+              }
+            }
+          }
         }
       }
 

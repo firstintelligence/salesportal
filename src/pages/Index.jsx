@@ -95,6 +95,8 @@ const noteOptions = [
 ];
 
 const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculatorData }) => {
+  // Track customer ID for document signature linking
+  const [customerId, setCustomerId] = useState(preloadedCustomer?.id || null);
   const navigate = useNavigate();
   const { tenant, loading: tenantLoading } = useTenant();
   
@@ -701,6 +703,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         
         if (insertError) throw insertError;
         customerId = newCustomer.id;
+        setCustomerId(newCustomer.id); // Update state for PDF signing context
       }
 
       // Get simplified product list for TPV
@@ -806,7 +809,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         const signingContext = {
           documentType: isInvoice ? 'invoice' : 'quote',
           documentId: crypto.randomUUID(),
-          customerId: null, // Will be set if customer exists
+          customerId: customerId, // Use customer ID from state if available
           customerName: `${billTo.firstName || ''} ${billTo.lastName || ''}`.trim(),
           agentId: localStorage.getItem('agentId') || 'unknown',
           tenantId: tenant?.id || null,
