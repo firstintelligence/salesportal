@@ -214,9 +214,10 @@ serve(async (req) => {
               const origHeight = signatureImage.height;
               const aspectRatio = origWidth / origHeight;
               
-              // Consistent max dimensions for signature across all pages (60px height at 72 DPI = ~60 points)
-              const maxWidth = 150;
-              const maxHeight = 45;
+              // Increased signature size (2-3x bigger) - consistent across all pages
+              // 120px height matches the Template4.jsx signature container
+              const maxWidth = 350;
+              const maxHeight = 90;
               
               let drawWidth: number;
               let drawHeight: number;
@@ -233,9 +234,9 @@ serve(async (req) => {
               }
               
               // Position signature in the signature area of CPA form
-              // The signature field is typically near the bottom left
+              // Moved right by ~1 inch (72 points) from original x:80 to x:152
               firstPage.drawImage(signatureImage, {
-                x: 80,
+                x: 152,
                 y: 75,
                 width: drawWidth,
                 height: drawHeight,
