@@ -47,7 +47,10 @@ const TemplatePage = () => {
           signatureType: 'customer'
         };
         
-        await generatePDF(formData, currentTemplate, tenant?.slug || 'georges', signingContext);
+        // Only super admins see the signing location stamp on the PDF
+        const agentId = localStorage.getItem('agentId');
+        const isSuperAdmin = agentId === 'MM23';
+        await generatePDF(formData, currentTemplate, tenant?.slug || 'georges', signingContext, { isSuperAdmin });
       } catch (error) {
         console.error('Error generating PDF:', error);
       } finally {
