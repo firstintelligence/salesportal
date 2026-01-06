@@ -18,7 +18,7 @@ const AGENT_MAPPING: Record<string, string> = {
   'WLead6': '+14168398267',
   // Energy Experts agents
   'WA4929': '+16479234929',
-  'AK47': '+10000000006', // Placeholder - update with real number
+  'AK47': '+14379875094',
   'YG23': '+10000000007', // Placeholder - update with real number
 };
 
