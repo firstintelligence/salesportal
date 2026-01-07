@@ -162,7 +162,7 @@ export const getTenantLogoSize = (tenantSlug, context = 'header') => {
   const overrides = {
     'georges': {
       header: 'h-10 sm:h-12',
-      invoice: 'h-[8.6rem]',
+      invoice: 'h-[34.4rem]',
     },
     'energyexperts': {
       header: 'h-7 sm:h-8',
