@@ -89,7 +89,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
     },
     'renopros': {
       name: "Reno Pros",
-      address: "100 King Street West, Toronto, ON M5X 1A9",
+      address: "1201-1200 Bay Street, Toronto, ON M4W 1J2",
       phone: "1-888-885-RENO (7366)",
       email: "info@renopros.io",
       invoicePrefix: "RENO"
