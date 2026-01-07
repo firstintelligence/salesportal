@@ -1151,7 +1151,10 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                                 items,
                                 financing,
                                 rebatesIncentives,
-                                yourCompany,
+                                yourCompany: {
+                                  ...yourCompany,
+                                  logoSize: tenantLogoSize // Always use fresh tenant logo size
+                                },
                                 isInvoice,
                                 subTotal,
                                 grandTotal,
