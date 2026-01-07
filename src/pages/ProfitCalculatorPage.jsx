@@ -385,19 +385,19 @@ const ProfitCalculatorPage = () => {
                     { label: 'Commission', field: 'commission', value: activeDeal.commission, cost: metrics.commissionCost },
                     { label: 'Marketing', field: 'marketingFee', value: activeDeal.marketingFee, cost: metrics.marketingFeeCost },
                   ].map(item => (
-                    <div key={item.field} className="flex items-center justify-between gap-2">
+                    <div key={item.field} className="flex items-center justify-between gap-3">
                       <label className="text-sm text-slate-600 flex-1">{item.label}</label>
-                      <div className="relative w-16">
+                      <div className="relative w-24">
                         <Input
                           type="number"
                           value={item.value || ''}
                           onChange={(e) => handleInputChange(item.field, parseFloat(e.target.value) || 0)}
-                          className="pr-6 text-right h-8 text-sm border-slate-200"
+                          className="pr-7 text-right h-9 border-slate-200"
                           placeholder="0"
                         />
-                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">%</span>
+                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">%</span>
                       </div>
-                      <span className="text-xs text-slate-500 w-16 text-right">{formatCurrency(item.cost)}</span>
+                      <span className="text-sm text-slate-600 w-20 text-right font-medium">{formatCurrency(item.cost)}</span>
                     </div>
                   ))}
                 </div>
