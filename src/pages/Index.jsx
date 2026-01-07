@@ -288,16 +288,31 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         }));
         setItems(itemsWithIds);
         
-        // Also restore financing data if available
+        // Restore full financing data if available
         if (preloadedInvoiceProfile.financing) {
           setFinancing(prev => ({
             ...prev,
-            ...preloadedInvoiceProfile.financing
+            financeCompany: preloadedInvoiceProfile.financing.financeCompany || prev.financeCompany,
+            loanAmount: preloadedInvoiceProfile.financing.loanAmount || prev.loanAmount,
+            amortizationPeriod: preloadedInvoiceProfile.financing.amortizationPeriod || prev.amortizationPeriod,
+            loanTerm: preloadedInvoiceProfile.financing.loanTerm || prev.loanTerm,
+            interestRate: preloadedInvoiceProfile.financing.interestRate ?? prev.interestRate
           }));
+        }
+        
+        // Restore rebates/incentives if available
+        if (preloadedInvoiceProfile.rebatesIncentives) {
+          setRebatesIncentives(preloadedInvoiceProfile.rebatesIncentives);
+        }
+        
+        // Restore tax percentage if available
+        if (preloadedInvoiceProfile.taxPercentage) {
+          settaxPercentage(preloadedInvoiceProfile.taxPercentage);
+          return; // Skip province-based tax update since we have saved tax
         }
       }
       
-      // Update tax based on customer province
+      // Update tax based on customer province (only if no saved tax percentage)
       settaxPercentage(getProvincialTax(preloadedCustomer.province || 'ON'));
       return;
     }
@@ -526,12 +541,19 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   }, []);
 
   // Update financing loan amount when grand total changes
+  // Auto-set amortization to 240 months when price exceeds $10,000
   useEffect(() => {
     const loanAmount = calculateLoanAmount(calculatedGrandTotal);
-    setFinancing(prev => ({
-      ...prev,
-      loanAmount
-    }));
+    setFinancing(prev => {
+      const updates = { ...prev, loanAmount };
+      
+      // Auto-default to 240 months amortization when grand total exceeds $10,000
+      if (calculatedGrandTotal > 10000 && prev.amortizationPeriod !== 240) {
+        updates.amortizationPeriod = 240;
+      }
+      
+      return updates;
+    });
   }, [calculatedGrandTotal]);
 
   const handleTemplateClick = (templateNumber) => {
@@ -734,6 +756,31 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
       // Create TPV request with invoice data (draft status)
       // Include full items_json for complete product configuration restoration
+      // items_json contains both items array and financing object for full restoration
+      const fullProductConfiguration = {
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name || '',
+          description: item.description || '',
+          productId: item.productId || '',
+          quantity: item.quantity || 1,
+          amount: item.amount || 0,
+          total: item.total || 0
+        })),
+        financing: {
+          financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
+          loanAmount: financing.loanAmount || 0,
+          amortizationPeriod: financing.amortizationPeriod || 180,
+          loanTerm: financing.loanTerm || 24,
+          interestRate: financing.interestRate || 0
+        },
+        rebatesIncentives: rebatesIncentives,
+        subTotal: subTotal,
+        taxAmount: taxAmount,
+        taxPercentage: taxPercentage,
+        grandTotal: grandTotal
+      };
+
       const tpvData = {
         customer_id: customerId,
         tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
@@ -758,7 +805,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           financing.amortizationPeriod
         ).toString() : null,
         status: 'draft',
-        items_json: items // Store full product configuration (quantity, amount, description, etc.)
+        items_json: fullProductConfiguration // Store full product configuration with financing
       };
 
       // Check if draft TPV exists for this customer
