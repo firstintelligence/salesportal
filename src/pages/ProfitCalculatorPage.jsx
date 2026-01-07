@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Calculator, TrendingUp, FileDown } from "lucide-react";
+import { ArrowLeft, FileDown, TrendingUp, TrendingDown, DollarSign, PieChart, Plus, X, ArrowUpRight } from "lucide-react";
 import { generateProfitCalculatorPDF } from "@/utils/profitCalculatorPDFGenerator";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 // Import product images - brand-specific
 import heatPumpImg from "@/assets/product-heat-pump-kinghome.png";
@@ -15,7 +16,7 @@ import waterHeaterImg from "@/assets/product-water-heater-bradford.png";
 import rheemProterraImg from "@/assets/product-rheem-proterra.png";
 import insulationImg from "@/assets/product-attic-insulation.png";
 
-// Product images mapping with specific product overrides
+// Product images mapping
 const productImages = {
   'heat-pump': heatPumpImg,
   'furnace': furnaceImg,
@@ -26,130 +27,27 @@ const productImages = {
   'custom': null,
 };
 
-// Function to get product image based on preset id and category
 const getProductImage = (presetId, category) => {
-  // Check for specific product overrides first
-  if (presetId === 'rheem-proterra') {
-    return rheemProterraImg;
-  }
-  // Fall back to category-based image
+  if (presetId === 'rheem-proterra') return rheemProterraImg;
   return productImages[category] || null;
 };
 
-// Product presets with cost breakdowns and image categories
+// Product presets
 const productPresets = [
-  {
-    id: 'heat-pump-standard',
-    name: 'Heat Pump Standard',
-    category: 'heat-pump',
-    equipmentCost: 4500,
-    laborCost: 2500,
-    salePrice: 12500,
-  },
-  {
-    id: 'heat-pump-premium',
-    name: 'Heat Pump Premium',
-    category: 'heat-pump',
-    equipmentCost: 7000,
-    laborCost: 3500,
-    salePrice: 18500,
-  },
-  {
-    id: 'furnace-standard',
-    name: 'Furnace Standard',
-    category: 'furnace',
-    equipmentCost: 2200,
-    laborCost: 1800,
-    salePrice: 6500,
-  },
-  {
-    id: 'furnace-premium',
-    name: 'Furnace Premium',
-    category: 'furnace',
-    equipmentCost: 3800,
-    laborCost: 2500,
-    salePrice: 9500,
-  },
-  {
-    id: 'tankless-standard',
-    name: 'Tankless Water Heater Standard',
-    category: 'tankless',
-    equipmentCost: 2200,
-    laborCost: 1500,
-    salePrice: 5800,
-  },
-  {
-    id: 'tankless-premium',
-    name: 'Tankless Water Heater Premium',
-    category: 'tankless',
-    equipmentCost: 3500,
-    laborCost: 2100,
-    salePrice: 8200,
-  },
-  {
-    id: 'cv40',
-    name: 'CV40 Water Heater',
-    category: 'water-heater',
-    equipmentCost: 1200,
-    laborCost: 1000,
-    salePrice: 3800,
-  },
-  {
-    id: 'cv50',
-    name: 'CV50 Water Heater',
-    category: 'water-heater',
-    equipmentCost: 1400,
-    laborCost: 1100,
-    salePrice: 4100,
-  },
-  {
-    id: 'pv40',
-    name: 'PV40 Water Heater',
-    category: 'water-heater',
-    equipmentCost: 1600,
-    laborCost: 1200,
-    salePrice: 4400,
-  },
-  {
-    id: 'pv50',
-    name: 'PV50 Water Heater',
-    category: 'water-heater',
-    equipmentCost: 1800,
-    laborCost: 1300,
-    salePrice: 4700,
-  },
-  {
-    id: 'rheem-proterra',
-    name: 'Rheem ProTerra Heat Pump',
-    category: 'heat-pump',
-    equipmentCost: 3200,
-    laborCost: 2000,
-    salePrice: 7200,
-  },
-  {
-    id: 'attic-insulation-1000',
-    name: 'Attic Insulation (up to 1000 sq ft)',
-    category: 'insulation',
-    equipmentCost: 1500,
-    laborCost: 2000,
-    salePrice: 4500,
-  },
-  {
-    id: 'attic-insulation-1000-plus',
-    name: 'Attic Insulation (1000+ sq ft)',
-    category: 'insulation',
-    equipmentCost: 2500,
-    laborCost: 2800,
-    salePrice: 6500,
-  },
-  {
-    id: 'custom',
-    name: 'Custom / Manual Entry',
-    category: 'custom',
-    equipmentCost: 0,
-    laborCost: 0,
-    salePrice: 0,
-  },
+  { id: 'heat-pump-standard', name: 'Heat Pump Standard', category: 'heat-pump', equipmentCost: 4500, laborCost: 2500, salePrice: 12500 },
+  { id: 'heat-pump-premium', name: 'Heat Pump Premium', category: 'heat-pump', equipmentCost: 7000, laborCost: 3500, salePrice: 18500 },
+  { id: 'furnace-standard', name: 'Furnace Standard', category: 'furnace', equipmentCost: 2200, laborCost: 1800, salePrice: 6500 },
+  { id: 'furnace-premium', name: 'Furnace Premium', category: 'furnace', equipmentCost: 3800, laborCost: 2500, salePrice: 9500 },
+  { id: 'tankless-standard', name: 'Tankless Water Heater Standard', category: 'tankless', equipmentCost: 2200, laborCost: 1500, salePrice: 5800 },
+  { id: 'tankless-premium', name: 'Tankless Water Heater Premium', category: 'tankless', equipmentCost: 3500, laborCost: 2100, salePrice: 8200 },
+  { id: 'cv40', name: 'CV40 Water Heater', category: 'water-heater', equipmentCost: 1200, laborCost: 1000, salePrice: 3800 },
+  { id: 'cv50', name: 'CV50 Water Heater', category: 'water-heater', equipmentCost: 1400, laborCost: 1100, salePrice: 4100 },
+  { id: 'pv40', name: 'PV40 Water Heater', category: 'water-heater', equipmentCost: 1600, laborCost: 1200, salePrice: 4400 },
+  { id: 'pv50', name: 'PV50 Water Heater', category: 'water-heater', equipmentCost: 1800, laborCost: 1300, salePrice: 4700 },
+  { id: 'rheem-proterra', name: 'Rheem ProTerra Heat Pump', category: 'heat-pump', equipmentCost: 3200, laborCost: 2000, salePrice: 7200 },
+  { id: 'attic-insulation-1000', name: 'Attic Insulation (up to 1000 sq ft)', category: 'insulation', equipmentCost: 1500, laborCost: 2000, salePrice: 4500 },
+  { id: 'attic-insulation-1000-plus', name: 'Attic Insulation (1000+ sq ft)', category: 'insulation', equipmentCost: 2500, laborCost: 2800, salePrice: 6500 },
+  { id: 'custom', name: 'Custom / Manual Entry', category: 'custom', equipmentCost: 0, laborCost: 0, salePrice: 0 },
 ];
 
 const defaultDealData = {
@@ -164,7 +62,6 @@ const defaultDealData = {
   marketingFee: 15,
 };
 
-// Helper to safely get numeric value
 const safeNumber = (val) => {
   const num = Number(val);
   return isNaN(num) ? 0 : num;
@@ -179,36 +76,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-// Mobile comparison row - shared label with two input values
-const ComparisonRow = ({ label, deal1Value, deal2Value, onDeal1Change, onDeal2Change, prefix, isPercent }) => (
-  <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-    <span className="text-[11px] text-muted-foreground truncate">{label}</span>
-    <div className="relative">
-      {prefix && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">{prefix}</span>}
-      <Input
-        type="number"
-        value={deal1Value === 0 ? '' : (deal1Value || '')}
-        onChange={(e) => onDeal1Change(parseFloat(e.target.value) || 0)}
-        className={`${prefix ? 'pl-4' : ''} ${isPercent ? 'pr-5' : ''} text-xs h-7 text-right`}
-        placeholder="0"
-      />
-      {isPercent && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">%</span>}
-    </div>
-    <div className="relative">
-      {prefix && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">{prefix}</span>}
-      <Input
-        type="number"
-        value={deal2Value === 0 ? '' : (deal2Value || '')}
-        onChange={(e) => onDeal2Change(parseFloat(e.target.value) || 0)}
-        className={`${prefix ? 'pl-4' : ''} ${isPercent ? 'pr-5' : ''} text-xs h-7 text-right`}
-        placeholder="0"
-      />
-      {isPercent && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px]">%</span>}
-    </div>
-  </div>
-);
-
-const calculateDealMetrics = (dealData) => {
+const calculateMetrics = (dealData) => {
   const dealSize = safeNumber(dealData.dealSize);
   const equipmentCost = safeNumber(dealData.equipmentCost);
   const laborCost = safeNumber(dealData.laborCost);
@@ -224,176 +92,58 @@ const calculateDealMetrics = (dealData) => {
   const commissionCost = (amountAfterDealerFee * commission) / 100;
   const marketingFeeCost = (amountAfterDealerFee * marketingFee) / 100;
   
-  const totalCosts = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
+  const fixedCosts = equipmentCost + laborCost + extras;
+  const variableCosts = dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
+  const totalCosts = fixedCosts + variableCosts;
   const grossProfit = dealSize - totalCosts;
   const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
 
-  return { dealSize, totalCosts, grossProfit, profitMargin };
+  return {
+    dealSize, equipmentCost, laborCost, extras,
+    dealerFeeCost, contractorFeeCost, commissionCost, marketingFeeCost,
+    fixedCosts, variableCosts, totalCosts, grossProfit, profitMargin
+  };
 };
 
-// Mobile comparison component
-const MobileComparison = ({ deal1, setDeal1, deal2, setDeal2 }) => {
-  const handlePresetChange = (presetId, setDealData, dealData) => {
-    const preset = productPresets.find(p => p.id === presetId);
-    if (preset) {
-      setDealData({
-        ...dealData,
-        productPreset: presetId,
-        dealSize: preset.salePrice,
-        equipmentCost: preset.equipmentCost,
-        laborCost: preset.laborCost,
-      });
+// Color palette matching the design examples
+const COLORS = {
+  blue: '#4F46E5',
+  blueLight: '#818CF8',
+  purple: '#7C3AED',
+  teal: '#14B8A6',
+  green: '#22C55E',
+  amber: '#F59E0B',
+  pink: '#EC4899',
+  red: '#EF4444',
+};
+
+const PIE_COLORS = ['#4F46E5', '#14B8A6', '#7C3AED', '#F59E0B', '#EC4899', '#22C55E', '#06B6D4'];
+
+const ProfitCalculatorPage = () => {
+  const navigate = useNavigate();
+  const [deals, setDeals] = useState([{ ...defaultDealData }]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const agentId = localStorage.getItem('agentId');
+    const allowedAgents = ['MM23', 'WA4929'];
+    if (!allowedAgents.includes(agentId)) {
+      navigate('/landing');
     }
+  }, [navigate]);
+
+  const activeDeal = deals[activeIndex];
+  const setActiveDeal = (data) => {
+    const newDeals = [...deals];
+    newDeals[activeIndex] = data;
+    setDeals(newDeals);
   };
 
-  const metrics1 = calculateDealMetrics(deal1);
-  const metrics2 = calculateDealMetrics(deal2);
-
-  const preset1 = productPresets.find(p => p.id === deal1.productPreset);
-  const preset2 = productPresets.find(p => p.id === deal2.productPreset);
-  const image1 = preset1 ? getProductImage(preset1.id, preset1.category) : null;
-  const image2 = preset2 ? getProductImage(preset2.id, preset2.category) : null;
-
-  return (
-    <Card className="md:hidden">
-      <CardContent className="p-3 space-y-3">
-        {/* Headers */}
-        <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-          <span className="text-xs font-semibold text-muted-foreground"></span>
-          <span className="text-xs font-bold text-center text-primary">Option 1</span>
-          <span className="text-xs font-bold text-center text-primary">Option 2</span>
-        </div>
-
-        {/* Product Selectors */}
-        <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-          <span className="text-[11px] text-muted-foreground">Product</span>
-          <Select value={deal1.productPreset} onValueChange={(v) => handlePresetChange(v, setDeal1, deal1)}>
-            <SelectTrigger className="h-7 text-[10px] px-2">
-              <SelectValue placeholder="Select..." />
-            </SelectTrigger>
-            <SelectContent>
-              {productPresets.map(preset => (
-                <SelectItem key={preset.id} value={preset.id} className="text-xs">
-                  {preset.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={deal2.productPreset} onValueChange={(v) => handlePresetChange(v, setDeal2, deal2)}>
-            <SelectTrigger className="h-7 text-[10px] px-2">
-              <SelectValue placeholder="Select..." />
-            </SelectTrigger>
-            <SelectContent>
-              {productPresets.map(preset => (
-                <SelectItem key={preset.id} value={preset.id} className="text-xs">
-                  {preset.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Product Images */}
-        {(image1 || image2) && (
-          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-            <span></span>
-            <div className="flex justify-center">
-              {image1 ? (
-                <img src={image1} alt={preset1?.name || 'Product'} className="w-14 h-14 object-contain" />
-              ) : <div className="w-14 h-14" />}
-            </div>
-            <div className="flex justify-center">
-              {image2 ? (
-                <img src={image2} alt={preset2?.name || 'Product'} className="w-14 h-14 object-contain" />
-              ) : <div className="w-14 h-14" />}
-            </div>
-          </div>
-        )}
-
-        {/* Fixed Costs */}
-        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fixed Costs</p>
-          <ComparisonRow label="Deal Size" deal1Value={deal1.dealSize} deal2Value={deal2.dealSize} onDeal1Change={(v) => setDeal1({...deal1, dealSize: v})} onDeal2Change={(v) => setDeal2({...deal2, dealSize: v})} prefix="$" />
-          <ComparisonRow label="Equipment" deal1Value={deal1.equipmentCost} deal2Value={deal2.equipmentCost} onDeal1Change={(v) => setDeal1({...deal1, equipmentCost: v})} onDeal2Change={(v) => setDeal2({...deal2, equipmentCost: v})} prefix="$" />
-          <ComparisonRow label="Labor" deal1Value={deal1.laborCost} deal2Value={deal2.laborCost} onDeal1Change={(v) => setDeal1({...deal1, laborCost: v})} onDeal2Change={(v) => setDeal2({...deal2, laborCost: v})} prefix="$" />
-          <ComparisonRow label="Extras" deal1Value={deal1.extras} deal2Value={deal2.extras} onDeal1Change={(v) => setDeal1({...deal1, extras: v})} onDeal2Change={(v) => setDeal2({...deal2, extras: v})} prefix="$" />
-        </div>
-
-        {/* Variable Costs */}
-        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Variable Costs</p>
-          <ComparisonRow label="Dealer Fee" deal1Value={deal1.dealerFee} deal2Value={deal2.dealerFee} onDeal1Change={(v) => setDeal1({...deal1, dealerFee: v})} onDeal2Change={(v) => setDeal2({...deal2, dealerFee: v})} isPercent />
-          <ComparisonRow label="Contractor" deal1Value={deal1.contractorFee} deal2Value={deal2.contractorFee} onDeal1Change={(v) => setDeal1({...deal1, contractorFee: v})} onDeal2Change={(v) => setDeal2({...deal2, contractorFee: v})} isPercent />
-          <ComparisonRow label="Commission" deal1Value={deal1.commission} deal2Value={deal2.commission} onDeal1Change={(v) => setDeal1({...deal1, commission: v})} onDeal2Change={(v) => setDeal2({...deal2, commission: v})} isPercent />
-          <ComparisonRow label="Marketing" deal1Value={deal1.marketingFee} deal2Value={deal2.marketingFee} onDeal1Change={(v) => setDeal1({...deal1, marketingFee: v})} onDeal2Change={(v) => setDeal2({...deal2, marketingFee: v})} isPercent />
-        </div>
-
-        {/* Results */}
-        <div className="space-y-1.5 p-3 bg-primary/10 rounded-lg border border-primary/20">
-          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-            <span className="text-[11px] text-muted-foreground">Total Costs</span>
-            <span className="text-xs font-medium text-destructive text-center">{formatCurrency(metrics1.totalCosts)}</span>
-            <span className="text-xs font-medium text-destructive text-center">{formatCurrency(metrics2.totalCosts)}</span>
-          </div>
-          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-            <span className="text-[11px] text-muted-foreground">Revenue</span>
-            <span className="text-xs font-medium text-center">{formatCurrency(metrics1.dealSize)}</span>
-            <span className="text-xs font-medium text-center">{formatCurrency(metrics2.dealSize)}</span>
-          </div>
-          <div className="border-t border-primary/20 my-1.5" />
-          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-            <span className="text-[11px] font-medium flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-primary" />
-              Profit
-            </span>
-            <span className={`text-sm font-bold text-center ${metrics1.grossProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {formatCurrency(metrics1.grossProfit)}
-            </span>
-            <span className={`text-sm font-bold text-center ${metrics2.grossProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {formatCurrency(metrics2.grossProfit)}
-            </span>
-          </div>
-          <div className="grid grid-cols-[1fr,1fr,1fr] gap-1.5 items-center">
-            <span className="text-[11px] text-muted-foreground">Margin</span>
-            <span className={`text-xs font-semibold text-center ${metrics1.profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {metrics1.profitMargin.toFixed(1)}%
-            </span>
-            <span className={`text-xs font-semibold text-center ${metrics2.profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {metrics2.profitMargin.toFixed(1)}%
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
-  <div className="flex items-center justify-between gap-2">
-    <span className={`text-muted-foreground shrink-0 ${small ? 'text-xs' : 'text-sm'}`}>{label}</span>
-    <div className="relative w-28">
-      {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">{prefix}</span>}
-      <Input
-        type="number"
-        value={value === 0 ? '' : (value || '')}
-        onChange={(e) => {
-          const val = e.target.value;
-          onChange(val === '' ? 0 : (parseFloat(val) || 0));
-        }}
-        className={`${prefix ? 'pl-5' : ''} ${suffix ? 'pr-6' : ''} text-sm h-8 text-right`}
-        placeholder="0"
-      />
-      {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">{suffix}</span>}
-    </div>
-  </div>
-);
-
-const DealCalculator = ({ dealNumber, dealData, setDealData, productPresets }) => {
   const handlePresetChange = (presetId) => {
     const preset = productPresets.find(p => p.id === presetId);
     if (preset) {
-      setDealData({
-        ...dealData,
+      setActiveDeal({
+        ...activeDeal,
         productPreset: presetId,
         dealSize: preset.salePrice,
         equipmentCost: preset.equipmentCost,
@@ -403,252 +153,418 @@ const DealCalculator = ({ dealNumber, dealData, setDealData, productPresets }) =
   };
 
   const handleInputChange = (field, value) => {
-    setDealData({ ...dealData, [field]: value });
+    setActiveDeal({ ...activeDeal, [field]: value });
   };
 
-  const selectedPreset = productPresets.find(p => p.id === dealData.productPreset);
+  const addComparisonProduct = () => {
+    if (deals.length < 3) {
+      setDeals([...deals, { ...defaultDealData }]);
+      setActiveIndex(deals.length);
+    }
+  };
+
+  const removeProduct = (index) => {
+    if (deals.length > 1) {
+      const newDeals = deals.filter((_, i) => i !== index);
+      setDeals(newDeals);
+      setActiveIndex(Math.max(0, activeIndex - 1));
+    }
+  };
+
+  const metrics = calculateMetrics(activeDeal);
+  const selectedPreset = productPresets.find(p => p.id === activeDeal.productPreset);
   const productImage = selectedPreset ? getProductImage(selectedPreset.id, selectedPreset.category) : null;
 
   const handleGeneratePDF = () => {
     const productName = selectedPreset?.name || 'Custom Deal';
-    generateProfitCalculatorPDF(dealData, dealNumber, productName);
+    generateProfitCalculatorPDF(activeDeal, activeIndex + 1, productName);
   };
 
-  // Calculate costs with safe number conversion
-  const dealSize = safeNumber(dealData.dealSize);
-  const equipmentCost = safeNumber(dealData.equipmentCost);
-  const laborCost = safeNumber(dealData.laborCost);
-  const extras = safeNumber(dealData.extras);
-  const dealerFee = safeNumber(dealData.dealerFee);
-  const contractorFee = safeNumber(dealData.contractorFee);
-  const commission = safeNumber(dealData.commission);
-  const marketingFee = safeNumber(dealData.marketingFee);
+  // Chart data
+  const costBreakdownData = [
+    { name: 'Equipment', value: metrics.equipmentCost, color: COLORS.blue },
+    { name: 'Labor', value: metrics.laborCost, color: COLORS.teal },
+    { name: 'Extras', value: metrics.extras, color: COLORS.purple },
+    { name: 'Dealer Fee', value: metrics.dealerFeeCost, color: COLORS.amber },
+    { name: 'Contractor', value: metrics.contractorFeeCost, color: COLORS.pink },
+    { name: 'Commission', value: metrics.commissionCost, color: COLORS.green },
+    { name: 'Marketing', value: metrics.marketingFeeCost, color: '#06B6D4' },
+  ].filter(item => item.value > 0);
 
-  const dealerFeeCost = (dealSize * dealerFee) / 100;
-  const amountAfterDealerFee = dealSize - dealerFeeCost;
-  const contractorFeeCost = (amountAfterDealerFee * contractorFee) / 100;
-  const commissionCost = (amountAfterDealerFee * commission) / 100;
-  const marketingFeeCost = (amountAfterDealerFee * marketingFee) / 100;
-  
-  const totalCosts = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + commissionCost + marketingFeeCost;
-  const costsBeforeCommission = equipmentCost + laborCost + extras + dealerFeeCost + contractorFeeCost + marketingFeeCost;
-  
-  const grossProfit = dealSize - totalCosts;
-  const profitBeforeCommission = dealSize - costsBeforeCommission;
-  const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
-  const marginBeforeCommission = dealSize > 0 ? (profitBeforeCommission / dealSize) * 100 : 0;
+  const barChartData = [
+    { name: 'Equipment', value: metrics.equipmentCost, fill: COLORS.blue },
+    { name: 'Labor', value: metrics.laborCost, fill: COLORS.teal },
+    { name: 'Dealer', value: metrics.dealerFeeCost, fill: COLORS.amber },
+    { name: 'Contractor', value: metrics.contractorFeeCost, fill: COLORS.pink },
+    { name: 'Commission', value: metrics.commissionCost, fill: COLORS.green },
+    { name: 'Marketing', value: metrics.marketingFeeCost, fill: '#06B6D4' },
+  ];
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2 pt-3 px-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Calculator className="w-4 h-4 text-primary" />
-          Option {dealNumber}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 px-3 pb-3">
-        {/* Product Preset Selector */}
-        <Select value={dealData.productPreset} onValueChange={handlePresetChange}>
-          <SelectTrigger className="h-9 text-sm">
-            <SelectValue placeholder="Select product..." />
-          </SelectTrigger>
-          <SelectContent>
-            {productPresets.map(preset => (
-              <SelectItem key={preset.id} value={preset.id}>
-                {preset.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Product Image */}
-        {productImage && (
-          <div className="flex justify-center py-2">
-            <img 
-              src={productImage} 
-              alt={selectedPreset?.name || 'Product'} 
-              className="w-24 h-24 object-contain"
-            />
-          </div>
-        )}
-
-        {/* Fixed Costs Section */}
-        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fixed Costs</p>
-          <CompactField label="Deal Size" value={dealData.dealSize} onChange={(v) => handleInputChange('dealSize', v)} prefix="$" />
-          <CompactField label="Equipment" value={dealData.equipmentCost} onChange={(v) => handleInputChange('equipmentCost', v)} prefix="$" />
-          <CompactField label="Labor" value={dealData.laborCost} onChange={(v) => handleInputChange('laborCost', v)} prefix="$" />
-          <CompactField label="Extras" value={dealData.extras} onChange={(v) => handleInputChange('extras', v)} prefix="$" />
-        </div>
-
-        {/* Variable Costs Section */}
-        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Variable Costs</p>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Dealer Fee</span>
-            <div className="flex items-center gap-1.5">
-              <div className="relative w-20">
-                <Input
-                  type="number"
-                  value={dealData.dealerFee || ''}
-                  onChange={(e) => handleInputChange('dealerFee', parseFloat(e.target.value) || 0)}
-                  className="pr-6 text-sm h-7 text-right"
-                  placeholder="0"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(dealerFeeCost)}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Contractor</span>
-            <div className="flex items-center gap-1.5">
-              <div className="relative w-20">
-                <Input
-                  type="number"
-                  value={dealData.contractorFee || ''}
-                  onChange={(e) => handleInputChange('contractorFee', parseFloat(e.target.value) || 0)}
-                  className="pr-6 text-sm h-7 text-right"
-                  placeholder="0"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(contractorFeeCost)}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Commission</span>
-            <div className="flex items-center gap-1.5">
-              <div className="relative w-20">
-                <Input
-                  type="number"
-                  value={dealData.commission || ''}
-                  onChange={(e) => handleInputChange('commission', parseFloat(e.target.value) || 0)}
-                  className="pr-6 text-sm h-7 text-right"
-                  placeholder="0"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(commissionCost)}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Marketing</span>
-            <div className="flex items-center gap-1.5">
-              <div className="relative w-20">
-                <Input
-                  type="number"
-                  value={dealData.marketingFee || ''}
-                  onChange={(e) => handleInputChange('marketingFee', parseFloat(e.target.value) || 0)}
-                  className="pr-6 text-sm h-7 text-right"
-                  placeholder="0"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground w-16 text-right">{formatCurrency(marketingFeeCost)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="space-y-1 p-3 bg-primary/10 rounded-lg border border-primary/20">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Total Costs</span>
-            <span className="font-medium text-destructive">{formatCurrency(totalCosts)}</span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Revenue</span>
-            <span className="font-medium">{formatCurrency(dealSize)}</span>
-          </div>
-          <div className="border-t border-primary/20 my-1.5" />
-          <div className="flex justify-between items-center">
-            <span className="font-medium flex items-center gap-1 text-sm">
-              <TrendingUp className="w-3.5 h-3.5 text-primary" />
-              Profit
-            </span>
-            <span className={`text-lg font-bold ${grossProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {formatCurrency(grossProfit)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Margin</span>
-            <span className={`font-semibold ${profitMargin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {profitMargin.toFixed(1)}%
-            </span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Margin (before comm.)</span>
-            <span className={`font-semibold ${marginBeforeCommission >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-destructive'}`}>
-              {marginBeforeCommission.toFixed(1)}%
-            </span>
-          </div>
-        </div>
-
-        {/* Generate PDF Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleGeneratePDF}
-          className="w-full flex items-center justify-center gap-2 text-primary hover:bg-primary/10"
-        >
-          <FileDown className="w-4 h-4" />
-          Generate PDF Report
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-const ProfitCalculatorPage = () => {
-  const navigate = useNavigate();
-  const [deal1, setDeal1] = useState({ ...defaultDealData });
-  const [deal2, setDeal2] = useState({ ...defaultDealData });
-  const [deal3, setDeal3] = useState({ ...defaultDealData });
-
-  useEffect(() => {
-    const agentId = localStorage.getItem('agentId');
-    const allowedAgents = ['MM23', 'WA4929'];
-    
-    if (!allowedAgents.includes(agentId)) {
-      navigate('/landing');
-    }
-  }, [navigate]);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
+      {/* Header */}
+      <div className="bg-white/70 backdrop-blur-md border-b border-indigo-100 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate('/landing')}
-            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
+            className="text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
-            <span className="hidden sm:inline">Back</span>
+            Back
           </Button>
-          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
-            Profit Calculator
-          </h1>
-          <div className="w-8 md:w-16" /> {/* Spacer for centering */}
+          <h1 className="text-lg font-bold text-slate-800">Profit Calculator</h1>
+          <Button
+            onClick={handleGeneratePDF}
+            size="sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+          >
+            <FileDown className="w-4 h-4" />
+            Export PDF
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-3 md:px-4 py-4">
-        {/* Mobile View - Side by side comparison */}
-        <MobileComparison 
-          deal1={deal1} 
-          setDeal1={setDeal1} 
-          deal2={deal2} 
-          setDeal2={setDeal2} 
-        />
-        
-        {/* Desktop View - 3 cards */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-          <DealCalculator dealNumber={1} dealData={deal1} setDealData={setDeal1} productPresets={productPresets} />
-          <DealCalculator dealNumber={2} dealData={deal2} setDealData={setDeal2} productPresets={productPresets} />
-          <DealCalculator dealNumber={3} dealData={deal3} setDealData={setDeal3} productPresets={productPresets} />
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Product Tabs */}
+        <div className="flex items-center gap-2 mb-6">
+          {deals.map((deal, index) => {
+            const preset = productPresets.find(p => p.id === deal.productPreset);
+            return (
+              <button
+                key={index}
+                onClick={() => setActiveIndex(index)}
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeIndex === index
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                }`}
+              >
+                {preset?.name || `Option ${index + 1}`}
+                {deals.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeProduct(index); }}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </button>
+            );
+          })}
+          {deals.length < 3 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addComparisonProduct}
+              className="rounded-full gap-1 border-dashed border-indigo-300 text-indigo-600 hover:bg-indigo-50"
+            >
+              <Plus className="w-4 h-4" />
+              Compare Product
+            </Button>
+          )}
+        </div>
+
+        {/* Key Metrics Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Revenue Card */}
+          <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-0 shadow-xl shadow-indigo-200/50">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-indigo-100 text-sm font-medium">Revenue</span>
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  <ArrowUpRight className="w-4 h-4" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold">{formatCurrency(metrics.dealSize)}</p>
+              <p className="text-indigo-200 text-xs mt-1">Total sale price</p>
+            </CardContent>
+          </Card>
+
+          {/* Total Costs Card */}
+          <Card className="bg-white border border-slate-200 shadow-lg">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-slate-500 text-sm font-medium">Total Costs</span>
+                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-amber-600" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-slate-800">{formatCurrency(metrics.totalCosts)}</p>
+              <p className="text-slate-400 text-xs mt-1">Fixed + Variable</p>
+            </CardContent>
+          </Card>
+
+          {/* Net Profit Card */}
+          <Card className={`border-0 shadow-xl ${metrics.grossProfit >= 0 ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-emerald-200/50' : 'bg-gradient-to-br from-red-500 to-rose-500 shadow-red-200/50'} text-white`}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white/80 text-sm font-medium">Net Profit</span>
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  {metrics.grossProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                </div>
+              </div>
+              <p className="text-3xl font-bold">{formatCurrency(metrics.grossProfit)}</p>
+              <p className="text-white/70 text-xs mt-1">{metrics.profitMargin.toFixed(1)}% margin</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Input Form */}
+          <div className="space-y-4">
+            {/* Product Selection */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  {productImage && (
+                    <img src={productImage} alt={selectedPreset?.name} className="w-16 h-16 object-contain" />
+                  )}
+                  <div className="flex-1">
+                    <label className="text-xs text-slate-500 font-medium">Select Product</label>
+                    <Select value={activeDeal.productPreset} onValueChange={handlePresetChange}>
+                      <SelectTrigger className="mt-1 border-slate-200">
+                        <SelectValue placeholder="Choose a product..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {productPresets.map(preset => (
+                          <SelectItem key={preset.id} value={preset.id}>{preset.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Fixed Costs */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                  Fixed Costs
+                </h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Sale Price', field: 'dealSize', value: activeDeal.dealSize },
+                    { label: 'Equipment', field: 'equipmentCost', value: activeDeal.equipmentCost },
+                    { label: 'Labor', field: 'laborCost', value: activeDeal.laborCost },
+                    { label: 'Extras/Materials', field: 'extras', value: activeDeal.extras },
+                  ].map(item => (
+                    <div key={item.field} className="flex items-center justify-between gap-3">
+                      <label className="text-sm text-slate-600">{item.label}</label>
+                      <div className="relative w-28">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                        <Input
+                          type="number"
+                          value={item.value || ''}
+                          onChange={(e) => handleInputChange(item.field, parseFloat(e.target.value) || 0)}
+                          className="pl-6 text-right h-9 border-slate-200"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Variable Costs */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-amber-500" />
+                  Variable Costs
+                </h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Dealer Fee', field: 'dealerFee', value: activeDeal.dealerFee, cost: metrics.dealerFeeCost },
+                    { label: 'Contractor', field: 'contractorFee', value: activeDeal.contractorFee, cost: metrics.contractorFeeCost },
+                    { label: 'Commission', field: 'commission', value: activeDeal.commission, cost: metrics.commissionCost },
+                    { label: 'Marketing', field: 'marketingFee', value: activeDeal.marketingFee, cost: metrics.marketingFeeCost },
+                  ].map(item => (
+                    <div key={item.field} className="flex items-center justify-between gap-2">
+                      <label className="text-sm text-slate-600 flex-1">{item.label}</label>
+                      <div className="relative w-16">
+                        <Input
+                          type="number"
+                          value={item.value || ''}
+                          onChange={(e) => handleInputChange(item.field, parseFloat(e.target.value) || 0)}
+                          className="pr-6 text-right h-8 text-sm border-slate-200"
+                          placeholder="0"
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">%</span>
+                      </div>
+                      <span className="text-xs text-slate-500 w-16 text-right">{formatCurrency(item.cost)}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Middle Column - Charts */}
+          <div className="space-y-4">
+            {/* Pie Chart - Cost Distribution */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-slate-700">Cost Distribution</h3>
+                  <PieChart className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="h-52">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={costBreakdownData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {costBreakdownData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value) => formatCurrency(value)}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Legend */}
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {costBreakdownData.slice(0, 6).map((item, index) => (
+                    <div key={item.name} className="flex items-center gap-2 text-xs">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: PIE_COLORS[index] }} />
+                      <span className="text-slate-600">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Profit Margin Gauge */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-4">Profit Margin</h3>
+                <div className="flex items-center justify-center">
+                  <div className="relative w-40 h-20">
+                    {/* Semi-circle background */}
+                    <svg viewBox="0 0 100 50" className="w-full h-full">
+                      <path
+                        d="M 5 50 A 45 45 0 0 1 95 50"
+                        fill="none"
+                        stroke="#E5E7EB"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M 5 50 A 45 45 0 0 1 95 50"
+                        fill="none"
+                        stroke={metrics.profitMargin >= 20 ? COLORS.green : metrics.profitMargin >= 10 ? COLORS.amber : COLORS.red}
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        strokeDasharray={`${Math.min(100, Math.max(0, metrics.profitMargin * 2.8))} 150`}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-end justify-center pb-2">
+                      <span className={`text-2xl font-bold ${
+                        metrics.profitMargin >= 20 ? 'text-green-600' : 
+                        metrics.profitMargin >= 10 ? 'text-amber-600' : 'text-red-600'
+                      }`}>
+                        {metrics.profitMargin.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center mt-2">
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                    metrics.profitMargin >= 25 ? 'bg-green-100 text-green-700' :
+                    metrics.profitMargin >= 15 ? 'bg-blue-100 text-blue-700' :
+                    metrics.profitMargin >= 5 ? 'bg-amber-100 text-amber-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {metrics.profitMargin >= 25 ? 'Excellent' :
+                     metrics.profitMargin >= 15 ? 'Good' :
+                     metrics.profitMargin >= 5 ? 'Moderate' : 'Low'}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Breakdown & Summary */}
+          <div className="space-y-4">
+            {/* Bar Chart - Cost Breakdown */}
+            <Card className="bg-white border border-slate-200 shadow-lg">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-4">Cost Breakdown</h3>
+                <div className="h-52">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barChartData} layout="vertical">
+                      <XAxis type="number" hide />
+                      <YAxis 
+                        type="category" 
+                        dataKey="name" 
+                        width={70}
+                        tick={{ fontSize: 11, fill: '#64748B' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip 
+                        formatter={(value) => formatCurrency(value)}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
+                      <Bar dataKey="value" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Summary Card */}
+            <Card className="bg-gradient-to-br from-slate-800 to-slate-900 text-white border-0 shadow-xl">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-medium text-slate-300 mb-4">Financial Summary</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Revenue</span>
+                    <span className="font-semibold">{formatCurrency(metrics.dealSize)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Fixed Costs</span>
+                    <span className="text-blue-400">{formatCurrency(metrics.fixedCosts)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Variable Costs</span>
+                    <span className="text-amber-400">{formatCurrency(metrics.variableCosts)}</span>
+                  </div>
+                  <div className="border-t border-slate-700 my-2" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300 font-medium">Net Profit</span>
+                    <span className={`text-xl font-bold ${metrics.grossProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {formatCurrency(metrics.grossProfit)}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Generate PDF Button */}
+            <Button
+              onClick={handleGeneratePDF}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200/50 py-6"
+            >
+              <FileDown className="w-5 h-5 mr-2" />
+              Generate PDF Report
+            </Button>
+          </div>
         </div>
       </main>
     </div>

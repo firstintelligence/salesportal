@@ -38,19 +38,9 @@ const calculateDealMetrics = (dealData) => {
   const profitMargin = dealSize > 0 ? (grossProfit / dealSize) * 100 : 0;
 
   return {
-    dealSize,
-    equipmentCost,
-    laborCost,
-    extras,
-    dealerFeeCost,
-    contractorFeeCost,
-    commissionCost,
-    marketingFeeCost,
-    fixedCosts,
-    variableCosts,
-    totalCosts,
-    grossProfit,
-    profitMargin,
+    dealSize, equipmentCost, laborCost, extras,
+    dealerFeeCost, contractorFeeCost, commissionCost, marketingFeeCost,
+    fixedCosts, variableCosts, totalCosts, grossProfit, profitMargin,
   };
 };
 
@@ -64,373 +54,277 @@ export const generateProfitCalculatorPDF = (dealData, dealNumber, productName = 
   const metrics = calculateDealMetrics(dealData);
   const pageWidth = 215.9;
   const pageHeight = 279.4;
-  const margin = 16;
+  const margin = 14;
   const contentWidth = pageWidth - (margin * 2);
   
-  // Modern, clean color palette - light theme with soft accents
+  // Modern color palette matching the UI
   const colors = {
-    // Background & surfaces
-    pageBg: [250, 251, 252],
-    cardBg: [255, 255, 255],
-    cardBorder: [234, 236, 240],
-    
-    // Text hierarchy
-    textPrimary: [17, 24, 39],
-    textSecondary: [75, 85, 99],
-    textMuted: [156, 163, 175],
-    
-    // Accent colors - soft, modern palette
-    blue: [59, 130, 246],
-    blueSoft: [239, 246, 255],
-    green: [34, 197, 94],
-    greenSoft: [240, 253, 244],
-    red: [239, 68, 68],
-    redSoft: [254, 242, 242],
-    amber: [245, 158, 11],
-    amberSoft: [255, 251, 235],
-    purple: [139, 92, 246],
-    purpleSoft: [245, 243, 255],
+    // Gradient backgrounds
+    indigo: [79, 70, 229],
+    indigoLight: [129, 140, 248],
+    purple: [124, 58, 237],
     teal: [20, 184, 166],
-    cyan: [6, 182, 212],
+    green: [34, 197, 94],
+    emerald: [16, 185, 129],
+    amber: [245, 158, 11],
+    red: [239, 68, 68],
     pink: [236, 72, 153],
-    indigo: [99, 102, 241],
+    cyan: [6, 182, 212],
+    
+    // Neutrals
+    slate900: [15, 23, 42],
+    slate800: [30, 41, 59],
+    slate700: [51, 65, 85],
+    slate600: [71, 85, 105],
+    slate500: [100, 116, 139],
+    slate400: [148, 163, 184],
+    slate300: [203, 213, 225],
+    slate200: [226, 232, 240],
+    slate100: [241, 245, 249],
+    slate50: [248, 250, 252],
+    white: [255, 255, 255],
+    
+    // Background gradient colors
+    bgLight: [238, 242, 255],
+    bgMid: [224, 231, 255],
   };
 
-  // Fill page background
-  doc.setFillColor(...colors.pageBg);
+  // Fill page with gradient-like background
+  doc.setFillColor(...colors.bgLight);
   doc.rect(0, 0, pageWidth, pageHeight, 'F');
+  
+  // Add subtle gradient overlay
+  doc.setFillColor(...colors.bgMid);
+  doc.rect(0, 0, pageWidth, 60, 'F');
 
-  let y = margin;
   const dateStr = new Date().toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
   });
 
+  let y = margin;
+
   // ══════════════════════════════════════════════════════════════════════
-  // HEADER - Clean, minimal header
+  // HEADER
   // ══════════════════════════════════════════════════════════════════════
-  doc.setFontSize(22);
+  doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.textPrimary);
-  doc.text('Profit Analysis', margin, y + 8);
+  doc.setTextColor(...colors.slate800);
+  doc.text('Profit Analysis', margin, y + 10);
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.textMuted);
-  doc.text(dateStr, pageWidth - margin, y + 6, { align: 'right' });
+  doc.setTextColor(...colors.slate500);
+  doc.text(dateStr, pageWidth - margin, y + 8, { align: 'right' });
   
-  // Product name badge
-  y += 14;
-  doc.setFillColor(...colors.blueSoft);
-  const badgeText = `${productName}`;
-  const badgeWidth = doc.getTextWidth(badgeText) * 0.35 + 12;
-  doc.roundedRect(margin, y, badgeWidth, 7, 2, 2, 'F');
+  // Product badge
+  y += 16;
+  doc.setFillColor(...colors.indigo);
+  doc.roundedRect(margin, y, 60, 8, 4, 4, 'F');
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.blue);
-  doc.text(badgeText, margin + 6, y + 5);
+  doc.setTextColor(...colors.white);
+  doc.text(productName, margin + 5, y + 5.5);
   
   y += 16;
 
   // ══════════════════════════════════════════════════════════════════════
-  // KEY METRICS - Three clean metric cards
+  // KEY METRICS - Three cards
   // ══════════════════════════════════════════════════════════════════════
   const cardGap = 6;
   const cardW = (contentWidth - cardGap * 2) / 3;
-  const cardH = 32;
+  const cardH = 38;
   
-  const metricCards = [
-    { 
-      label: 'Revenue', 
-      value: formatCurrency(metrics.dealSize), 
-      iconBg: colors.blueSoft,
-      iconColor: colors.blue,
-      valueColor: colors.textPrimary
-    },
-    { 
-      label: 'Total Costs', 
-      value: formatCurrency(metrics.totalCosts), 
-      iconBg: colors.amberSoft,
-      iconColor: colors.amber,
-      valueColor: colors.amber
-    },
-    { 
-      label: 'Net Profit', 
-      value: formatCurrency(metrics.grossProfit), 
-      iconBg: metrics.grossProfit >= 0 ? colors.greenSoft : colors.redSoft,
-      iconColor: metrics.grossProfit >= 0 ? colors.green : colors.red,
-      valueColor: metrics.grossProfit >= 0 ? colors.green : colors.red
-    },
-  ];
+  // Revenue Card (Indigo gradient)
+  let cardX = margin;
+  doc.setFillColor(...colors.indigo);
+  doc.roundedRect(cardX, y, cardW, cardH, 4, 4, 'F');
+  doc.setFillColor(...colors.indigoLight);
+  doc.roundedRect(cardX + cardW - 25, y + 5, 20, 12, 3, 3, 'F');
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(255, 255, 255, 0.8);
+  doc.text('Revenue', cardX + 8, y + 12);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.white);
+  doc.text(formatCurrency(metrics.dealSize), cardX + 8, y + 28);
   
-  metricCards.forEach((card, i) => {
-    const x = margin + i * (cardW + cardGap);
-    
-    // Card with subtle border
-    doc.setFillColor(...colors.cardBg);
-    doc.setDrawColor(...colors.cardBorder);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(x, y, cardW, cardH, 3, 3, 'FD');
-    
-    // Label
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.textSecondary);
-    doc.text(card.label, x + 10, y + 12);
-    
-    // Value
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...card.valueColor);
-    doc.text(card.value, x + 10, y + 24);
-  });
+  // Total Costs Card (White)
+  cardX = margin + cardW + cardGap;
+  doc.setFillColor(...colors.white);
+  doc.setDrawColor(...colors.slate200);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(cardX, y, cardW, cardH, 4, 4, 'FD');
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colors.slate500);
+  doc.text('Total Costs', cardX + 8, y + 12);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.slate800);
+  doc.text(formatCurrency(metrics.totalCosts), cardX + 8, y + 28);
+  
+  // Net Profit Card (Green/Red gradient)
+  cardX = margin + (cardW + cardGap) * 2;
+  const profitColor = metrics.grossProfit >= 0 ? colors.emerald : colors.red;
+  doc.setFillColor(...profitColor);
+  doc.roundedRect(cardX, y, cardW, cardH, 4, 4, 'F');
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(255, 255, 255, 0.8);
+  doc.text('Net Profit', cardX + 8, y + 12);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.white);
+  doc.text(formatCurrency(metrics.grossProfit), cardX + 8, y + 28);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${metrics.profitMargin.toFixed(1)}% margin`, cardX + 8, y + 35);
   
   y += cardH + 10;
 
   // ══════════════════════════════════════════════════════════════════════
-  // PROFIT MARGIN SECTION - Clean gauge with analysis
-  // ══════════════════════════════════════════════════════════════════════
-  const gaugeCardH = 50;
-  
-  // Card
-  doc.setFillColor(...colors.cardBg);
-  doc.setDrawColor(...colors.cardBorder);
-  doc.roundedRect(margin, y, contentWidth, gaugeCardH, 3, 3, 'FD');
-  
-  // Left side - Circular progress indicator
-  const gaugeCX = margin + 35;
-  const gaugeCY = y + gaugeCardH / 2;
-  const gaugeR = 18;
-  
-  // Background circle
-  doc.setDrawColor(...colors.cardBorder);
-  doc.setLineWidth(3);
-  doc.circle(gaugeCX, gaugeCY, gaugeR, 'S');
-  
-  // Progress arc (simplified - draw as colored circle segment)
-  const progressColor = metrics.profitMargin >= 20 ? colors.green : 
-                        metrics.profitMargin >= 10 ? colors.amber : 
-                        metrics.profitMargin >= 0 ? colors.amber : colors.red;
-  doc.setDrawColor(...progressColor);
-  doc.setLineWidth(3);
-  
-  // Draw progress arc segments
-  const absMargin = Math.abs(metrics.profitMargin);
-  const progressPct = Math.min(100, absMargin * 2);
-  const segments = Math.floor(progressPct / 100 * 36);
-  for (let i = 0; i < segments; i++) {
-    const startAngle = -90 + (i * 10);
-    const endAngle = -90 + ((i + 1) * 10);
-    const rad1 = (startAngle * Math.PI) / 180;
-    const rad2 = (endAngle * Math.PI) / 180;
-    doc.line(
-      gaugeCX + gaugeR * Math.cos(rad1), 
-      gaugeCY + gaugeR * Math.sin(rad1),
-      gaugeCX + gaugeR * Math.cos(rad2), 
-      gaugeCY + gaugeR * Math.sin(rad2)
-    );
-  }
-  
-  // Center text
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...progressColor);
-  const marginText = `${metrics.profitMargin >= 0 ? '' : ''}${metrics.profitMargin.toFixed(1)}%`;
-  doc.text(marginText, gaugeCX, gaugeCY + 2, { align: 'center' });
-  
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.textMuted);
-  doc.text('Margin', gaugeCX, gaugeCY + 8, { align: 'center' });
-  
-  // Right side - Analysis text
-  const rightX = margin + 70;
-  
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.textPrimary);
-  doc.text('Profit Margin Analysis', rightX, y + 14);
-  
-  // Status badge
-  let statusText = '';
-  let statusBg = colors.greenSoft;
-  let statusColor = colors.green;
-  if (metrics.profitMargin >= 25) { 
-    statusText = 'Excellent'; statusBg = colors.greenSoft; statusColor = colors.green;
-  } else if (metrics.profitMargin >= 15) { 
-    statusText = 'Good'; statusBg = colors.blueSoft; statusColor = colors.blue;
-  } else if (metrics.profitMargin >= 5) { 
-    statusText = 'Moderate'; statusBg = colors.amberSoft; statusColor = colors.amber;
-  } else if (metrics.profitMargin >= 0) { 
-    statusText = 'Low'; statusBg = colors.amberSoft; statusColor = colors.amber;
-  } else { 
-    statusText = 'Loss'; statusBg = colors.redSoft; statusColor = colors.red;
-  }
-  
-  doc.setFillColor(...statusBg);
-  const statusW = doc.getTextWidth(statusText) * 0.35 + 8;
-  doc.roundedRect(rightX, y + 18, statusW, 6, 2, 2, 'F');
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...statusColor);
-  doc.text(statusText, rightX + 4, y + 22.5);
-  
-  // Summary line
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.textSecondary);
-  doc.text(`Revenue: ${formatCurrency(metrics.dealSize)}`, rightX, y + 34);
-  doc.text(`Costs: ${formatCurrency(metrics.totalCosts)}`, rightX + 55, y + 34);
-  
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...progressColor);
-  doc.text(`Profit: ${formatCurrency(metrics.grossProfit)}`, rightX, y + 42);
-  
-  y += gaugeCardH + 8;
-
-  // ══════════════════════════════════════════════════════════════════════
-  // COST BREAKDOWN - Two column cards
+  // TWO COLUMN LAYOUT - Costs & Chart
   // ══════════════════════════════════════════════════════════════════════
   const colGap = 8;
   const colW = (contentWidth - colGap) / 2;
-  const colH = 58;
+  const colH = 70;
   
   // Fixed Costs Card
-  doc.setFillColor(...colors.cardBg);
-  doc.setDrawColor(...colors.cardBorder);
-  doc.roundedRect(margin, y, colW, colH, 3, 3, 'FD');
+  doc.setFillColor(...colors.white);
+  doc.setDrawColor(...colors.slate200);
+  doc.roundedRect(margin, y, colW, colH, 4, 4, 'FD');
   
+  doc.setFillColor(...colors.indigo);
+  doc.circle(margin + 10, y + 12, 2, 'F');
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.textPrimary);
-  doc.text('Fixed Costs', margin + 10, y + 12);
-  
-  doc.setTextColor(...colors.blue);
-  doc.text(formatCurrency(metrics.fixedCosts), margin + colW - 10, y + 12, { align: 'right' });
+  doc.setTextColor(...colors.slate700);
+  doc.text('Fixed Costs', margin + 16, y + 14);
+  doc.setTextColor(...colors.indigo);
+  doc.text(formatCurrency(metrics.fixedCosts), margin + colW - 8, y + 14, { align: 'right' });
   
   const fixedItems = [
-    { label: 'Equipment', value: metrics.equipmentCost, color: colors.blue },
+    { label: 'Equipment', value: metrics.equipmentCost, color: colors.indigo },
     { label: 'Labor', value: metrics.laborCost, color: colors.teal },
     { label: 'Extras/Materials', value: metrics.extras, color: colors.purple },
   ];
   
-  let itemY = y + 22;
-  const barMaxW = colW - 65;
-  
-  fixedItems.forEach(item => {
+  let itemY = y + 26;
+  const barMaxW = colW - 55;
+  fixedItems.forEach((item, index) => {
     const pct = metrics.fixedCosts > 0 ? (item.value / metrics.fixedCosts) * 100 : 0;
     
-    // Dot indicator
     doc.setFillColor(...item.color);
-    doc.circle(margin + 14, itemY, 2, 'F');
+    doc.circle(margin + 10, itemY, 2, 'F');
     
-    // Label
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.textSecondary);
-    doc.text(item.label, margin + 20, itemY + 1.5);
+    doc.setTextColor(...colors.slate600);
+    doc.text(item.label, margin + 16, itemY + 1.5);
     
-    // Value
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.textPrimary);
-    doc.text(formatCurrency(item.value), margin + colW - 10, itemY + 1.5, { align: 'right' });
+    doc.setTextColor(...colors.slate700);
+    doc.text(formatCurrency(item.value), margin + colW - 8, itemY + 1.5, { align: 'right' });
     
     // Progress bar
-    doc.setFillColor(...colors.pageBg);
-    doc.roundedRect(margin + 10, itemY + 5, barMaxW, 3, 1.5, 1.5, 'F');
+    doc.setFillColor(...colors.slate100);
+    doc.roundedRect(margin + 10, itemY + 5, barMaxW, 4, 2, 2, 'F');
     if (pct > 0) {
       doc.setFillColor(...item.color);
-      doc.roundedRect(margin + 10, itemY + 5, Math.max(3, (pct / 100) * barMaxW), 3, 1.5, 1.5, 'F');
+      doc.roundedRect(margin + 10, itemY + 5, Math.max(4, (pct / 100) * barMaxW), 4, 2, 2, 'F');
     }
     
-    itemY += 14;
+    itemY += 16;
   });
   
   // Variable Costs Card
   const varX = margin + colW + colGap;
-  doc.setFillColor(...colors.cardBg);
-  doc.setDrawColor(...colors.cardBorder);
-  doc.roundedRect(varX, y, colW, colH, 3, 3, 'FD');
+  doc.setFillColor(...colors.white);
+  doc.setDrawColor(...colors.slate200);
+  doc.roundedRect(varX, y, colW, colH, 4, 4, 'FD');
   
+  doc.setFillColor(...colors.amber);
+  doc.circle(varX + 10, y + 12, 2, 'F');
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.textPrimary);
-  doc.text('Variable Costs', varX + 10, y + 12);
-  
+  doc.setTextColor(...colors.slate700);
+  doc.text('Variable Costs', varX + 16, y + 14);
   doc.setTextColor(...colors.amber);
-  doc.text(formatCurrency(metrics.variableCosts), varX + colW - 10, y + 12, { align: 'right' });
+  doc.text(formatCurrency(metrics.variableCosts), varX + colW - 8, y + 14, { align: 'right' });
   
   const varItems = [
     { label: `Dealer Fee (${dealData.dealerFee}%)`, value: metrics.dealerFeeCost, color: colors.amber },
     { label: `Contractor (${dealData.contractorFee}%)`, value: metrics.contractorFeeCost, color: colors.pink },
-    { label: `Commission (${dealData.commission}%)`, value: metrics.commissionCost, color: colors.indigo },
+    { label: `Commission (${dealData.commission}%)`, value: metrics.commissionCost, color: colors.green },
     { label: `Marketing (${dealData.marketingFee}%)`, value: metrics.marketingFeeCost, color: colors.cyan },
   ];
   
-  itemY = y + 22;
-  varItems.forEach(item => {
+  itemY = y + 24;
+  varItems.forEach((item) => {
     const pct = metrics.variableCosts > 0 ? (item.value / metrics.variableCosts) * 100 : 0;
     
     doc.setFillColor(...item.color);
-    doc.circle(varX + 14, itemY, 2, 'F');
+    doc.circle(varX + 10, itemY, 1.5, 'F');
     
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.textSecondary);
-    doc.text(item.label, varX + 20, itemY + 1.5);
+    doc.setTextColor(...colors.slate600);
+    doc.text(item.label, varX + 16, itemY + 1);
     
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.textPrimary);
-    doc.text(formatCurrency(item.value), varX + colW - 10, itemY + 1.5, { align: 'right' });
+    doc.setTextColor(...colors.slate700);
+    doc.text(formatCurrency(item.value), varX + colW - 8, itemY + 1, { align: 'right' });
     
     // Progress bar
-    doc.setFillColor(...colors.pageBg);
-    doc.roundedRect(varX + 10, itemY + 5, barMaxW, 2.5, 1, 1, 'F');
+    doc.setFillColor(...colors.slate100);
+    doc.roundedRect(varX + 10, itemY + 4, barMaxW, 3, 1.5, 1.5, 'F');
     if (pct > 0) {
       doc.setFillColor(...item.color);
-      doc.roundedRect(varX + 10, itemY + 5, Math.max(2.5, (pct / 100) * barMaxW), 2.5, 1, 1, 'F');
+      doc.roundedRect(varX + 10, itemY + 4, Math.max(3, (pct / 100) * barMaxW), 3, 1.5, 1.5, 'F');
     }
     
-    itemY += 10;
+    itemY += 12;
   });
   
   y += colH + 8;
 
   // ══════════════════════════════════════════════════════════════════════
-  // COST DISTRIBUTION - Clean horizontal bar chart
+  // COST DISTRIBUTION BAR
   // ══════════════════════════════════════════════════════════════════════
-  const distH = 38;
+  const distH = 42;
   
-  doc.setFillColor(...colors.cardBg);
-  doc.setDrawColor(...colors.cardBorder);
-  doc.roundedRect(margin, y, contentWidth, distH, 3, 3, 'FD');
+  doc.setFillColor(...colors.white);
+  doc.setDrawColor(...colors.slate200);
+  doc.roundedRect(margin, y, contentWidth, distH, 4, 4, 'FD');
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.textPrimary);
-  doc.text('Cost Distribution', margin + 10, y + 11);
+  doc.setTextColor(...colors.slate700);
+  doc.text('Cost Distribution', margin + 10, y + 12);
   
   // Stacked bar
-  const barY = y + 16;
-  const barH = 8;
+  const barY = y + 18;
+  const barH = 10;
   const barW = contentWidth - 20;
   
   const allCosts = [
-    { value: metrics.equipmentCost, color: colors.blue, label: 'Equipment' },
+    { value: metrics.equipmentCost, color: colors.indigo, label: 'Equipment' },
     { value: metrics.laborCost, color: colors.teal, label: 'Labor' },
     { value: metrics.extras, color: colors.purple, label: 'Extras' },
     { value: metrics.dealerFeeCost, color: colors.amber, label: 'Dealer' },
     { value: metrics.contractorFeeCost, color: colors.pink, label: 'Contractor' },
-    { value: metrics.commissionCost, color: colors.indigo, label: 'Commission' },
+    { value: metrics.commissionCost, color: colors.green, label: 'Commission' },
     { value: metrics.marketingFeeCost, color: colors.cyan, label: 'Marketing' },
   ];
   
-  // Background bar
-  doc.setFillColor(...colors.pageBg);
-  doc.roundedRect(margin + 10, barY, barW, barH, 4, 4, 'F');
+  // Background
+  doc.setFillColor(...colors.slate100);
+  doc.roundedRect(margin + 10, barY, barW, barH, 5, 5, 'F');
   
-  // Draw stacked segments
+  // Draw segments
   let barX = margin + 10;
   const activeCosts = allCosts.filter(c => c.value > 0);
   activeCosts.forEach((cost, i) => {
@@ -438,18 +332,13 @@ export const generateProfitCalculatorPDF = (dealData, dealNumber, productName = 
       const segW = (cost.value / metrics.totalCosts) * barW;
       doc.setFillColor(...cost.color);
       
-      // First segment - rounded left
       if (i === 0) {
-        doc.roundedRect(barX, barY, segW + 2, barH, 4, 4, 'F');
-        doc.rect(barX + segW - 2, barY, 4, barH, 'F');
-      } 
-      // Last segment - rounded right
-      else if (i === activeCosts.length - 1) {
-        doc.roundedRect(barX - 2, barY, segW + 2, barH, 4, 4, 'F');
-        doc.rect(barX - 2, barY, 4, barH, 'F');
-      } 
-      // Middle segments
-      else {
+        doc.roundedRect(barX, barY, segW + 3, barH, 5, 5, 'F');
+        doc.rect(barX + segW - 3, barY, 6, barH, 'F');
+      } else if (i === activeCosts.length - 1) {
+        doc.roundedRect(barX - 3, barY, segW + 3, barH, 5, 5, 'F');
+        doc.rect(barX - 3, barY, 6, barH, 'F');
+      } else {
         doc.rect(barX, barY, segW, barH, 'F');
       }
       barX += segW;
@@ -458,14 +347,14 @@ export const generateProfitCalculatorPDF = (dealData, dealNumber, productName = 
   
   // Legend
   let legendX = margin + 10;
-  const legendY = y + 30;
+  const legendY = y + 35;
   activeCosts.forEach((cost) => {
     doc.setFillColor(...cost.color);
     doc.roundedRect(legendX, legendY, 6, 4, 1, 1, 'F');
     
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.textSecondary);
+    doc.setTextColor(...colors.slate500);
     const pctStr = `${cost.label} ${((cost.value / metrics.totalCosts) * 100).toFixed(0)}%`;
     doc.text(pctStr, legendX + 8, legendY + 3);
     legendX += doc.getTextWidth(pctStr) + 14;
@@ -474,115 +363,147 @@ export const generateProfitCalculatorPDF = (dealData, dealNumber, productName = 
   y += distH + 8;
 
   // ══════════════════════════════════════════════════════════════════════
-  // SUMMARY CARD - Clean equation display
+  // PROFIT MARGIN GAUGE
   // ══════════════════════════════════════════════════════════════════════
-  const summaryH = 24;
+  const gaugeH = 50;
   
-  doc.setFillColor(...colors.blueSoft);
-  doc.roundedRect(margin, y, contentWidth, summaryH, 3, 3, 'F');
+  doc.setFillColor(...colors.white);
+  doc.setDrawColor(...colors.slate200);
+  doc.roundedRect(margin, y, contentWidth, gaugeH, 4, 4, 'FD');
   
-  const summaryItems = [
-    { value: formatCurrency(metrics.dealSize), label: 'Revenue', color: colors.textPrimary },
+  // Gauge on left
+  const gaugeCX = margin + 45;
+  const gaugeCY = y + 38;
+  const gaugeR = 25;
+  
+  // Background arc
+  doc.setDrawColor(...colors.slate200);
+  doc.setLineWidth(5);
+  for (let i = 0; i < 60; i++) {
+    const angle1 = Math.PI + (i / 60) * Math.PI;
+    const angle2 = Math.PI + ((i + 1) / 60) * Math.PI;
+    doc.line(
+      gaugeCX + gaugeR * Math.cos(angle1), gaugeCY + gaugeR * Math.sin(angle1),
+      gaugeCX + gaugeR * Math.cos(angle2), gaugeCY + gaugeR * Math.sin(angle2)
+    );
+  }
+  
+  // Progress arc
+  const marginPct = Math.min(100, Math.max(0, metrics.profitMargin * 2));
+  const progressColor = metrics.profitMargin >= 20 ? colors.green : 
+                        metrics.profitMargin >= 10 ? colors.amber : colors.red;
+  doc.setDrawColor(...progressColor);
+  doc.setLineWidth(5);
+  const segments = Math.floor((marginPct / 100) * 60);
+  for (let i = 0; i < segments; i++) {
+    const angle1 = Math.PI + (i / 60) * Math.PI;
+    const angle2 = Math.PI + ((i + 1) / 60) * Math.PI;
+    doc.line(
+      gaugeCX + gaugeR * Math.cos(angle1), gaugeCY + gaugeR * Math.sin(angle1),
+      gaugeCX + gaugeR * Math.cos(angle2), gaugeCY + gaugeR * Math.sin(angle2)
+    );
+  }
+  
+  // Center text
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...progressColor);
+  doc.text(`${metrics.profitMargin.toFixed(1)}%`, gaugeCX, gaugeCY - 5, { align: 'center' });
+  
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colors.slate500);
+  doc.text('Margin', gaugeCX, gaugeCY + 3, { align: 'center' });
+  
+  // Right side - Analysis
+  const rightX = margin + 90;
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.slate800);
+  doc.text('Profit Analysis', rightX, y + 16);
+  
+  // Status badge
+  let statusText = '';
+  let statusBg = colors.green;
+  if (metrics.profitMargin >= 25) { statusText = 'Excellent'; statusBg = colors.green; }
+  else if (metrics.profitMargin >= 15) { statusText = 'Good'; statusBg = colors.indigo; }
+  else if (metrics.profitMargin >= 5) { statusText = 'Moderate'; statusBg = colors.amber; }
+  else { statusText = 'Low'; statusBg = colors.red; }
+  
+  doc.setFillColor(...statusBg);
+  doc.roundedRect(rightX, y + 20, 28, 7, 3, 3, 'F');
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.white);
+  doc.text(statusText, rightX + 14, y + 25, { align: 'center' });
+  
+  // Summary
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colors.slate600);
+  doc.text(`Revenue: ${formatCurrency(metrics.dealSize)}`, rightX, y + 36);
+  doc.text(`Costs: ${formatCurrency(metrics.totalCosts)}`, rightX + 50, y + 36);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...progressColor);
+  doc.text(`Profit: ${formatCurrency(metrics.grossProfit)}`, rightX, y + 44);
+  
+  y += gaugeH + 8;
+
+  // ══════════════════════════════════════════════════════════════════════
+  // FINANCIAL SUMMARY CARD
+  // ══════════════════════════════════════════════════════════════════════
+  const summaryH = 28;
+  
+  doc.setFillColor(...colors.slate800);
+  doc.roundedRect(margin, y, contentWidth, summaryH, 4, 4, 'F');
+  
+  const sumItems = [
+    { value: formatCurrency(metrics.dealSize), label: 'Revenue', color: colors.white },
     { value: '−', isOp: true },
     { value: formatCurrency(metrics.totalCosts), label: 'Costs', color: colors.amber },
     { value: '=', isOp: true },
-    { value: formatCurrency(metrics.grossProfit), label: 'Profit', color: metrics.grossProfit >= 0 ? colors.green : colors.red },
+    { value: formatCurrency(metrics.grossProfit), label: 'Profit', color: metrics.grossProfit >= 0 ? colors.emerald : colors.red },
   ];
   
-  const itemW = contentWidth / 5;
-  summaryItems.forEach((item, i) => {
-    const itemX = margin + itemW * i + itemW / 2;
+  const itemWidth = contentWidth / 5;
+  sumItems.forEach((item, i) => {
+    const itemX = margin + itemWidth * i + itemWidth / 2;
     
     if (item.isOp) {
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...colors.textMuted);
-      doc.text(item.value, itemX, y + 14, { align: 'center' });
+      doc.setTextColor(...colors.slate400);
+      doc.text(item.value, itemX, y + 16, { align: 'center' });
     } else {
-      doc.setFontSize(12);
+      doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...item.color);
-      doc.text(item.value, itemX, y + 12, { align: 'center' });
+      doc.text(item.value, itemX, y + 14, { align: 'center' });
       
-      doc.setFontSize(6);
+      doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...colors.textMuted);
-      doc.text(item.label, itemX, y + 18, { align: 'center' });
+      doc.setTextColor(...colors.slate400);
+      doc.text(item.label, itemX, y + 22, { align: 'center' });
     }
   });
-  
-  y += summaryH + 8;
-
-  // ══════════════════════════════════════════════════════════════════════
-  // INSIGHT CALLOUT
-  // ══════════════════════════════════════════════════════════════════════
-  const insightH = 20;
-  
-  let insightBg, insightBorder, insightIcon;
-  if (metrics.profitMargin >= 15) {
-    insightBg = colors.greenSoft;
-    insightBorder = colors.green;
-    insightIcon = '✓';
-  } else if (metrics.profitMargin >= 5) {
-    insightBg = colors.amberSoft;
-    insightBorder = colors.amber;
-    insightIcon = '!';
-  } else {
-    insightBg = colors.redSoft;
-    insightBorder = colors.red;
-    insightIcon = '!';
-  }
-  
-  doc.setFillColor(...insightBg);
-  doc.roundedRect(margin, y, contentWidth, insightH, 3, 3, 'F');
-  
-  // Left accent bar
-  doc.setFillColor(...insightBorder);
-  doc.roundedRect(margin, y, 3, insightH, 2, 2, 'F');
-  
-  // Icon
-  doc.setFillColor(...insightBorder);
-  doc.circle(margin + 14, y + insightH / 2, 4, 'F');
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 255, 255);
-  doc.text(insightIcon, margin + 14, y + insightH / 2 + 2, { align: 'center' });
-  
-  // Insight text
-  let insight = '';
-  if (metrics.profitMargin >= 25) {
-    insight = 'Excellent profitability. This deal delivers strong returns with healthy margins.';
-  } else if (metrics.profitMargin >= 15) {
-    insight = 'Good profit margin. Consider optimizing variable costs for even better results.';
-  } else if (metrics.profitMargin >= 5) {
-    insight = 'Moderate margin. Review fees and costs to improve profitability.';
-  } else if (metrics.profitMargin >= 0) {
-    insight = 'Low margin warning. Cost reduction or price adjustment recommended.';
-  } else {
-    insight = 'Negative margin. This deal results in a loss — restructuring required.';
-  }
-  
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.textSecondary);
-  doc.text(insight, margin + 24, y + insightH / 2 + 2);
 
   // ══════════════════════════════════════════════════════════════════════
   // FOOTER
   // ══════════════════════════════════════════════════════════════════════
   const footerY = pageHeight - margin - 4;
   
-  doc.setDrawColor(...colors.cardBorder);
+  doc.setDrawColor(...colors.slate300);
   doc.setLineWidth(0.3);
   doc.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
   
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.textMuted);
+  doc.setTextColor(...colors.slate400);
   doc.text('Generated by Profit Calculator', margin, footerY);
   doc.text(dateStr, pageWidth - margin, footerY, { align: 'right' });
 
-  // Save the PDF
+  // Save
   const fileName = `profit-analysis-${productName.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(fileName);
 };
