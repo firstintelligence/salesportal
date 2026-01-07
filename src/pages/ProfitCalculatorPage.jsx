@@ -7,21 +7,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Import product images
-import heatPumpImg from "@/assets/product-heat-pump.png";
-import furnaceImg from "@/assets/product-furnace.png";
-import tanklessImg from "@/assets/product-tankless.png";
-import waterHeaterImg from "@/assets/product-water-heater.png";
-import insulationImg from "@/assets/product-insulation.png";
+// Import product images - brand-specific
+import heatPumpImg from "@/assets/product-heat-pump-trane.png";
+import furnaceImg from "@/assets/product-furnace-lennox.png";
+import tanklessImg from "@/assets/product-tankless-navien.png";
+import waterHeaterImg from "@/assets/product-water-heater-bradford.png";
+import rheemProterraImg from "@/assets/product-rheem-proterra.png";
+import insulationImg from "@/assets/product-attic-insulation.png";
 
-// Product images mapping
+// Product images mapping with specific product overrides
 const productImages = {
   'heat-pump': heatPumpImg,
   'furnace': furnaceImg,
   'tankless': tanklessImg,
   'water-heater': waterHeaterImg,
+  'rheem-proterra': rheemProterraImg,
   'insulation': insulationImg,
   'custom': null,
+};
+
+// Function to get product image based on preset id and category
+const getProductImage = (presetId, category) => {
+  // Check for specific product overrides first
+  if (presetId === 'rheem-proterra') {
+    return rheemProterraImg;
+  }
+  // Fall back to category-based image
+  return productImages[category] || null;
 };
 
 // Product presets with cost breakdowns and image categories
@@ -239,8 +251,8 @@ const MobileComparison = ({ deal1, setDeal1, deal2, setDeal2 }) => {
 
   const preset1 = productPresets.find(p => p.id === deal1.productPreset);
   const preset2 = productPresets.find(p => p.id === deal2.productPreset);
-  const image1 = preset1 ? productImages[preset1.category] : null;
-  const image2 = preset2 ? productImages[preset2.category] : null;
+  const image1 = preset1 ? getProductImage(preset1.id, preset1.category) : null;
+  const image2 = preset2 ? getProductImage(preset2.id, preset2.category) : null;
 
   return (
     <Card className="md:hidden">
@@ -287,15 +299,16 @@ const MobileComparison = ({ deal1, setDeal1, deal2, setDeal2 }) => {
             <span></span>
             <div className="flex justify-center">
               {image1 ? (
-                <div className="w-14 h-14 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
-                  <img src={image1} alt={preset1?.name || 'Product'} className="w-full h-full object-contain p-0.5" />
-                </div>
+                <img src={image1} alt={preset1?.name || 'Product'} className="w-14 h-14 object-contain" />
               ) : <div className="w-14 h-14" />}
             </div>
             <div className="flex justify-center">
               {image2 ? (
-                <div className="w-14 h-14 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
-                  <img src={image2} alt={preset2?.name || 'Product'} className="w-full h-full object-contain p-0.5" />
+                <img src={image2} alt={preset2?.name || 'Product'} className="w-14 h-14 object-contain" />
+              ) : <div className="w-14 h-14" />}
+            </div>
+          </div>
+        )}
                 </div>
               ) : <div className="w-14 h-14" />}
             </div>
@@ -399,7 +412,7 @@ const DealCalculator = ({ dealNumber, dealData, setDealData, productPresets }) =
   };
 
   const selectedPreset = productPresets.find(p => p.id === dealData.productPreset);
-  const productImage = selectedPreset ? productImages[selectedPreset.category] : null;
+  const productImage = selectedPreset ? getProductImage(selectedPreset.id, selectedPreset.category) : null;
 
   const handleGeneratePDF = () => {
     const productName = selectedPreset?.name || 'Custom Deal';
@@ -456,13 +469,11 @@ const DealCalculator = ({ dealNumber, dealData, setDealData, productPresets }) =
         {/* Product Image */}
         {productImage && (
           <div className="flex justify-center py-2">
-            <div className="w-24 h-24 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-border/50">
-              <img 
-                src={productImage} 
-                alt={selectedPreset?.name || 'Product'} 
-                className="w-full h-full object-contain p-1"
-              />
-            </div>
+            <img 
+              src={productImage} 
+              alt={selectedPreset?.name || 'Product'} 
+              className="w-24 h-24 object-contain"
+            />
           </div>
         )}
 
