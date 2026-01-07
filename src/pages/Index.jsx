@@ -119,7 +119,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     phone: "", 
     address: "", 
     city: "", 
-    province: "", 
+    province: "ON", 
     postalCode: "",
     coApplicantName: "",
     coApplicantPhone: ""
@@ -173,7 +173,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     return [{ id: crypto.randomUUID(), quantity: 1, amount: 0, total: 0, name: "", description: "", productId: "" }];
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [taxPercentage, settaxPercentage] = useState(0);
+  const [taxPercentage, settaxPercentage] = useState(13); // Default to Ontario HST 13%
   const [taxAmount, setTaxAmount] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
