@@ -279,6 +279,26 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           tenantCompanyInfo.invoicePrefix
         ),
       }));
+      
+      // Load items from preloadedInvoiceProfile if available (full product configuration from DB)
+      if (preloadedInvoiceProfile?.items && preloadedInvoiceProfile.items.length > 0) {
+        const itemsWithIds = preloadedInvoiceProfile.items.map(item => ({
+          ...item,
+          id: item.id || crypto.randomUUID()
+        }));
+        setItems(itemsWithIds);
+        
+        // Also restore financing data if available
+        if (preloadedInvoiceProfile.financing) {
+          setFinancing(prev => ({
+            ...prev,
+            ...preloadedInvoiceProfile.financing
+          }));
+        }
+      }
+      
+      // Update tax based on customer province
+      settaxPercentage(getProvincialTax(preloadedCustomer.province || 'ON'));
       return;
     }
 
@@ -713,6 +733,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       const simplifiedProducts = getSimplifiedProductList(items);
 
       // Create TPV request with invoice data (draft status)
+      // Include full items_json for complete product configuration restoration
       const tpvData = {
         customer_id: customerId,
         tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
@@ -736,7 +757,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           financing.interestRate || 0,
           financing.amortizationPeriod
         ).toString() : null,
-        status: 'draft'
+        status: 'draft',
+        items_json: items // Store full product configuration (quantity, amount, description, etc.)
       };
 
       // Check if draft TPV exists for this customer

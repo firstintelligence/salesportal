@@ -339,6 +339,7 @@ export type Database = {
           first_name: string | null
           id: string
           interest_rate: string | null
+          items_json: Json | null
           last_name: string | null
           monthly_payment: string | null
           postal_code: string | null
@@ -367,6 +368,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           interest_rate?: string | null
+          items_json?: Json | null
           last_name?: string | null
           monthly_payment?: string | null
           postal_code?: string | null
@@ -395,6 +397,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           interest_rate?: string | null
+          items_json?: Json | null
           last_name?: string | null
           monthly_payment?: string | null
           postal_code?: string | null
