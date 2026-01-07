@@ -81,7 +81,8 @@ const DashboardPage = () => {
             products,
             sales_price,
             status,
-            created_at
+            created_at,
+            updated_at
           )
         `)
         .eq("tenant_id", tenantId) // CRITICAL: Filter by tenant for data isolation
@@ -474,7 +475,11 @@ const DashboardPage = () => {
           <TooltipProvider delayDuration={300}>
             <div className="space-y-3">
               {filteredDeals.map((customer, index) => {
-                const latestTpv = customer.tpv_requests?.[0];
+                // Get the most recently updated TPV request
+                const sortedTpvRequests = [...(customer.tpv_requests || [])].sort((a, b) => 
+                  new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
+                );
+                const latestTpv = sortedTpvRequests[0];
                 const displayAgent = agentId === "MM23" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
                 const fullName = customer.first_name && customer.last_name 
                   ? `${customer.first_name} ${customer.last_name}`
