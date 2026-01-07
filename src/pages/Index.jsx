@@ -151,12 +151,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     manufacturerRebate: 0
   });
   const [yourCompany, setYourCompany] = useState({
-    name: tenantCompanyInfo?.name || "",
-    address: tenantCompanyInfo?.address || "",
-    phone: tenantCompanyInfo?.phone || "",
-    email: tenantCompanyInfo?.email || "",
-    logo: tenantLogo || null,
-    logoSize: tenantLogoSize || 'h-12'
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    logo: null,
+    logoSize: 'h-12'
   });
   const [items, setItems] = useState(() => {
     if (preloadedCalculatorData?.purchaseAmount) {
@@ -1156,7 +1156,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                                 rebatesIncentives,
                                 yourCompany: {
                                   ...yourCompany,
-                                  logoSize: tenantLogoSize // Always use fresh tenant logo size
+                                  // CRITICAL: Always compute fresh logo size from tenant to prevent stale values
+                                  logo: tenantSlug ? getTenantLogo(tenantSlug) : yourCompany.logo,
+                                  logoSize: tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : yourCompany.logoSize
                                 },
                                 isInvoice,
                                 subTotal,
