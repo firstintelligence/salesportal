@@ -46,19 +46,47 @@ const InvoiceGeneratorPage = () => {
         }
 
         if (tpvData?.items_json) {
-          // Ensure each item has a unique ID for React reconciliation
-          const itemsWithIds = tpvData.items_json.map(item => ({
-            ...item,
-            id: item.id || crypto.randomUUID()
-          }));
-          setLoadedItems({
-            items: itemsWithIds,
-            financing: {
-              interestRate: parseFloat(tpvData.interest_rate) || 0,
-              loanTerm: parseInt(tpvData.promotional_term) || 24,
-              amortizationPeriod: parseInt(tpvData.amortization) || 180
-            }
-          });
+          const savedConfig = tpvData.items_json;
+          
+          // Handle both old format (array of items) and new format (object with items + financing)
+          if (Array.isArray(savedConfig)) {
+            // Old format: items_json is just an array of items
+            const itemsWithIds = savedConfig.map(item => ({
+              ...item,
+              id: item.id || crypto.randomUUID()
+            }));
+            setLoadedItems({
+              items: itemsWithIds,
+              financing: {
+                financeCompany: 'Financeit Canada Inc.',
+                loanAmount: 0,
+                interestRate: parseFloat(tpvData.interest_rate) || 0,
+                loanTerm: parseInt(tpvData.promotional_term) || 24,
+                amortizationPeriod: parseInt(tpvData.amortization) || 180
+              }
+            });
+          } else {
+            // New format: items_json contains { items, financing, ... }
+            const itemsWithIds = (savedConfig.items || []).map(item => ({
+              ...item,
+              id: item.id || crypto.randomUUID()
+            }));
+            setLoadedItems({
+              items: itemsWithIds,
+              financing: {
+                financeCompany: savedConfig.financing?.financeCompany || 'Financeit Canada Inc.',
+                loanAmount: savedConfig.financing?.loanAmount || 0,
+                interestRate: savedConfig.financing?.interestRate || parseFloat(tpvData.interest_rate) || 0,
+                loanTerm: savedConfig.financing?.loanTerm || parseInt(tpvData.promotional_term) || 24,
+                amortizationPeriod: savedConfig.financing?.amortizationPeriod || parseInt(tpvData.amortization) || 180
+              },
+              rebatesIncentives: savedConfig.rebatesIncentives || null,
+              subTotal: savedConfig.subTotal,
+              taxAmount: savedConfig.taxAmount,
+              taxPercentage: savedConfig.taxPercentage,
+              grandTotal: savedConfig.grandTotal
+            });
+          }
         }
       } catch (err) {
         console.error("Error loading items from database:", err);
