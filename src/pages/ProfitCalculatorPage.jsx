@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Calculator, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calculator, TrendingUp, FileDown } from "lucide-react";
+import { generateProfitCalculatorPDF } from "@/utils/profitCalculatorPDFGenerator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -379,7 +380,7 @@ const CompactField = ({ label, value, onChange, prefix, suffix, small }) => (
   </div>
 );
 
-const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
+const DealCalculator = ({ dealNumber, dealData, setDealData, productPresets }) => {
   const handlePresetChange = (presetId) => {
     const preset = productPresets.find(p => p.id === presetId);
     if (preset) {
@@ -399,6 +400,11 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
 
   const selectedPreset = productPresets.find(p => p.id === dealData.productPreset);
   const productImage = selectedPreset ? productImages[selectedPreset.category] : null;
+
+  const handleGeneratePDF = () => {
+    const productName = selectedPreset?.name || 'Custom Deal';
+    generateProfitCalculatorPDF(dealData, dealNumber, productName);
+  };
 
   // Calculate costs with safe number conversion
   const dealSize = safeNumber(dealData.dealSize);
@@ -571,6 +577,17 @@ const DealCalculator = ({ dealNumber, dealData, setDealData }) => {
             </span>
           </div>
         </div>
+
+        {/* Generate PDF Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleGeneratePDF}
+          className="w-full flex items-center justify-center gap-2 text-primary hover:bg-primary/10"
+        >
+          <FileDown className="w-4 h-4" />
+          Generate PDF Report
+        </Button>
       </CardContent>
     </Card>
   );
@@ -623,9 +640,9 @@ const ProfitCalculatorPage = () => {
         
         {/* Desktop View - 3 cards */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-          <DealCalculator dealNumber={1} dealData={deal1} setDealData={setDeal1} />
-          <DealCalculator dealNumber={2} dealData={deal2} setDealData={setDeal2} />
-          <DealCalculator dealNumber={3} dealData={deal3} setDealData={setDeal3} />
+          <DealCalculator dealNumber={1} dealData={deal1} setDealData={setDeal1} productPresets={productPresets} />
+          <DealCalculator dealNumber={2} dealData={deal2} setDealData={setDeal2} productPresets={productPresets} />
+          <DealCalculator dealNumber={3} dealData={deal3} setDealData={setDeal3} productPresets={productPresets} />
         </div>
       </main>
     </div>
