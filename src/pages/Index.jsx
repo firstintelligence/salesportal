@@ -1100,7 +1100,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               ref={previewContainerRef}
               className="bg-gray-200 rounded border border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
             >
-              <div className="p-4 w-full flex flex-col items-center gap-6">
+              <div className="p-4 w-full flex flex-col items-center gap-6" style={{ maxWidth: '100%' }}>
                 {(() => {
                   const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
                   const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
@@ -1124,14 +1124,17 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                   const scaledHeight = pageHeight * previewScale;
                   
                   return Array.from({ length: numberOfPages }, (_, pageIndex) => {
-                    return (
-                      <div key={pageIndex} className="relative">
-                        {/* Page container sized to exact 8.5x11 proportions */}
-                        <div 
-                          className="relative bg-white shadow-xl border border-gray-300 rounded-sm" 
-                          style={{ 
-                            width: `${scaledWidth}px`,
-                            height: `${scaledHeight}px`,
+                      return (
+                        <div key={pageIndex} className="relative" style={{ maxWidth: '100%' }}>
+                          {/* Page container sized to exact 8.5x11 proportions */}
+                          <div 
+                            className="relative bg-white shadow-xl border border-gray-300 rounded-sm overflow-hidden" 
+                            style={{ 
+                              width: `${scaledWidth}px`,
+                              maxWidth: '100%',
+                              height: `${scaledHeight}px`,
+                            }}
+                          >
                           }}
                         >
                           {/* Scaling wrapper */}
