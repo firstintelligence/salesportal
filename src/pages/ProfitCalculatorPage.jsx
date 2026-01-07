@@ -309,11 +309,6 @@ const MobileComparison = ({ deal1, setDeal1, deal2, setDeal2 }) => {
             </div>
           </div>
         )}
-                </div>
-              ) : <div className="w-14 h-14" />}
-            </div>
-          </div>
-        )}
 
         {/* Fixed Costs */}
         <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
