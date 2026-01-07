@@ -1146,34 +1146,40 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                               width: `${pageWidth}px`,
                             }}
                           >
-                            <InvoiceTemplate
-                              data={{
-                                invoice,
-                                billTo,
-                                shipTo,
-                                items,
-                                financing,
-                                rebatesIncentives,
-                                yourCompany: {
-                                  ...yourCompany,
-                                  // CRITICAL: Always compute fresh logo size from tenant to prevent stale values
-                                  logo: tenantSlug ? getTenantLogo(tenantSlug) : yourCompany.logo,
-                                  logoSize: tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : yourCompany.logoSize
-                                },
-                                isInvoice,
-                                subTotal,
-                                grandTotal,
-                                taxAmount,
-                                taxPercentage,
-                                notes,
-                                selectedCurrency,
-                                pageNumber: pageIndex + 1,
-                                totalPages: numberOfPages,
-                                signature: savedSignatureDataUrl,
-                                coApplicantSignature: coApplicantSignatureDataUrl,
-                              }}
-                              templateNumber={4}
-                            />
+                            {(() => {
+                              const computedLogoSize = tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : yourCompany.logoSize;
+                              const computedLogo = tenantSlug ? getTenantLogo(tenantSlug) : yourCompany.logo;
+                              console.log('DEBUG Invoice preview:', { tenantSlug, computedLogoSize, computedLogo, yourCompanyLogoSize: yourCompany.logoSize });
+                              return (
+                                <InvoiceTemplate
+                                  data={{
+                                    invoice,
+                                    billTo,
+                                    shipTo,
+                                    items,
+                                    financing,
+                                    rebatesIncentives,
+                                    yourCompany: {
+                                      ...yourCompany,
+                                      logo: computedLogo,
+                                      logoSize: computedLogoSize
+                                    },
+                                    isInvoice,
+                                    subTotal,
+                                    grandTotal,
+                                    taxAmount,
+                                    taxPercentage,
+                                    notes,
+                                    selectedCurrency,
+                                    pageNumber: pageIndex + 1,
+                                    totalPages: numberOfPages,
+                                    signature: savedSignatureDataUrl,
+                                    coApplicantSignature: coApplicantSignatureDataUrl,
+                                  }}
+                                  templateNumber={4}
+                                />
+                              );
+                            })()}
                           </div>
                           {/* Page indicator - only show if multiple pages */}
                           {numberOfPages > 1 && (
