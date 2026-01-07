@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Import product images - brand-specific
-import heatPumpImg from "@/assets/product-heat-pump-trane.png";
+import heatPumpImg from "@/assets/product-heat-pump-kinghome.png";
 import furnaceImg from "@/assets/product-furnace-lennox.png";
 import tanklessImg from "@/assets/product-tankless-navien.png";
 import waterHeaterImg from "@/assets/product-water-heater-bradford.png";
