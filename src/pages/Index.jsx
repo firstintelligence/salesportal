@@ -1135,8 +1135,6 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                               height: `${scaledHeight}px`,
                             }}
                           >
-                          }}
-                        >
                           {/* Scaling wrapper */}
                           <div
                             style={{
