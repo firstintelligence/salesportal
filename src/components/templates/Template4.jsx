@@ -14,6 +14,27 @@ const SIGNATURE_STYLE = {
   objectFit: 'contain'
 };
 
+// Helper to convert Tailwind height class to CSS value
+// This is needed because Tailwind can't dynamically generate arbitrary value classes at runtime
+const getLogoHeight = (logoSize) => {
+  if (!logoSize) return '4rem'; // default h-16
+  // Handle arbitrary values like h-[8.6rem]
+  if (logoSize.includes('[')) {
+    return logoSize.replace('h-[', '').replace(']', '');
+  }
+  // Handle standard Tailwind height classes
+  const heightMap = {
+    'h-8': '2rem',
+    'h-10': '2.5rem',
+    'h-12': '3rem',
+    'h-14': '3.5rem',
+    'h-16': '4rem',
+    'h-20': '5rem',
+    'h-24': '6rem',
+  };
+  return heightMap[logoSize] || '4rem';
+};
+
 const Template4 = ({ data, showTermsAndConditions = true }) => {
   const { 
     billTo = {}, 
@@ -110,9 +131,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                   </span>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 {yourCompany.logo && (
-                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className={`${yourCompany.logoSize || 'h-16'} mb-1 ml-auto object-contain`} />
+                  <img 
+                    src={yourCompany.logo} 
+                    alt={yourCompany.name || "Company Logo"} 
+                    className="mb-1 ml-auto object-contain"
+                    style={{ height: getLogoHeight(yourCompany.logoSize) }}
+                  />
                 )}
               </div>
             </div>
@@ -353,9 +379,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                   <span className="font-semibold">Customer:</span> {customerName}
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 {yourCompany.logo && (
-                  <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className={`${yourCompany.logoSize || 'h-16'} mb-1 ml-auto object-contain`} />
+                  <img 
+                    src={yourCompany.logo} 
+                    alt={yourCompany.name || "Company Logo"} 
+                    className="mb-1 ml-auto object-contain"
+                    style={{ height: getLogoHeight(yourCompany.logoSize) }}
+                  />
                 )}
               </div>
             </div>
@@ -432,9 +463,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <span className="font-semibold">Customer:</span> {customerName}
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex-shrink-0">
               {yourCompany.logo && (
-                <img src={yourCompany.logo} alt={yourCompany.name || "Company Logo"} className={`${yourCompany.logoSize || 'h-16'} mb-1 ml-auto object-contain`} />
+                <img 
+                  src={yourCompany.logo} 
+                  alt={yourCompany.name || "Company Logo"} 
+                  className="mb-1 ml-auto object-contain"
+                  style={{ height: getLogoHeight(yourCompany.logoSize) }}
+                />
               )}
             </div>
           </div>
