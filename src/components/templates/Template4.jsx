@@ -296,9 +296,9 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
 
         {/* Signature Section - On every page (page 1 for first page) */}
         {isFirstPage && (
-          <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
+        <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
             <div className="flex gap-8 mb-2" style={{marginLeft: '60px'}}>
-              <div style={{flex: '1'}}>
+              <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-1 flex items-center h-[120px]">
@@ -311,7 +311,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '1'}}>
+                <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-1 flex items-center h-[120px]">
@@ -379,7 +379,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
 
             {/* Signature Section on Page 2 (Terms & Conditions) */}
             <div className="flex gap-8 mt-8" style={{marginLeft: '60px'}}>
-              <div style={{flex: '1'}}>
+              <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                 <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[120px]">
@@ -392,7 +392,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '1'}}>
+                <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                   <h3 className="text-sm font-semibold mb-2" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[120px]">
@@ -440,9 +440,9 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
 
         {/* Signature Section - On continuation pages (not first, not last with T&C) */}
         {!isFirstPage && !isLastPage && (
-          <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
+        <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
             <div className="flex gap-8 mb-2" style={{marginLeft: '60px'}}>
-              <div style={{flex: '1'}}>
+              <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                 <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
                   <div className="mb-1 flex items-center h-[120px]">
@@ -455,7 +455,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '1'}}>
+                <div style={{flex: '0 0 auto', minWidth: '200px', maxWidth: '350px'}}>
                   <h3 className="text-xs font-semibold mb-1" style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
                     <div className="mb-1 flex items-center h-[120px]">
