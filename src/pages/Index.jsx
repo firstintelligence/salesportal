@@ -353,7 +353,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       }));
       settaxPercentage(getProvincialTax('ON')); // Default to Ontario
     }
-  }, [preloadedCustomer, formDataKey, tenantCompanyInfo, tenantLogo]);
+  }, [preloadedCustomer, formDataKey, tenantCompanyInfo, tenantLogo, tenantLogoSize]);
 
   useEffect(() => {
     // CRITICAL: Only save when tenant is loaded to prevent cross-tenant data
@@ -559,9 +559,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       number: generateRandomInvoiceNumber(),
     });
     setYourCompany({
-      name: "Your Company",
-      address: "789 Oak St, Businessville, USA",
-      phone: "(555) 555-5555",
+      name: tenantCompanyInfo?.name || "Your Company",
+      address: tenantCompanyInfo?.address || "789 Oak St, Businessville, USA",
+      phone: tenantCompanyInfo?.phone || "(555) 555-5555",
+      email: tenantCompanyInfo?.email || "",
+      logo: tenantLogo,
+      logoSize: tenantLogoSize
     });
     setItems([
       {
