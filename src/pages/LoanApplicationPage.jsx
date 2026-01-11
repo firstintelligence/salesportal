@@ -24,14 +24,18 @@ import { cn } from "@/lib/utils";
 import AddressAutocomplete from "../components/AddressAutocomplete";
 import { capitalizeWords, formatPostalCode, formatPhoneNumber } from "@/utils/inputFormatting";
 import { recordDocumentSignature } from "@/utils/signingLocationService";
+import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 
 
 const LoanApplicationPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { tenant } = useTenant();
   const customer = location.state?.customer;
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
+  const [createdCustomerId, setCreatedCustomerId] = useState(customer?.id || null);
   
   const formatLocalDate = (date) => {
     if (!date) return "";
@@ -523,7 +527,6 @@ const LoanApplicationPage = () => {
       let documentUrl = null;
       
       try {
-        const { supabase } = await import('@/integrations/supabase/client');
         const fileName = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
         const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9\-_.]/g, '_');
         const storagePath = `${documentId}/${sanitizedFileName}`;
@@ -564,15 +567,60 @@ const LoanApplicationPage = () => {
         URL.revokeObjectURL(url);
       }
       
+      // Create customer if not exists (when coming from standalone loan application)
+      let customerId = createdCustomerId;
+      if (!customerId && tenant?.id) {
+        const agentId = localStorage.getItem('agentId');
+        const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '');
+        
+        // Check if customer exists by phone number within the same tenant
+        if (phoneDigits) {
+          const { data: existingCustomer } = await supabase
+            .from("customers")
+            .select("id")
+            .eq("phone", phoneDigits)
+            .eq("tenant_id", tenant.id)
+            .maybeSingle();
+          
+          if (existingCustomer) {
+            customerId = existingCustomer.id;
+          } else {
+            // Create new customer
+            const { data: newCustomer, error: insertError } = await supabase
+              .from("customers")
+              .insert({
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                email: formData.email || null,
+                phone: phoneDigits,
+                address: formData.address,
+                city: formData.city || null,
+                province: formData.province || null,
+                postal_code: formData.postalCode || null,
+                tenant_id: tenant.id,
+                agent_id: agentId,
+              })
+              .select("id")
+              .single();
+            
+            if (!insertError && newCustomer) {
+              customerId = newCustomer.id;
+              setCreatedCustomerId(newCustomer.id);
+              console.log('Created new customer from loan application:', customerId);
+            }
+          }
+        }
+      }
+      
       // Record document signature for the loan application
       try {
         await recordDocumentSignature({
           documentType: 'loan_application',
           documentId: documentId,
-          customerId: customer?.id || null,
+          customerId: customerId || null,
           customerName: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
           agentId: localStorage.getItem('agentId') || 'unknown',
-          tenantId: null,
+          tenantId: tenant?.id || null,
           signatureType: 'customer',
           documentUrl: documentUrl
         });
