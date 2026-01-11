@@ -41,7 +41,7 @@ const ProductListItem = memo(({
   };
 
   return (
-    <div className="bg-white md:border md:border-slate-200 md:rounded-lg p-2 md:p-3 md:shadow-sm">
+    <div className="bg-white md:border md:border-slate-200 md:rounded-lg md:p-3 md:shadow-sm">
       {/* Mobile: Stack layout, Desktop: Single row */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
         {/* Product selector - full width on mobile */}
