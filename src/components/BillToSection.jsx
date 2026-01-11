@@ -24,7 +24,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Bill To</h2>
+      <h2 className="text-lg md:text-2xl font-semibold mb-4">Bill To</h2>
       <div className="grid grid-cols-2 gap-2 md:gap-4">
         <FloatingLabelInput
           id="billToFirstName"
