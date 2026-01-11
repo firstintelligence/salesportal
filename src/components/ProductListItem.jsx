@@ -41,16 +41,16 @@ const ProductListItem = memo(({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
-      {/* Compact main row */}
-      <div className="flex items-center gap-2">
-        {/* Product selector - takes most space */}
-        <div className="flex-1 min-w-0">
+    <div className="bg-white md:border md:border-slate-200 md:rounded-lg p-2 md:p-3 md:shadow-sm">
+      {/* Mobile: Stack layout, Desktop: Single row */}
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
+        {/* Product selector - full width on mobile */}
+        <div className="w-full md:flex-1 md:min-w-0">
           <Select 
             value={item.productId || ''} 
             onValueChange={handleProductSelect}
           >
-            <SelectTrigger className="h-10 bg-slate-50 border-slate-200 text-sm">
+            <SelectTrigger className="h-10 bg-slate-50 border-slate-200 text-sm w-full">
               <SelectValue placeholder="Select product..." />
             </SelectTrigger>
             <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-[300px]">
@@ -78,56 +78,59 @@ const ProductListItem = memo(({
           </Select>
         </div>
 
-        {/* Quantity */}
-        <Input
-          type="number"
-          min="1"
-          value={item.quantity}
-          onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-          className="h-10 w-16 text-center text-sm bg-slate-50 border-slate-200"
-        />
-
-        {/* Price */}
-        <div className="relative w-24">
-          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+        {/* Second row on mobile: Qty, Price, Total, Actions */}
+        <div className="flex items-center gap-2">
+          {/* Quantity */}
           <Input
             type="number"
-            min="0"
-            step="0.01"
-            value={item.amount}
-            onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
-            className="h-10 pl-5 text-sm bg-slate-50 border-slate-200"
+            min="1"
+            value={item.quantity}
+            onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
+            className="h-10 w-14 md:w-16 text-center text-sm bg-slate-50 border-slate-200"
           />
-        </div>
 
-        {/* Total display */}
-        <div className="w-24 h-10 flex items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700">
-          ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </div>
+          {/* Price */}
+          <div className="relative flex-1 md:w-24 md:flex-none">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              value={item.amount}
+              onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
+              className="h-10 pl-5 text-sm bg-slate-50 border-slate-200"
+            />
+          </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-0.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-            onClick={() => setShowDetails(!showDetails)}
-            title="Edit details"
-          >
-            {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-          {!isOnly && (
+          {/* Total display */}
+          <div className="w-20 md:w-24 h-10 flex items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
+            ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-0.5 shrink-0">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => onRemove(index)}
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              onClick={() => setShowDetails(!showDetails)}
+              title="Edit details"
             >
-              <Trash2 className="h-4 w-4" />
+              {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
-          )}
+            {!isOnly && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => onRemove(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
