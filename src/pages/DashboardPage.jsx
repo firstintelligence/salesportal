@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles, Download, PlayCircle, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { formatPhoneNumber, formatPostalCode, capitalizeWords } from "@/utils/inputFormatting";
 import { useTenant } from "@/contexts/TenantContext";
@@ -81,8 +82,15 @@ const DashboardPage = () => {
             products,
             sales_price,
             status,
+            recording_url,
             created_at,
             updated_at
+          ),
+          document_signatures!customer_id(
+            id,
+            document_type,
+            document_url,
+            signed_at
           )
         `)
         .eq("tenant_id", tenantId) // Filter by tenant for data isolation
@@ -484,9 +492,26 @@ const DashboardPage = () => {
                 const salesPrice = formatCurrency(latestTpv?.sales_price);
                 const tpvCompleted = latestTpv?.status?.toLowerCase() === 'completed';
                 const statusConfig = getStatusConfig(latestTpv?.status);
-                // Mock states for loan and checklist - these would come from actual data
-                const loanCompleted = false;
-                const checklistCompleted = false;
+                
+                // Get document signatures for this customer
+                const documentSignatures = customer.document_signatures || [];
+                const loanApplication = documentSignatures.find(d => d.document_type === 'loan_application');
+                const invoiceDocument = documentSignatures.find(d => d.document_type === 'invoice');
+                const tpvRecording = latestTpv?.recording_url;
+                
+                // Determine completion states from actual data
+                const loanCompleted = !!loanApplication?.document_url;
+                const checklistCompleted = false; // TODO: check from installation_checklists table
+                
+                // Document badge click handler
+                const handleDocumentClick = (e, url, type) => {
+                  e.stopPropagation();
+                  if (url) {
+                    window.open(url, '_blank');
+                  } else {
+                    toast.error(`No ${type} available`);
+                  }
+                };
                 
                 return (
                   <Card 
@@ -526,7 +551,7 @@ const DashboardPage = () => {
                       </div>
 
                       {/* Middle Row - Details */}
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                         <div className="flex items-center gap-1.5">
                           <Phone className="w-3.5 h-3.5" />
                           <span className="font-mono text-xs">{formatPhoneNumber(customer.phone)}</span>
@@ -538,9 +563,60 @@ const DashboardPage = () => {
                       </div>
                       
                       {latestTpv?.products && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 bg-muted/50 px-3 py-2 rounded-lg">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 bg-muted/50 px-3 py-2 rounded-lg">
                           <Package className="w-3.5 h-3.5 shrink-0" />
                           <span className="truncate font-medium">{latestTpv.products}</span>
+                        </div>
+                      )}
+
+                      {/* Document Badges - Downloadable files */}
+                      {(tpvRecording || loanCompleted || invoiceDocument?.document_url) && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {tpvRecording && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={(e) => handleDocumentClick(e, tpvRecording, 'TPV recording')}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-medium hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
+                                >
+                                  <PlayCircle className="w-3 h-3" />
+                                  TPV Recording
+                                  <Download className="w-3 h-3" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Download TPV call recording</TooltipContent>
+                            </Tooltip>
+                          )}
+                          {loanCompleted && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={(e) => handleDocumentClick(e, loanApplication?.document_url, 'loan application')}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-medium hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
+                                >
+                                  <CreditCard className="w-3 h-3" />
+                                  Loan App
+                                  <Download className="w-3 h-3" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Download loan application PDF</TooltipContent>
+                            </Tooltip>
+                          )}
+                          {invoiceDocument?.document_url && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={(e) => handleDocumentClick(e, invoiceDocument.document_url, 'invoice')}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors"
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  Invoice
+                                  <Download className="w-3 h-3" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Download invoice PDF</TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
                       )}
 
