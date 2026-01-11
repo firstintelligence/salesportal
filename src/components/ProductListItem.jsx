@@ -107,27 +107,27 @@ const ProductListItem = memo(({
             ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-0.5 shrink-0">
+          {/* Actions - larger on mobile/tablet */}
+          <div className="flex items-center gap-1 md:gap-0.5 shrink-0">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              className="h-11 w-11 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg"
               onClick={() => setShowDetails(!showDetails)}
               title="Edit details"
             >
-              {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showDetails ? <ChevronUp className="h-6 w-6 md:h-4 md:w-4" /> : <ChevronDown className="h-6 w-6 md:h-4 md:w-4" />}
             </Button>
             {!isOnly && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="h-11 w-11 md:h-8 md:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-red-50 md:bg-transparent rounded-lg"
                 onClick={() => onRemove(index)}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-6 w-6 md:h-4 md:w-4" />
               </Button>
             )}
           </div>
