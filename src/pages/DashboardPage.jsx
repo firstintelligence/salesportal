@@ -220,6 +220,9 @@ const DashboardPage = () => {
       case 'loan':
         navigate(`/customer/${customer.id}?action=loan`);
         break;
+      case 'invoice':
+        navigate(`/customer/${customer.id}?action=invoice`);
+        break;
       case 'checklist':
         navigate(`/customer/${customer.id}?action=checklist`);
         break;
@@ -237,7 +240,7 @@ const DashboardPage = () => {
     return fullName.includes(query) || phone.includes(query) || address.includes(query);
   });
 
-  const ActionButton = ({ completed, icon: Icon, label, onClick }) => (
+  const ActionButton = ({ completed, inProgress, icon: Icon, label, onClick }) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
@@ -245,7 +248,9 @@ const DashboardPage = () => {
           className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
             completed 
               ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' 
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105'
+              : inProgress
+                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105'
           }`}
         >
           {completed ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
@@ -510,7 +515,15 @@ const DashboardPage = () => {
                 const tpvRecording = latestTpv?.recording_url;
                 
                 // Determine completion states from actual data
-                const loanCompleted = !!loanApplication?.document_url;
+                // Loan: has document = filled, has signature_type = signed
+                const loanFilled = !!loanApplication?.document_url;
+                const loanSigned = loanFilled && !!loanApplication?.signature_type;
+                const loanCompleted = loanSigned; // For backward compatibility
+                
+                // Invoice: has document = filled, has signature_type = signed
+                const invoiceFilled = !!invoiceDocument?.document_url;
+                const invoiceSigned = invoiceFilled && !!invoiceDocument?.signature_type;
+                
                 const checklistCompleted = false; // TODO: check from installation_checklists table
                 
                 // Document badge click handler
@@ -580,14 +593,15 @@ const DashboardPage = () => {
                       )}
 
                       {/* Document Badges - Downloadable files */}
-                      {(tpvRecording || loanCompleted || invoiceDocument?.document_url) && (
+                      {/* Blue = filled but not signed, Green = signed */}
+                      {(tpvRecording || loanFilled || invoiceFilled) && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {tpvRecording && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button
                                   onClick={(e) => handleDocumentClick(e, tpvRecording, 'TPV recording')}
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-medium hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors"
                                 >
                                   <PlayCircle className="w-3 h-3" />
                                   TPV Recording
@@ -597,34 +611,46 @@ const DashboardPage = () => {
                               <TooltipContent>Download TPV call recording</TooltipContent>
                             </Tooltip>
                           )}
-                          {loanCompleted && (
+                          {loanFilled && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button
                                   onClick={(e) => handleDocumentClick(e, loanApplication?.document_url, 'loan application')}
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-medium hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                                    loanSigned 
+                                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' 
+                                      : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60'
+                                  }`}
                                 >
                                   <CreditCard className="w-3 h-3" />
-                                  Loan App
+                                  Loan App {loanSigned ? '✓' : ''}
                                   <Download className="w-3 h-3" />
                                 </button>
                               </TooltipTrigger>
-                              <TooltipContent>Download loan application PDF</TooltipContent>
+                              <TooltipContent>
+                                {loanSigned ? 'Download signed loan application' : 'Download loan application (unsigned)'}
+                              </TooltipContent>
                             </Tooltip>
                           )}
-                          {invoiceDocument?.document_url && (
+                          {invoiceFilled && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button
                                   onClick={(e) => handleDocumentClick(e, invoiceDocument.document_url, 'invoice')}
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors"
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                                    invoiceSigned 
+                                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' 
+                                      : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60'
+                                  }`}
                                 >
                                   <FileText className="w-3 h-3" />
-                                  Invoice
+                                  Invoice {invoiceSigned ? '✓' : ''}
                                   <Download className="w-3 h-3" />
                                 </button>
                               </TooltipTrigger>
-                              <TooltipContent>Download invoice PDF</TooltipContent>
+                              <TooltipContent>
+                                {invoiceSigned ? 'Download signed invoice' : 'Download invoice (unsigned)'}
+                              </TooltipContent>
                             </Tooltip>
                           )}
                         </div>
@@ -640,10 +666,18 @@ const DashboardPage = () => {
                             onClick={(e) => handleActionClick(e, 'tpv', customer)}
                           />
                           <ActionButton 
-                            completed={loanCompleted}
-                            icon={FileText}
-                            label={loanCompleted ? "Loan Complete" : "Loan Application"}
+                            completed={loanSigned}
+                            inProgress={loanFilled && !loanSigned}
+                            icon={CreditCard}
+                            label={loanSigned ? "Loan Signed" : loanFilled ? "Loan Filled (Unsigned)" : "Loan Application"}
                             onClick={(e) => handleActionClick(e, 'loan', customer)}
+                          />
+                          <ActionButton 
+                            completed={invoiceSigned}
+                            inProgress={invoiceFilled && !invoiceSigned}
+                            icon={FileText}
+                            label={invoiceSigned ? "Invoice Signed" : invoiceFilled ? "Invoice Filled (Unsigned)" : "Generate Invoice"}
+                            onClick={(e) => handleActionClick(e, 'invoice', customer)}
                           />
                           <ActionButton 
                             completed={checklistCompleted}
@@ -656,7 +690,8 @@ const DashboardPage = () => {
                         {/* Progress indicator */}
                         <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1.5 rounded-full">
                           <div className={`w-2 h-2 rounded-full transition-colors ${tpvCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-2 h-2 rounded-full transition-colors ${loanCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors ${loanSigned ? 'bg-emerald-500' : loanFilled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors ${invoiceSigned ? 'bg-emerald-500' : invoiceFilled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
                           <div className={`w-2 h-2 rounded-full transition-colors ${checklistCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
                         </div>
                       </div>
