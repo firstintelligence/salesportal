@@ -78,25 +78,25 @@ const ProductListItem = memo(({
           </Select>
         </div>
 
-        {/* Quantity - compact on mobile */}
+        {/* Quantity - compact on mobile, no spinners */}
         <Input
           type="number"
           min="1"
           value={item.quantity}
           onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-          className="h-10 w-10 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-1"
+          className="h-10 w-8 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
 
-        {/* Price - editable, takes more space on mobile now */}
-        <div className="relative w-20 md:w-24 shrink-0">
-          <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+        {/* Price - editable, larger width on mobile with smaller font */}
+        <div className="relative flex-1 min-w-0 md:flex-none md:w-24 shrink-0">
+          <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] md:text-xs">$</span>
           <Input
             type="number"
             min="0"
             step="0.01"
             value={item.amount}
             onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
-            className="h-10 pl-4 pr-1 text-xs md:text-sm bg-slate-50 border-slate-200"
+            className="h-10 pl-4 pr-1 text-[10px] md:text-sm bg-slate-50 border-slate-200"
           />
         </div>
 
@@ -105,16 +105,16 @@ const ProductListItem = memo(({
           ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
 
-        {/* Details toggle - moved to far right on mobile, delete button hidden here */}
+        {/* Details toggle - smaller on mobile */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="h-9 w-9 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg shrink-0"
+          className="h-9 w-7 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg shrink-0"
           onClick={() => setShowDetails(!showDetails)}
           title="Edit details"
         >
-          {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {showDetails ? <ChevronUp className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <ChevronDown className="h-3.5 w-3.5 md:h-4 md:w-4" />}
         </Button>
         
         {/* Delete button - only shown on desktop inline, on mobile it's in expanded section */}
