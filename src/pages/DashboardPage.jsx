@@ -70,7 +70,7 @@ const DashboardPage = () => {
     try {
       setLoading(true);
       
-      // CRITICAL: Always filter by tenant_id to ensure complete data isolation
+      // CRITICAL: Filter by tenant_id AND agent_id to ensure agents only see their own deals
       let query = supabase
         .from("customers")
         .select(`
@@ -85,18 +85,15 @@ const DashboardPage = () => {
             updated_at
           )
         `)
-        .eq("tenant_id", tenantId) // CRITICAL: Filter by tenant for data isolation
+        .eq("tenant_id", tenantId) // Filter by tenant for data isolation
+        .eq("agent_id", currentAgentId) // Filter by agent - agents only see their own customers
         .order("created_at", { ascending: false });
 
       const { data, error } = await query;
 
       if (error) throw error;
       
-      // Filter by agent_id - agents see only their own customers, admin sees all
-      // Note: RLS policies also enforce this, but we filter here for clarity
-      let filteredData = data || [];
-      
-      setDeals(filteredData);
+      setDeals(data || []);
     } catch (error) {
       console.error("Error fetching deals:", error);
     } finally {
