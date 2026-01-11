@@ -50,7 +50,7 @@ const ProductListItem = memo(({
             value={item.productId || ''} 
             onValueChange={handleProductSelect}
           >
-            <SelectTrigger className="h-10 bg-slate-50 border-slate-200 text-sm w-full">
+            <SelectTrigger className="h-10 bg-slate-50 border-slate-200 text-xs md:text-sm w-full">
               <SelectValue placeholder="Select product..." />
             </SelectTrigger>
             <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-[300px]">
@@ -78,7 +78,7 @@ const ProductListItem = memo(({
           </Select>
         </div>
 
-        {/* Second row on mobile: Qty, Price, Total, Actions */}
+        {/* Second row on mobile: Qty, Price, Actions */}
         <div className="flex items-center gap-2">
           {/* Quantity */}
           <Input
@@ -86,24 +86,24 @@ const ProductListItem = memo(({
             min="1"
             value={item.quantity}
             onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-            className="h-10 w-14 md:w-16 text-center text-sm bg-slate-50 border-slate-200"
+            className="h-10 w-12 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200"
           />
 
-          {/* Price */}
+          {/* Price - editable */}
           <div className="relative flex-1 md:w-24 md:flex-none">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs md:text-sm">$</span>
             <Input
               type="number"
               min="0"
               step="0.01"
               value={item.amount}
               onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
-              className="h-10 pl-5 text-sm bg-slate-50 border-slate-200"
+              className="h-10 pl-5 text-xs md:text-sm bg-slate-50 border-slate-200"
             />
           </div>
 
-          {/* Total display */}
-          <div className="w-20 md:w-24 h-10 flex items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
+          {/* Total display - hidden on mobile, shown on md+ */}
+          <div className="hidden md:flex w-24 h-10 items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
             ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
 
@@ -113,21 +113,21 @@ const ProductListItem = memo(({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-11 w-11 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg"
+              className="h-10 w-10 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg"
               onClick={() => setShowDetails(!showDetails)}
               title="Edit details"
             >
-              {showDetails ? <ChevronUp className="h-6 w-6 md:h-4 md:w-4" /> : <ChevronDown className="h-6 w-6 md:h-4 md:w-4" />}
+              {showDetails ? <ChevronUp className="h-5 w-5 md:h-4 md:w-4" /> : <ChevronDown className="h-5 w-5 md:h-4 md:w-4" />}
             </Button>
             {!isOnly && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-11 w-11 md:h-8 md:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-red-50 md:bg-transparent rounded-lg"
+                className="h-10 w-10 md:h-8 md:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-red-50 md:bg-transparent rounded-lg"
                 onClick={() => onRemove(index)}
               >
-                <Trash2 className="h-6 w-6 md:h-4 md:w-4" />
+                <Trash2 className="h-5 w-5 md:h-4 md:w-4" />
               </Button>
             )}
           </div>
@@ -144,7 +144,7 @@ const ProductListItem = memo(({
               value={item.name || ''}
               onChange={(e) => onItemChange(index, 'name', e.target.value)}
               placeholder="Enter item name..."
-              className="h-9 text-sm bg-slate-50 border-slate-200"
+              className="h-9 text-xs md:text-sm bg-slate-50 border-slate-200"
             />
           </div>
           <div>
@@ -154,7 +154,7 @@ const ProductListItem = memo(({
               value={item.description || ''}
               onChange={(e) => onItemChange(index, 'description', e.target.value)}
               placeholder="Enter description..."
-              className="h-9 text-sm bg-slate-50 border-slate-200"
+              className="h-9 text-xs md:text-sm bg-slate-50 border-slate-200"
             />
           </div>
         </div>
