@@ -218,8 +218,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     const updateScale = () => {
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
-      const horizontalPadding = 32; // p-4 left + right
-      const verticalPadding = 32; // p-4 top + bottom
+      
+      // Check if we're on mobile (no padding) or desktop (p-4 padding)
+      const isMobile = window.innerWidth < 1024;
+      const horizontalPadding = isMobile ? 0 : 32; // p-4 left + right on desktop only
+      const verticalPadding = isMobile ? 0 : 32; // p-4 top + bottom on desktop only
 
       const availableWidth = containerWidth - horizontalPadding;
       const availableHeight = containerHeight - verticalPadding;
