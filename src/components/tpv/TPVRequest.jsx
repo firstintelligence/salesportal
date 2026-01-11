@@ -154,11 +154,19 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
     localStorage.setItem("tpvFormData", JSON.stringify(formData));
   }, [formData]);
 
+  // Calculate admin fee: 1.49% of sales price, capped at $149
+  const calculateAdminFee = (salesAmount) => {
+    const fee = salesAmount * 0.0149;
+    return Math.min(fee, 149);
+  };
+
   // Calculate monthly payment when relevant fields change
   useEffect(() => {
     const { salesPrice, interestRate, amortization } = formData;
     if (salesPrice && interestRate && amortization) {
-      const principal = parseFloat(salesPrice.replace(/[^0-9.]/g, ""));
+      const basePrincipal = parseFloat(salesPrice.replace(/[^0-9.]/g, ""));
+      const adminFee = calculateAdminFee(basePrincipal);
+      const principal = basePrincipal + adminFee; // Total loan amount includes admin fee
       const rate = parseFloat(interestRate.replace("%", "")) / 100 / 12;
       const months = parseInt(amortization.replace(/\D/g, ""));
       
