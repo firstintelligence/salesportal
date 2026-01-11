@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles, Download, PlayCircle, CreditCard } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles, Download, PlayCircle, CreditCard, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,12 +16,13 @@ import { useTenant } from "@/contexts/TenantContext";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const { tenant, loading: tenantLoading } = useTenant();
+  const { tenant, loading: tenantLoading, isViewingAllTenants, isSuperAdmin } = useTenant();
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [tenantNames, setTenantNames] = useState({}); // Map of tenant_id to name
   const [newDeal, setNewDeal] = useState({
     first_name: "",
     last_name: "",
@@ -50,6 +51,21 @@ const DashboardPage = () => {
 
   const getAgentName = (id) => agentNames[id] || id;
 
+  // Fetch tenant names for super admin view
+  useEffect(() => {
+    const fetchTenantNames = async () => {
+      if (isViewingAllTenants) {
+        const { data } = await supabase.from('tenants').select('id, name');
+        if (data) {
+          const nameMap = {};
+          data.forEach(t => { nameMap[t.id] = t.name; });
+          setTenantNames(nameMap);
+        }
+      }
+    };
+    fetchTenantNames();
+  }, [isViewingAllTenants]);
+
   useEffect(() => {
     const authenticated = localStorage.getItem("authenticated");
     const storedAgentId = localStorage.getItem("agentId");
@@ -63,11 +79,11 @@ const DashboardPage = () => {
     
     // Wait for tenant to load before fetching deals
     if (!tenantLoading && tenant?.id) {
-      fetchDeals(storedAgentId, tenant.id);
+      fetchDeals(storedAgentId, tenant.id, isViewingAllTenants);
     }
-  }, [navigate, tenant?.id, tenantLoading]);
+  }, [navigate, tenant?.id, tenantLoading, isViewingAllTenants]);
 
-  const fetchDeals = async (currentAgentId, tenantId) => {
+  const fetchDeals = async (currentAgentId, tenantId, viewingAllTenants = false) => {
     try {
       setLoading(true);
       
@@ -75,9 +91,9 @@ const DashboardPage = () => {
       const { data: adminCheck } = await supabase
         .rpc('is_admin_agent', { agent_id: currentAgentId });
       
-      const isSuperAdmin = adminCheck === true;
+      const isAdmin = adminCheck === true;
       
-      // Build query - super admins see all customers, regular agents only see their own
+      // Build query
       let query = supabase
         .from("customers")
         .select(`
@@ -96,14 +112,20 @@ const DashboardPage = () => {
             id,
             document_type,
             document_url,
+            signature_type,
             signed_at
           )
         `)
-        .eq("tenant_id", tenantId) // Always filter by tenant for data isolation
         .order("created_at", { ascending: false });
 
+      // If viewing all tenants (Super Admin mode), don't filter by tenant
+      // Otherwise, filter by the selected tenant
+      if (!viewingAllTenants) {
+        query = query.eq("tenant_id", tenantId);
+      }
+
       // Only filter by agent_id if NOT a super admin
-      if (!isSuperAdmin) {
+      if (!isAdmin) {
         query = query.eq("agent_id", currentAgentId);
       }
 
@@ -290,9 +312,17 @@ const DashboardPage = () => {
             <ArrowLeft className="mr-1 h-4 w-4" />
             <span className="hidden sm:inline">Back</span>
           </Button>
-          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
-            Dashboard
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+              Dashboard
+            </h1>
+            {isViewingAllTenants && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">
+                <Shield className="w-2.5 h-2.5" />
+                All Tenants
+              </span>
+            )}
+          </div>
           <div className="w-8 md:w-16" /> {/* Spacer for centering */}
         </div>
       </div>
@@ -302,6 +332,7 @@ const DashboardPage = () => {
           <div className="flex-1">
             <p className="text-sm text-muted-foreground">
               {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
+              {isViewingAllTenants && ` across all tenants`}
             </p>
           </div>
             
@@ -544,6 +575,15 @@ const DashboardPage = () => {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <CardContent className="p-4">
+                      {/* Tenant badge when viewing all tenants */}
+                      {isViewingAllTenants && customer.tenant_id && (
+                        <div className="mb-2">
+                          <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">
+                            {tenantNames[customer.tenant_id] || 'Unknown Tenant'}
+                          </span>
+                        </div>
+                      )}
+                      
                       {/* Top Row - Name, Status Badge, Price */}
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="min-w-0 flex-1">

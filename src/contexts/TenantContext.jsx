@@ -3,6 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TenantContext = createContext(null);
 
+// Special Super Admin tenant that represents "all tenants combined"
+export const SUPER_ADMIN_TENANT = {
+  id: 'super-admin-all',
+  name: 'Super Admin',
+  slug: 'super-admin',
+  logo_url: null,
+  address: null,
+  phone: null,
+  email: null,
+  isAllTenants: true, // Flag to identify this special tenant
+};
+
 export const useTenant = () => {
   const context = useContext(TenantContext);
   if (!context) {
@@ -49,11 +61,31 @@ export const TenantProvider = ({ children }) => {
         }
 
         setAgentProfile(profile);
-        setTenant(tenantData);
+        
+        // If super admin, default to the Super Admin tenant (all tenants view)
+        if (profile.is_super_admin) {
+          const selectedTenantId = localStorage.getItem('selectedTenantId');
+          if (selectedTenantId === SUPER_ADMIN_TENANT.id) {
+            setTenant(SUPER_ADMIN_TENANT);
+          } else if (selectedTenantId) {
+            // Load the specific tenant they had selected
+            const { data: selectedTenant } = await supabase
+              .from('tenants')
+              .select('*')
+              .eq('id', selectedTenantId)
+              .single();
+            setTenant(selectedTenant || SUPER_ADMIN_TENANT);
+          } else {
+            // Default to Super Admin tenant for super admins
+            setTenant(SUPER_ADMIN_TENANT);
+          }
+        } else {
+          setTenant(tenantData);
+        }
+        
         setOriginalTenant(tenantData);
         
         localStorage.setItem('agentProfile', JSON.stringify(profile));
-        localStorage.setItem('tenant', JSON.stringify(tenantData));
         localStorage.setItem('originalTenant', JSON.stringify(tenantData));
         
         return profile;
@@ -79,7 +111,6 @@ export const TenantProvider = ({ children }) => {
   const initializeFromStorage = () => {
     try {
       const storedProfile = localStorage.getItem('agentProfile');
-      const storedTenant = localStorage.getItem('tenant');
       const storedOriginalTenant = localStorage.getItem('originalTenant');
       
       if (storedProfile) {
@@ -88,16 +119,29 @@ export const TenantProvider = ({ children }) => {
         
         if (profile.is_super_admin) {
           const selectedTenantId = localStorage.getItem('selectedTenantId');
-          if (selectedTenantId && storedTenant) {
-            const parsedTenant = JSON.parse(storedTenant);
-            if (parsedTenant.id === selectedTenantId) {
-              setTenant(parsedTenant);
+          if (selectedTenantId === SUPER_ADMIN_TENANT.id) {
+            setTenant(SUPER_ADMIN_TENANT);
+          } else if (selectedTenantId) {
+            const storedTenant = localStorage.getItem('tenant');
+            if (storedTenant) {
+              const parsedTenant = JSON.parse(storedTenant);
+              if (parsedTenant.id === selectedTenantId) {
+                setTenant(parsedTenant);
+              } else {
+                setTenant(SUPER_ADMIN_TENANT);
+              }
+            } else {
+              setTenant(SUPER_ADMIN_TENANT);
             }
-          } else if (storedTenant) {
+          } else {
+            // Default to Super Admin tenant
+            setTenant(SUPER_ADMIN_TENANT);
+          }
+        } else {
+          const storedTenant = localStorage.getItem('tenant');
+          if (storedTenant) {
             setTenant(JSON.parse(storedTenant));
           }
-        } else if (storedTenant) {
-          setTenant(JSON.parse(storedTenant));
         }
       }
       
@@ -124,6 +168,9 @@ export const TenantProvider = ({ children }) => {
     localStorage.removeItem('selectedTenantId');
   };
 
+  // Helper to check if currently viewing all tenants
+  const isViewingAllTenants = tenant?.isAllTenants === true;
+
   const value = {
     tenant,
     originalTenant,
@@ -133,6 +180,8 @@ export const TenantProvider = ({ children }) => {
     switchTenant,
     clearTenantData,
     isSuperAdmin: agentProfile?.is_super_admin || false,
+    isViewingAllTenants,
+    SUPER_ADMIN_TENANT,
   };
 
   return (

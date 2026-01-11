@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTenant } from '@/contexts/TenantContext';
+import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Select,
@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Building2 } from 'lucide-react';
+import { Building2, Shield } from 'lucide-react';
 
 // Inline version for use within page headers
 export const TenantSwitcherInline = ({ className = '' }) => {
@@ -52,7 +52,8 @@ export const TenantSwitcherInline = ({ className = '' }) => {
         .order('name');
 
       if (!error && data) {
-        setTenants(data);
+        // Add Super Admin tenant at the beginning
+        setTenants([SUPER_ADMIN_TENANT, ...data]);
       }
       setTenantsLoading(false);
     };
@@ -75,12 +76,21 @@ export const TenantSwitcherInline = ({ className = '' }) => {
       }}
     >
       <SelectTrigger className={`w-[160px] sm:w-[180px] bg-background/80 backdrop-blur border-border/50 shadow-sm text-sm ${className}`}>
-        <Building2 className="w-3.5 h-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
+        {tenant?.isAllTenants ? (
+          <Shield className="w-3.5 h-3.5 mr-1.5 text-amber-500 flex-shrink-0" />
+        ) : (
+          <Building2 className="w-3.5 h-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
+        )}
         <SelectValue placeholder="Select company" className="truncate" />
       </SelectTrigger>
       <SelectContent className="bg-background border-border z-[100]">
         {tenants.map((t) => (
-          <SelectItem key={t.id} value={t.id}>
+          <SelectItem 
+            key={t.id} 
+            value={t.id}
+            className={t.isAllTenants ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}
+          >
+            {t.isAllTenants && <Shield className="w-3 h-3 inline mr-1.5" />}
             {t.name}
           </SelectItem>
         ))}
