@@ -20,23 +20,30 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         });
       }
 
-      // Calculate canvas size
+      // Calculate canvas size - maximize screen utilization (95%+)
       const updateSize = () => {
-        if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
-          // Leave space for buttons and guidelines
-          setCanvasSize({
-            width: rect.width - 48, // 24px padding each side
-            height: rect.height - 120 // Space for buttons and guidelines
-          });
-        }
+        // Use window dimensions for maximum screen usage
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Reserve minimal space for buttons (40px header + 40px footer = 80px total)
+        const headerHeight = 44;
+        const footerHeight = 44;
+        const horizontalPadding = 8; // 4px each side
+        
+        setCanvasSize({
+          width: screenWidth - horizontalPadding,
+          height: screenHeight - headerHeight - footerHeight - 8 // 8px for margins
+        });
       };
 
       updateSize();
       window.addEventListener('resize', updateSize);
+      window.addEventListener('orientationchange', updateSize);
 
       return () => {
         window.removeEventListener('resize', updateSize);
+        window.removeEventListener('orientationchange', updateSize);
       };
     } else {
       document.body.style.overflow = '';
@@ -116,100 +123,75 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       className="fixed inset-0 z-50 bg-background flex flex-col"
       style={{ touchAction: 'none' }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+      {/* Compact Header */}
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-border bg-muted/30 shrink-0" style={{ height: '44px' }}>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleCancel}
-          className="text-muted-foreground"
+          className="text-muted-foreground h-8 px-2"
         >
-          <X className="h-5 w-5 mr-1" />
-          Cancel
+          <X className="h-4 w-4 mr-1" />
+          <span className="text-xs">Cancel</span>
         </Button>
-        <h2 className="text-lg font-semibold text-foreground">Sign Here</h2>
+        <h2 className="text-sm font-semibold text-foreground">Sign Here</h2>
         <Button
           variant="default"
           size="sm"
           onClick={handleFinish}
-          className="bg-primary text-primary-foreground"
+          className="bg-primary text-primary-foreground h-8 px-2"
         >
-          <Check className="h-5 w-5 mr-1" />
-          Finish
+          <Check className="h-4 w-4 mr-1" />
+          <span className="text-xs">Done</span>
         </Button>
       </div>
 
-      {/* Signature Area */}
+      {/* Signature Area - Maximized */}
       <div 
         ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center p-6 overflow-hidden"
+        className="flex-1 flex items-center justify-center p-1 overflow-hidden bg-white"
       >
-        {/* Signature box with guidelines */}
-        <div className="relative w-full max-w-4xl">
-          {/* Guidelines */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Baseline guide */}
-            <div 
-              className="absolute left-4 right-4 border-b-2 border-dashed border-muted-foreground/30"
-              style={{ bottom: '25%' }}
-            />
-            {/* Left margin guide */}
-            <div 
-              className="absolute top-4 bottom-4 border-l-2 border-dashed border-muted-foreground/20"
-              style={{ left: '5%' }}
-            />
-            {/* Right margin guide */}
-            <div 
-              className="absolute top-4 bottom-4 border-r-2 border-dashed border-muted-foreground/20"
-              style={{ right: '5%' }}
-            />
-          </div>
-
-          {/* Corner markers */}
-          <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-primary/50" />
-          <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-primary/50" />
-          <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-primary/50" />
-          <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-primary/50" />
-
-          {/* Canvas container - white bg on container only, not canvas */}
-          <div className="border-2 border-border rounded-lg bg-white overflow-hidden shadow-inner flex justify-center">
-            {canvasSize.width > 0 && (
-              <SignatureCanvas
-                ref={signatureRef}
-                canvasProps={{
+        {/* Canvas container - maximized */}
+        <div className="border-2 border-dashed border-gray-300 rounded bg-white overflow-hidden relative">
+          {/* Baseline guide */}
+          <div 
+            className="absolute left-2 right-2 border-b border-dashed border-gray-300 pointer-events-none"
+            style={{ bottom: '25%' }}
+          />
+          
+          {canvasSize.width > 0 && canvasSize.height > 0 && (
+            <SignatureCanvas
+              ref={signatureRef}
+              canvasProps={{
+                width: canvasSize.width,
+                height: canvasSize.height,
+                className: 'touch-none',
+                style: { 
                   width: canvasSize.width,
-                  height: Math.min(canvasSize.height, 300),
-                  className: 'touch-none',
-                  style: { 
-                    width: canvasSize.width,
-                    height: Math.min(canvasSize.height, 300),
-                    touchAction: 'none'
-                  }
-                }}
-                backgroundColor="white"
-                penColor="black"
-                minWidth={1.5}
-                maxWidth={3}
-              />
-            )}
-          </div>
-
-          {/* Instruction text */}
-          <p className="text-center text-sm text-muted-foreground mt-3">
-            Sign within the box above using your finger or stylus
-          </p>
+                  height: canvasSize.height,
+                  touchAction: 'none',
+                  display: 'block'
+                }
+              }}
+              backgroundColor="white"
+              penColor="black"
+              minWidth={1.5}
+              maxWidth={3}
+            />
+          )}
         </div>
       </div>
 
-      {/* Footer with Clear button */}
-      <div className="p-4 border-t border-border bg-muted/30 flex justify-center">
+      {/* Compact Footer with Clear button */}
+      <div className="px-2 py-1.5 border-t border-border bg-muted/30 flex justify-center shrink-0" style={{ height: '44px' }}>
         <Button
           variant="outline"
+          size="sm"
           onClick={handleClear}
-          className="px-8"
+          className="px-4 h-8"
         >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Clear Signature
+          <Trash2 className="h-3 w-3 mr-1" />
+          <span className="text-xs">Clear</span>
         </Button>
       </div>
     </div>

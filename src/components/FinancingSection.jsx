@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { calculateMonthlyPayment } from '../utils/financingCalculations';
 import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombination } from '../utils/dealerFeeCalculations';
+
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
@@ -37,11 +38,11 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   };
 
   return (
-    <div className="mb-6 bg-green-50 p-4 rounded-lg h-full">
-      <h2 className="text-lg font-semibold mb-2">Financing Payment Details</h2>
+    <div className="mb-6 bg-green-50 p-3 md:p-4 rounded-lg h-full">
+      <h2 className="text-base md:text-lg font-semibold mb-2">Financing Payment Details</h2>
       
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium">Show Contractor Fees</span>
+      <div className="flex items-center justify-between mb-3 md:mb-4">
+        <span className="text-xs md:text-sm font-medium">Show Contractor Fees</span>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">{showContractorFees ? 'ON' : 'OFF'}</span>
           <Switch
@@ -52,21 +53,24 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
         </div>
       </div>
       
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-3">
         <FloatingLabelInput
           id="financeCompany"
           label="Finance Company"
           value={financing.financeCompany}
           onChange={(e) => handleFinancingChange('financeCompany', e.target.value)}
           disabled
+          className="text-xs md:text-sm"
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Loan Amount + Admin Fee - 2 columns */}
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
           <FloatingLabelInput
             id="loanAmount"
             label="Loan Amount"
             value={`$${formatWithCommas(financing.loanAmount || 0)}`}
             disabled
+            className="text-xs md:text-sm"
           />
 
           <FloatingLabelInput
@@ -74,20 +78,22 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
             label="Admin Fee"
             value={`$${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}`}
             disabled
+            className="text-xs md:text-sm"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Promo Term + Amortization - 2 columns */}
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Promo Term</label>
+            <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Promo Term</label>
             <Select 
               value={(financing.loanTerm || 24).toString()} 
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
             >
-              <SelectTrigger className="text-left">
+              <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
                 <SelectValue className="text-left" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                 {availableTerms.length > 0 ? (
                   availableTerms.map(term => (
                     <SelectItem key={term} value={term.toString()}>
@@ -107,15 +113,15 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Amortization</label>
+            <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Amortization</label>
             <Select 
               value={(financing.amortizationPeriod || 180).toString()} 
               onValueChange={(value) => handleFinancingChange('amortizationPeriod', parseInt(value))}
             >
-              <SelectTrigger className="text-left">
+              <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
                 <SelectValue className="text-left" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                 <SelectItem value="12">12 months</SelectItem>
                 <SelectItem value="24">24 months</SelectItem>
                 <SelectItem value="36">36 months</SelectItem>
@@ -135,17 +141,18 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 items-end">
+        {/* Interest Rate + Monthly Payment - 2 columns */}
+        <div className="grid grid-cols-2 gap-2 md:gap-4 items-end">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Interest Rate</label>
+            <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Interest Rate</label>
             <Select 
               value={(financing.interestRate || 0).toString()} 
               onValueChange={(value) => handleFinancingChange('interestRate', parseFloat(value))}
             >
-              <SelectTrigger className="h-[40px]">
+              <SelectTrigger className="h-[40px] text-xs md:text-sm bg-white border-gray-300">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                 {interestRates.map(rate => (
                   <SelectItem key={rate} value={rate.toString()}>
                     {rate}%
@@ -156,8 +163,8 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Monthly Payment</label>
-            <div className="px-2.5 py-2 h-[40px] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 font-semibold flex items-center">
+            <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Monthly Payment</label>
+            <div className="px-2.5 py-2 h-[40px] text-xs md:text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 font-semibold flex items-center">
               ${formatWithCommas(monthlyPayment)}
             </div>
           </div>

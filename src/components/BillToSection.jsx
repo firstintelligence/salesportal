@@ -32,6 +32,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           value={billTo.firstName || ''}
           onChange={handleInputChange}
           name="firstName"
+          className="text-xs md:text-sm"
         />
         <FloatingLabelInput
           id="billToLastName"
@@ -39,6 +40,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           value={billTo.lastName || ''}
           onChange={handleInputChange}
           name="lastName"
+          className="text-xs md:text-sm"
         />
       </div>
       <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
@@ -49,6 +51,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           value={billTo.email || ''}
           onChange={handleInputChange}
           name="email"
+          className="text-xs md:text-sm"
         />
         <FloatingLabelInput
           id="billToPhone"
@@ -60,6 +63,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             handleInputChange({ target: { name: 'phone', value: formatted } });
           }}
           name="phone"
+          className="text-xs md:text-sm"
         />
       </div>
       <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
@@ -69,6 +73,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           value={billTo.address || ''}
           onChange={handleInputChange}
           name="address"
+          className="text-xs md:text-sm"
         />
         <FloatingLabelInput
           id="billToCity"
@@ -76,17 +81,18 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           value={billTo.city || ''}
           onChange={handleInputChange}
           name="city"
+          className="text-xs md:text-sm"
         />
       </div>
       <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
         <div>
           <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
-            <SelectTrigger className="h-[40px] text-base bg-background border-input">
+            <SelectTrigger className="h-[40px] text-xs md:text-sm bg-white border-gray-300">
               <SelectValue placeholder="Province" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
               {provinces.map((prov) => (
-                <SelectItem key={prov.code} value={prov.code} className="text-base">
+                <SelectItem key={prov.code} value={prov.code} className="text-sm">
                   {prov.code}
                 </SelectItem>
               ))}
@@ -101,6 +107,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             onChange={handleInputChange}
             name="postalCode"
             isPostalCode={true}
+            className="text-xs md:text-sm"
           />
           <Button
             type="button"
@@ -159,6 +166,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
               value={billTo.coApplicantName || ''}
               onChange={handleInputChange}
               name="coApplicantName"
+              className="text-xs md:text-sm"
             />
             <FloatingLabelInput
               id="coApplicantPhone"
@@ -170,6 +178,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
                 handleInputChange({ target: { name: 'coApplicantPhone', value: formatted } });
               }}
               name="coApplicantPhone"
+              className="text-xs md:text-sm"
             />
           </div>
         )}
