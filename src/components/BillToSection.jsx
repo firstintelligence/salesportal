@@ -87,7 +87,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
         <div>
           <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
-            <SelectTrigger className="h-[40px] text-xs md:text-sm bg-white border-gray-300">
+            <SelectTrigger className="min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm bg-white border-gray-300">
               <SelectValue placeholder="Province" />
             </SelectTrigger>
             <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
