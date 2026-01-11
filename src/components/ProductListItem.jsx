@@ -41,7 +41,7 @@ const ProductListItem = memo(({
   };
 
   return (
-    <div className="bg-white md:border md:border-slate-200 md:rounded-lg md:p-3 md:shadow-sm">
+    <div className={`bg-white md:border md:border-slate-200 md:rounded-lg md:p-3 md:shadow-sm ${showDetails ? 'mb-3' : ''}`}>
       {/* Mobile: Single row with product, qty, amount | Desktop: Single row */}
       <div className="flex items-center gap-1.5 md:gap-2">
         {/* Product selector - takes most space on mobile */}
@@ -87,8 +87,8 @@ const ProductListItem = memo(({
           className="h-10 w-10 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-1"
         />
 
-        {/* Price - editable, compact on mobile */}
-        <div className="relative w-16 md:w-24 shrink-0">
+        {/* Price - editable, takes more space on mobile now */}
+        <div className="relative w-20 md:w-24 shrink-0">
           <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
           <Input
             type="number"
@@ -105,55 +105,85 @@ const ProductListItem = memo(({
           ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
 
-        {/* Actions - compact on mobile */}
-        <div className="flex items-center gap-0.5 shrink-0">
+        {/* Details toggle - moved to far right on mobile, delete button hidden here */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-9 w-9 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg shrink-0"
+          onClick={() => setShowDetails(!showDetails)}
+          title="Edit details"
+        >
+          {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        
+        {/* Delete button - only shown on desktop inline, on mobile it's in expanded section */}
+        {!isOnly && (
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 w-9 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg"
-            onClick={() => setShowDetails(!showDetails)}
-            title="Edit details"
+            className="hidden md:flex h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0"
+            onClick={() => onRemove(index)}
           >
-            {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            <Trash2 className="h-4 w-4" />
           </Button>
-          {!isOnly && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-9 w-9 md:h-8 md:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-red-50 md:bg-transparent rounded-lg"
-              onClick={() => onRemove(index)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Expandable details section */}
       {showDetails && (
-        <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Item Name</label>
-            <Input
-              type="text"
-              value={item.name || ''}
-              onChange={(e) => onItemChange(index, 'name', e.target.value)}
-              placeholder="Enter item name..."
-              className="h-9 text-xs md:text-sm bg-slate-50 border-slate-200"
-            />
+        <div className="mt-3 pt-3 border-t border-slate-100 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="relative">
+              <Input
+                type="text"
+                value={item.name || ''}
+                onChange={(e) => onItemChange(index, 'name', e.target.value)}
+                placeholder=" "
+                className="h-10 text-xs md:text-sm bg-white border-slate-200 pt-4 peer"
+                id={`item-name-${index}`}
+              />
+              <label 
+                htmlFor={`item-name-${index}`}
+                className="absolute left-3 top-1 text-[10px] font-medium text-slate-500 pointer-events-none"
+              >
+                Item Name
+              </label>
+            </div>
+            <div className="relative">
+              <Input
+                type="text"
+                value={item.description || ''}
+                onChange={(e) => onItemChange(index, 'description', e.target.value)}
+                placeholder=" "
+                className="h-10 text-xs md:text-sm bg-white border-slate-200 pt-4 peer"
+                id={`item-desc-${index}`}
+              />
+              <label 
+                htmlFor={`item-desc-${index}`}
+                className="absolute left-3 top-1 text-[10px] font-medium text-slate-500 pointer-events-none"
+              >
+                Description
+              </label>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
-            <Input
-              type="text"
-              value={item.description || ''}
-              onChange={(e) => onItemChange(index, 'description', e.target.value)}
-              placeholder="Enter description..."
-              className="h-9 text-xs md:text-sm bg-slate-50 border-slate-200"
-            />
-          </div>
+          
+          {/* Delete button inside expanded section on mobile */}
+          {!isOnly && (
+            <div className="md:hidden flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-destructive border-destructive hover:bg-destructive hover:text-white"
+                onClick={() => onRemove(index)}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Item
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
