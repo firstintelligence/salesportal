@@ -925,12 +925,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      {/* Sticky action bar for mobile */}
-      <div className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm px-3 py-2.5">
+      {/* Sticky action bar for mobile - positioned directly below main header with no gap */}
+      <div className="lg:hidden fixed top-14 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white px-3 py-2.5 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center flex-1"
+            className="bg-red-500 text-white px-3 py-3 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center flex-1"
             style={{ maxWidth: '25%' }}
             aria-label="Clear Invoice"
           >
@@ -940,7 +940,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           <button
             onClick={handleSaveToDashboard}
             disabled={isSaving}
-            className="bg-green-600 text-white px-3 py-2.5 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed flex-1"
+            className="bg-green-600 text-white px-3 py-3 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed flex-1"
             style={{ maxWidth: '25%' }}
             aria-label="Save Invoice"
           >
@@ -965,12 +965,22 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                 checked={isInvoice}
                 onChange={(e) => setIsInvoice(e.target.checked)}
               />
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="relative w-12 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all after:shadow-sm peer-checked:bg-blue-600"></div>
             </label>
             <span className={`font-medium ${isInvoice ? 'text-blue-600' : 'text-gray-400'}`}>Invoice</span>
           </div>
         </div>
       </div>
+      
+      {/* Floating signature button for mobile */}
+      <button
+        type="button"
+        onClick={() => setIsSignaturePadOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 bg-primary text-white px-4 py-3 rounded-full shadow-lg hover:bg-primary/90 flex items-center gap-2"
+      >
+        <Pen className="h-5 w-5" />
+        <span className="text-sm font-medium">Sign</span>
+      </button>
       
       {/* Desktop action bar */}
       <div className="hidden lg:block relative mb-8">
