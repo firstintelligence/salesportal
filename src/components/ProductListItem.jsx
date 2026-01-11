@@ -42,10 +42,10 @@ const ProductListItem = memo(({
 
   return (
     <div className={`bg-white md:border md:border-slate-200 md:rounded-lg md:p-3 md:shadow-sm ${showDetails ? 'mb-3' : ''}`}>
-      {/* Mobile: Single row with product, qty, amount | Desktop: Single row */}
+      {/* Mobile: Product on left half, qty+price+arrow on right half | Desktop: Single row */}
       <div className="flex items-center gap-1.5 md:gap-2">
-        {/* Product selector - takes most space on mobile */}
-        <div className="flex-1 min-w-0">
+        {/* Product selector - takes half width on mobile, flex on desktop */}
+        <div className="w-1/2 md:w-auto md:flex-1 min-w-0">
           <Select 
             value={item.productId || ''} 
             onValueChange={handleProductSelect}
@@ -78,44 +78,47 @@ const ProductListItem = memo(({
           </Select>
         </div>
 
-        {/* Quantity - compact on mobile, no spinners */}
-        <Input
-          type="number"
-          min="1"
-          value={item.quantity}
-          onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-          className="h-10 w-8 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        />
-
-        {/* Price - editable, larger width on mobile with smaller font */}
-        <div className="relative flex-1 min-w-0 md:flex-none md:w-24 shrink-0">
-          <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] md:text-xs">$</span>
+        {/* Right half on mobile: Qty + Price + Arrow */}
+        <div className="w-1/2 md:w-auto md:flex-1 flex items-center gap-1.5 md:gap-2">
+          {/* Quantity - compact, no spinners */}
           <Input
             type="number"
-            min="0"
-            step="0.01"
-            value={item.amount}
-            onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
-            className="h-10 pl-4 pr-1 text-[10px] md:text-sm bg-slate-50 border-slate-200"
+            min="1"
+            value={item.quantity}
+            onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
+            className="h-10 w-8 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shrink-0"
           />
-        </div>
 
-        {/* Total display - hidden on mobile, shown on md+ */}
-        <div className="hidden md:flex w-24 h-10 items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
-          ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </div>
+          {/* Price - takes remaining space on mobile */}
+          <div className="relative flex-1 min-w-0">
+            <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] md:text-xs">$</span>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              value={item.amount}
+              onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
+              className="h-10 pl-4 pr-1 text-[10px] md:text-sm bg-slate-50 border-slate-200"
+            />
+          </div>
 
-        {/* Details toggle - smaller on mobile */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-9 w-7 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg shrink-0"
-          onClick={() => setShowDetails(!showDetails)}
-          title="Edit details"
-        >
-          {showDetails ? <ChevronUp className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <ChevronDown className="h-3.5 w-3.5 md:h-4 md:w-4" />}
-        </Button>
+          {/* Total display - hidden on mobile, shown on md+ */}
+          <div className="hidden md:flex w-24 h-10 items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
+            ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
+
+          {/* Details toggle - smaller on mobile */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 w-7 md:h-8 md:w-8 p-0 text-muted-foreground hover:text-foreground bg-slate-100 md:bg-transparent rounded-lg shrink-0"
+            onClick={() => setShowDetails(!showDetails)}
+            title="Edit details"
+          >
+            {showDetails ? <ChevronUp className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <ChevronDown className="h-3.5 w-3.5 md:h-4 md:w-4" />}
+          </Button>
+        </div>
         
         {/* Delete button - only shown on desktop inline, on mobile it's in expanded section */}
         {!isOnly && (
