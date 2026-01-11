@@ -926,38 +926,38 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   return (
     <div className="container mx-auto px-4 py-8 relative">
       {/* Sticky action bar for mobile */}
-      <div className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm px-3 py-2">
+      <div className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm px-3 py-2.5">
         <div className="flex items-center gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white px-2 py-1.5 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center flex-1"
+            className="bg-red-500 text-white px-3 py-2.5 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center flex-1"
             style={{ maxWidth: '25%' }}
             aria-label="Clear Invoice"
           >
-            <FiTrash2 size={14} />
-            <span className="text-[10px] font-medium ml-1">Clear</span>
+            <FiTrash2 size={16} />
+            <span className="text-xs font-medium ml-1">Clear</span>
           </button>
           <button
             onClick={handleSaveToDashboard}
             disabled={isSaving}
-            className="bg-green-600 text-white px-2 py-1.5 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed flex-1"
+            className="bg-green-600 text-white px-3 py-2.5 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed flex-1"
             style={{ maxWidth: '25%' }}
             aria-label="Save Invoice"
           >
             {isSaving ? (
               <>
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span className="text-[10px] font-medium ml-1">...</span>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-xs font-medium ml-1">...</span>
               </>
             ) : (
               <>
-                <Save className="h-3 w-3" />
-                <span className="text-[10px] font-medium ml-1">Save</span>
+                <Save className="h-4 w-4" />
+                <span className="text-xs font-medium ml-1">Save</span>
               </>
             )}
           </button>
-          <div className="flex items-center justify-center gap-1 text-[10px] flex-1" style={{ maxWidth: '50%' }}>
-            <span className={`${!isInvoice ? 'font-semibold text-blue-600' : 'text-gray-500'}`}>Quote</span>
+          <div className="flex items-center justify-center gap-2 text-xs flex-1" style={{ maxWidth: '50%' }}>
+            <span className={`font-medium ${!isInvoice ? 'text-blue-600' : 'text-gray-400'}`}>Quote</span>
             <label className="inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -965,9 +965,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                 checked={isInvoice}
                 onChange={(e) => setIsInvoice(e.target.checked)}
               />
-              <div className="relative w-8 h-4 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
-            <span className={`${isInvoice ? 'font-semibold text-blue-600' : 'text-gray-500'}`}>Invoice</span>
+            <span className={`font-medium ${isInvoice ? 'text-blue-600' : 'text-gray-400'}`}>Invoice</span>
           </div>
         </div>
       </div>
