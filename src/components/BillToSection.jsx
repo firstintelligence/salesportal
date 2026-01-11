@@ -25,7 +25,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
   return (
     <div className="mb-6">
       <h2 className="text-2xl font-semibold mb-4">Bill To</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4">
         <FloatingLabelInput
           id="billToFirstName"
           label="First Name"
@@ -41,7 +41,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           name="lastName"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
         <FloatingLabelInput
           id="billToEmail"
           label="Email"
@@ -62,7 +62,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           name="phone"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
         <FloatingLabelInput
           id="billToAddress"
           label="Address"
@@ -78,11 +78,11 @@ const BillToSection = ({ billTo, handleInputChange }) => {
           name="city"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4">
         <div>
           <Select value={billTo.province || ''} onValueChange={(value) => handleInputChange({ target: { name: 'province', value } })}>
             <SelectTrigger className="h-[40px] text-base bg-background border-input">
-              <SelectValue placeholder="Select province" />
+              <SelectValue placeholder="Province" />
             </SelectTrigger>
             <SelectContent>
               {provinces.map((prov) => (
@@ -106,7 +106,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
             type="button"
             variant="outline"
             size="sm"
-            className="absolute right-[3px] top-1/2 -translate-y-1/2 h-[calc(100%-6px)] px-2 text-xs"
+            className="absolute right-[3px] top-1/2 -translate-y-1/2 h-[calc(100%-6px)] px-1.5 md:px-2 text-xs"
             onClick={async () => {
               try {
                 const postalCode = await AddressLookupService.lookupPostalCode(
@@ -130,12 +130,12 @@ const BillToSection = ({ billTo, handleInputChange }) => {
       </div>
       
       {/* Co-Applicant Section */}
-      <div className="mt-4">
+      <div className="mt-2 md:mt-4">
         <Button
           type="button"
           variant={billTo.coApplicantName ? "outline" : "success"}
           size="sm"
-          className="w-full"
+          className="w-1/2 md:w-full"
           onClick={() => {
             const currentValue = billTo.coApplicantName || '';
             if (currentValue) {
@@ -152,7 +152,7 @@ const BillToSection = ({ billTo, handleInputChange }) => {
         </Button>
         
         {billTo.coApplicantName && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-2 gap-2 md:gap-4 mt-2 md:mt-4 p-2 md:p-4 bg-gray-50 rounded-lg">
             <FloatingLabelInput
               id="coApplicantName"
               label="Co-Applicant Name"

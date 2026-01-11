@@ -918,27 +918,27 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         <div className="absolute left-0 flex gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white px-3 py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2"
+            className="bg-red-500 text-white px-4 sm:px-3 py-2.5 sm:py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2 min-w-[100px] sm:min-w-0 justify-center"
             aria-label="Clear Invoice"
           >
             <FiTrash2 size={20} />
-            <span className="hidden sm:inline text-sm font-medium">Clear</span>
+            <span className="text-sm font-medium">Clear</span>
           </button>
           <button
             onClick={handleSaveToDashboard}
             disabled={isSaving}
-            className="bg-green-600 text-white px-3 py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-green-600 text-white px-4 sm:px-3 py-2.5 sm:py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 min-w-[100px] sm:min-w-0 justify-center disabled:opacity-70 disabled:cursor-not-allowed"
             aria-label="Save Invoice"
           >
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="hidden sm:inline text-sm font-medium">Saving...</span>
+                <Loader2 className="h-5 w-5 sm:h-4 sm:w-4 animate-spin" />
+                <span className="text-sm font-medium">Saving...</span>
               </>
             ) : (
               <>
-                <Save className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm font-medium">Save</span>
+                <Save className="h-5 w-5 sm:h-4 sm:w-4" />
+                <span className="text-sm font-medium">Save</span>
               </>
             )}
           </button>
@@ -966,30 +966,37 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                   <span className={isInvoice ? 'font-semibold' : ''}>Invoice</span>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FloatingLabelInput
-                  id="invoiceNumber"
-                  label={`${isInvoice ? 'Invoice' : 'Quote'} Number`}
-                  value={invoice.number}
-                  onChange={handleInputChange(setInvoice)}
-                  name="number"
-                />
-                <FloatingLabelInput
-                  id="invoiceDate"
-                  label={`${isInvoice ? 'Invoice' : 'Quote'} Date`}
-                  type="date"
-                  value={invoice.date}
-                  onChange={handleDateChange}
-                  name="date"
-                />
-                <FloatingLabelInput
-                  id="paymentDate"
-                  label={isInvoice ? 'Due Date' : 'Valid Until'}
-                  type="date"
-                  value={invoice.paymentDate}
-                  disabled
-                  name="paymentDate"
-                />
+              <div className="grid grid-cols-3 gap-2 md:gap-4">
+                <div className="col-span-1">
+                  <FloatingLabelInput
+                    id="invoiceNumber"
+                    label={`${isInvoice ? 'Inv' : 'Qt'} #`}
+                    value={invoice.number}
+                    onChange={handleInputChange(setInvoice)}
+                    name="number"
+                    className="text-xs md:text-base"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FloatingLabelInput
+                    id="invoiceDate"
+                    label="Date"
+                    type="date"
+                    value={invoice.date}
+                    onChange={handleDateChange}
+                    name="date"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <FloatingLabelInput
+                    id="paymentDate"
+                    label={isInvoice ? 'Due' : 'Valid'}
+                    type="date"
+                    value={invoice.paymentDate}
+                    disabled
+                    name="paymentDate"
+                  />
+                </div>
               </div>
             </div>
 
