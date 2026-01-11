@@ -71,7 +71,13 @@ const DashboardPage = () => {
     try {
       setLoading(true);
       
-      // CRITICAL: Filter by tenant_id AND agent_id to ensure agents only see their own deals
+      // Check if current agent is a super admin
+      const { data: adminCheck } = await supabase
+        .rpc('is_admin_agent', { agent_id: currentAgentId });
+      
+      const isSuperAdmin = adminCheck === true;
+      
+      // Build query - super admins see all customers, regular agents only see their own
       let query = supabase
         .from("customers")
         .select(`
@@ -93,9 +99,13 @@ const DashboardPage = () => {
             signed_at
           )
         `)
-        .eq("tenant_id", tenantId) // Filter by tenant for data isolation
-        .eq("agent_id", currentAgentId) // Filter by agent - agents only see their own customers
+        .eq("tenant_id", tenantId) // Always filter by tenant for data isolation
         .order("created_at", { ascending: false });
+
+      // Only filter by agent_id if NOT a super admin
+      if (!isSuperAdmin) {
+        query = query.eq("agent_id", currentAgentId);
+      }
 
       const { data, error } = await query;
 
