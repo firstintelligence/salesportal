@@ -914,45 +914,99 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      <div className="relative flex items-center justify-center mb-8">
-        <div className="absolute left-0 flex gap-2">
-          <button
-            onClick={clearForm}
-            className="bg-red-500 text-white px-4 sm:px-3 py-2.5 sm:py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2 min-w-[100px] sm:min-w-0 justify-center"
-            aria-label="Clear Invoice"
-          >
-            <FiTrash2 size={20} />
-            <span className="text-sm font-medium">Clear</span>
-          </button>
-          <button
-            onClick={handleSaveToDashboard}
-            disabled={isSaving}
-            className="bg-green-600 text-white px-4 sm:px-3 py-2.5 sm:py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 min-w-[100px] sm:min-w-0 justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-            aria-label="Save Invoice"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-5 w-5 sm:h-4 sm:w-4 animate-spin" />
-                <span className="text-sm font-medium">Saving...</span>
-              </>
-            ) : (
-              <>
-                <Save className="h-5 w-5 sm:h-4 sm:w-4" />
-                <span className="text-sm font-medium">Save</span>
-              </>
-            )}
-          </button>
+      {/* Sticky action bar for mobile */}
+      <div className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm px-3 py-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-2">
+            <button
+              onClick={clearForm}
+              className="bg-red-500 text-white px-3 py-1.5 rounded-full shadow-sm hover:bg-red-600 flex items-center gap-1.5"
+              aria-label="Clear Invoice"
+            >
+              <FiTrash2 size={16} />
+              <span className="text-xs font-medium">Clear</span>
+            </button>
+            <button
+              onClick={handleSaveToDashboard}
+              disabled={isSaving}
+              className="bg-green-600 text-white px-3 py-1.5 rounded-full shadow-sm hover:bg-green-700 flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-not-allowed"
+              aria-label="Save Invoice"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-xs font-medium">Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span className="text-xs font-medium">Save</span>
+                </>
+              )}
+            </button>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className={!isInvoice ? 'font-semibold' : 'text-gray-500'}>Qt</span>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={isInvoice}
+                onChange={(e) => setIsInvoice(e.target.checked)}
+              />
+              <div className="relative w-8 h-4 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+            <span className={isInvoice ? 'font-semibold' : 'text-gray-500'}>Inv</span>
+          </div>
+        </div>
       </div>
-    </div>
+      
+      {/* Desktop action bar */}
+      <div className="hidden lg:block relative mb-8">
+        <div className="flex items-center justify-center">
+          <div className="absolute left-0 flex gap-2">
+            <button
+              onClick={clearForm}
+              className="bg-red-500 text-white px-3 py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2"
+              aria-label="Clear Invoice"
+            >
+              <FiTrash2 size={18} />
+              <span className="text-sm font-medium">Clear</span>
+            </button>
+            <button
+              onClick={handleSaveToDashboard}
+              disabled={isSaving}
+              className="bg-green-600 text-white px-3 py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              aria-label="Save Invoice"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm font-medium">Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span className="text-sm font-medium">Save</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Spacer for sticky bar on mobile */}
+      <div className="lg:hidden h-12"></div>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-1 lg:order-1">
           <form>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-semibold">
-                  {isInvoice ? 'Invoice' : 'Quote'} Information
+                <h2 className="text-lg md:text-2xl font-semibold">
+                  {isInvoice ? 'Invoice' : 'Quote'} Info
                 </h2>
-                <div className="flex items-center gap-2">
+                {/* Desktop only toggle - mobile uses sticky bar */}
+                <div className="hidden lg:flex items-center gap-2">
                   <span className={!isInvoice ? 'font-semibold' : ''}>Quote</span>
                   <label className="inline-flex items-center cursor-pointer">
                     <input
@@ -1156,7 +1210,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
         <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md order-2 lg:order-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-            <h2 className="text-2xl font-semibold">{isInvoice ? 'Invoice Preview' : 'Quote Preview'}</h2>
+            <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
             <div className="flex gap-2 w-full sm:w-auto justify-end">
               <Button 
                 onClick={handleDownloadPDF}

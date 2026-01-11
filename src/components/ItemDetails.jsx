@@ -7,7 +7,7 @@ const ItemDetails = memo(({ items, handleItemChange, addItem, removeItem, moveIt
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold">Products</h2>
+        <h2 className="text-lg md:text-2xl font-semibold">Products</h2>
         <span className="text-sm text-muted-foreground">
           {items.length} item{items.length !== 1 ? 's' : ''}
         </span>
