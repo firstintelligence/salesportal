@@ -321,6 +321,102 @@ export const hvacProducts = [
     description: 'Electrical panel upgrade for increased capacity and safety',
     basePrice: 3500,
     category: 'Electrical'
+  },
+  
+  // Additional HVAC Equipment
+  {
+    id: 'air-handler',
+    name: 'Air Handler',
+    description: 'Indoor air handler unit for HVAC systems with professional installation',
+    basePrice: 4500,
+    category: 'Heat Pumps'
+  },
+  {
+    id: 'boiler',
+    name: 'Boiler System',
+    description: 'High-efficiency boiler system for hydronic heating with professional installation',
+    basePrice: 8000,
+    category: 'Furnaces'
+  },
+  
+  // Additional Water Heating
+  {
+    id: 'hybrid-water-heater',
+    name: 'Hybrid Water Heater',
+    description: 'Heat pump water heater combining electric and heat pump technology',
+    basePrice: 6500,
+    category: 'Water Heating'
+  },
+  
+  // UV Water Filtration
+  {
+    id: 'uv-water-filter',
+    name: 'UV Water Filter',
+    description: 'Ultraviolet water purification system for bacteria and virus elimination',
+    basePrice: 2500,
+    category: 'Water Filtration'
+  },
+  
+  // Additional Air Filtration
+  {
+    id: 'uv-air-filter',
+    name: 'UV Air Filter',
+    description: 'Ultraviolet air purification system for HVAC duct installation',
+    basePrice: 1500,
+    category: 'Air Filtration'
+  },
+  {
+    id: 'air-purifier',
+    name: 'Air Purifier',
+    description: 'Whole-home air purification system with HEPA and activated carbon filtration',
+    basePrice: 2500,
+    category: 'Air Filtration'
+  },
+  
+  // Solar
+  {
+    id: 'solar-panels',
+    name: 'Solar Panels',
+    description: 'Residential solar panel installation with inverter and monitoring system',
+    basePrice: 25000,
+    category: 'Energy Storage'
+  },
+  
+  // Services
+  {
+    id: 'duct-cleaning',
+    name: 'Duct Cleaning Service',
+    description: 'Complete HVAC duct cleaning with sanitization',
+    basePrice: 500,
+    category: 'Services'
+  },
+  {
+    id: 'maintenance-plan',
+    name: 'Annual Maintenance Plan',
+    description: 'Comprehensive annual maintenance plan for HVAC equipment',
+    basePrice: 300,
+    category: 'Services'
+  },
+  {
+    id: 'plumbing-repairs',
+    name: 'Plumbing Repairs',
+    description: 'General plumbing repair services',
+    basePrice: 500,
+    category: 'Services'
+  },
+  {
+    id: 'electrical-work',
+    name: 'Electrical Work',
+    description: 'General electrical work and repairs',
+    basePrice: 500,
+    category: 'Services'
+  },
+  {
+    id: 'sheet-metal',
+    name: 'Sheet Metal Work',
+    description: 'Custom sheet metal fabrication and ductwork modifications',
+    basePrice: 1000,
+    category: 'Services'
   }
 ];
 

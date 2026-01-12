@@ -66,7 +66,10 @@ const PaymentCalculatorPage = () => {
   }, [navigate]);
 
   // Auto-select highest available amortization based on purchase amount
+  // Only run when there's an actual purchase amount entered
   useEffect(() => {
+    if (purchaseAmount <= 0) return; // Don't auto-adjust for zero/blank amounts
+    
     if (purchaseAmount >= 10000) {
       setAmortizationPeriod(240);
     } else {
@@ -74,8 +77,8 @@ const PaymentCalculatorPage = () => {
       if (amortizationPeriod === 240) {
         setShow240Warning(true);
         setTimeout(() => setShow240Warning(false), 3000);
+        setAmortizationPeriod(180);
       }
-      setAmortizationPeriod(180);
     }
   }, [purchaseAmount]);
 

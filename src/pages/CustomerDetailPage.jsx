@@ -204,14 +204,26 @@ const CustomerDetailPage = () => {
 
   const navigateToTpv = () => {
     const tpvData = getLatestTpvData();
+    
+    // Build calculator data from invoice profile or TPV data
+    const calculatorData = invoiceProfile ? {
+      purchaseAmount: invoiceProfile.grandTotal,
+      interestRate: invoiceProfile.financing?.interestRate,
+      promoTerm: invoiceProfile.financing?.loanTerm,
+      amortizationPeriod: invoiceProfile.financing?.amortizationPeriod,
+      items: invoiceProfile.items // Pass full items array
+    } : (tpvData ? {
+      purchaseAmount: parseFloat(tpvData.salesPrice) || 0,
+      interestRate: parseFloat(tpvData.interestRate) || 0,
+      promoTerm: parseInt(tpvData.promotionalTerm) || 24,
+      amortizationPeriod: parseInt(tpvData.amortization) || 180,
+      products: tpvData.products?.split(', ') || []
+    } : null);
+    
     navigate('/tpv-ai', { 
       state: { 
         customer,
-        prefillData: tpvData || (invoiceProfile ? {
-          products: invoiceProfile.items?.map(i => i.name).join(', '),
-          salesPrice: invoiceProfile.grandTotal,
-          interestRate: invoiceProfile.financing?.interestRate
-        } : null)
+        calculatorData
       } 
     });
   };
