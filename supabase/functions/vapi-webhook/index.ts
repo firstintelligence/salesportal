@@ -8,7 +8,7 @@ const corsHeaders = {
 
 // Agent ID to phone number mapping
 const AGENT_MAPPING: Record<string, string> = {
-  'MM23': '+19059043544',
+  'MM231611': '+19059043544',
   'WK8448': '+16476258448',
   'TB0195': '+14168750195',
   'AA9097': '+16477169097',
@@ -23,7 +23,7 @@ const AGENT_MAPPING: Record<string, string> = {
 };
 
 // Admin agent who receives all notifications
-const ADMIN_AGENT_ID = 'MM23';
+const ADMIN_AGENT_ID = 'MM231611';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

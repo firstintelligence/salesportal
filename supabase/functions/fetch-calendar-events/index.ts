@@ -7,7 +7,7 @@ const corsHeaders = {
 
 // Map agent IDs to their Google Calendar IDs
 const AGENT_CALENDARS: Record<string, string> = {
-  "MM23": Deno.env.get("CALENDAR_ID_MM23") || "",
+  "MM231611": Deno.env.get("CALENDAR_ID_MM23") || "",
   "TB0195": Deno.env.get("CALENDAR_ID_TB0195") || "",
   "AA9097": Deno.env.get("CALENDAR_ID_AA9097") || "",
   "HB6400": Deno.env.get("CALENDAR_ID_HB6400") || "",
@@ -35,7 +35,7 @@ serve(async (req) => {
 
     // Get calendar IDs to fetch
     let calendarIds: string[] = [];
-    if (agentId === "MM23") {
+    if (agentId === "MM231611") {
       // Admin sees all calendars
       calendarIds = Object.values(AGENT_CALENDARS).filter(id => id);
     } else {
