@@ -20,7 +20,7 @@ const AGENT_MAPPING: Record<string, string> = {
   'WA4929': '+16479234929',
   'AK47': '+14379875094',
   'YG23': '+10000000007', // Placeholder - update with real number
-  'AR5172': '+14165944777', // Radi
+  'AR4777': '+14165944777', // Radi
 };
 
 // Admin agent who receives all notifications
