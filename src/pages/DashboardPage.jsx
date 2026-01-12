@@ -657,39 +657,45 @@ const DashboardPage = () => {
                         )}
                       </div>
 
-                      {/* Row 2: Phone + Full Address - same text size, tap/long-press to copy */}
+                      {/* Row 2: Phone + Address - larger font, no province */}
                       <div className="flex items-center gap-3 text-muted-foreground mb-2">
                         <button
                           onClick={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
                           onContextMenu={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
                           className="flex items-center gap-1 shrink-0 hover:text-foreground transition-colors active:scale-95"
                         >
-                          <Phone className="w-3 h-3" />
-                          <span className="text-[11px]">{formatPhoneNumber(customer.phone)}</span>
+                          <Phone className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">{formatPhoneNumber(customer.phone)}</span>
                         </button>
                         <button
                           onClick={(e) => {
-                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
                             handleCopyToClipboard(e, fullAddress, 'Address');
                           }}
                           onContextMenu={(e) => {
-                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
                             handleCopyToClipboard(e, fullAddress, 'Address');
                           }}
                           className="flex items-center gap-1 min-w-0 flex-1 hover:text-foreground transition-colors active:scale-95 text-left"
                         >
-                          <MapPin className="w-3 h-3 shrink-0" />
-                          <span className="truncate text-[11px]">
-                            {customer.address}{customer.city ? `, ${customer.city}` : ''}{customer.province ? `, ${customer.province}` : ''}
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate text-xs font-medium">
+                            {customer.address}{customer.city ? `, ${customer.city}` : ''}
                           </span>
                         </button>
                       </div>
                       
-                      {/* Row 3: Products (if any) */}
+                      {/* Row 3: Products as individual tags */}
                       {latestTpv?.products && (
-                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mb-2 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded">
-                          <Package className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{latestTpv.products}</span>
+                        <div className="flex flex-wrap items-center gap-1 mb-2">
+                          {latestTpv.products.split(',').map((product, idx) => (
+                            <span 
+                              key={idx}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-700 dark:text-slate-300"
+                            >
+                              {product.trim()}
+                            </span>
+                          ))}
                         </div>
                       )}
 
