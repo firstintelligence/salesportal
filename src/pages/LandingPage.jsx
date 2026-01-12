@@ -1,21 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, ScanLine } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ProfileDropdown from "@/components/ProfileDropdown";
 
-// Admin agents who can see signing certificates
-const SUPER_ADMINS = ['MM23'];
+// Super admin ID
+const SUPER_ADMIN_ID = 'MM231611';
 // Agents who can see profit calculator
-const PROFIT_CALC_AGENTS = ['MM23', 'WA4929'];
+const PROFIT_CALC_AGENTS = ['MM231611', 'WA4929'];
 const LandingPage = () => {
   const navigate = useNavigate();
   const { tenant, agentProfile, isSuperAdmin } = useTenant();
   const agentId = localStorage.getItem('agentId');
-  const isAdmin = SUPER_ADMINS.includes(agentId);
+  const isSuperAdminUser = agentId === SUPER_ADMIN_ID;
   const canSeeProfitCalc = PROFIT_CALC_AGENTS.includes(agentId);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -151,7 +151,7 @@ const LandingPage = () => {
             
             
             {/* Signing Certificates - Admin Only */}
-            {isAdmin && (
+            {isSuperAdminUser && (
               <Button
                 onClick={() => navigate("/signing-certificates")}
                 variant="ghost"
@@ -218,6 +218,50 @@ const LandingPage = () => {
               </Card>
             ))}
           </div>
+
+          {/* Super Admin Only - Qualify Section */}
+          {isSuperAdminUser && (
+            <div className="mt-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 to-transparent dark:via-amber-700" />
+                <span className="text-sm font-semibold text-amber-600 dark:text-amber-400 px-3">
+                  SUPER ADMIN
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 to-transparent dark:via-amber-700" />
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                <Card
+                  onClick={() => navigate("/qualify")}
+                  className="
+                    relative overflow-hidden border-2 border-amber-300 dark:border-amber-700 cursor-pointer
+                    shadow-lg hover:shadow-xl
+                    transition-all duration-300 ease-out
+                    hover:scale-[1.03] hover:-translate-y-1
+                    active:scale-[0.97]
+                    bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30
+                  "
+                >
+                  {/* Large background icon */}
+                  <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 opacity-[0.08] pointer-events-none">
+                    <ScanLine className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  
+                  <CardContent className="p-4 sm:p-5 lg:p-6">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-amber-500 shadow-lg w-fit mb-3 sm:mb-4">
+                      <ScanLine className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
+                    </div>
+                    <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tracking-tight leading-tight">
+                      Qualify
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-1.5">
+                      Scan ID for eligibility
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

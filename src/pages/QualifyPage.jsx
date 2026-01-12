@@ -1,0 +1,216 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ScanLine } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
+import IDScanner from "@/components/qualify/IDScanner";
+import IDScanResult from "@/components/qualify/IDScanResult";
+import ApprovalScreen from "@/components/qualify/ApprovalScreen";
+
+// Only super admin can access this page
+const SUPER_ADMIN_ID = 'MM231611';
+
+const QualifyPage = () => {
+  const navigate = useNavigate();
+  const { tenant } = useTenant();
+  const [step, setStep] = useState('scanner'); // 'scanner' | 'result' | 'approved'
+  const [scanData, setScanData] = useState(null);
+  const [approvedProfile, setApprovedProfile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const authenticated = localStorage.getItem('authenticated');
+    const agentId = localStorage.getItem('agentId');
+    
+    if (!authenticated) {
+      navigate('/');
+      return;
+    }
+
+    // Only super admin can access
+    if (agentId !== SUPER_ADMIN_ID) {
+      toast.error('Access denied. Super admin only.');
+      navigate('/landing');
+      return;
+    }
+  }, [navigate]);
+
+  const handleScanComplete = (data) => {
+    setScanData(data);
+    setStep('result');
+  };
+
+  const handleEditData = (editedData) => {
+    setScanData(editedData);
+  };
+
+  const handleApprove = async (data) => {
+    setIsSubmitting(true);
+    
+    try {
+      const agentId = localStorage.getItem('agentId');
+      
+      // First, create a customer profile
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          address: data.address,
+          city: data.city,
+          province: data.province || 'ON',
+          postal_code: data.postalCode,
+          phone: 'N/A', // Phone not available from ID
+          agent_id: agentId,
+          tenant_id: tenant?.id || null
+        })
+        .select()
+        .single();
+
+      if (customerError) {
+        console.error('Error creating customer:', customerError);
+        throw new Error('Failed to create customer profile');
+      }
+
+      // Generate filename: LastName_FirstName_Address
+      const sanitizeName = (str) => (str || '').replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
+      const fileName = `${sanitizeName(data.lastName)}_${sanitizeName(data.firstName)}_${sanitizeName(data.address)}_${Date.now()}.jpg`;
+
+      // Upload ID image to storage if we have it
+      let imagePath = null;
+      if (data.imageBase64) {
+        // Convert base64 to blob
+        const base64Data = data.imageBase64.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+        // Upload to storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(`id-scans/${fileName}`, blob, {
+            contentType: 'image/jpeg',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          // Continue without image - not critical
+        } else {
+          imagePath = uploadData?.path;
+        }
+      }
+
+      // Create ID scan record
+      const { error: scanError } = await supabase
+        .from('id_scans')
+        .insert({
+          customer_id: customerData.id,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          date_of_birth: data.dateOfBirth || null,
+          id_number: data.idNumber,
+          id_expiry: data.idExpiry || null,
+          address: data.address,
+          city: data.city,
+          province: data.province || 'ON',
+          postal_code: data.postalCode,
+          id_type: data.idType || 'Ontario Driver\'s License',
+          id_image_path: imagePath,
+          status: 'approved',
+          scanned_by: agentId,
+          tenant_id: tenant?.id || null
+        });
+
+      if (scanError) {
+        console.error('Error saving ID scan:', scanError);
+        // Don't throw - customer was created successfully
+      }
+
+      setApprovedProfile({
+        ...data,
+        customerId: customerData.id
+      });
+      setStep('approved');
+      toast.success('Profile created successfully!');
+
+    } catch (error) {
+      console.error('Approval error:', error);
+      toast.error(error.message || 'Failed to create profile');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReset = () => {
+    setScanData(null);
+    setApprovedProfile(null);
+    setStep('scanner');
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-card border-b border-border sticky top-0 z-10">
+        <div className="max-w-lg mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/landing')}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <div className="flex items-center gap-2">
+              <ScanLine className="w-5 h-5 text-primary" />
+              <span className="font-semibold">ID Qualify</span>
+            </div>
+            <div className="w-16" /> {/* Spacer for centering */}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-lg mx-auto px-4 py-6">
+        <Card>
+          <CardContent className="p-6">
+            {step === 'scanner' && (
+              <IDScanner 
+                onScanComplete={handleScanComplete}
+                onCancel={() => navigate('/landing')}
+              />
+            )}
+
+            {step === 'result' && scanData && (
+              <IDScanResult 
+                scanData={scanData}
+                onApprove={handleApprove}
+                onEdit={handleEditData}
+                isSubmitting={isSubmitting}
+              />
+            )}
+
+            {step === 'approved' && approvedProfile && (
+              <ApprovalScreen 
+                profileData={approvedProfile}
+                onDone={() => navigate('/landing')}
+                onScanAnother={handleReset}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default QualifyPage;
