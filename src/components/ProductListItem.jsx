@@ -53,7 +53,7 @@ const ProductListItem = memo(({
             <SelectTrigger className="h-10 bg-slate-50 border-slate-200 text-xs md:text-sm w-full">
               <SelectValue placeholder="Product..." />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-[300px] w-[var(--radix-select-trigger-width)]">
+            <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-[300px] w-[calc(100vw-2rem)] md:w-[var(--radix-select-trigger-width)] md:min-w-[400px]">
               <SelectItem value="custom" className="font-medium text-primary">
                 + Custom Product
               </SelectItem>
