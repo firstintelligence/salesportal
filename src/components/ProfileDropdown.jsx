@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTenant } from '@/contexts/TenantContext';
+import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Building2, Edit2, LogOut, ChevronDown, ChevronRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -91,7 +91,8 @@ const ProfileDropdown = () => {
         .order('name');
 
       if (!error && data) {
-        setTenants(data);
+        // Add Super Admin tenant at the beginning for super admins
+        setTenants([SUPER_ADMIN_TENANT, ...data]);
       }
       setTenantsLoading(false);
     };
@@ -188,7 +189,7 @@ const ProfileDropdown = () => {
                             switchTenant(t);
                             setTenantExpanded(false);
                           }}
-                          className={`flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm ${tenant?.id === t.id ? 'bg-accent' : ''}`}
+                          className={`flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm ${tenant?.id === t.id ? 'bg-accent' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}`}
                         >
                           {tenant?.id === t.id && <Check className="w-3 h-3 mr-2" />}
                           <span className={tenant?.id === t.id ? '' : 'ml-5'}>{t.name}</span>
@@ -209,7 +210,7 @@ const ProfileDropdown = () => {
                       <DropdownMenuItem
                         key={t.id}
                         onClick={() => switchTenant(t)}
-                        className={tenant?.id === t.id ? 'bg-accent' : ''}
+                        className={`${tenant?.id === t.id ? 'bg-accent' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}`}
                       >
                         {t.name}
                       </DropdownMenuItem>
