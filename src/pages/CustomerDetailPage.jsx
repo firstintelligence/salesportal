@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { useTenant } from "@/contexts/TenantContext";
+import { useTenant, SUPER_ADMIN_TENANT } from "@/contexts/TenantContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +27,7 @@ import {
 const CustomerDetailPage = () => {
   const navigate = useNavigate();
   const { customerId } = useParams();
-  const { tenant, loading: tenantLoading } = useTenant();
+  const { tenant, loading: tenantLoading, isViewingAllTenants, isSuperAdmin } = useTenant();
   const [customer, setCustomer] = useState(null);
   const [tpvRequests, setTpvRequests] = useState([]);
   const [checklists, setChecklists] = useState([]);
@@ -50,7 +50,9 @@ const CustomerDetailPage = () => {
     const agentId = localStorage.getItem("agentId");
     setIsAdmin(agentId === 'MM23');
     
-    if (tenantLoading || !tenantSlug) return;
+    // For super admin viewing all tenants, we don't need tenantSlug
+    if (tenantLoading) return;
+    if (!isViewingAllTenants && !tenantSlug) return;
     
     fetchCustomerData();
     loadInvoiceProfile();
@@ -69,18 +71,30 @@ const CustomerDetailPage = () => {
       setLoading(true);
       const agentId = localStorage.getItem("agentId");
 
-      const { data: customerData, error: customerError } = await supabase
+      // Build query - super admin viewing all tenants can see any customer
+      let customerQuery = supabase
         .from("customers")
         .select("*")
-        .eq("id", customerId)
-        .eq("tenant_id", tenant.id)
-        .single();
+        .eq("id", customerId);
+      
+      // Only filter by tenant if not super admin viewing all tenants
+      if (!isViewingAllTenants && tenant?.id) {
+        customerQuery = customerQuery.eq("tenant_id", tenant.id);
+      }
+
+      const { data: customerData, error: customerError } = await customerQuery.maybeSingle();
 
       if (customerError) {
         console.error("Error fetching customer:", customerError);
         setCustomer(null);
         return;
       }
+      
+      if (!customerData) {
+        setCustomer(null);
+        return;
+      }
+      
       setCustomer(customerData);
 
       const { data: tpvData, error: tpvError } = await supabase

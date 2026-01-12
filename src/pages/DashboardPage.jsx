@@ -46,7 +46,8 @@ const DashboardPage = () => {
     "MA11": "Mohamed",
     "MW11": "Mohan",
     "BB2704": "Bonnie",
-    "AB5394": "Abe"
+    "AB5394": "Abe",
+    "CH5149": "Chady"
   };
 
   const getAgentName = (id) => agentNames[id] || id;
@@ -184,6 +185,12 @@ const DashboardPage = () => {
     try {
       if (!newDeal.first_name || !newDeal.last_name || !newDeal.phone || !newDeal.address) {
         toast.error("Please fill in all required fields");
+        return;
+      }
+      
+      // Prevent creating deals when viewing all tenants (no valid tenant_id)
+      if (isViewingAllTenants) {
+        toast.error("Please select a specific tenant to create a new deal.");
         return;
       }
       
