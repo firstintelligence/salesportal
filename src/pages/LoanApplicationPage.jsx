@@ -871,7 +871,7 @@ const LoanApplicationPage = () => {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h3 className="font-semibold text-sm text-foreground">Quick Start</h3>
-                <p className="text-xs text-muted-foreground">Auto-fill with ID scan</p>
+                <p className="text-xs text-muted-foreground">Scan ID to autofill fields</p>
               </div>
               <Button
                 type="button"
