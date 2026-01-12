@@ -619,7 +619,7 @@ const LoanApplicationPage = () => {
                   
                   // Position signature relative to field
                   const xPos = rect.x;
-                  const yPos = rect.y + 20; // Moved up by 100 pixels from previous -80 offset
+                  const yPos = rect.y + 5; // Moved down 15 pixels from previous +20 offset
                   
                   // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
