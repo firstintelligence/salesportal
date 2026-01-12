@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, ScanLine, ChevronDown } from "lucide-react";
+import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, UserCheck, ChevronDown } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import financeitLogo from "@/assets/financeit-logo.svg";
 import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
@@ -879,7 +879,7 @@ const LoanApplicationPage = () => {
                 className="shrink-0"
                 onClick={() => setIsIdScannerOpen(true)}
               >
-                <ScanLine className="w-4 h-4 mr-2" />
+                <UserCheck className="w-4 h-4 mr-2" />
                 Scan ID
               </Button>
             </div>
@@ -1258,7 +1258,7 @@ const LoanApplicationPage = () => {
                 className="w-full border-primary text-primary hover:bg-primary/10"
                 onClick={() => setIsIdScannerOpen(true)}
               >
-                <ScanLine className="w-4 h-4 mr-2" />
+                <UserCheck className="w-4 h-4 mr-2" />
                 Scan ID to Auto-Fill
               </Button>
             </div>
