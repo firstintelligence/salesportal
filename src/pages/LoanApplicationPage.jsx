@@ -467,27 +467,34 @@ const LoanApplicationPage = () => {
                   // Clear the text field
                   signatureField.setText('');
                   
-                  // Calculate dimensions to fit signature while maintaining aspect ratio
+                  // Calculate dimensions - minimum 2.5 inches (180 points) width for readability
                   const imgWidth = signatureImage.width;
                   const imgHeight = signatureImage.height;
                   const aspectRatio = imgWidth / imgHeight;
                   
-                  let drawWidth = rect.width;
+                  // Minimum width of 180 points (2.5 inches) for signature legibility
+                  const MIN_SIGNATURE_WIDTH = 180;
+                  const MIN_SIGNATURE_HEIGHT = 50;
+                  
+                  // Start with a good readable size, not constrained by tiny form field
+                  let drawWidth = Math.max(MIN_SIGNATURE_WIDTH, rect.width);
                   let drawHeight = drawWidth / aspectRatio;
                   
-                  if (drawHeight > rect.height) {
-                    drawHeight = rect.height;
+                  // Ensure minimum height as well
+                  if (drawHeight < MIN_SIGNATURE_HEIGHT) {
+                    drawHeight = MIN_SIGNATURE_HEIGHT;
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Center the signature in the field
-                  const xOffset = (rect.width - drawWidth) / 2;
-                  const yOffset = (rect.height - drawHeight) / 2;
+                  // Position signature at the field location, slightly offset for centering
+                  // Anchor to bottom-left of signature field area
+                  const xPos = rect.x;
+                  const yPos = rect.y;
                   
-                  // Draw the signature image
+                  // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
-                    x: rect.x + xOffset,
-                    y: rect.y + yOffset,
+                    x: xPos,
+                    y: yPos,
                     width: drawWidth,
                     height: drawHeight,
                   });
