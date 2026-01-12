@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Calendar as CalendarIcon, Pen } from "lucide-react";
+import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2 } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import financeitLogo from "@/assets/financeit-logo.svg";
 import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
@@ -36,6 +36,7 @@ const LoanApplicationPage = () => {
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState(false);
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   const [createdCustomerId, setCreatedCustomerId] = useState(customer?.id || null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const formatLocalDate = (date) => {
     if (!date) return "";
@@ -633,6 +634,93 @@ const LoanApplicationPage = () => {
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF. Please try again.');
+    }
+  };
+
+  // Save profile without generating PDF (no signature required)
+  const handleSaveProfile = async () => {
+    if (!formData.firstName || !formData.lastName) {
+      toast.error('Please enter first and last name');
+      return;
+    }
+    
+    if (!tenant?.id) {
+      toast.error('Tenant not loaded. Please try again.');
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      const agentId = localStorage.getItem('agentId');
+      const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '');
+      
+      if (!phoneDigits) {
+        toast.error('Please enter a phone number');
+        setIsSaving(false);
+        return;
+      }
+      
+      // Check if customer already exists by phone number within the same tenant
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("tenant_id", tenant.id)
+        .or(`phone.eq.${phoneDigits},phone.eq.${formData.homePhone},phone.eq.${formData.mobilePhone}`)
+        .maybeSingle();
+      
+      let customerId;
+      
+      if (existingCustomer) {
+        // Update existing customer
+        customerId = existingCustomer.id;
+        const { error: updateError } = await supabase
+          .from("customers")
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email || null,
+            address: formData.address || null,
+            city: formData.city || null,
+            province: formData.province || null,
+            postal_code: formData.postalCode || null,
+          })
+          .eq("id", customerId);
+        
+        if (updateError) throw updateError;
+        toast.success('Customer profile updated!');
+      } else {
+        // Create new customer
+        const { data: newCustomer, error: insertError } = await supabase
+          .from("customers")
+          .insert({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email || null,
+            phone: phoneDigits,
+            address: formData.address || null,
+            city: formData.city || null,
+            province: formData.province || null,
+            postal_code: formData.postalCode || null,
+            tenant_id: tenant.id,
+            agent_id: agentId,
+          })
+          .select("id")
+          .single();
+        
+        if (insertError) throw insertError;
+        customerId = newCustomer.id;
+        toast.success('Customer profile saved!');
+      }
+      
+      setCreatedCustomerId(customerId);
+      
+      // Navigate to customer detail page
+      navigate(`/customer/${customerId}`);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('Failed to save profile');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1300,6 +1388,20 @@ const LoanApplicationPage = () => {
             </div>
 
             <div className="flex gap-4 pt-6">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={handleSaveProfile}
+                disabled={isSaving}
+                className="flex-1"
+              >
+                {isSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {isSaving ? 'Saving...' : 'Save Profile'}
+              </Button>
               <Button type="submit" className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
                 Generate PDF
