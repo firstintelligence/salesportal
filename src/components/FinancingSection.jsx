@@ -54,32 +54,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
       </div>
       
       <div className="space-y-3">
-        <FloatingLabelInput
-          id="financeCompany"
-          label="Finance Company"
-          value={financing.financeCompany}
-          onChange={(e) => handleFinancingChange('financeCompany', e.target.value)}
-          disabled
-          className="text-xs md:text-sm"
-        />
-        
-        {/* Loan Amount + Admin Fee - 2 columns */}
-        <div className="grid grid-cols-2 gap-2 md:gap-4">
-          <FloatingLabelInput
-            id="loanAmount"
-            label="Loan Amount"
-            value={`$${formatWithCommas(financing.loanAmount || 0)}`}
-            disabled
-            className="text-xs md:text-sm"
-          />
-
-          <FloatingLabelInput
-            id="adminFee"
-            label="Admin Fee"
-            value={`$${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}`}
-            disabled
-            className="text-xs md:text-sm"
-          />
+        {/* Finance Company, Loan Amount, Admin Fee - displayed as plain text */}
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[10px] md:text-xs text-gray-600">Finance Company:</span>
+            <span className="text-xs md:text-sm font-semibold text-gray-900">{financing.financeCompany}</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[10px] md:text-xs text-gray-600">Loan Amount:</span>
+            <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(financing.loanAmount || 0)}</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[10px] md:text-xs text-gray-600">Admin Fee:</span>
+            <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}</span>
+          </div>
         </div>
 
         {/* Promo Term + Amortization - 2 columns */}
