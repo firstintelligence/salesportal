@@ -564,13 +564,43 @@ const DashboardPage = () => {
                 
                 const checklistCompleted = false; // TODO: check from installation_checklists table
                 
-                // Document badge click handler
+                // Document badge click handler - download file instead of opening in blocked iframe
                 const handleDocumentClick = (e, url, type) => {
                   e.stopPropagation();
                   if (url) {
-                    window.open(url, '_blank');
+                    // Create a temporary link to trigger download
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    // Extract filename from URL for download
+                    const filename = url.split('/').pop() || `${type}.pdf`;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    toast.success(`Downloading ${type}...`);
                   } else {
                     toast.error(`No ${type} available`);
+                  }
+                };
+                
+                // Copy to clipboard handler for long-press functionality
+                const handleCopyToClipboard = async (e, text, label) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  try {
+                    await navigator.clipboard.writeText(text);
+                    toast.success(`${label} copied!`);
+                  } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    toast.success(`${label} copied!`);
                   }
                 };
                 
@@ -617,18 +647,32 @@ const DashboardPage = () => {
                         )}
                       </div>
 
-                      {/* Row 2: Phone + Full Address */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                        <div className="flex items-center gap-1 shrink-0">
+                      {/* Row 2: Phone + Full Address - same text size, tap/long-press to copy */}
+                      <div className="flex items-center gap-3 text-muted-foreground mb-2">
+                        <button
+                          onClick={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
+                          onContextMenu={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
+                          className="flex items-center gap-1 shrink-0 hover:text-foreground transition-colors active:scale-95"
+                        >
                           <Phone className="w-3 h-3" />
-                          <span className="font-mono text-[11px]">{formatPhoneNumber(customer.phone)}</span>
-                        </div>
-                        <div className="flex items-center gap-1 min-w-0 flex-1">
+                          <span className="text-[11px]">{formatPhoneNumber(customer.phone)}</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            handleCopyToClipboard(e, fullAddress, 'Address');
+                          }}
+                          onContextMenu={(e) => {
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            handleCopyToClipboard(e, fullAddress, 'Address');
+                          }}
+                          className="flex items-center gap-1 min-w-0 flex-1 hover:text-foreground transition-colors active:scale-95 text-left"
+                        >
                           <MapPin className="w-3 h-3 shrink-0" />
                           <span className="truncate text-[11px]">
                             {customer.address}{customer.city ? `, ${customer.city}` : ''}{customer.province ? `, ${customer.province}` : ''}
                           </span>
-                        </div>
+                        </button>
                       </div>
                       
                       {/* Row 3: Products (if any) */}
