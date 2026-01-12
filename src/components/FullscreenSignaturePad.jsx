@@ -175,12 +175,26 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         ref={containerRef}
         className="flex-1 flex items-center justify-center p-1 overflow-hidden bg-white"
       >
-        {/* Canvas container - maximized */}
-        <div className="border-2 border-dashed border-gray-300 rounded bg-white overflow-hidden relative">
-          {/* Baseline guide */}
+        {/* Canvas container - maximized with solid thick border */}
+        <div className="border-4 border-gray-800 rounded-lg bg-white overflow-hidden relative">
+          {/* Sign Here watermark text */}
           <div 
-            className="absolute left-2 right-2 border-b border-dashed border-gray-300 pointer-events-none"
-            style={{ bottom: '25%' }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+            style={{ zIndex: 0 }}
+          >
+            <span className="text-gray-200 text-4xl sm:text-5xl md:text-6xl font-light tracking-widest uppercase">
+              Sign Here
+            </span>
+          </div>
+          
+          {/* Baseline guide - long dashes */}
+          <div 
+            className="absolute left-4 right-4 pointer-events-none"
+            style={{ 
+              bottom: '25%',
+              height: '2px',
+              backgroundImage: 'repeating-linear-gradient(to right, #d1d5db 0px, #d1d5db 12px, transparent 12px, transparent 20px)'
+            }}
           />
           
           {canvasSize.width > 0 && canvasSize.height > 0 && (
@@ -206,8 +220,16 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         </div>
       </div>
 
-      {/* Footer with Clear and Submit buttons */}
-      <div className="px-2 py-1.5 border-t border-border bg-muted/30 flex justify-between items-center shrink-0" style={{ height: '44px' }}>
+      {/* Footer with Clear and Submit buttons - with safe area padding */}
+      <div 
+        className="px-4 py-2 border-t border-border bg-muted/30 flex justify-between items-center shrink-0"
+        style={{ 
+          minHeight: '52px',
+          paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+          paddingLeft: 'max(16px, env(safe-area-inset-left))',
+          paddingRight: 'max(16px, env(safe-area-inset-right))'
+        }}
+      >
         <Button
           variant="outline"
           size="sm"
