@@ -161,6 +161,7 @@ export type Database = {
           document_type: string
           document_url: string | null
           id: string
+          invoice_amount: number | null
           ip_address: string | null
           isp: string | null
           latitude: number | null
@@ -185,6 +186,7 @@ export type Database = {
           document_type: string
           document_url?: string | null
           id?: string
+          invoice_amount?: number | null
           ip_address?: string | null
           isp?: string | null
           latitude?: number | null
@@ -209,6 +211,7 @@ export type Database = {
           document_type?: string
           document_url?: string | null
           id?: string
+          invoice_amount?: number | null
           ip_address?: string | null
           isp?: string | null
           latitude?: number | null

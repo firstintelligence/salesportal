@@ -1,6 +1,7 @@
 import { supabase } from '../integrations/supabase/client';
 import { getTenantCompanyInfo } from './tenantLogos';
 import { recordDocumentSignature, captureSigningLocation } from './signingLocationService';
+import { calculateSubTotal, calculateTaxAmount } from './invoiceCalculations';
 
 export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges', signingContext = null, options = {}) => {
   return new Promise(async (resolve, reject) => {
@@ -245,6 +246,15 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       // Record document signature if signing context is provided OR if there's a signature
       if (signingContext || invoiceDataWithLocation.signature) {
         try {
+          // Calculate invoice total amount for storage
+          let invoiceAmount = null;
+          if (invoiceDataWithLocation.items && Array.isArray(invoiceDataWithLocation.items)) {
+            const subTotal = parseFloat(calculateSubTotal(invoiceDataWithLocation.items));
+            const taxPercentage = invoiceDataWithLocation.taxPercentage || 0;
+            const taxAmount = parseFloat(calculateTaxAmount(subTotal, taxPercentage));
+            invoiceAmount = subTotal + taxAmount;
+          }
+          
           // Use pre-captured signing location instead of capturing again
           const signatureRecord = {
             document_type: signingContext?.documentType || 'invoice',
@@ -256,6 +266,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
             signature_type: signingContext?.signatureType || 'customer',
             signed_at: new Date().toISOString(),
             document_url: documentUrl,
+            invoice_amount: invoiceAmount,
             // Use pre-captured location data
             ip_address: signingLocation?.ip_address || null,
             latitude: signingLocation?.latitude || null,
