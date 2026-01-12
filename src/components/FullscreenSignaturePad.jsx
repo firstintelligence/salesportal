@@ -159,30 +159,80 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       if (isEmpty) {
         onSave(null);
       } else {
-        // Get the canvas and process it to make white pixels transparent
+        // Get the canvas and process it
         const canvas = signatureRef.current.getCanvas();
         const ctx = canvas.getContext('2d');
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         
-        // Convert white/near-white pixels to transparent
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          
-          if (r > 200 && g > 200 && b > 200) {
-            data[i + 3] = 0;
+        // Find the bounding box of the actual signature (non-white pixels)
+        let minX = canvas.width;
+        let minY = canvas.height;
+        let maxX = 0;
+        let maxY = 0;
+        
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const i = (y * canvas.width + x) * 4;
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            
+            // Check if pixel is not white/near-white (i.e., part of signature)
+            if (!(r > 200 && g > 200 && b > 200)) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
           }
         }
         
-        const transparentCanvas = document.createElement('canvas');
-        transparentCanvas.width = canvas.width;
-        transparentCanvas.height = canvas.height;
-        const transparentCtx = transparentCanvas.getContext('2d');
-        transparentCtx.putImageData(imageData, 0, 0);
+        // Add padding around the signature
+        const padding = 10;
+        minX = Math.max(0, minX - padding);
+        minY = Math.max(0, minY - padding);
+        maxX = Math.min(canvas.width - 1, maxX + padding);
+        maxY = Math.min(canvas.height - 1, maxY + padding);
         
-        const dataUrl = transparentCanvas.toDataURL('image/png');
+        const croppedWidth = maxX - minX + 1;
+        const croppedHeight = maxY - minY + 1;
+        
+        // Get the cropped region
+        const croppedImageData = ctx.getImageData(minX, minY, croppedWidth, croppedHeight);
+        const croppedData = croppedImageData.data;
+        
+        // Convert white/near-white pixels to transparent
+        for (let i = 0; i < croppedData.length; i += 4) {
+          const r = croppedData[i];
+          const g = croppedData[i + 1];
+          const b = croppedData[i + 2];
+          
+          if (r > 200 && g > 200 && b > 200) {
+            croppedData[i + 3] = 0;
+          }
+        }
+        
+        // Create a high-resolution canvas for better PDF quality (2x scale)
+        const scale = 2;
+        const outputCanvas = document.createElement('canvas');
+        outputCanvas.width = croppedWidth * scale;
+        outputCanvas.height = croppedHeight * scale;
+        const outputCtx = outputCanvas.getContext('2d');
+        
+        // Create temp canvas at original size with cropped data
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = croppedWidth;
+        tempCanvas.height = croppedHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.putImageData(croppedImageData, 0, 0);
+        
+        // Scale up to output canvas with smooth interpolation
+        outputCtx.imageSmoothingEnabled = true;
+        outputCtx.imageSmoothingQuality = 'high';
+        outputCtx.drawImage(tempCanvas, 0, 0, croppedWidth * scale, croppedHeight * scale);
+        
+        const dataUrl = outputCanvas.toDataURL('image/png', 1.0);
         onSave(dataUrl);
       }
     }
