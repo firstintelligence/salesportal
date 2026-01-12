@@ -798,8 +798,23 @@ const LoanApplicationPage = () => {
     e.preventDefault();
     
     // Validation
-    if (!formData.firstName || !formData.lastName || !formData.email) {
-      toast.error('Please fill in all required fields');
+    if (!formData.firstName || !formData.lastName) {
+      toast.error('Please fill in first and last name');
+      return;
+    }
+    
+    if (!formData.birthdate) {
+      toast.error('Please enter your date of birth');
+      return;
+    }
+    
+    if (!formData.maritalStatus) {
+      toast.error('Please select your marital status');
+      return;
+    }
+    
+    if (!formData.homePhone) {
+      toast.error('Please enter your phone number');
       return;
     }
     
@@ -844,6 +859,25 @@ const LoanApplicationPage = () => {
       <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8">
         <div className="bg-white border border-border rounded-lg shadow-lg p-4 md:p-8">
           <div className="border-t-2 border-green-600 mb-6"></div>
+          
+          {/* Quick Scan ID at Top */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-sm text-foreground">Quick Start: Scan ID</h3>
+                <p className="text-xs text-muted-foreground">Scan your ID to auto-fill personal details, address, and identification info</p>
+              </div>
+              <Button
+                type="button"
+                variant="default"
+                className="shrink-0"
+                onClick={() => setIsIdScannerOpen(true)}
+              >
+                <ScanLine className="w-4 h-4 mr-2" />
+                Scan ID
+              </Button>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Details Section */}
@@ -888,7 +922,7 @@ const LoanApplicationPage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="birthdate">Birthdate</Label>
+                  <Label htmlFor="birthdate">Birthdate *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -922,10 +956,11 @@ const LoanApplicationPage = () => {
                   </Popover>
                 </div>
                 <div>
-                  <Label htmlFor="maritalStatus">Marital Status</Label>
+                  <Label htmlFor="maritalStatus">Marital Status *</Label>
                   <Select
                     value={formData.maritalStatus}
                     onValueChange={(value) => handleSelectChange("maritalStatus", value)}
+                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
@@ -940,7 +975,7 @@ const LoanApplicationPage = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="homePhone">Phone Number</Label>
+                  <Label htmlFor="homePhone">Phone Number *</Label>
                   <Input
                     id="homePhone"
                     name="homePhone"
@@ -948,6 +983,7 @@ const LoanApplicationPage = () => {
                     value={formData.homePhone}
                     onChange={handleInputChange}
                     autoComplete="tel-national"
+                    required
                   />
                 </div>
               </div>
@@ -965,14 +1001,13 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div className="md:col-start-1 md:row-start-1">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required
                     autoComplete="email"
                   />
                 </div>
