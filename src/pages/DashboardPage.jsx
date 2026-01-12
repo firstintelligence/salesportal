@@ -274,15 +274,15 @@ const DashboardPage = () => {
       <TooltipTrigger asChild>
         <button
           onClick={onClick}
-          className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
+          className={`relative w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 ${
             completed 
-              ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' 
+              ? 'bg-emerald-500 text-white' 
               : inProgress
-                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105'
+                ? 'bg-blue-500 text-white'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
           }`}
         >
-          {completed ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+          {completed ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="top" className="text-xs font-medium">
@@ -531,7 +531,7 @@ const DashboardPage = () => {
           </Card>
         ) : (
           <TooltipProvider delayDuration={300}>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {filteredDeals.map((customer, index) => {
                 // Get the most recently updated TPV request
                 const sortedTpvRequests = [...(customer.tpv_requests || [])].sort((a, b) => 
@@ -577,170 +577,137 @@ const DashboardPage = () => {
                 return (
                   <Card 
                     key={customer.id}
-                    className={`cursor-pointer transition-all duration-300 hover:scale-[1.01] card-elevated border-0 border-l-4 rounded-2xl overflow-hidden ${statusConfig.border} ${statusConfig.bg}`}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-900`}
                     onClick={() => navigate(`/customer/${customer.id}`)}
-                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <CardContent className="p-4">
+                    <CardContent className="p-3">
                       {/* Tenant badge when viewing all tenants */}
                       {isViewingAllTenants && customer.tenant_id && (
-                        <div className="mb-2">
-                          <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">
+                        <div className="mb-1.5">
+                          <span className="text-[9px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">
                             {tenantNames[customer.tenant_id] || 'Unknown Tenant'}
                           </span>
                         </div>
                       )}
                       
-                      {/* Top Row - Name, Status Badge, Price */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-foreground text-base truncate">
-                              {fullName}
-                            </h3>
-                            {displayAgent && (
-                              <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0">
-                                {displayAgent}
-                              </span>
-                            )}
-                          </div>
+                      {/* Row 1: Name + Agent + Price */}
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <h3 className="font-semibold text-foreground text-sm truncate">
+                            {fullName}
+                          </h3>
+                          {displayAgent && (
+                            <span className="text-[9px] font-medium text-muted-foreground bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded shrink-0">
+                              {displayAgent}
+                            </span>
+                          )}
                           {latestTpv && (
-                            <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusConfig.badge}`}>
-                              <Sparkles className="w-2.5 h-2.5 mr-1" />
+                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded shrink-0 ${
+                              tpvCompleted ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300' :
+                              'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'
+                            }`}>
                               {statusConfig.label}
                             </span>
                           )}
                         </div>
                         {salesPrice && (
-                          <div className="text-right shrink-0">
-                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">
-                              {salesPrice}
-                            </span>
-                          </div>
+                          <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400 shrink-0">
+                            {salesPrice}
+                          </span>
                         )}
                       </div>
 
-                      {/* Middle Row - Details */}
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5" />
-                          <span className="font-mono text-xs">{formatPhoneNumber(customer.phone)}</span>
+                      {/* Row 2: Phone + Full Address */}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Phone className="w-3 h-3" />
+                          <span className="font-mono text-[11px]">{formatPhoneNumber(customer.phone)}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 truncate">
-                          <MapPin className="w-3.5 h-3.5 shrink-0" />
-                          <span className="truncate text-xs">{customer.city || customer.address}</span>
+                        <div className="flex items-center gap-1 min-w-0 flex-1">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          <span className="truncate text-[11px]">
+                            {customer.address}{customer.city ? `, ${customer.city}` : ''}{customer.province ? `, ${customer.province}` : ''}
+                          </span>
                         </div>
                       </div>
                       
+                      {/* Row 3: Products (if any) */}
                       {latestTpv?.products && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 bg-muted/50 px-3 py-2 rounded-lg">
-                          <Package className="w-3.5 h-3.5 shrink-0" />
-                          <span className="truncate font-medium">{latestTpv.products}</span>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mb-2 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded">
+                          <Package className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{latestTpv.products}</span>
                         </div>
                       )}
 
-                      {/* Document Badges - Downloadable files */}
-                      {/* Blue = filled but not signed, Green = signed */}
+                      {/* Row 4: Document badges (compact) */}
                       {(tpvRecording || loanFilled || invoiceFilled) && (
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="flex flex-wrap gap-1.5 mb-2">
                           {tpvRecording && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={(e) => handleDocumentClick(e, tpvRecording, 'TPV recording')}
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors"
-                                >
-                                  <PlayCircle className="w-3 h-3" />
-                                  TPV Recording
-                                  <Download className="w-3 h-3" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>Download TPV call recording</TooltipContent>
-                            </Tooltip>
+                            <button
+                              onClick={(e) => handleDocumentClick(e, tpvRecording, 'TPV recording')}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/60"
+                            >
+                              <PlayCircle className="w-2.5 h-2.5" />
+                              TPV
+                            </button>
                           )}
                           {loanFilled && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={(e) => handleDocumentClick(e, loanApplication?.document_url, 'loan application')}
-                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                                    loanSigned 
-                                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' 
-                                      : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60'
-                                  }`}
-                                >
-                                  <CreditCard className="w-3 h-3" />
-                                  Loan App {loanSigned ? '✓' : ''}
-                                  <Download className="w-3 h-3" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {loanSigned ? 'Download signed loan application' : 'Download loan application (unsigned)'}
-                              </TooltipContent>
-                            </Tooltip>
+                            <button
+                              onClick={(e) => handleDocumentClick(e, loanApplication?.document_url, 'loan application')}
+                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                loanSigned 
+                                  ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200' 
+                                  : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200'
+                              }`}
+                            >
+                              <CreditCard className="w-2.5 h-2.5" />
+                              Loan{loanSigned ? ' ✓' : ''}
+                            </button>
                           )}
                           {invoiceFilled && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={(e) => handleDocumentClick(e, invoiceDocument.document_url, 'invoice')}
-                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                                    invoiceSigned 
-                                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' 
-                                      : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60'
-                                  }`}
-                                >
-                                  <FileText className="w-3 h-3" />
-                                  Invoice {invoiceSigned ? '✓' : ''}
-                                  <Download className="w-3 h-3" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {invoiceSigned ? 'Download signed invoice' : 'Download invoice (unsigned)'}
-                              </TooltipContent>
-                            </Tooltip>
+                            <button
+                              onClick={(e) => handleDocumentClick(e, invoiceDocument.document_url, 'invoice')}
+                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                invoiceSigned 
+                                  ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200' 
+                                  : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200'
+                              }`}
+                            >
+                              <FileText className="w-2.5 h-2.5" />
+                              Invoice{invoiceSigned ? ' ✓' : ''}
+                            </button>
                           )}
                         </div>
                       )}
 
-                      {/* Bottom Row - Action Buttons */}
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                        <div className="flex items-center gap-2">
-                          <ActionButton 
-                            completed={tpvCompleted}
-                            icon={PhoneCall}
-                            label={tpvCompleted ? "TPV Complete" : "Start TPV"}
-                            onClick={(e) => handleActionClick(e, 'tpv', customer)}
-                          />
-                          <ActionButton 
-                            completed={loanSigned}
-                            inProgress={loanFilled && !loanSigned}
-                            icon={CreditCard}
-                            label={loanSigned ? "Loan Signed" : loanFilled ? "Loan Filled (Unsigned)" : "Loan Application"}
-                            onClick={(e) => handleActionClick(e, 'loan', customer)}
-                          />
-                          <ActionButton 
-                            completed={invoiceSigned}
-                            inProgress={invoiceFilled && !invoiceSigned}
-                            icon={FileText}
-                            label={invoiceSigned ? "Invoice Signed" : invoiceFilled ? "Invoice Filled (Unsigned)" : "Generate Invoice"}
-                            onClick={(e) => handleActionClick(e, 'invoice', customer)}
-                          />
-                          <ActionButton 
-                            completed={checklistCompleted}
-                            icon={ClipboardCheck}
-                            label={checklistCompleted ? "Checklist Complete" : "Installation Checklist"}
-                            onClick={(e) => handleActionClick(e, 'checklist', customer)}
-                          />
-                        </div>
-                        
-                        {/* Progress indicator */}
-                        <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1.5 rounded-full">
-                          <div className={`w-2 h-2 rounded-full transition-colors ${tpvCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-2 h-2 rounded-full transition-colors ${loanSigned ? 'bg-emerald-500' : loanFilled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-2 h-2 rounded-full transition-colors ${invoiceSigned ? 'bg-emerald-500' : invoiceFilled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                          <div className={`w-2 h-2 rounded-full transition-colors ${checklistCompleted ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                        </div>
+                      {/* Row 5: Action Buttons */}
+                      <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <ActionButton 
+                          completed={tpvCompleted}
+                          icon={PhoneCall}
+                          label={tpvCompleted ? "TPV Complete" : "Start TPV"}
+                          onClick={(e) => handleActionClick(e, 'tpv', customer)}
+                        />
+                        <ActionButton 
+                          completed={loanSigned}
+                          inProgress={loanFilled && !loanSigned}
+                          icon={CreditCard}
+                          label={loanSigned ? "Loan Signed" : loanFilled ? "Loan Filled" : "Loan Application"}
+                          onClick={(e) => handleActionClick(e, 'loan', customer)}
+                        />
+                        <ActionButton 
+                          completed={invoiceSigned}
+                          inProgress={invoiceFilled && !invoiceSigned}
+                          icon={FileText}
+                          label={invoiceSigned ? "Invoice Signed" : invoiceFilled ? "Invoice Filled" : "Generate Invoice"}
+                          onClick={(e) => handleActionClick(e, 'invoice', customer)}
+                        />
+                        <ActionButton 
+                          completed={checklistCompleted}
+                          icon={ClipboardCheck}
+                          label={checklistCompleted ? "Checklist Complete" : "Checklist"}
+                          onClick={(e) => handleActionClick(e, 'checklist', customer)}
+                        />
                       </div>
                     </CardContent>
                   </Card>
