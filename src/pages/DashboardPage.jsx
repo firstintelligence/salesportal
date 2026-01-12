@@ -114,7 +114,8 @@ const DashboardPage = () => {
             document_type,
             document_url,
             signature_type,
-            signed_at
+            signed_at,
+            invoice_amount
           )
         `)
         .order("created_at", { ascending: false });
@@ -542,15 +543,24 @@ const DashboardPage = () => {
                 const fullName = customer.first_name && customer.last_name 
                   ? `${customer.first_name} ${customer.last_name}`
                   : "Unnamed";
-                const salesPrice = formatCurrency(latestTpv?.sales_price);
+                // salesPrice will be determined after checking invoice documents
                 const tpvCompleted = latestTpv?.status?.toLowerCase() === 'completed';
                 const statusConfig = getStatusConfig(latestTpv?.status);
                 
                 // Get document signatures for this customer
                 const documentSignatures = customer.document_signatures || [];
                 const loanApplication = documentSignatures.find(d => d.document_type === 'loan_application');
-                const invoiceDocument = documentSignatures.find(d => d.document_type === 'invoice');
+                // Get the most recent invoice document (sorted by signed_at)
+                const invoiceDocuments = documentSignatures
+                  .filter(d => d.document_type === 'invoice')
+                  .sort((a, b) => new Date(b.signed_at) - new Date(a.signed_at));
+                const invoiceDocument = invoiceDocuments[0];
                 const tpvRecording = latestTpv?.recording_url;
+                
+                // Use invoice_amount from signed document if available, otherwise fall back to TPV sales_price
+                const displayAmount = invoiceDocument?.invoice_amount 
+                  ? formatCurrency(invoiceDocument.invoice_amount)
+                  : formatCurrency(latestTpv?.sales_price);
                 
                 // Determine completion states from actual data
                 // Loan: has document = filled, has signature_type = signed
@@ -640,9 +650,9 @@ const DashboardPage = () => {
                             </span>
                           )}
                         </div>
-                        {salesPrice && (
+                        {displayAmount && (
                           <span className="font-bold text-sm text-emerald-600 dark:text-emerald-400 shrink-0">
-                            {salesPrice}
+                            {displayAmount}
                           </span>
                         )}
                       </div>
