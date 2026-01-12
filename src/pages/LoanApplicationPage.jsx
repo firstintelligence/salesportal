@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, ScanLine } from "lucide-react";
+import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, ScanLine, ChevronDown } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import financeitLogo from "@/assets/financeit-logo.svg";
 import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
@@ -28,6 +28,7 @@ import { recordDocumentSignature } from "@/utils/signingLocationService";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 
 const LoanApplicationPage = () => {
@@ -885,7 +886,7 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 PERSONAL DETAILS
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="firstName">First Name *</Label>
                   <Input
@@ -920,7 +921,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="birthdate">Birthdate *</Label>
                   <Popover>
@@ -988,7 +989,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div className="md:col-start-3 md:row-start-1">
                   <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
                   <Input
@@ -1031,7 +1032,7 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 HOUSING
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div className="md:col-span-2">
                   <Label htmlFor="address">Address *</Label>
                   <Input
@@ -1054,7 +1055,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="city">City</Label>
                   <Input
@@ -1103,7 +1104,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="housingStatus">Housing Status</Label>
                   <Select
@@ -1148,12 +1149,22 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 BORROWER IDENTIFICATION
               </div>
-              <p className="text-xs text-muted-foreground italic">
-                Acceptable forms of photo ID: Driver's License, Current Canadian Passport, 
-                Canadian Citizenship Card, Permanent Resident Card, Certificate of Indian Status issued by the Government of Canada, 
-                Provincial Government Photo Identification Card, Provincial Government Health Card (not accepted if issued in Ontario, Manitoba or PEI), Nexus Card, LCBO BYID Card.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="w-full justify-between text-xs text-muted-foreground italic p-2 h-auto">
+                    <span>View acceptable forms of photo ID</span>
+                    <ChevronDown className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-180" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-2">
+                  <p className="text-xs text-muted-foreground italic bg-muted/50 p-3 rounded-md">
+                    Acceptable forms of photo ID: Driver's License, Current Canadian Passport, 
+                    Canadian Citizenship Card, Permanent Resident Card, Certificate of Indian Status issued by the Government of Canada, 
+                    Provincial Government Photo Identification Card, Provincial Government Health Card (not accepted if issued in Ontario, Manitoba or PEI), Nexus Card, LCBO BYID Card.
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="photoIdType">ID Type</Label>
                   <Select
@@ -1200,7 +1211,7 @@ const LoanApplicationPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="photoIdNumber">ID Number</Label>
                   <Input
@@ -1264,7 +1275,7 @@ const LoanApplicationPage = () => {
                 EMPLOYMENT & INCOME INFORMATION
               </div>
               {/* Row 1: Employment Status, Business Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="employmentStatus">Employment Status</Label>
                   <Select
@@ -1296,7 +1307,7 @@ const LoanApplicationPage = () => {
               </div>
 
               {/* Row 2: Position Title, Gross Monthly Income */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="positionTitle">Position Title</Label>
                   <Input
@@ -1319,7 +1330,7 @@ const LoanApplicationPage = () => {
               </div>
 
               {/* Row 3: Time at Job, Employer Address */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="timeAtJob">Time at Job (Years)</Label>
                   <Input
@@ -1343,7 +1354,7 @@ const LoanApplicationPage = () => {
               </div>
 
               {/* Row 4: Employer City, Employer Province */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="employerCity">Employer City</Label>
                   <Input
