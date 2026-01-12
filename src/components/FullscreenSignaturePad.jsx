@@ -13,12 +13,27 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       // Lock body scroll
       document.body.style.overflow = 'hidden';
       
-      // Force landscape orientation hint
-      if (screen.orientation?.lock) {
-        screen.orientation.lock('landscape').catch(() => {
-          // Silently fail if not supported
-        });
-      }
+      // Request fullscreen first, then lock orientation to landscape
+      const enterFullscreenLandscape = async () => {
+        try {
+          const docEl = document.documentElement;
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen();
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen(); // Safari
+          }
+          
+          // Now lock orientation to landscape
+          if (screen.orientation?.lock) {
+            await screen.orientation.lock('landscape');
+          }
+        } catch (err) {
+          // Silently fail - some browsers don't support this
+          console.log('Fullscreen/orientation lock not supported');
+        }
+      };
+      
+      enterFullscreenLandscape();
 
       // Calculate canvas size - maximize screen utilization (95%+)
       const updateSize = () => {
@@ -47,9 +62,26 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       };
     } else {
       document.body.style.overflow = '';
-      if (screen.orientation?.unlock) {
-        screen.orientation.unlock();
-      }
+      
+      // Exit fullscreen and unlock orientation
+      const exitFullscreen = async () => {
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) {
+              await document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              await document.webkitExitFullscreen();
+            }
+          }
+          if (screen.orientation?.unlock) {
+            screen.orientation.unlock();
+          }
+        } catch (err) {
+          // Silently fail
+        }
+      };
+      
+      exitFullscreen();
     }
   }, [isOpen]);
 
@@ -135,15 +167,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
           <span className="text-xs">Cancel</span>
         </Button>
         <h2 className="text-sm font-semibold text-foreground">Sign Here</h2>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleFinish}
-          className="bg-primary text-primary-foreground h-8 px-2"
-        >
-          <Check className="h-4 w-4 mr-1" />
-          <span className="text-xs">Done</span>
-        </Button>
+        <div className="w-16" /> {/* Spacer for centering title */}
       </div>
 
       {/* Signature Area - Maximized */}
@@ -182,8 +206,8 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         </div>
       </div>
 
-      {/* Compact Footer with Clear button */}
-      <div className="px-2 py-1.5 border-t border-border bg-muted/30 flex justify-center shrink-0" style={{ height: '44px' }}>
+      {/* Footer with Clear and Submit buttons */}
+      <div className="px-2 py-1.5 border-t border-border bg-muted/30 flex justify-between items-center shrink-0" style={{ height: '44px' }}>
         <Button
           variant="outline"
           size="sm"
@@ -192,6 +216,16 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         >
           <Trash2 className="h-3 w-3 mr-1" />
           <span className="text-xs">Clear</span>
+        </Button>
+        
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleFinish}
+          className="bg-primary text-primary-foreground h-8 px-6"
+        >
+          <Check className="h-4 w-4 mr-1" />
+          <span className="text-xs">Submit</span>
         </Button>
       </div>
     </div>
