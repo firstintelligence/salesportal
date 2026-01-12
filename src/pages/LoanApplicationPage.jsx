@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, ScanLine } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import financeitLogo from "@/assets/financeit-logo.svg";
 import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
+import IDScanner from "@/components/qualify/IDScanner";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import {
@@ -26,6 +27,7 @@ import { capitalizeWords, formatPostalCode, formatPhoneNumber } from "@/utils/in
 import { recordDocumentSignature } from "@/utils/signingLocationService";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 
 const LoanApplicationPage = () => {
@@ -37,6 +39,67 @@ const LoanApplicationPage = () => {
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   const [createdCustomerId, setCreatedCustomerId] = useState(customer?.id || null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isIdScannerOpen, setIsIdScannerOpen] = useState(false);
+  
+  // Handle ID scan completion
+  const handleIdScanComplete = (scanData) => {
+    setIsIdScannerOpen(false);
+    
+    // Map the scanned data to form fields
+    let idType = '';
+    if (scanData.idType) {
+      const idTypeLower = scanData.idType.toLowerCase();
+      if (idTypeLower.includes('driver')) {
+        idType = 'drivers_license';
+      } else if (idTypeLower.includes('passport')) {
+        idType = 'passport';
+      } else if (idTypeLower.includes('citizenship')) {
+        idType = 'citizenship';
+      } else if (idTypeLower.includes('permanent') || idTypeLower.includes('pr')) {
+        idType = 'pr_card';
+      } else if (idTypeLower.includes('status') || idTypeLower.includes('indian')) {
+        idType = 'status_card';
+      } else if (idTypeLower.includes('provincial') || idTypeLower.includes('photo id')) {
+        idType = 'provincial_id';
+      } else if (idTypeLower.includes('health')) {
+        idType = 'health_card';
+      } else if (idTypeLower.includes('nexus')) {
+        idType = 'nexus';
+      }
+    }
+    
+    // Map province code
+    let province = scanData.province || '';
+    if (province.toLowerCase() === 'ontario') {
+      province = 'ON';
+    } else if (province.length > 2) {
+      // Try to convert full province name to code
+      const provinceMap = {
+        'quebec': 'QC', 'british columbia': 'BC', 'alberta': 'AB',
+        'manitoba': 'MB', 'saskatchewan': 'SK', 'nova scotia': 'NS',
+        'new brunswick': 'NB', 'newfoundland': 'NL', 'prince edward island': 'PE'
+      };
+      province = provinceMap[province.toLowerCase()] || province.substring(0, 2).toUpperCase();
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      photoIdType: idType || prev.photoIdType,
+      photoIdProvince: province || prev.photoIdProvince,
+      photoIdNumber: scanData.idNumber || prev.photoIdNumber,
+      photoIdExpiry: scanData.idExpiry || prev.photoIdExpiry,
+      // Also fill in personal info if available and not already filled
+      firstName: prev.firstName || scanData.firstName || '',
+      lastName: prev.lastName || scanData.lastName || '',
+      birthdate: prev.birthdate || scanData.dateOfBirth || '',
+      address: prev.address || scanData.address || '',
+      city: prev.city || scanData.city || '',
+      province: prev.province || province || '',
+      postalCode: prev.postalCode || scanData.postalCode || '',
+    }));
+    
+    toast.success('ID scanned successfully!');
+  };
   
   const formatLocalDate = (date) => {
     if (!date) return "";
@@ -486,10 +549,10 @@ const LoanApplicationPage = () => {
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Position signature at the field location, slightly offset for centering
-                  // Anchor to bottom-left of signature field area
+                  // Position signature lower - the field rect.y is too high
+                  // Offset signature down by 80 points to place it in the correct area
                   const xPos = rect.x;
-                  const yPos = rect.y;
+                  const yPos = rect.y - 80; // Move signature down significantly
                   
                   // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
@@ -1147,6 +1210,17 @@ const LoanApplicationPage = () => {
                   </Popover>
                 </div>
               </div>
+              
+              {/* Scan ID Button */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary/10"
+                onClick={() => setIsIdScannerOpen(true)}
+              >
+                <ScanLine className="w-4 h-4 mr-2" />
+                Scan ID to Auto-Fill
+              </Button>
             </div>
 
             {/* Employment Section */}
@@ -1425,6 +1499,16 @@ const LoanApplicationPage = () => {
         onSave={handleSignatureSave}
         initialSignature={savedSignatureDataUrl}
       />
+      
+      {/* ID Scanner Dialog */}
+      <Dialog open={isIdScannerOpen} onOpenChange={setIsIdScannerOpen}>
+        <DialogContent className="max-w-md">
+          <IDScanner 
+            onScanComplete={handleIdScanComplete}
+            onCancel={() => setIsIdScannerOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
