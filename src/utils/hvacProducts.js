@@ -39,21 +39,21 @@ export const hvacProducts = [
     name: '1 Head Ductless Heat Pump',
     description: 'Single zone ductless mini-split heat pump with professional installation',
     basePrice: 12000,
-    category: 'Heat Pumps'
+    category: 'Ductless Heat Pumps'
   },
   {
     id: 'ductless-heat-pump-2-head',
     name: '2 Head Ductless Heat Pump',
     description: 'Dual zone ductless mini-split heat pump with professional installation',
     basePrice: 16000,
-    category: 'Heat Pumps'
+    category: 'Ductless Heat Pumps'
   },
   {
     id: 'ductless-heat-pump-3-head',
     name: '3 Head Ductless Heat Pump',
     description: 'Triple zone ductless mini-split heat pump with professional installation',
     basePrice: 22000,
-    category: 'Heat Pumps'
+    category: 'Ductless Heat Pumps'
   },
   
   // Furnaces - All 95% AFUE
