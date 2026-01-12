@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Trash2, Check, X } from "lucide-react";
@@ -8,72 +8,101 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
   const containerRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // Calculate canvas size based on current window dimensions
+  const calculateSize = useCallback(() => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const landscape = screenWidth > screenHeight;
+    setIsLandscape(landscape);
+    
+    const headerHeight = 44;
+    
+    if (landscape) {
+      // Landscape: buttons on right side, no footer
+      const buttonColumnWidth = 72;
+      const padding = 32;
+      return {
+        width: screenWidth - buttonColumnWidth - padding,
+        height: screenHeight - headerHeight - 16
+      };
+    } else {
+      // Portrait: buttons at bottom
+      const footerHeight = 52;
+      const padding = 32;
+      return {
+        width: screenWidth - padding,
+        height: screenHeight - headerHeight - footerHeight - 16
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
+      // Reset ready state
+      setIsReady(false);
+      
       // Lock body scroll
       document.body.style.overflow = 'hidden';
       
-      // Request fullscreen first, then lock orientation to landscape
-      const enterFullscreenLandscape = async () => {
+      // Force landscape orientation for mobile
+      const forceLandscape = async () => {
         try {
+          // First try to request fullscreen
           const docEl = document.documentElement;
           if (docEl.requestFullscreen) {
             await docEl.requestFullscreen();
           } else if (docEl.webkitRequestFullscreen) {
-            await docEl.webkitRequestFullscreen(); // Safari
+            await docEl.webkitRequestFullscreen();
           }
           
-          // Now lock orientation to landscape
+          // Then lock to landscape
           if (screen.orientation?.lock) {
-            await screen.orientation.lock('landscape');
+            try {
+              await screen.orientation.lock('landscape');
+            } catch (orientErr) {
+              // Try landscape-primary as fallback
+              try {
+                await screen.orientation.lock('landscape-primary');
+              } catch (fallbackErr) {
+                console.log('Landscape lock not supported');
+              }
+            }
           }
         } catch (err) {
-          // Silently fail - some browsers don't support this
-          console.log('Fullscreen/orientation lock not supported');
+          console.log('Fullscreen not supported:', err.message);
         }
+        
+        // Wait for orientation change to settle, then calculate size
+        setTimeout(() => {
+          const size = calculateSize();
+          setCanvasSize(size);
+          setIsReady(true);
+        }, 300);
       };
       
-      enterFullscreenLandscape();
+      forceLandscape();
 
-      // Calculate canvas size - maximize screen utilization
-      const updateSize = () => {
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const landscape = screenWidth > screenHeight;
-        setIsLandscape(landscape);
-        
-        const headerHeight = 44;
-        
-        if (landscape) {
-          // Landscape: buttons on right side, no footer
-          const buttonColumnWidth = 72; // Width for button column
-          const padding = 32; // 16px each side
-          setCanvasSize({
-            width: screenWidth - buttonColumnWidth - padding,
-            height: screenHeight - headerHeight - 16
-          });
-        } else {
-          // Portrait: buttons at bottom
-          const footerHeight = 52;
-          const padding = 32;
-          setCanvasSize({
-            width: screenWidth - padding,
-            height: screenHeight - headerHeight - footerHeight - 16
-          });
-        }
+      // Handle resize and orientation changes
+      const handleResize = () => {
+        const size = calculateSize();
+        setCanvasSize(size);
       };
 
-      updateSize();
-      window.addEventListener('resize', updateSize);
-      window.addEventListener('orientationchange', updateSize);
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('orientationchange', () => {
+        // Wait for orientation change to complete
+        setTimeout(handleResize, 100);
+      });
 
       return () => {
-        window.removeEventListener('resize', updateSize);
-        window.removeEventListener('orientationchange', updateSize);
+        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('orientationchange', handleResize);
       };
     } else {
       document.body.style.overflow = '';
+      setIsReady(false);
       
       // Exit fullscreen and unlock orientation
       const exitFullscreen = async () => {
@@ -95,21 +124,28 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       
       exitFullscreen();
     }
-  }, [isOpen]);
+  }, [isOpen, calculateSize]);
 
+  // Load initial signature ONLY when pad is ready and canvas exists
   useEffect(() => {
-    // Load initial signature if exists
-    if (isOpen && initialSignature && signatureRef.current && canvasSize.width > 0) {
-      setTimeout(() => {
-        if (signatureRef.current) {
-          signatureRef.current.fromDataURL(initialSignature, {
-            width: canvasSize.width,
-            height: canvasSize.height
-          });
-        }
-      }, 100);
+    if (isOpen && isReady && signatureRef.current && canvasSize.width > 0) {
+      // ALWAYS clear the canvas first to prevent stacking signatures
+      signatureRef.current.clear();
+      
+      // Only load the initial signature if one was provided
+      if (initialSignature) {
+        // Small delay to ensure canvas is ready after clear
+        setTimeout(() => {
+          if (signatureRef.current) {
+            signatureRef.current.fromDataURL(initialSignature, {
+              width: canvasSize.width - 8,
+              height: canvasSize.height - 8
+            });
+          }
+        }, 50);
+      }
     }
-  }, [isOpen, initialSignature, canvasSize]);
+  }, [isOpen, isReady, initialSignature, canvasSize]);
 
   const handleClear = () => {
     if (signatureRef.current) {
@@ -213,7 +249,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
               }}
             />
             
-            {canvasSize.width > 0 && canvasSize.height > 0 && (
+            {canvasSize.width > 0 && canvasSize.height > 0 && isReady && (
               <SignatureCanvas
                 ref={signatureRef}
                 canvasProps={{
