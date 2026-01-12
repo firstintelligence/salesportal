@@ -242,6 +242,84 @@ export type Database = {
           },
         ]
       }
+      id_scans: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          customer_id: string | null
+          date_of_birth: string | null
+          first_name: string
+          id: string
+          id_expiry: string | null
+          id_image_path: string | null
+          id_number: string | null
+          id_type: string | null
+          last_name: string
+          postal_code: string | null
+          province: string | null
+          scanned_by: string
+          status: string | null
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          customer_id?: string | null
+          date_of_birth?: string | null
+          first_name: string
+          id?: string
+          id_expiry?: string | null
+          id_image_path?: string | null
+          id_number?: string | null
+          id_type?: string | null
+          last_name: string
+          postal_code?: string | null
+          province?: string | null
+          scanned_by: string
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          customer_id?: string | null
+          date_of_birth?: string | null
+          first_name?: string
+          id?: string
+          id_expiry?: string | null
+          id_image_path?: string | null
+          id_number?: string | null
+          id_type?: string | null
+          last_name?: string
+          postal_code?: string | null
+          province?: string | null
+          scanned_by?: string
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "id_scans_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "id_scans_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       installation_checklists: {
         Row: {
           agent_id: string

@@ -5,7 +5,7 @@ import {
   ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
   Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
   CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
-  Globe, Fingerprint
+  Globe, Fingerprint, ScanLine, User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +32,7 @@ const CustomerDetailPage = () => {
   const [tpvRequests, setTpvRequests] = useState([]);
   const [checklists, setChecklists] = useState([]);
   const [documentSignatures, setDocumentSignatures] = useState([]);
+  const [idScans, setIdScans] = useState([]);
   const [invoiceProfile, setInvoiceProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -115,7 +116,7 @@ const CustomerDetailPage = () => {
       if (checklistError) throw checklistError;
       setChecklists(checklistData || []);
 
-      // Fetch document signatures for this customer (admin can see all signatures)
+      // Fetch document signatures and ID scans for this customer (admin can see all)
       if (agentId === 'MM231611') {
         // First try by customer_id
         const { data: sigData, error: sigError } = await supabase
@@ -142,6 +143,17 @@ const CustomerDetailPage = () => {
               }
             }
           }
+        }
+
+        // Fetch ID scans for this customer
+        const { data: idScanData, error: idScanError } = await supabase
+          .from("id_scans")
+          .select("*")
+          .eq("customer_id", customerId)
+          .order("created_at", { ascending: false });
+        
+        if (!idScanError && idScanData) {
+          setIdScans(idScanData);
         }
       }
 
@@ -587,6 +599,75 @@ const CustomerDetailPage = () => {
             </div>
           )}
         </div>
+
+        {/* ID Scans Section (Admin Only) */}
+        {isAdmin && idScans.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <ScanLine className="w-5 h-5 text-amber-600" />
+              <h2 className="text-lg font-semibold text-foreground">ID Scans</h2>
+              <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">Admin Only</Badge>
+            </div>
+
+            <div className="space-y-3">
+              {idScans.map((scan) => (
+                <Card key={scan.id} className="bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                          <User className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {scan.first_name} {scan.last_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {scan.id_type} • Scanned {new Date(scan.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge className="bg-emerald-100 text-emerald-700">{scan.status}</Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs text-muted-foreground">ID Number</p>
+                        <p className="font-mono font-medium">{scan.id_number || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">DOB</p>
+                        <p className="font-medium">{scan.date_of_birth || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">ID Expiry</p>
+                        <p className="font-medium">{scan.id_expiry || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Address</p>
+                        <p className="font-medium truncate">{scan.address}</p>
+                      </div>
+                    </div>
+
+                    {scan.id_image_path && (
+                      <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
+                        <a
+                          href={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/documents/${scan.id_image_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-amber-700 hover:text-amber-800"
+                        >
+                          <Download className="w-4 h-4" />
+                          View ID Photo
+                        </a>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Document Signatures Section (Admin Only) */}
         {isAdmin && documentSignatures.length > 0 && (
