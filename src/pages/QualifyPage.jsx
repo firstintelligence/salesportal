@@ -53,6 +53,9 @@ const QualifyPage = () => {
     try {
       const agentId = localStorage.getItem('agentId');
       
+      // Get valid tenant_id (null if super admin "all tenants" view)
+      const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
+      
       // First, create a customer profile
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
@@ -65,7 +68,7 @@ const QualifyPage = () => {
           postal_code: data.postalCode,
           phone: 'N/A', // Phone not available from ID
           agent_id: agentId,
-          tenant_id: tenant?.id || null
+          tenant_id: validTenantId
         })
         .select()
         .single();
@@ -126,7 +129,7 @@ const QualifyPage = () => {
           id_image_path: imagePath,
           status: 'approved',
           scanned_by: agentId,
-          tenant_id: tenant?.id || null
+          tenant_id: validTenantId
         });
 
       if (scanError) {
