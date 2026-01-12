@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, ScanLine } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, UserCheck } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -244,12 +244,12 @@ const LandingPage = () => {
                 >
                   {/* Large background icon */}
                   <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 opacity-[0.08] pointer-events-none">
-                    <ScanLine className="w-full h-full" strokeWidth={1} />
+                    <UserCheck className="w-full h-full" strokeWidth={1} />
                   </div>
                   
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="p-2.5 sm:p-3 rounded-xl bg-amber-500 shadow-lg w-fit mb-3 sm:mb-4">
-                      <ScanLine className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
+                      <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
                     </div>
                     <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tracking-tight leading-tight">
                       Qualify
