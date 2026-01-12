@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTenant } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Building2, Edit2, LogOut, ChevronDown } from 'lucide-react';
+import { User, Building2, Edit2, LogOut, ChevronDown, ChevronRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,7 +25,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 const ProfileDropdown = () => {
   const navigate = useNavigate();
   const { tenant, agentProfile, switchTenant, loading: contextLoading } = useTenant();
@@ -35,6 +39,16 @@ const ProfileDropdown = () => {
   const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
   const [nickname, setNickname] = useState('');
   const [saving, setSaving] = useState(false);
+  const [tenantExpanded, setTenantExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (agentProfile?.first_name) {
@@ -153,23 +167,56 @@ const ProfileDropdown = () => {
           {isSuperAdmin && !tenantsLoading && tenants.length > 0 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Building2 className="w-4 h-4 mr-2" />
-                  <span className="truncate">{tenant?.name || 'Switch Company'}</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-64">
-                  {tenants.map((t) => (
-                    <DropdownMenuItem
-                      key={t.id}
-                      onClick={() => switchTenant(t)}
-                      className={tenant?.id === t.id ? 'bg-accent' : ''}
-                    >
-                      {t.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
+              {/* Mobile: Use collapsible inline menu */}
+              {isMobile ? (
+                <Collapsible open={tenantExpanded} onOpenChange={setTenantExpanded}>
+                  <CollapsibleTrigger asChild>
+                    <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm">
+                      <div className="flex items-center">
+                        <Building2 className="w-4 h-4 mr-2" />
+                        <span className="truncate">{tenant?.name || 'Switch Company'}</span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${tenantExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="max-h-48 overflow-y-auto pl-4 border-l-2 border-muted ml-4 mt-1 mb-1">
+                      {tenants.map((t) => (
+                        <div
+                          key={t.id}
+                          onClick={() => {
+                            switchTenant(t);
+                            setTenantExpanded(false);
+                          }}
+                          className={`flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm ${tenant?.id === t.id ? 'bg-accent' : ''}`}
+                        >
+                          {tenant?.id === t.id && <Check className="w-3 h-3 mr-2" />}
+                          <span className={tenant?.id === t.id ? '' : 'ml-5'}>{t.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                /* Desktop: Use standard submenu */
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Building2 className="w-4 h-4 mr-2" />
+                    <span className="truncate">{tenant?.name || 'Switch Company'}</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-64 max-h-80 overflow-y-auto">
+                    {tenants.map((t) => (
+                      <DropdownMenuItem
+                        key={t.id}
+                        onClick={() => switchTenant(t)}
+                        className={tenant?.id === t.id ? 'bg-accent' : ''}
+                      >
+                        {t.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
             </>
           )}
           
