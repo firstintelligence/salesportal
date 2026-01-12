@@ -7,6 +7,7 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
   const signatureRef = useRef(null);
   const containerRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -35,21 +36,32 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
       
       enterFullscreenLandscape();
 
-      // Calculate canvas size - maximize screen utilization (95%+)
+      // Calculate canvas size - maximize screen utilization
       const updateSize = () => {
-        // Use window dimensions for maximum screen usage
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
+        const landscape = screenWidth > screenHeight;
+        setIsLandscape(landscape);
         
-        // Reserve minimal space for buttons (40px header + 40px footer = 80px total)
         const headerHeight = 44;
-        const footerHeight = 44;
-        const horizontalPadding = 8; // 4px each side
         
-        setCanvasSize({
-          width: screenWidth - horizontalPadding,
-          height: screenHeight - headerHeight - footerHeight - 8 // 8px for margins
-        });
+        if (landscape) {
+          // Landscape: buttons on right side, no footer
+          const buttonColumnWidth = 72; // Width for button column
+          const padding = 32; // 16px each side
+          setCanvasSize({
+            width: screenWidth - buttonColumnWidth - padding,
+            height: screenHeight - headerHeight - 16
+          });
+        } else {
+          // Portrait: buttons at bottom
+          const footerHeight = 52;
+          const padding = 32;
+          setCanvasSize({
+            width: screenWidth - padding,
+            height: screenHeight - headerHeight - footerHeight - 16
+          });
+        }
       };
 
       updateSize();
@@ -118,19 +130,16 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         const data = imageData.data;
         
         // Convert white/near-white pixels to transparent
-        // Use a lower threshold to catch all white and off-white pixels
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
           const g = data[i + 1];
           const b = data[i + 2];
           
-          // If pixel is white or near-white (threshold 200), make it transparent
           if (r > 200 && g > 200 && b > 200) {
-            data[i + 3] = 0; // Set alpha to 0 (transparent)
+            data[i + 3] = 0;
           }
         }
         
-        // Create a new canvas for the transparent signature
         const transparentCanvas = document.createElement('canvas');
         transparentCanvas.width = canvas.width;
         transparentCanvas.height = canvas.height;
@@ -167,94 +176,126 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
           <span className="text-xs">Cancel</span>
         </Button>
         <h2 className="text-sm font-semibold text-foreground">Sign Here</h2>
-        <div className="w-16" /> {/* Spacer for centering title */}
+        <div className="w-16" />
       </div>
 
-      {/* Signature Area - with proper margins */}
-      <div 
-        ref={containerRef}
-        className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-muted/20"
-      >
-        {/* Canvas container - with solid thick border and visible margins */}
+      {/* Main content area - different layout for landscape vs portrait */}
+      <div className={`flex-1 flex ${isLandscape ? 'flex-row' : 'flex-col'} overflow-hidden`}>
+        {/* Signature Area */}
         <div 
-          className="border-4 border-gray-800 rounded-lg bg-white overflow-hidden relative w-full h-full"
-          style={{ maxWidth: canvasSize.width, maxHeight: canvasSize.height }}
+          ref={containerRef}
+          className={`flex items-center justify-center p-4 overflow-hidden bg-muted/20 ${isLandscape ? 'flex-1' : ''}`}
         >
-          {/* Sign Here watermark text - handwriting font */}
           <div 
-            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-            style={{ zIndex: 0 }}
+            className="border-4 border-gray-800 rounded-lg bg-white overflow-hidden relative"
+            style={{ width: canvasSize.width, height: canvasSize.height }}
           >
-            <span 
-              className="text-gray-200 text-4xl sm:text-5xl md:text-6xl tracking-wide"
-              style={{ fontFamily: "'Caveat', cursive" }}
+            {/* Sign Here watermark */}
+            <div 
+              className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+              style={{ zIndex: 0 }}
             >
-              Sign Here
-            </span>
-          </div>
-          
-          {/* Baseline guide - long dashes */}
-          <div 
-            className="absolute left-4 right-4 pointer-events-none"
-            style={{ 
-              bottom: '25%',
-              height: '2px',
-              backgroundImage: 'repeating-linear-gradient(to right, #d1d5db 0px, #d1d5db 12px, transparent 12px, transparent 20px)'
-            }}
-          />
-          
-          {canvasSize.width > 0 && canvasSize.height > 0 && (
-            <SignatureCanvas
-              ref={signatureRef}
-              canvasProps={{
-                width: canvasSize.width - 32,
-                height: canvasSize.height - 32,
-                className: 'touch-none',
-                style: { 
-                  width: canvasSize.width - 32,
-                  height: canvasSize.height - 32,
-                  touchAction: 'none',
-                  display: 'block'
-                }
+              <span 
+                className="text-gray-200 text-4xl sm:text-5xl md:text-6xl tracking-wide"
+                style={{ fontFamily: "'Caveat', cursive" }}
+              >
+                Sign Here
+              </span>
+            </div>
+            
+            {/* Baseline guide */}
+            <div 
+              className="absolute left-4 right-4 pointer-events-none"
+              style={{ 
+                bottom: '25%',
+                height: '2px',
+                backgroundImage: 'repeating-linear-gradient(to right, #d1d5db 0px, #d1d5db 12px, transparent 12px, transparent 20px)'
               }}
-              backgroundColor="white"
-              penColor="black"
-              minWidth={1.5}
-              maxWidth={3}
             />
-          )}
+            
+            {canvasSize.width > 0 && canvasSize.height > 0 && (
+              <SignatureCanvas
+                ref={signatureRef}
+                canvasProps={{
+                  width: canvasSize.width - 8,
+                  height: canvasSize.height - 8,
+                  className: 'touch-none',
+                  style: { 
+                    width: canvasSize.width - 8,
+                    height: canvasSize.height - 8,
+                    touchAction: 'none',
+                    display: 'block'
+                  }
+                }}
+                backgroundColor="white"
+                penColor="black"
+                minWidth={1.5}
+                maxWidth={3}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Footer with Clear and Submit buttons - with safe area padding */}
-      <div 
-        className="px-4 py-2 border-t border-border bg-muted/30 flex justify-between items-center shrink-0"
-        style={{ 
-          minHeight: '52px',
-          paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
-          paddingLeft: 'max(16px, env(safe-area-inset-left))',
-          paddingRight: 'max(16px, env(safe-area-inset-right))'
-        }}
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleClear}
-          className="px-4 h-8"
-        >
-          <Trash2 className="h-3 w-3 mr-1" />
-          <span className="text-xs">Clear</span>
-        </Button>
-        
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleFinish}
-          className="bg-primary text-primary-foreground h-8 px-6"
-        >
-          <Check className="h-4 w-4 mr-1" />
-          <span className="text-xs">Submit</span>
-        </Button>
+        {/* Buttons - side panel in landscape, footer in portrait */}
+        {isLandscape ? (
+          <div 
+            className="flex flex-col justify-center gap-3 px-3 py-4 bg-muted/30 border-l border-border shrink-0"
+            style={{ 
+              width: '72px',
+              paddingRight: 'max(12px, env(safe-area-inset-right))'
+            }}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClear}
+              className="w-full h-14 flex flex-col items-center justify-center gap-1 p-1"
+            >
+              <Trash2 className="h-5 w-5" />
+              <span className="text-[10px]">Clear</span>
+            </Button>
+            
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleFinish}
+              className="w-full h-14 flex flex-col items-center justify-center gap-1 p-1 bg-primary text-primary-foreground"
+            >
+              <Check className="h-5 w-5" />
+              <span className="text-[10px]">Submit</span>
+            </Button>
+          </div>
+        ) : (
+          <div 
+            className="px-4 py-2 border-t border-border bg-muted/30 flex justify-between items-center shrink-0"
+            style={{ 
+              minHeight: '52px',
+              paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+              paddingLeft: 'max(16px, env(safe-area-inset-left))',
+              paddingRight: 'max(16px, env(safe-area-inset-right))'
+            }}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClear}
+              className="px-4 h-8"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              <span className="text-xs">Clear</span>
+            </Button>
+            
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleFinish}
+              className="bg-primary text-primary-foreground h-8 px-6"
+            >
+              <Check className="h-4 w-4 mr-1" />
+              <span className="text-xs">Submit</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
