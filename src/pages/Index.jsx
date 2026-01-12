@@ -13,7 +13,7 @@ import { templates } from "../utils/templateRegistry";
 import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw, Loader2, Pen, Save } from "lucide-react";
+import { RefreshCw, Loader2, Pen, Save, Phone } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
@@ -1146,6 +1146,35 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
             <div className="flex gap-2 w-full sm:w-auto justify-end">
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/tpv-ai', {
+                  state: {
+                    customer: customerId ? {
+                      id: customerId,
+                      first_name: billTo.firstName,
+                      last_name: billTo.lastName,
+                      phone: billTo.phone,
+                      email: billTo.email,
+                      address: billTo.address,
+                      city: billTo.city,
+                      province: billTo.province,
+                      postal_code: billTo.postalCode
+                    } : null,
+                    calculatorData: {
+                      purchaseAmount: grandTotal,
+                      interestRate: financing.interestRate,
+                      promoTerm: financing.loanTerm,
+                      amortizationPeriod: financing.amortizationPeriod,
+                      items: items
+                    }
+                  }
+                })}
+                className="flex-1 sm:flex-initial"
+              >
+                <Phone className="mr-2 h-4 w-4" />
+                Request TPV
+              </Button>
               <Button 
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}

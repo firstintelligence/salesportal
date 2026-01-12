@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import InputMask from "react-input-mask";
 import { useTenant } from "@/contexts/TenantContext";
 import { capitalizeWords, formatPostalCode } from "@/utils/inputFormatting";
+import { calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
 
 const canadianProvinces = [
   { value: "AB", label: "Alberta" },
@@ -68,17 +69,17 @@ const productGroups = [
 ];
 
 const interestRates = [
-  "0.00%", "2.99%", "3.99%", "4.99%", "5.99%", "6.99%", "7.99%", "8.99%", "9.99%", 
+  "0%", "2.99%", "3.99%", "4.99%", "5.99%", "6.99%", "7.99%", "8.99%", "9.99%", 
   "10.99%", "11.99%", "12.99%", "13.99%", "16.99%"
 ];
 
 const promotionalTerms = [
-  "No Promo", "3 months", "6 months", "12 months", "18 months", "24 months",
+  "6 months", "12 months", "18 months", "24 months",
   "36 months", "48 months", "60 months"
 ];
 
 const amortizationPeriods = [
-  "12 months", "24 months", "36 months", "48 months", "60 months", "72 months", "84 months", "96 months", 
+  "60 months", "72 months", "84 months", "96 months", 
   "108 months", "120 months", "132 months", "144 months", "180 months", "240 months"
 ];
 
@@ -86,9 +87,33 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
   const navigate = useNavigate();
   const { tenant } = useTenant();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Extract products from preloadedCalculatorData if available
+  const getPreloadedProducts = () => {
+    if (preloadedCalculatorData?.items && Array.isArray(preloadedCalculatorData.items)) {
+      // Items from invoice generator - extract product names and match to product list
+      return preloadedCalculatorData.items.map(item => item.name || item).filter(Boolean);
+    }
+    if (preloadedCalculatorData?.products && Array.isArray(preloadedCalculatorData.products)) {
+      return preloadedCalculatorData.products;
+    }
+    return [];
+  };
+  
   const [formData, setFormData] = useState(() => {
+    const preloadedProducts = getPreloadedProducts();
+    
     // If preloaded customer data exists, use it
     if (preloadedCustomer) {
+      // Calculate monthly payment using same formula as invoice generator
+      let monthlyPayment = "";
+      if (preloadedCalculatorData?.purchaseAmount && preloadedCalculatorData?.amortizationPeriod) {
+        const loanAmount = calculateLoanAmount(preloadedCalculatorData.purchaseAmount);
+        const rate = preloadedCalculatorData.interestRate || 0;
+        const months = preloadedCalculatorData.amortizationPeriod;
+        monthlyPayment = calculateMonthlyPayment(loanAmount, rate, months).toFixed(2);
+      }
+      
       return {
         firstName: preloadedCustomer.first_name || "",
         lastName: preloadedCustomer.last_name || "",
@@ -98,17 +123,26 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
         city: preloadedCustomer.city || "",
         province: preloadedCustomer.province || "",
         postalCode: preloadedCustomer.postal_code || "",
-        products: [],
-        salesPrice: preloadedCalculatorData ? `$${preloadedCalculatorData.purchaseAmount.toLocaleString()}` : "",
-        interestRate: preloadedCalculatorData ? `${preloadedCalculatorData.interestRate}%` : "",
-        promotionalTerm: preloadedCalculatorData ? `${preloadedCalculatorData.promoTerm} months` : "",
-        amortization: preloadedCalculatorData ? `${preloadedCalculatorData.amortizationPeriod} months` : "",
-        monthlyPayment: preloadedCalculatorData ? preloadedCalculatorData.promoPayment?.toFixed(2) || "" : "",
+        products: preloadedProducts,
+        salesPrice: preloadedCalculatorData ? `$${preloadedCalculatorData.purchaseAmount?.toLocaleString() || ''}` : "",
+        interestRate: preloadedCalculatorData?.interestRate !== undefined ? `${preloadedCalculatorData.interestRate}%` : "",
+        promotionalTerm: preloadedCalculatorData?.promoTerm ? `${preloadedCalculatorData.promoTerm} months` : "",
+        amortization: preloadedCalculatorData?.amortizationPeriod ? `${preloadedCalculatorData.amortizationPeriod} months` : "",
+        monthlyPayment: monthlyPayment,
       };
     }
     
     // If calculator data exists without customer, use it with blank customer fields
     if (preloadedCalculatorData) {
+      // Calculate monthly payment using same formula as invoice generator
+      let monthlyPayment = "";
+      if (preloadedCalculatorData.purchaseAmount && preloadedCalculatorData.amortizationPeriod) {
+        const loanAmount = calculateLoanAmount(preloadedCalculatorData.purchaseAmount);
+        const rate = preloadedCalculatorData.interestRate || 0;
+        const months = preloadedCalculatorData.amortizationPeriod;
+        monthlyPayment = calculateMonthlyPayment(loanAmount, rate, months).toFixed(2);
+      }
+      
       return {
         firstName: "",
         lastName: "",
@@ -118,12 +152,12 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
         city: "",
         province: "",
         postalCode: "",
-        products: [],
-        salesPrice: `$${preloadedCalculatorData.purchaseAmount.toLocaleString()}`,
-        interestRate: `${preloadedCalculatorData.interestRate}%`,
-        promotionalTerm: `${preloadedCalculatorData.promoTerm} months`,
-        amortization: `${preloadedCalculatorData.amortizationPeriod} months`,
-        monthlyPayment: preloadedCalculatorData.promoPayment?.toFixed(2) || "",
+        products: preloadedProducts,
+        salesPrice: `$${preloadedCalculatorData.purchaseAmount?.toLocaleString() || ''}`,
+        interestRate: preloadedCalculatorData.interestRate !== undefined ? `${preloadedCalculatorData.interestRate}%` : "",
+        promotionalTerm: preloadedCalculatorData.promoTerm ? `${preloadedCalculatorData.promoTerm} months` : "",
+        amortization: preloadedCalculatorData.amortizationPeriod ? `${preloadedCalculatorData.amortizationPeriod} months` : "",
+        monthlyPayment: monthlyPayment,
       };
     }
     
@@ -148,30 +182,19 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
 
   // No longer save form data to localStorage - each session starts fresh
 
-  // Calculate admin fee: 1.49% of sales price, capped at $149
-  const calculateAdminFee = (salesAmount) => {
-    const fee = salesAmount * 0.0149;
-    return Math.min(fee, 149);
-  };
-
-  // Calculate monthly payment when relevant fields change
+  // Calculate monthly payment using same logic as Invoice Generator
+  // Sales price is the base price (before admin fee), but loan amount includes admin fee
   useEffect(() => {
     const { salesPrice, interestRate, amortization } = formData;
     if (salesPrice && interestRate && amortization) {
       const basePrincipal = parseFloat(salesPrice.replace(/[^0-9.]/g, ""));
-      const adminFee = calculateAdminFee(basePrincipal);
-      const principal = basePrincipal + adminFee; // Total loan amount includes admin fee
-      const rate = parseFloat(interestRate.replace("%", "")) / 100 / 12;
+      const rate = parseFloat(interestRate.replace("%", ""));
       const months = parseInt(amortization.replace(/\D/g, ""));
       
-      if (principal > 0 && months > 0) {
-        let payment;
-        if (rate === 0) {
-          payment = principal / months;
-        } else {
-          payment = (principal * rate * Math.pow(1 + rate, months)) / 
-                    (Math.pow(1 + rate, months) - 1);
-        }
+      if (basePrincipal > 0 && months > 0) {
+        // Use the same calculation as invoice generator - loan amount includes admin fee
+        const loanAmount = calculateLoanAmount(basePrincipal);
+        const payment = calculateMonthlyPayment(loanAmount, rate, months);
         setFormData(prev => ({
           ...prev,
           monthlyPayment: payment.toFixed(2)
