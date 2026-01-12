@@ -170,19 +170,25 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
         <div className="w-16" /> {/* Spacer for centering title */}
       </div>
 
-      {/* Signature Area - Maximized */}
+      {/* Signature Area - with proper margins */}
       <div 
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-1 overflow-hidden bg-white"
+        className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-muted/20"
       >
-        {/* Canvas container - maximized with solid thick border */}
-        <div className="border-4 border-gray-800 rounded-lg bg-white overflow-hidden relative">
-          {/* Sign Here watermark text */}
+        {/* Canvas container - with solid thick border and visible margins */}
+        <div 
+          className="border-4 border-gray-800 rounded-lg bg-white overflow-hidden relative w-full h-full"
+          style={{ maxWidth: canvasSize.width, maxHeight: canvasSize.height }}
+        >
+          {/* Sign Here watermark text - handwriting font */}
           <div 
             className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
             style={{ zIndex: 0 }}
           >
-            <span className="text-gray-200 text-4xl sm:text-5xl md:text-6xl font-light tracking-widest uppercase">
+            <span 
+              className="text-gray-200 text-4xl sm:text-5xl md:text-6xl tracking-wide"
+              style={{ fontFamily: "'Caveat', cursive" }}
+            >
               Sign Here
             </span>
           </div>
@@ -201,12 +207,12 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
             <SignatureCanvas
               ref={signatureRef}
               canvasProps={{
-                width: canvasSize.width,
-                height: canvasSize.height,
+                width: canvasSize.width - 32,
+                height: canvasSize.height - 32,
                 className: 'touch-none',
                 style: { 
-                  width: canvasSize.width,
-                  height: canvasSize.height,
+                  width: canvasSize.width - 32,
+                  height: canvasSize.height - 32,
                   touchAction: 'none',
                   display: 'block'
                 }
