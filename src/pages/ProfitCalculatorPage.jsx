@@ -126,7 +126,7 @@ const ProfitCalculatorPage = () => {
 
   useEffect(() => {
     const agentId = localStorage.getItem('agentId');
-    const allowedAgents = ['MM23', 'WA4929'];
+    const allowedAgents = ['MM231611', 'WA4929'];
     if (!allowedAgents.includes(agentId)) {
       navigate('/landing');
     }

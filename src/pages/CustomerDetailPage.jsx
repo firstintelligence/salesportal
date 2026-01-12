@@ -48,7 +48,7 @@ const CustomerDetailPage = () => {
     
     // Check if current user is admin
     const agentId = localStorage.getItem("agentId");
-    setIsAdmin(agentId === 'MM23');
+    setIsAdmin(agentId === 'MM231611');
     
     // For super admin viewing all tenants, we don't need tenantSlug
     if (tenantLoading) return;
@@ -116,7 +116,7 @@ const CustomerDetailPage = () => {
       setChecklists(checklistData || []);
 
       // Fetch document signatures for this customer (admin can see all signatures)
-      if (agentId === 'MM23') {
+      if (agentId === 'MM231611') {
         // First try by customer_id
         const { data: sigData, error: sigError } = await supabase
           .from("document_signatures")

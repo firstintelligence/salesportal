@@ -901,7 +901,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         
         // Only super admins see the signing location stamp on the PDF
         const agentId = localStorage.getItem('agentId');
-        const isSuperAdmin = agentId === 'MM23';
+        const isSuperAdmin = agentId === 'MM231611';
         await generatePDF(formData, 4, tenantSlug, signingContext, { isSuperAdmin });
       } catch (error) {
         console.error('Error generating PDF:', error);
