@@ -368,6 +368,147 @@ export type Database = {
           },
         ]
       }
+      loan_applications: {
+        Row: {
+          address: string | null
+          agent_id: string | null
+          birthdate: string | null
+          business_name: string | null
+          city: string | null
+          created_at: string
+          credit_consent: boolean | null
+          customer_id: string | null
+          electronic_consent: boolean | null
+          email: string | null
+          employer_address: string | null
+          employer_city: string | null
+          employer_province: string | null
+          employment_status: string | null
+          first_name: string | null
+          gross_monthly_income: string | null
+          home_phone: string | null
+          housing_status: string | null
+          id: string
+          last_name: string | null
+          marital_status: string | null
+          middle_name: string | null
+          mobile_phone: string | null
+          monthly_housing_costs: string | null
+          photo_id_expiry: string | null
+          photo_id_number: string | null
+          photo_id_province: string | null
+          photo_id_type: string | null
+          position_title: string | null
+          postal_code: string | null
+          privacy_consent: boolean | null
+          province: string | null
+          signature_date: string | null
+          sin: string | null
+          tenant_id: string | null
+          time_at_job: string | null
+          unit_no: string | null
+          updated_at: string
+          years_at_address: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_id?: string | null
+          birthdate?: string | null
+          business_name?: string | null
+          city?: string | null
+          created_at?: string
+          credit_consent?: boolean | null
+          customer_id?: string | null
+          electronic_consent?: boolean | null
+          email?: string | null
+          employer_address?: string | null
+          employer_city?: string | null
+          employer_province?: string | null
+          employment_status?: string | null
+          first_name?: string | null
+          gross_monthly_income?: string | null
+          home_phone?: string | null
+          housing_status?: string | null
+          id?: string
+          last_name?: string | null
+          marital_status?: string | null
+          middle_name?: string | null
+          mobile_phone?: string | null
+          monthly_housing_costs?: string | null
+          photo_id_expiry?: string | null
+          photo_id_number?: string | null
+          photo_id_province?: string | null
+          photo_id_type?: string | null
+          position_title?: string | null
+          postal_code?: string | null
+          privacy_consent?: boolean | null
+          province?: string | null
+          signature_date?: string | null
+          sin?: string | null
+          tenant_id?: string | null
+          time_at_job?: string | null
+          unit_no?: string | null
+          updated_at?: string
+          years_at_address?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_id?: string | null
+          birthdate?: string | null
+          business_name?: string | null
+          city?: string | null
+          created_at?: string
+          credit_consent?: boolean | null
+          customer_id?: string | null
+          electronic_consent?: boolean | null
+          email?: string | null
+          employer_address?: string | null
+          employer_city?: string | null
+          employer_province?: string | null
+          employment_status?: string | null
+          first_name?: string | null
+          gross_monthly_income?: string | null
+          home_phone?: string | null
+          housing_status?: string | null
+          id?: string
+          last_name?: string | null
+          marital_status?: string | null
+          middle_name?: string | null
+          mobile_phone?: string | null
+          monthly_housing_costs?: string | null
+          photo_id_expiry?: string | null
+          photo_id_number?: string | null
+          photo_id_province?: string | null
+          photo_id_type?: string | null
+          position_title?: string | null
+          postal_code?: string | null
+          privacy_consent?: boolean | null
+          province?: string | null
+          signature_date?: string | null
+          sin?: string | null
+          tenant_id?: string | null
+          time_at_job?: string | null
+          unit_no?: string | null
+          updated_at?: string
+          years_at_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_applications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_applications_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           address: string | null

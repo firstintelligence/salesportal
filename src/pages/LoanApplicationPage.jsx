@@ -162,21 +162,88 @@ const LoanApplicationPage = () => {
     signatureDate: "",
   });
 
-  // Preload customer data
+  // Preload customer data and loan application data
   useEffect(() => {
-    if (customer) {
-      setFormData(prev => ({
-        ...prev,
-        firstName: customer.first_name || "",
-        lastName: customer.last_name || "",
-        email: customer.email || "",
-        homePhone: customer.phone || "",
-        address: customer.address || "",
-        city: customer.city || "",
-        province: customer.province || "",
-        postalCode: customer.postal_code || "",
-      }));
-    }
+    const loadCustomerData = async () => {
+      if (customer) {
+        // First set basic customer info
+        setFormData(prev => ({
+          ...prev,
+          firstName: customer.first_name || "",
+          lastName: customer.last_name || "",
+          email: customer.email || "",
+          homePhone: customer.phone || "",
+          address: customer.address || "",
+          city: customer.city || "",
+          province: customer.province || "",
+          postalCode: customer.postal_code || "",
+        }));
+        
+        // Then try to load existing loan application data
+        try {
+          const { data: loanApp, error } = await supabase
+            .from("loan_applications")
+            .select("*")
+            .eq("customer_id", customer.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          
+          if (!error && loanApp) {
+            setFormData(prev => ({
+              ...prev,
+              // Personal Details
+              firstName: loanApp.first_name || prev.firstName,
+              lastName: loanApp.last_name || prev.lastName,
+              middleName: loanApp.middle_name || prev.middleName,
+              birthdate: loanApp.birthdate || prev.birthdate,
+              homePhone: loanApp.home_phone || prev.homePhone,
+              mobilePhone: loanApp.mobile_phone || prev.mobilePhone,
+              maritalStatus: loanApp.marital_status || prev.maritalStatus,
+              email: loanApp.email || prev.email,
+              sin: loanApp.sin || prev.sin,
+              
+              // Housing
+              address: loanApp.address || prev.address,
+              unitNo: loanApp.unit_no || prev.unitNo,
+              city: loanApp.city || prev.city,
+              province: loanApp.province || prev.province,
+              postalCode: loanApp.postal_code || prev.postalCode,
+              housingStatus: loanApp.housing_status || prev.housingStatus,
+              yearsAtAddress: loanApp.years_at_address || prev.yearsAtAddress,
+              monthlyHousingCosts: loanApp.monthly_housing_costs || prev.monthlyHousingCosts,
+              
+              // Borrower ID
+              photoIdType: loanApp.photo_id_type || prev.photoIdType,
+              photoIdProvince: loanApp.photo_id_province || prev.photoIdProvince,
+              photoIdNumber: loanApp.photo_id_number || prev.photoIdNumber,
+              photoIdExpiry: loanApp.photo_id_expiry || prev.photoIdExpiry,
+              
+              // Employment
+              businessName: loanApp.business_name || prev.businessName,
+              positionTitle: loanApp.position_title || prev.positionTitle,
+              grossMonthlyIncome: loanApp.gross_monthly_income || prev.grossMonthlyIncome,
+              employerAddress: loanApp.employer_address || prev.employerAddress,
+              timeAtJob: loanApp.time_at_job || prev.timeAtJob,
+              employmentStatus: loanApp.employment_status || prev.employmentStatus,
+              employerCity: loanApp.employer_city || prev.employerCity,
+              employerProvince: loanApp.employer_province || prev.employerProvince,
+              
+              // Consents - don't reload these, they should be re-consented each time
+              privacyConsent: false,
+              electronicConsent: false,
+              creditConsent: false,
+              signatureDate: "",
+            }));
+            console.log('Loaded existing loan application data for customer:', customer.id);
+          }
+        } catch (err) {
+          console.error('Error loading loan application data:', err);
+        }
+      }
+    };
+    
+    loadCustomerData();
   }, [customer]);
   
   const handleInputChange = (e) => {
@@ -683,6 +750,88 @@ const LoanApplicationPage = () => {
         }
       }
       
+      // Save loan application data to database
+      if (customerId && tenant?.id) {
+        const agentId = localStorage.getItem('agentId');
+        const loanAppData = {
+          customer_id: customerId,
+          tenant_id: tenant.id,
+          agent_id: agentId,
+          // Personal Details
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          middle_name: formData.middleName || null,
+          birthdate: formData.birthdate || null,
+          home_phone: formData.homePhone || null,
+          mobile_phone: formData.mobilePhone || null,
+          marital_status: formData.maritalStatus || null,
+          email: formData.email || null,
+          sin: formData.sin || null,
+          // Housing
+          address: formData.address || null,
+          unit_no: formData.unitNo || null,
+          city: formData.city || null,
+          province: formData.province || null,
+          postal_code: formData.postalCode || null,
+          housing_status: formData.housingStatus || null,
+          years_at_address: formData.yearsAtAddress || null,
+          monthly_housing_costs: formData.monthlyHousingCosts || null,
+          // Borrower ID
+          photo_id_type: formData.photoIdType || null,
+          photo_id_province: formData.photoIdProvince || null,
+          photo_id_number: formData.photoIdNumber || null,
+          photo_id_expiry: formData.photoIdExpiry || null,
+          // Employment
+          business_name: formData.businessName || null,
+          position_title: formData.positionTitle || null,
+          gross_monthly_income: formData.grossMonthlyIncome || null,
+          employer_address: formData.employerAddress || null,
+          time_at_job: formData.timeAtJob || null,
+          employment_status: formData.employmentStatus || null,
+          employer_city: formData.employerCity || null,
+          employer_province: formData.employerProvince || null,
+          // Consents
+          privacy_consent: formData.privacyConsent,
+          electronic_consent: formData.electronicConsent,
+          credit_consent: formData.creditConsent,
+          signature_date: formData.signatureDate || null,
+        };
+        
+        try {
+          // Check if loan application exists for this customer
+          const { data: existingLoanApp } = await supabase
+            .from("loan_applications")
+            .select("id")
+            .eq("customer_id", customerId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          
+          if (existingLoanApp) {
+            // Update existing loan application
+            await supabase
+              .from("loan_applications")
+              .update(loanAppData)
+              .eq("id", existingLoanApp.id);
+            console.log('Updated loan application:', existingLoanApp.id);
+          } else {
+            // Create new loan application
+            const { data: newLoanApp, error: insertError } = await supabase
+              .from("loan_applications")
+              .insert(loanAppData)
+              .select("id")
+              .single();
+            
+            if (!insertError) {
+              console.log('Created new loan application:', newLoanApp?.id);
+            }
+          }
+        } catch (loanAppError) {
+          console.error('Error saving loan application data:', loanAppError);
+          // Don't fail the process if loan app save fails
+        }
+      }
+      
       // Record document signature for the loan application
       try {
         await recordDocumentSignature({
@@ -838,22 +987,22 @@ const LoanApplicationPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-3 md:px-4 py-2 flex items-center">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 relative">
+        <div className="max-w-4xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate("/landing")}
-            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2 shrink-0"
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2 min-w-[48px]"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
             <span className="hidden sm:inline">Back</span>
           </Button>
-          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white flex-1 text-center">
+          <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
             Loan Application
           </h1>
           {/* Invisible spacer to balance the back button */}
-          <div className="w-[52px] sm:w-[72px] shrink-0"></div>
+          <div className="min-w-[48px]"></div>
         </div>
       </div>
       
