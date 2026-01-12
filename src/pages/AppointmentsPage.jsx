@@ -22,7 +22,15 @@ const AppointmentsPage = () => {
     "TB0195": "Tadeo",
     "AA9097": "Donny",
     "HB6400": "Harry",
-    "TP5142": "Tony"
+    "TP5142": "Tony",
+    "CI11": "Chris",
+    "LA11": "Levi",
+    "AW11": "Ann",
+    "MA11": "Mohamed",
+    "MW11": "Mohan",
+    "BB2704": "Bonnie",
+    "AB5394": "Abe",
+    "CH5149": "Chady"
   };
 
   useEffect(() => {
