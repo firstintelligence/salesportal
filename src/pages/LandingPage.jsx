@@ -85,6 +85,14 @@ const LandingPage = () => {
       gradient: "bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/40 dark:to-cyan-950/30",
       iconBg: "bg-teal-500",
     },
+    {
+      title: "Qualify",
+      subtitle: "Scan ID for eligibility",
+      icon: UserCheck,
+      path: "/qualify",
+      gradient: "bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/40 dark:to-blue-950/30",
+      iconBg: "bg-indigo-500",
+    },
   ];
 
   // Add profit calculator tile if user has permission
@@ -219,49 +227,6 @@ const LandingPage = () => {
             ))}
           </div>
 
-          {/* Super Admin Only - Qualify Section */}
-          {isSuperAdminUser && (
-            <div className="mt-10">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 to-transparent dark:via-amber-700" />
-                <span className="text-sm font-semibold text-amber-600 dark:text-amber-400 px-3">
-                  SUPER ADMIN
-                </span>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-300 to-transparent dark:via-amber-700" />
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-                <Card
-                  onClick={() => navigate("/qualify")}
-                  className="
-                    relative overflow-hidden border-2 border-amber-300 dark:border-amber-700 cursor-pointer
-                    shadow-lg hover:shadow-xl
-                    transition-all duration-300 ease-out
-                    hover:scale-[1.03] hover:-translate-y-1
-                    active:scale-[0.97]
-                    bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30
-                  "
-                >
-                  {/* Large background icon */}
-                  <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 opacity-[0.08] pointer-events-none">
-                    <UserCheck className="w-full h-full" strokeWidth={1} />
-                  </div>
-                  
-                  <CardContent className="p-4 sm:p-5 lg:p-6">
-                    <div className="p-2.5 sm:p-3 rounded-xl bg-amber-500 shadow-lg w-fit mb-3 sm:mb-4">
-                      <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
-                    </div>
-                    <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tracking-tight leading-tight">
-                      Qualify
-                    </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-1.5">
-                      Scan ID for eligibility
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

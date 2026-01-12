@@ -10,9 +10,6 @@ import IDScanner from "@/components/qualify/IDScanner";
 import IDScanResult from "@/components/qualify/IDScanResult";
 import ApprovalScreen from "@/components/qualify/ApprovalScreen";
 
-// Only super admin can access this page
-const SUPER_ADMIN_ID = 'MM231611';
-
 const QualifyPage = () => {
   const navigate = useNavigate();
   const { tenant } = useTenant();
@@ -23,17 +20,9 @@ const QualifyPage = () => {
 
   useEffect(() => {
     const authenticated = localStorage.getItem('authenticated');
-    const agentId = localStorage.getItem('agentId');
     
     if (!authenticated) {
       navigate('/');
-      return;
-    }
-
-    // Only super admin can access
-    if (agentId !== SUPER_ADMIN_ID) {
-      toast.error('Access denied. Super admin only.');
-      navigate('/landing');
       return;
     }
   }, [navigate]);
