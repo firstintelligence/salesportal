@@ -297,7 +297,7 @@ const IDScanResult = ({ scanData, onApprove, onEdit, isSubmitting }) => {
         </div>
       )}
 
-      {/* Approve Button */}
+      {/* Check Eligibility Button */}
       <Button 
         className="w-full h-14 text-lg bg-emerald-600 hover:bg-emerald-700"
         onClick={() => onApprove(scanData)}
@@ -306,12 +306,12 @@ const IDScanResult = ({ scanData, onApprove, onEdit, isSubmitting }) => {
         {isSubmitting ? (
           <>
             <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Processing...
+            Checking Eligibility...
           </>
         ) : (
           <>
             <CheckCircle2 className="w-5 h-5 mr-2" />
-            Approve & Create Profile
+            Check Eligibility
           </>
         )}
       </Button>
