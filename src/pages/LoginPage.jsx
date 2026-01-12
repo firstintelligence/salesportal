@@ -57,7 +57,7 @@ const LoginPage = () => {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-700 block pl-1">Agent ID</label>
               <Input
-                type="text"
+                type="password"
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value.toUpperCase())}
                 placeholder="Enter your ID"
