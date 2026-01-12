@@ -320,62 +320,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       return;
     }
 
-    // Load form data from tenant-specific localStorage key
-    const savedFormData = localStorage.getItem(formDataKey);
-    if (savedFormData) {
-      const parsedData = JSON.parse(savedFormData);
-      const loadedBillTo = parsedData.billTo || {};
-      setBillTo({ 
-        firstName: loadedBillTo.firstName || "", 
-        lastName: loadedBillTo.lastName || "", 
-        email: loadedBillTo.email || "", 
-        phone: formatPhoneNumber(loadedBillTo.phone) || "", 
-        address: loadedBillTo.address || "", 
-        city: loadedBillTo.city || "", 
-        province: loadedBillTo.province || "ON", 
-        postalCode: loadedBillTo.postalCode || "",
-        coApplicantName: loadedBillTo.coApplicantName || "",
-        coApplicantPhone: formatPhoneNumber(loadedBillTo.coApplicantPhone) || ""
-      });
-      setShipTo(parsedData.shipTo || { name: "", address: "", phone: "" });
-      setInvoice(
-        parsedData.invoice || { date: "", paymentDate: "", number: "" }
-      );
-      // ALWAYS use current tenant's company info - never load from storage
-      setYourCompany({
-        name: tenantCompanyInfo.name,
-        address: tenantCompanyInfo.address,
-        phone: tenantCompanyInfo.phone,
-        email: tenantCompanyInfo.email,
-        logo: tenantLogo,
-        logoSize: tenantLogoSize
-      });
-      // Ensure all items have unique IDs for proper React reconciliation
-      const loadedItems = parsedData.items || [];
-      setItems(loadedItems.map(item => ({
-        ...item,
-        id: item.id || crypto.randomUUID()
-      })));
-      const province = parsedData.billTo?.province || 'ON';
-      settaxPercentage(getProvincialTax(province));
-      setFinancing(parsedData.financing || {
-        financeCompany: "Financeit Canada Inc.",
-        loanAmount: 0,
-        amortizationPeriod: 180,
-        loanTerm: 24,
-        interestRate: 0
-      });
-      setRebatesIncentives(parsedData.rebatesIncentives || {
-        federalRebate: 0,
-        provincialRebate: 0,
-        utilityRebate: 0,
-        manufacturerRebate: 0
-      });
-      setNotes(parsedData.notes || "Installation includes permits, electrical connections, and system commissioning. All work performed by licensed professionals with full warranty coverage.");
-      setSavedSignatureDataUrl(parsedData.signature || null);
-      setCoApplicantSignatureDataUrl(parsedData.coApplicantSignature || null);
-      
-    } else {
+    // No preloaded customer - start with blank form (no localStorage loading)
+    // This ensures each login session starts fresh
+    {
       // If no saved data, set default values with current tenant info
       setYourCompany({
         name: tenantCompanyInfo.name,
@@ -393,44 +340,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     }
   }, [preloadedCustomer, formDataKey, tenantCompanyInfo, tenantLogo, tenantLogoSize]);
 
-  useEffect(() => {
-    // CRITICAL: Only save when tenant is loaded to prevent cross-tenant data
-    if (!formDataKey) return;
-    
-    // Save form data to tenant-specific localStorage key
-    const formData = {
-      billTo,
-      shipTo,
-      invoice,
-      // Don't save yourCompany - always use current tenant info
-      items,
-      taxPercentage,
-      taxAmount,
-      subTotal,
-      grandTotal,
-      financing,
-      rebatesIncentives,
-      notes,
-      signature: savedSignatureDataUrl,
-      coApplicantSignature: coApplicantSignatureDataUrl,
-    };
-    localStorage.setItem(formDataKey, JSON.stringify(formData));
-  }, [
-    formDataKey,
-    billTo,
-    shipTo,
-    invoice,
-    items,
-    taxPercentage,
-    notes,
-    taxAmount,
-    subTotal,
-    grandTotal,
-    financing,
-    rebatesIncentives,
-    savedSignatureDataUrl,
-    coApplicantSignatureDataUrl,
-  ]);
+  // No longer persist form data to localStorage - each session starts fresh
+  // Data is only saved when navigating to specific tools via state props
 
   const handleInputChange = (setter) => (e) => {
     const { name, value } = e.target;
