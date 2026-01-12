@@ -867,11 +867,11 @@ const LoanApplicationPage = () => {
           <div className="border-t-2 border-green-600 mb-6"></div>
           
           {/* Quick Scan ID at Top */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 md:p-4 mb-6">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="font-semibold text-sm text-foreground">Quick Start: Scan ID</h3>
-                <p className="text-xs text-muted-foreground">Scan your ID to auto-fill personal details, address, and identification info</p>
+                <h3 className="font-semibold text-sm text-foreground">Quick Start</h3>
+                <p className="text-xs text-muted-foreground">Auto-fill with ID scan</p>
               </div>
               <Button
                 type="button"
@@ -891,6 +891,7 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 PERSONAL DETAILS
               </div>
+              {/* Single continuous grid for mobile - fields flow naturally */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="firstName">First Name *</Label>
@@ -924,9 +925,6 @@ const LoanApplicationPage = () => {
                     autoComplete="family-name"
                   />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="birthdate">Birthdate *</Label>
                   <Popover>
@@ -992,21 +990,7 @@ const LoanApplicationPage = () => {
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                <div className="md:col-start-3 md:row-start-1">
-                  <Label htmlFor="mobilePhone">Mobile Phone Number</Label>
-                  <Input
-                    id="mobilePhone"
-                    name="mobilePhone"
-                    type="tel"
-                    value={formData.mobilePhone}
-                    onChange={handleInputChange}
-                    autoComplete="tel-national"
-                  />
-                </div>
-                <div className="md:col-start-1 md:row-start-1">
+                <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
@@ -1017,8 +1001,19 @@ const LoanApplicationPage = () => {
                     autoComplete="email"
                   />
                 </div>
-                <div className="md:col-start-2 md:row-start-1">
-                  <Label htmlFor="sin">SIN Number (Optional)</Label>
+                <div>
+                  <Label htmlFor="mobilePhone">Mobile Phone</Label>
+                  <Input
+                    id="mobilePhone"
+                    name="mobilePhone"
+                    type="tel"
+                    value={formData.mobilePhone}
+                    onChange={handleInputChange}
+                    autoComplete="tel-national"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sin">SIN (Optional)</Label>
                   <Input
                     id="sin"
                     name="sin"
@@ -1037,8 +1032,9 @@ const LoanApplicationPage = () => {
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
                 HOUSING
               </div>
+              {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                <div className="md:col-span-2">
+                <div className="col-span-2 md:col-span-2">
                   <Label htmlFor="address">Address *</Label>
                   <Input
                     id="address"
@@ -1058,9 +1054,6 @@ const LoanApplicationPage = () => {
                     autoComplete="address-line2"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="city">City</Label>
                   <Input
@@ -1107,9 +1100,6 @@ const LoanApplicationPage = () => {
                     autoComplete="postal-code"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="housingStatus">Housing Status</Label>
                   <Select
@@ -1137,13 +1127,14 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="monthlyHousingCosts">Monthly Housing Costs</Label>
+                  <Label htmlFor="monthlyHousingCosts">Monthly Housing</Label>
                   <Input
                     id="monthlyHousingCosts"
                     name="monthlyHousingCosts"
                     type="number"
                     value={formData.monthlyHousingCosts}
                     onChange={handleInputChange}
+                    placeholder="$"
                   />
                 </div>
               </div>
@@ -1169,6 +1160,7 @@ const LoanApplicationPage = () => {
                   </p>
                 </CollapsibleContent>
               </Collapsible>
+              {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="photoIdType">ID Type</Label>
@@ -1198,7 +1190,7 @@ const LoanApplicationPage = () => {
                     onValueChange={(value) => handleSelectChange("photoIdProvince", value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
+                      <SelectValue placeholder="Province" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ON">ON</SelectItem>
@@ -1214,9 +1206,6 @@ const LoanApplicationPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <Label htmlFor="photoIdNumber">ID Number</Label>
                   <Input
@@ -1226,8 +1215,8 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="w-full">
-                  <Label htmlFor="photoIdExpiry">ID Expiry Date</Label>
+                <div>
+                  <Label htmlFor="photoIdExpiry">ID Expiry</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -1277,18 +1266,18 @@ const LoanApplicationPage = () => {
             {/* Employment Section */}
             <div className="space-y-3">
               <div className="bg-gray-500 text-white px-3 py-2 text-xs font-semibold uppercase">
-                EMPLOYMENT & INCOME INFORMATION
+                EMPLOYMENT & INCOME
               </div>
-              {/* Row 1: Employment Status, Business Name */}
+              {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="employmentStatus">Employment Status</Label>
+                  <Label htmlFor="employmentStatus">Status</Label>
                   <Select
                     value={formData.employmentStatus}
                     onValueChange={(value) => handleSelectChange("employmentStatus", value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="employed">Employed</SelectItem>
@@ -1309,12 +1298,8 @@ const LoanApplicationPage = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-              </div>
-
-              {/* Row 2: Position Title, Gross Monthly Income */}
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="positionTitle">Position Title</Label>
+                  <Label htmlFor="positionTitle">Position</Label>
                   <Input
                     id="positionTitle"
                     name="positionTitle"
@@ -1323,21 +1308,18 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="grossMonthlyIncome">Gross Monthly Income</Label>
+                  <Label htmlFor="grossMonthlyIncome">Monthly Income</Label>
                   <Input
                     id="grossMonthlyIncome"
                     name="grossMonthlyIncome"
                     type="number"
                     value={formData.grossMonthlyIncome}
                     onChange={handleInputChange}
+                    placeholder="$"
                   />
                 </div>
-              </div>
-
-              {/* Row 3: Time at Job, Employer Address */}
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="timeAtJob">Time at Job (Years)</Label>
+                  <Label htmlFor="timeAtJob">Years at Job</Label>
                   <Input
                     id="timeAtJob"
                     name="timeAtJob"
@@ -1347,7 +1329,7 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="employerAddress">Employer Address</Label>
+                  <Label htmlFor="employerAddress">Work Address</Label>
                   <Input
                     id="employerAddress"
                     name="employerAddress"
@@ -1356,12 +1338,8 @@ const LoanApplicationPage = () => {
                     autoComplete="off"
                   />
                 </div>
-              </div>
-
-              {/* Row 4: Employer City, Employer Province */}
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="employerCity">Employer City</Label>
+                  <Label htmlFor="employerCity">Work City</Label>
                   <Input
                     id="employerCity"
                     name="employerCity"
@@ -1371,13 +1349,13 @@ const LoanApplicationPage = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="employerProvince">Employer Province</Label>
+                  <Label htmlFor="employerProvince">Work Province</Label>
                   <Select
                     value={formData.employerProvince}
                     onValueChange={(value) => handleSelectChange("employerProvince", value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
+                      <SelectValue placeholder="Province" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ON">ON</SelectItem>
