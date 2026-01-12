@@ -107,20 +107,18 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
       };
     }
     
-    // If calculator data exists without customer, use it
+    // If calculator data exists without customer, use it with blank customer fields
     if (preloadedCalculatorData) {
-      const saved = localStorage.getItem("tpvFormData");
-      const savedData = saved ? JSON.parse(saved) : {};
       return {
-        firstName: savedData.firstName || "",
-        lastName: savedData.lastName || "",
-        phoneNumber: savedData.phoneNumber || "",
-        email: savedData.email || "",
-        address: savedData.address || "",
-        city: savedData.city || "",
-        province: savedData.province || "",
-        postalCode: savedData.postalCode || "",
-        products: savedData.products || [],
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        address: "",
+        city: "",
+        province: "",
+        postalCode: "",
+        products: [],
         salesPrice: `$${preloadedCalculatorData.purchaseAmount.toLocaleString()}`,
         interestRate: `${preloadedCalculatorData.interestRate}%`,
         promotionalTerm: `${preloadedCalculatorData.promoTerm} months`,
@@ -129,9 +127,8 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
       };
     }
     
-    // Otherwise restore form data from localStorage if available
-    const saved = localStorage.getItem("tpvFormData");
-    return saved ? JSON.parse(saved) : {
+    // Always start with blank form - no localStorage loading
+    return {
       firstName: "",
       lastName: "",
       phoneNumber: "",
@@ -149,10 +146,7 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
     };
   });
 
-  // Save form data to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("tpvFormData", JSON.stringify(formData));
-  }, [formData]);
+  // No longer save form data to localStorage - each session starts fresh
 
   // Calculate admin fee: 1.49% of sales price, capped at $149
   const calculateAdminFee = (salesAmount) => {

@@ -19,6 +19,19 @@ const LoginPage = () => {
       const profile = await loadTenantData(agentId);
       
       if (profile) {
+        // Clear all form data from previous sessions to ensure blank slate
+        localStorage.removeItem("tpvFormData");
+        localStorage.removeItem("formData");
+        // Clear any tenant-specific form data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("formData_")) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
         localStorage.setItem("authenticated", "true");
         localStorage.setItem("agentId", profile.agent_id);
         if (profile.phone) {

@@ -13,11 +13,14 @@ const PaymentCalculatorPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const customer = location.state?.customer;
-  const [purchaseAmount, setPurchaseAmount] = useState(5250);
-  const [purchaseAmountDisplay, setPurchaseAmountDisplay] = useState('$5,250.00');
-  const [interestRate, setInterestRate] = useState(9.99);
-  const [amortizationPeriod, setAmortizationPeriod] = useState(180);
-  const [promoTerm, setPromoTerm] = useState(36);
+  const calculatorData = location.state?.calculatorData;
+  
+  // Initialize with blank values or preloaded data - never use hardcoded defaults
+  const [purchaseAmount, setPurchaseAmount] = useState(calculatorData?.purchaseAmount || 0);
+  const [purchaseAmountDisplay, setPurchaseAmountDisplay] = useState(calculatorData?.purchaseAmount ? `$${calculatorData.purchaseAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '');
+  const [interestRate, setInterestRate] = useState(calculatorData?.interestRate ?? 9.99);
+  const [amortizationPeriod, setAmortizationPeriod] = useState(calculatorData?.amortizationPeriod || 180);
+  const [promoTerm, setPromoTerm] = useState(calculatorData?.promoTerm || 36);
   const [show240Warning, setShow240Warning] = useState(false);
   const [showContractorFees, setShowContractorFees] = useState(false);
 
