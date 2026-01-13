@@ -740,67 +740,38 @@ const LoanApplicationPage = () => {
       const isValidTenant = tenant?.id && !tenant?.isAllTenants;
       
       if (!customerId && isValidTenant) {
+        // Always create a new customer when starting fresh (no existing customerId)
+        // This allows duplicate phone numbers/emails for testing purposes
+        // Updates only happen when editing an existing profile (customerId is set from navigation)
         const agentId = localStorage.getItem('agentId');
         const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '') || '';
+        const customerPhone = phoneDigits || 'N/A';
         
-        // Use phone for lookup if available, otherwise lookup by name + address + tenant
-        let existingCustomer = null;
+        const { data: newCustomer, error: insertError } = await supabase
+          .from("customers")
+          .insert({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email || null,
+            phone: customerPhone,
+            address: formData.address || 'N/A',
+            city: formData.city || null,
+            province: formData.province || null,
+            postal_code: formData.postalCode || null,
+            tenant_id: tenant.id,
+            agent_id: agentId,
+          })
+          .select("id")
+          .single();
         
-        if (phoneDigits) {
-          // Check if customer exists by phone number within the same tenant
-          const { data } = await supabase
-            .from("customers")
-            .select("id")
-            .eq("phone", phoneDigits)
-            .eq("tenant_id", tenant.id)
-            .maybeSingle();
-          existingCustomer = data;
-        } else if (formData.firstName && formData.lastName && formData.address) {
-          // Fallback: check by name + address within same tenant
-          const { data } = await supabase
-            .from("customers")
-            .select("id")
-            .eq("first_name", formData.firstName)
-            .eq("last_name", formData.lastName)
-            .eq("address", formData.address)
-            .eq("tenant_id", tenant.id)
-            .maybeSingle();
-          existingCustomer = data;
-        }
-        
-        if (existingCustomer) {
-          customerId = existingCustomer.id;
-          console.log('Found existing customer:', customerId);
-        } else {
-          // Create new customer - phone is required by DB, use placeholder if empty
-          const customerPhone = phoneDigits || 'N/A';
-          
-          const { data: newCustomer, error: insertError } = await supabase
-            .from("customers")
-            .insert({
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              email: formData.email || null,
-              phone: customerPhone,
-              address: formData.address || 'N/A',
-              city: formData.city || null,
-              province: formData.province || null,
-              postal_code: formData.postalCode || null,
-              tenant_id: tenant.id,
-              agent_id: agentId,
-            })
-            .select("id")
-            .single();
-          
-          if (!insertError && newCustomer) {
-            customerId = newCustomer.id;
-            setCreatedCustomerId(newCustomer.id);
-            console.log('Created new customer from loan application:', customerId);
-            toast.success('Customer profile saved to dashboard');
-          } else if (insertError) {
-            console.error('Error creating customer:', insertError);
-            toast.error('Failed to save customer profile: ' + insertError.message);
-          }
+        if (!insertError && newCustomer) {
+          customerId = newCustomer.id;
+          setCreatedCustomerId(newCustomer.id);
+          console.log('Created new customer from loan application:', customerId);
+          toast.success('Customer profile saved to dashboard');
+        } else if (insertError) {
+          console.error('Error creating customer:', insertError);
+          toast.error('Failed to save customer profile: ' + insertError.message);
         }
       } else if (!isValidTenant && !customerId) {
         console.warn('Cannot create customer: No valid tenant selected. Super Admin must select a specific tenant to save profiles.');
