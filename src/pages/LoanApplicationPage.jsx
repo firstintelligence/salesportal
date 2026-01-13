@@ -42,9 +42,25 @@ const LoanApplicationPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isIdScannerOpen, setIsIdScannerOpen] = useState(false);
   
+  // Helper to convert ALL CAPS text to Title Case
+  const toTitleCase = (str) => {
+    if (!str) return str;
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+  
   // Handle ID scan completion
   const handleIdScanComplete = (scanData) => {
     setIsIdScannerOpen(false);
+    
+    // Apply title case to text fields that may come back fully capitalized
+    const firstName = toTitleCase(scanData.firstName);
+    const lastName = toTitleCase(scanData.lastName);
+    const address = toTitleCase(scanData.address);
+    const city = toTitleCase(scanData.city);
     
     // Map the scanned data to form fields
     let idType = '';
@@ -89,12 +105,12 @@ const LoanApplicationPage = () => {
       photoIdProvince: province || prev.photoIdProvince,
       photoIdNumber: scanData.idNumber || prev.photoIdNumber,
       photoIdExpiry: scanData.idExpiry || prev.photoIdExpiry,
-      // Also fill in personal info if available and not already filled
-      firstName: prev.firstName || scanData.firstName || '',
-      lastName: prev.lastName || scanData.lastName || '',
+      // Use title-cased values for personal info
+      firstName: prev.firstName || firstName || '',
+      lastName: prev.lastName || lastName || '',
       birthdate: prev.birthdate || scanData.dateOfBirth || '',
-      address: prev.address || scanData.address || '',
-      city: prev.city || scanData.city || '',
+      address: prev.address || address || '',
+      city: prev.city || city || '',
       province: prev.province || province || '',
       postalCode: prev.postalCode || scanData.postalCode || '',
     }));
