@@ -96,8 +96,11 @@ const ProductListItem = memo(({
               type="number"
               min="0"
               step="0.01"
-              value={item.amount}
+              value={item.amount === 0 ? '' : item.amount}
               onChange={(e) => onItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
+              onFocus={(e) => { if (item.amount === 0) e.target.value = ''; }}
+              onBlur={(e) => { if (e.target.value === '') onItemChange(index, 'amount', 0); }}
+              placeholder="0"
               className="h-10 pl-4 pr-1 text-[10px] md:text-sm bg-slate-50 border-slate-200"
             />
           </div>
