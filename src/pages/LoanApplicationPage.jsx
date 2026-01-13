@@ -614,29 +614,34 @@ const LoanApplicationPage = () => {
                   // Clear the text field
                   signatureField.setText('');
                   
-                  // Calculate dimensions - minimum 2.5 inches (180 points) width for readability
+                  // Calculate dimensions using FIXED target size to ensure consistency
+                  // The signature image may have varying dimensions due to cropping/scaling,
+                  // so we use a fixed width and calculate height based on aspect ratio
                   const imgWidth = signatureImage.width;
                   const imgHeight = signatureImage.height;
                   const aspectRatio = imgWidth / imgHeight;
                   
-                  // Minimum width of 180 points (2.5 inches) for signature legibility
-                  const MIN_SIGNATURE_WIDTH = 180;
-                  const MIN_SIGNATURE_HEIGHT = 50;
+                  // Use a FIXED target width for consistency across all generations
+                  // This prevents the signature from growing on regeneration
+                  const FIXED_SIGNATURE_WIDTH = 140; // Fixed width in points (~2 inches)
                   
-                  // Start with a good readable size, not constrained by tiny form field
-                  let drawWidth = Math.max(MIN_SIGNATURE_WIDTH, rect.width);
+                  // Calculate height to maintain aspect ratio
+                  let drawWidth = FIXED_SIGNATURE_WIDTH;
                   let drawHeight = drawWidth / aspectRatio;
                   
-                  // Ensure minimum height as well
+                  // Ensure minimum height for legibility
+                  const MIN_SIGNATURE_HEIGHT = 35;
                   if (drawHeight < MIN_SIGNATURE_HEIGHT) {
                     drawHeight = MIN_SIGNATURE_HEIGHT;
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Reduce size to 85% while maintaining aspect ratio, anchored to left
-                  const scaleFactor = 0.85;
-                  drawWidth = drawWidth * scaleFactor;
-                  drawHeight = drawHeight * scaleFactor;
+                  // Cap maximum height to prevent overly tall signatures
+                  const MAX_SIGNATURE_HEIGHT = 60;
+                  if (drawHeight > MAX_SIGNATURE_HEIGHT) {
+                    drawHeight = MAX_SIGNATURE_HEIGHT;
+                    drawWidth = drawHeight * aspectRatio;
+                  }
                   
                   // Position signature relative to field - moved down 15 pixels from previous position
                   const xPos = rect.x;
