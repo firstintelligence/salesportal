@@ -5,14 +5,20 @@ import BaseTemplate from './BaseTemplate';
 import { formatPhoneNumber } from '../../utils/inputFormatting';
 import { getProductDescription } from '../../utils/productDescriptions';
 
-// Consistent signature dimensions across all pages - increased size 2-3x
+// Consistent signature dimensions across ALL pages - same size everywhere
 const SIGNATURE_STYLE = {
-  maxHeight: '120px',
+  maxHeight: '90px',
   height: 'auto',
   width: 'auto',
-  maxWidth: '350px',
+  maxWidth: '280px',
   objectFit: 'contain'
 };
+
+// Consistent signature container height for all pages
+const SIGNATURE_CONTAINER_HEIGHT = '90px';
+
+// Consistent label margin for all signature sections
+const SIGNATURE_LABEL_MARGIN = 'mb-8';
 
 // Helper to convert Tailwind height class to CSS value
 // This is needed because Tailwind can't dynamically generate arbitrary value classes at runtime
@@ -324,10 +330,10 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
         {isFirstPage && (
         <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
             <div className="flex gap-8 mb-2">
-              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                <h3 className="text-xs font-semibold mb-12" style={{color: '#194578'}}>Customer Signature</h3>
+              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-1 flex items-center h-[120px]">
+                  <div className="mb-1 flex items-center" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                     <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
@@ -337,10 +343,10 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                  <h3 className="text-xs font-semibold mb-12" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                  <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-1 flex items-center h-[120px]">
+                    <div className="mb-1 flex items-center" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                       <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (
@@ -408,32 +414,32 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               </div>
             </div>
 
-            {/* Signature Section on Page 2 (Terms & Conditions) */}
+            {/* Signature Section on Page 2 (Terms & Conditions) - SAME SIZE AS PAGE 1 */}
             <div className="flex gap-8 mt-8">
-              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                <h3 className="text-sm font-semibold mb-14" style={{color: '#194578'}}>Customer Signature</h3>
+              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[120px]">
+                  <div className="mb-1 flex items-center border-b-2 border-gray-400" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                     <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
-                  <div className="border-b-2 border-gray-400 mb-2 h-10 w-full"></div>
+                  <div className="border-b-2 border-gray-400 mb-1 h-6 w-full"></div>
                 )}
-                <p className="text-sm text-gray-600">{customerName}</p>
-                <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                <p className="text-xs text-gray-600">{customerName}</p>
+                <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                  <h3 className="text-sm font-semibold mb-14" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                  <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-2 flex items-center border-b-2 border-gray-400 h-[120px]">
+                    <div className="mb-1 flex items-center border-b-2 border-gray-400" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                       <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (
-                    <div className="border-b-2 border-gray-400 mb-2 h-10 w-full"></div>
+                    <div className="border-b-2 border-gray-400 mb-1 h-6 w-full"></div>
                   )}
-                  <p className="text-sm text-gray-600">{data.billTo.coApplicantName}</p>
-                  <p className="text-sm text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
+                  <p className="text-xs text-gray-600">{data.billTo.coApplicantName}</p>
+                  <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
                 </div>
               )}
             </div>
@@ -476,14 +482,14 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
           </div>
         )}
 
-        {/* Signature Section - On continuation pages (not first, not last with T&C) */}
+        {/* Signature Section - On continuation pages (not first, not last with T&C) - SAME SIZE AS PAGE 1 */}
         {!isFirstPage && !isLastPage && (
         <div className="mt-auto pt-2" style={{pageBreakInside: 'avoid'}}>
             <div className="flex gap-8 mb-2">
-              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                <h3 className="text-xs font-semibold mb-12" style={{color: '#194578'}}>Customer Signature</h3>
+              <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Customer Signature</h3>
                 {signature ? (
-                  <div className="mb-1 flex items-center h-[120px]">
+                  <div className="mb-1 flex items-center" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                     <img src={signature} alt="Customer Signature" style={SIGNATURE_STYLE} />
                   </div>
                 ) : (
@@ -493,10 +499,10 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                 <p className="text-xs text-gray-600">Date: {invoice.date ? formatInTimeZone(new Date(invoice.date + 'T12:00:00'), "America/Toronto", "MMM dd, yyyy") : formatInTimeZone(new Date(), "America/Toronto", "MMM dd, yyyy")}</p>
               </div>
               {data.billTo?.coApplicantName && (
-                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '400px'}}>
-                  <h3 className="text-xs font-semibold mb-12" style={{color: '#194578'}}>Co-Applicant Signature</h3>
+                <div style={{flex: '0 0 auto', minWidth: '280px', maxWidth: '350px'}}>
+                  <h3 className={`text-xs font-semibold ${SIGNATURE_LABEL_MARGIN}`} style={{color: '#194578'}}>Co-Applicant Signature</h3>
                   {coApplicantSignature ? (
-                    <div className="mb-1 flex items-center h-[120px]">
+                    <div className="mb-1 flex items-center" style={{height: SIGNATURE_CONTAINER_HEIGHT}}>
                       <img src={coApplicantSignature} alt="Co-Applicant Signature" style={SIGNATURE_STYLE} />
                     </div>
                   ) : (

@@ -214,10 +214,10 @@ serve(async (req) => {
               const origHeight = signatureImage.height;
               const aspectRatio = origWidth / origHeight;
               
-              // Increased signature size (2-3x bigger) - consistent across all pages
-              // 120px height matches the Template4.jsx signature container
-              const maxWidth = 350;
-              const maxHeight = 90;
+              // Signature size matching Template4.jsx - consistent 280x72 max
+              // This matches the SIGNATURE_STYLE in Template4.jsx (maxWidth: 280px, maxHeight: 90px)
+              const maxWidth = 280;
+              const maxHeight = 72;
               
               let drawWidth: number;
               let drawHeight: number;
