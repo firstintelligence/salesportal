@@ -23,7 +23,7 @@ import {
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
-  const { tenant, agentProfile, switchTenant, loading: contextLoading } = useTenant();
+  const { tenant, agentProfile, accessibleTenants, switchTenant, loading: contextLoading, hasMultiTenantAccess } = useTenant();
   const [tenants, setTenants] = useState([]);
   const [tenantsLoading, setTenantsLoading] = useState(true);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -63,24 +63,33 @@ const ProfileDropdown = () => {
 
   useEffect(() => {
     const fetchTenants = async () => {
-      if (!isSuperAdmin) {
-        return;
-      }
+      if (isSuperAdmin) {
+        // Super admins see all tenants
+        const { data, error } = await supabase
+          .from('tenants')
+          .select('*')
+          .order('name');
 
-      const { data, error } = await supabase
-        .from('tenants')
-        .select('*')
-        .order('name');
-
-      if (!error && data) {
-        // Add Super Admin tenant at the beginning for super admins
-        setTenants([SUPER_ADMIN_TENANT, ...data]);
+        if (!error && data) {
+          // Add Super Admin tenant at the beginning for super admins
+          setTenants([SUPER_ADMIN_TENANT, ...data]);
+        }
+      } else if (hasMultiTenantAccess && accessibleTenants.length > 0) {
+        // Non-super-admins with multi-tenant access see only their accessible tenants
+        setTenants(accessibleTenants);
       }
       setTenantsLoading(false);
     };
 
-    fetchTenants();
-  }, [isSuperAdmin]);
+    if (isSuperAdmin || hasMultiTenantAccess) {
+      fetchTenants();
+    } else {
+      setTenantsLoading(false);
+    }
+  }, [isSuperAdmin, hasMultiTenantAccess, accessibleTenants]);
+
+  // Determine if tenant switcher should be shown
+  const showTenantSwitcher = (isSuperAdmin || hasMultiTenantAccess) && !tenantsLoading && tenants.length > 1;
 
   const handleLogout = () => {
     localStorage.removeItem('authenticated');
@@ -116,8 +125,8 @@ const ProfileDropdown = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {/* Tenant Switcher for Super Admins */}
-        {isSuperAdmin && !tenantsLoading && tenants.length > 0 && (
+        {/* Tenant Switcher for Super Admins or Multi-Tenant Agents */}
+        {showTenantSwitcher && (
           <>
             {/* Mobile: Use collapsible inline menu */}
             {isMobile ? (
