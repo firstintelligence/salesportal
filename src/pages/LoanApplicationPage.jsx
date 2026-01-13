@@ -623,8 +623,8 @@ const LoanApplicationPage = () => {
                   
                   // Use a FIXED target width for consistency across all generations
                   // This prevents the signature from growing on regeneration
-                  // Increased by 15% from 140 to 161 points
-                  const FIXED_SIGNATURE_WIDTH = 161; // Fixed width in points (~2.25 inches)
+                  // Reduced by 5% from 161 to 153 points
+                  const FIXED_SIGNATURE_WIDTH = 153; // Fixed width in points (~2.1 inches)
                   
                   // Calculate height to maintain aspect ratio
                   let drawWidth = FIXED_SIGNATURE_WIDTH;
