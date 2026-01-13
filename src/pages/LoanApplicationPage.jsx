@@ -732,8 +732,12 @@ const LoanApplicationPage = () => {
       }
       
       // Create customer if not exists (when coming from standalone loan application)
+      // Note: Super Admin's special "all tenants" tenant has isAllTenants=true and a non-UUID id
+      // We need a real tenant ID to create customers/loan applications
       let customerId = createdCustomerId;
-      if (!customerId && tenant?.id) {
+      const isValidTenant = tenant?.id && !tenant?.isAllTenants;
+      
+      if (!customerId && isValidTenant) {
         const agentId = localStorage.getItem('agentId');
         const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '');
         
@@ -771,13 +775,18 @@ const LoanApplicationPage = () => {
               customerId = newCustomer.id;
               setCreatedCustomerId(newCustomer.id);
               console.log('Created new customer from loan application:', customerId);
+            } else if (insertError) {
+              console.error('Error creating customer:', insertError);
             }
           }
         }
+      } else if (!isValidTenant && !customerId) {
+        console.warn('Cannot create customer: No valid tenant selected. Super Admin must select a specific tenant to save profiles.');
+        toast.warning('Select a specific tenant (not "Super Admin") to save this profile to the dashboard.');
       }
       
-      // Save loan application data to database
-      if (customerId && tenant?.id) {
+      // Save loan application data to database (only if we have a valid tenant, not Super Admin "all tenants" mode)
+      if (customerId && isValidTenant) {
         const agentId = localStorage.getItem('agentId');
         const loanAppData = {
           customer_id: customerId,
@@ -889,8 +898,9 @@ const LoanApplicationPage = () => {
       return;
     }
     
-    if (!tenant?.id) {
-      toast.error('Tenant not loaded. Please try again.');
+    // Check for valid tenant (Super Admin "all tenants" mode has isAllTenants=true with non-UUID id)
+    if (!tenant?.id || tenant?.isAllTenants) {
+      toast.error('Please select a specific tenant (not "Super Admin") to save profiles.');
       return;
     }
     
