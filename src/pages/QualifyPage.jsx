@@ -27,8 +27,26 @@ const QualifyPage = () => {
     }
   }, [navigate]);
 
+  // Helper to convert ALL CAPS text to Title Case
+  const toTitleCase = (str) => {
+    if (!str) return str;
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const handleScanComplete = (data) => {
-    setScanData(data);
+    // Apply title case to text fields that may come back fully capitalized
+    const transformedData = {
+      ...data,
+      firstName: toTitleCase(data.firstName),
+      lastName: toTitleCase(data.lastName),
+      address: toTitleCase(data.address),
+      city: toTitleCase(data.city),
+    };
+    setScanData(transformedData);
     setStep('result');
   };
 
