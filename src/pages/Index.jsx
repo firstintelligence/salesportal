@@ -103,6 +103,19 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // Track whether we've already loaded initial form data to avoid overwriting user input
   const hasLoadedInitialData = useRef(false);
   
+  // Reset the ref when component unmounts or key props change
+  // This fixes the back button issue where the component reuses stale ref state
+  useEffect(() => {
+    return () => {
+      hasLoadedInitialData.current = false;
+    };
+  }, []);
+  
+  // Also reset when preloadedCustomer changes (different customer or back navigation)
+  useEffect(() => {
+    hasLoadedInitialData.current = false;
+  }, [preloadedCustomer?.id]);
+  
   // CRITICAL: Don't render anything until tenant is fully loaded to prevent cross-tenant data exposure
   const tenantSlug = tenant?.slug;
   const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;

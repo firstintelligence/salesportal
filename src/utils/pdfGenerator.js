@@ -233,17 +233,8 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         console.error('Error with document storage:', storageError);
       }
 
-      // Create download link
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      // Record document signature if signing context is provided OR if there's a signature
+      // IMPORTANT: Record document signature BEFORE downloading PDF
+      // Opening/downloading PDF can interrupt JavaScript execution
       if (signingContext || invoiceDataWithLocation.signature) {
         try {
           // Calculate invoice total amount for storage
@@ -314,6 +305,16 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
           // Don't fail PDF generation if signature recording fails
         }
       }
+
+      // NOW create download link (after all database operations are complete)
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
       console.log('PDF downloaded successfully');
       resolve();
