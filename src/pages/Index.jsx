@@ -14,7 +14,7 @@ import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
 import { RefreshCw, Loader2, Pen, Save, Phone } from "lucide-react";
-import { addDays, format } from "date-fns";
+import { addDays, format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
 import { supabase } from "@/integrations/supabase/client";
@@ -453,16 +453,20 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   };
 
   // Auto-set payment date to 7 days after invoice date - only update paymentDate, not the whole invoice
+  // Use parse to avoid timezone issues with Date constructor
   const handleDateChange = useCallback((e) => {
     const { name, value } = e.target;
     if (name === 'date' && value) {
-      const paymentDate = addDays(new Date(value), 7);
+      // Parse the date string properly to avoid timezone issues
+      const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+      const paymentDate = addDays(parsedDate, 7);
       setInvoice(prev => ({
         ...prev,
         date: value,
         paymentDate: format(paymentDate, 'yyyy-MM-dd')
       }));
     } else {
+      // Allow direct editing of paymentDate field
       setInvoice(prev => ({ ...prev, [name]: value }));
     }
   }, []);
@@ -568,7 +572,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   const clearForm = () => {
     // Get today's date and due date (7 days later)
     const today = getTodayInToronto();
-    const dueDate = format(addDays(new Date(today), 7), 'yyyy-MM-dd');
+    const parsedToday = parse(today, 'yyyy-MM-dd', new Date());
+    const dueDate = format(addDays(parsedToday, 7), 'yyyy-MM-dd');
     
     // Reset the hasLoadedInitialData flag so the form doesn't try to reload old data
     hasLoadedInitialData.current = false;
@@ -993,7 +998,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     label={isInvoice ? 'Due' : 'Valid'}
                     type="date"
                     value={invoice.paymentDate}
-                    disabled
+                    onChange={handleDateChange}
                     name="paymentDate"
                     className="text-[10px] md:text-base"
                   />
