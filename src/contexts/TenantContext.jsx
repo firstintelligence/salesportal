@@ -27,6 +27,7 @@ export const TenantProvider = ({ children }) => {
   const [tenant, setTenant] = useState(null);
   const [originalTenant, setOriginalTenant] = useState(null);
   const [agentProfile, setAgentProfile] = useState(null);
+  const [accessibleTenants, setAccessibleTenants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadTenantData = async (agentId) => {
@@ -44,23 +45,38 @@ export const TenantProvider = ({ children }) => {
       }
 
       if (profile) {
-        // Then get the tenant separately if tenant_id exists
+        // Get all tenants the agent has access to from the junction table
+        const { data: tenantAccess, error: accessError } = await supabase
+          .from('agent_tenant_access')
+          .select('tenant_id, tenants(*)')
+          .eq('agent_id', agentId);
+
+        let accessibleTenantsList = [];
+        if (!accessError && tenantAccess) {
+          accessibleTenantsList = tenantAccess
+            .map(ta => ta.tenants)
+            .filter(Boolean);
+        }
+
+        // Fallback to the agent_profiles.tenant_id if no junction table entries
         let tenantData = null;
-        if (profile.tenant_id) {
+        if (accessibleTenantsList.length > 0) {
+          tenantData = accessibleTenantsList[0];
+        } else if (profile.tenant_id) {
           const { data: tenant, error: tenantError } = await supabase
             .from('tenants')
             .select('*')
             .eq('id', profile.tenant_id)
             .single();
           
-          if (tenantError) {
-            console.error('Error fetching tenant:', tenantError);
-          } else {
+          if (!tenantError && tenant) {
             tenantData = tenant;
+            accessibleTenantsList = [tenant];
           }
         }
 
         setAgentProfile(profile);
+        setAccessibleTenants(accessibleTenantsList);
         
         // If super admin, default to the Super Admin tenant (all tenants view)
         if (profile.is_super_admin) {
@@ -80,13 +96,21 @@ export const TenantProvider = ({ children }) => {
             setTenant(SUPER_ADMIN_TENANT);
           }
         } else {
-          setTenant(tenantData);
+          // For non-super-admins with multiple tenants, check for saved selection
+          const selectedTenantId = localStorage.getItem('selectedTenantId');
+          if (selectedTenantId && accessibleTenantsList.some(t => t.id === selectedTenantId)) {
+            const selectedTenant = accessibleTenantsList.find(t => t.id === selectedTenantId);
+            setTenant(selectedTenant);
+          } else {
+            setTenant(tenantData);
+          }
         }
         
         setOriginalTenant(tenantData);
         
         localStorage.setItem('agentProfile', JSON.stringify(profile));
         localStorage.setItem('originalTenant', JSON.stringify(tenantData));
+        localStorage.setItem('accessibleTenants', JSON.stringify(accessibleTenantsList));
         
         return profile;
       }
@@ -99,7 +123,13 @@ export const TenantProvider = ({ children }) => {
   };
 
   const switchTenant = (newTenant) => {
-    if (!agentProfile?.is_super_admin) {
+    // Allow switching for super admins or agents with multiple tenant access
+    if (!agentProfile?.is_super_admin && accessibleTenants.length <= 1) {
+      return;
+    }
+    
+    // For non-super-admins, only allow switching to accessible tenants
+    if (!agentProfile?.is_super_admin && !accessibleTenants.some(t => t.id === newTenant.id)) {
       return;
     }
     
@@ -112,6 +142,11 @@ export const TenantProvider = ({ children }) => {
     try {
       const storedProfile = localStorage.getItem('agentProfile');
       const storedOriginalTenant = localStorage.getItem('originalTenant');
+      const storedAccessibleTenants = localStorage.getItem('accessibleTenants');
+      
+      if (storedAccessibleTenants) {
+        setAccessibleTenants(JSON.parse(storedAccessibleTenants));
+      }
       
       if (storedProfile) {
         const profile = JSON.parse(storedProfile);
@@ -162,25 +197,32 @@ export const TenantProvider = ({ children }) => {
     setTenant(null);
     setOriginalTenant(null);
     setAgentProfile(null);
+    setAccessibleTenants([]);
     localStorage.removeItem('agentProfile');
     localStorage.removeItem('tenant');
     localStorage.removeItem('originalTenant');
     localStorage.removeItem('selectedTenantId');
+    localStorage.removeItem('accessibleTenants');
   };
 
   // Helper to check if currently viewing all tenants
   const isViewingAllTenants = tenant?.isAllTenants === true;
+  
+  // Helper to check if agent has multi-tenant access
+  const hasMultiTenantAccess = accessibleTenants.length > 1;
 
   const value = {
     tenant,
     originalTenant,
     agentProfile,
+    accessibleTenants,
     loading,
     loadTenantData,
     switchTenant,
     clearTenantData,
     isSuperAdmin: agentProfile?.is_super_admin || false,
     isViewingAllTenants,
+    hasMultiTenantAccess,
     SUPER_ADMIN_TENANT,
   };
 
