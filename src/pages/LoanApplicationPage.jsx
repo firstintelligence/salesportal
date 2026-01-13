@@ -716,22 +716,8 @@ const LoanApplicationPage = () => {
         console.error('Error with document storage:', storageError);
       }
       
-      // Open the PDF in browser instead of downloading
-      const url = URL.createObjectURL(blob);
-      
-      // Open in new tab/window on mobile and desktop
-      const newWindow = window.open(url, '_blank');
-      if (newWindow) {
-        // Clean up after a delay to ensure PDF loads
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-      } else {
-        // Fallback to download if popup blocked
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
-        link.click();
-        URL.revokeObjectURL(url);
-      }
+      // IMPORTANT: Create customer and save data BEFORE opening PDF
+      // Opening PDF in new window can interrupt JavaScript execution
       
       // Create customer if not exists (when coming from standalone loan application)
       // Note: Super Admin's special "all tenants" tenant has isAllTenants=true and a non-UUID id
@@ -884,6 +870,23 @@ const LoanApplicationPage = () => {
       } catch (sigError) {
         console.error('Error recording document signature:', sigError);
         // Don't fail the process if signature recording fails
+      }
+      
+      // NOW open the PDF in browser (after all database operations are complete)
+      const url = URL.createObjectURL(blob);
+      
+      // Open in new tab/window on mobile and desktop
+      const newWindow = window.open(url, '_blank');
+      if (newWindow) {
+        // Clean up after a delay to ensure PDF loads
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      } else {
+        // Fallback to download if popup blocked
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Loan_Application_${formData.firstName}_${formData.lastName}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
       }
       
       toast.success('PDF generated successfully!');
