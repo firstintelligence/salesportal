@@ -739,6 +739,15 @@ const LoanApplicationPage = () => {
       let customerId = createdCustomerId;
       const isValidTenant = tenant?.id && !tenant?.isAllTenants;
       
+      console.log('PDF Generation - Customer creation check:', {
+        createdCustomerId,
+        tenantId: tenant?.id,
+        tenantName: tenant?.name,
+        isAllTenants: tenant?.isAllTenants,
+        isValidTenant,
+        willCreateCustomer: !customerId && isValidTenant
+      });
+      
       if (!customerId && isValidTenant) {
         // Always create a new customer when starting fresh (no existing customerId)
         // This allows duplicate phone numbers/emails for testing purposes
