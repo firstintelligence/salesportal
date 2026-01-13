@@ -623,29 +623,31 @@ const LoanApplicationPage = () => {
                   
                   // Use a FIXED target width for consistency across all generations
                   // This prevents the signature from growing on regeneration
-                  const FIXED_SIGNATURE_WIDTH = 140; // Fixed width in points (~2 inches)
+                  // Increased by 15% from 140 to 161 points
+                  const FIXED_SIGNATURE_WIDTH = 161; // Fixed width in points (~2.25 inches)
                   
                   // Calculate height to maintain aspect ratio
                   let drawWidth = FIXED_SIGNATURE_WIDTH;
                   let drawHeight = drawWidth / aspectRatio;
                   
-                  // Ensure minimum height for legibility
-                  const MIN_SIGNATURE_HEIGHT = 35;
+                  // Ensure minimum height for legibility (also increased by 15%)
+                  const MIN_SIGNATURE_HEIGHT = 40;
                   if (drawHeight < MIN_SIGNATURE_HEIGHT) {
                     drawHeight = MIN_SIGNATURE_HEIGHT;
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Cap maximum height to prevent overly tall signatures
-                  const MAX_SIGNATURE_HEIGHT = 60;
+                  // Cap maximum height to prevent overly tall signatures (also increased by 15%)
+                  const MAX_SIGNATURE_HEIGHT = 69;
                   if (drawHeight > MAX_SIGNATURE_HEIGHT) {
                     drawHeight = MAX_SIGNATURE_HEIGHT;
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Position signature relative to field - moved down 15 pixels from previous position
+                  // Position signature relative to field - expand upward, then move down 3px
+                  // Left position stays anchored at rect.x
                   const xPos = rect.x;
-                  const yPos = rect.y - 10; // Moved down 15 pixels from previous +5 offset
+                  const yPos = rect.y - 13; // Previous -10, minus 3 more pixels down
                   
                   // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
@@ -1312,14 +1314,17 @@ const LoanApplicationPage = () => {
                 </div>
                 <div>
                   <Label htmlFor="monthlyHousingCosts">Monthly Housing</Label>
-                  <Input
-                    id="monthlyHousingCosts"
-                    name="monthlyHousingCosts"
-                    type="number"
-                    value={formData.monthlyHousingCosts}
-                    onChange={handleInputChange}
-                    placeholder="$"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
+                    <Input
+                      id="monthlyHousingCosts"
+                      name="monthlyHousingCosts"
+                      type="number"
+                      value={formData.monthlyHousingCosts}
+                      onChange={handleInputChange}
+                      className="pl-7"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1493,14 +1498,17 @@ const LoanApplicationPage = () => {
                 </div>
                 <div>
                   <Label htmlFor="grossMonthlyIncome">Monthly Income</Label>
-                  <Input
-                    id="grossMonthlyIncome"
-                    name="grossMonthlyIncome"
-                    type="number"
-                    value={formData.grossMonthlyIncome}
-                    onChange={handleInputChange}
-                    placeholder="$"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
+                    <Input
+                      id="grossMonthlyIncome"
+                      name="grossMonthlyIncome"
+                      type="number"
+                      value={formData.grossMonthlyIncome}
+                      onChange={handleInputChange}
+                      className="pl-7"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="timeAtJob">Years at Job</Label>
