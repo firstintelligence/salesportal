@@ -644,10 +644,10 @@ const LoanApplicationPage = () => {
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Position signature relative to field - expand upward, then move down 3px
+                  // Position signature relative to field - expand upward
                   // Left position stays anchored at rect.x
                   const xPos = rect.x;
-                  const yPos = rect.y - 13; // Previous -10, minus 3 more pixels down
+                  const yPos = rect.y - 23; // Moved down 10 more pixels (from -13 to -23)
                   
                   // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
