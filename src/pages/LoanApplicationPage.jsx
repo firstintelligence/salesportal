@@ -617,9 +617,14 @@ const LoanApplicationPage = () => {
                     drawWidth = drawHeight * aspectRatio;
                   }
                   
-                  // Position signature relative to field
+                  // Reduce size to 85% while maintaining aspect ratio, anchored to left
+                  const scaleFactor = 0.85;
+                  drawWidth = drawWidth * scaleFactor;
+                  drawHeight = drawHeight * scaleFactor;
+                  
+                  // Position signature relative to field - moved down 15 pixels from previous position
                   const xPos = rect.x;
-                  const yPos = rect.y + 5; // Moved down 15 pixels from previous +20 offset
+                  const yPos = rect.y - 10; // Moved down 15 pixels from previous +5 offset
                   
                   // Draw the signature image at proper size
                   page.drawImage(signatureImage, {
