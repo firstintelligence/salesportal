@@ -15,7 +15,7 @@ import FullscreenSignaturePad from '@/components/FullscreenSignaturePad';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { formatPhoneNumber, formatPostalCode } from '@/utils/inputFormatting';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { provinces } from '@/utils/canadianProvinces';
+import { canadianProvinces } from '@/utils/canadianProvinces';
 
 // Super admin check
 const SUPER_ADMIN_ID = 'MM231611';
