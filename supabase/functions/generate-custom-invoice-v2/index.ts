@@ -315,21 +315,21 @@ Deno.serve(async (req) => {
 
       // Consent checkboxes
       yPos -= 15;
-      page.drawText(`Privacy Policy: ${financial.acceptPrivacyPolicy ? '☑' : '☐'}`, {
+      page.drawText(`Privacy Policy: ${financial.acceptPrivacyPolicy ? '[X]' : '[ ]'}`, {
         x: 50,
         y: yPos,
         size: 9,
         font: helvetica,
       });
       yPos -= 12;
-      page.drawText(`Electronic Consent: ${financial.electronicConsent ? '☑' : '☐'}`, {
+      page.drawText(`Electronic Consent: ${financial.electronicConsent ? '[X]' : '[ ]'}`, {
         x: 50,
         y: yPos,
         size: 9,
         font: helvetica,
       });
       yPos -= 12;
-      page.drawText(`Credit Consent: ${financial.creditConsent ? '☑' : '☐'}`, {
+      page.drawText(`Credit Consent: ${financial.creditConsent ? '[X]' : '[ ]'}`, {
         x: 50,
         y: yPos,
         size: 9,
