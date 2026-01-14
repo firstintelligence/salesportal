@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, UserCheck } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, UserCheck, FileEdit } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -96,7 +96,7 @@ const LandingPage = () => {
   ];
 
   // Add profit calculator tile if user has permission
-  const tools = canSeeProfitCalc 
+  let tools = canSeeProfitCalc 
     ? [
         ...baseTools,
         {
@@ -109,6 +109,21 @@ const LandingPage = () => {
         },
       ]
     : baseTools;
+
+  // Add Custom Invoice V2 tile for super admin only
+  if (isSuperAdminUser) {
+    tools = [
+      ...tools,
+      {
+        title: "Custom Invoice V2",
+        subtitle: "Super Admin Only",
+        icon: FileEdit,
+        path: "/custom-invoice-v2",
+        gradient: "bg-gradient-to-br from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/40 dark:to-pink-950/30",
+        iconBg: "bg-fuchsia-500",
+      },
+    ];
+  }
 
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
   const tenantLogoSize = tenant ? getTenantLogoSize(tenant.slug, 'header') : 'h-10 sm:h-12';
