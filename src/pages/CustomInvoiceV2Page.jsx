@@ -13,7 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { getProvincialTax, calculateMonthlyPayment } from '@/utils/financingCalculations';
 import FullscreenSignaturePad from '@/components/FullscreenSignaturePad';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
-import { formatPhoneNumber, formatPostalCode, formatCurrency } from '@/utils/inputFormatting';
+import { formatPhoneNumber, formatPostalCode } from '@/utils/inputFormatting';
+import { formatCurrency } from '@/utils/formatCurrency';
 import { provinces } from '@/utils/canadianProvinces';
 
 // Super admin check
