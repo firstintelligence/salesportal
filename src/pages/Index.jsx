@@ -910,9 +910,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                 </>
               )}
             </button>
+          </div>
         </div>
       </div>
-      
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
         <div className="w-full lg:w-1/2 lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>
