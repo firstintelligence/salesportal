@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Building2, LogOut, ChevronDown, Check, Trophy, CircleUser } from 'lucide-react';
+import { Building2, LogOut, ChevronDown, Check, Trophy, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -107,10 +107,10 @@ const ProfileDropdown = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-1 px-2 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+          className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
         >
-          <CircleUser className="w-5 h-5 sm:w-5 sm:h-5" />
-          <ChevronDown className="w-3 h-3 opacity-60 hidden sm:block" />
+          <UserCircle2 className="w-5 h-5 text-slate-600" />
+          <ChevronDown className="w-3 h-3 text-slate-500 hidden sm:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 bg-white border border-slate-200 shadow-lg z-50">
