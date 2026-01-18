@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, TrendingUp, UserCheck, FileEdit, Users } from "lucide-react";
+import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Button } from "@/components/ui/button";
@@ -41,40 +41,22 @@ const LandingPage = () => {
       iconColor: "text-red-600",
     },
     {
-      title: "Savings Calculator",
-      subtitle: "Calculate savings",
+      title: "Calculator",
+      subtitle: "Payments & Savings",
       icon: Calculator,
-      path: "/savings-calculator",
+      path: "/calculator",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
     },
     {
-      title: "Payment Calculator",
-      subtitle: "Financing options",
-      icon: DollarSign,
-      path: "/payment-calculator",
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
-    },
-    {
-      title: "Invoice Generator",
-      subtitle: "Create invoices",
+      title: "Documents",
+      subtitle: "Invoices & Loan Apps",
       icon: FileText,
-      path: "/invoice-generator",
+      path: "/documents",
       color: "from-yellow-500 to-yellow-600",
       bgColor: "bg-yellow-50",
       iconColor: "text-yellow-600",
-    },
-    {
-      title: "Loan Application",
-      subtitle: "Apply for financing",
-      icon: CreditCard,
-      path: "/loan-application",
-      color: "from-lime-500 to-lime-600",
-      bgColor: "bg-lime-50",
-      iconColor: "text-lime-600",
     },
     {
       title: "TPV AI",
@@ -84,15 +66,6 @@ const LandingPage = () => {
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
-    },
-    {
-      title: "Qualify",
-      subtitle: "Scan ID for eligibility",
-      icon: UserCheck,
-      path: "/qualify",
-      color: "from-cyan-500 to-cyan-600",
-      bgColor: "bg-cyan-50",
-      iconColor: "text-cyan-600",
     },
   ];
 
@@ -186,6 +159,17 @@ const LandingPage = () => {
       {/* Main Content */}
       <div className="px-3 py-5 sm:px-6 sm:py-8 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          {/* Scan ID CTA Button - Mobile Only */}
+          <div className="mb-4 sm:hidden">
+            <Button
+              onClick={() => navigate("/qualify")}
+              className="w-full py-4 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-semibold text-base shadow-lg flex items-center justify-center gap-2"
+            >
+              <ScanLine className="h-5 w-5" />
+              Scan ID
+            </Button>
+          </div>
+          
           {/* Welcome Section */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">

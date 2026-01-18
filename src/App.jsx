@@ -23,6 +23,8 @@ import SigningCertificatesPage from "./pages/SigningCertificatesPage";
 import ProfitCalculatorPage from "./pages/ProfitCalculatorPage";
 import QualifyPage from "./pages/QualifyPage";
 import CustomInvoiceV2Page from "./pages/CustomInvoiceV2Page";
+import CalculatorPage from "./pages/CalculatorPage";
+import DocumentsPage from "./pages/DocumentsPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const AppContent = () => {
         <Route path="/customers" element={<DashboardPage />} />
         <Route path="/customer/:customerId" element={<CustomerDetailPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/calculator" element={<CalculatorPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />
         <Route path="/savings-calculator" element={<SavingsCalculatorPage />} />
         <Route path="/loan-application" element={<LoanApplicationPage />} />
