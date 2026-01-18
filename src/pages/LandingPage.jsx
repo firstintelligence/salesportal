@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, TrendingUp, UserCheck, FileEdit, Users, ChevronRight } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, TrendingUp, UserCheck, FileEdit, Users } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Button } from "@/components/ui/button";
@@ -136,8 +136,8 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-100">
-      {/* Top Navigation Bar - Salesforce inspired */}
-      <header className="sticky top-0 z-10 bg-[#032D60] shadow-lg px-3 py-2 sm:px-6 sm:py-3">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo/Company - Left */}
           <div className="flex items-center gap-2">
@@ -145,24 +145,24 @@ const LandingPage = () => {
               <img 
                 src={tenantLogo} 
                 alt={companyName}
-                className="h-6 sm:h-10 object-contain brightness-0 invert"
+                className="h-7 sm:h-10 object-contain"
               />
             )}
           </div>
           
           {/* Navigation Links */}
-          <div className="flex items-center gap-0.5 sm:gap-1">
+          <div className="flex items-center gap-2 sm:gap-1.5">
             <Button
               onClick={() => navigate("/dashboard")}
               variant="ghost"
               size="sm"
-              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-md transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg transition-all duration-200 ${
                 isDashboard 
-                  ? 'bg-white/20 text-white font-medium' 
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
+                  ? 'bg-primary/10 text-primary font-medium' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Grid2X2 className="w-4 h-4" />
+              <Grid2X2 className="w-5 h-5" />
               <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
             </Button>
             
@@ -170,13 +170,13 @@ const LandingPage = () => {
               onClick={() => navigate("/customers")}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-md text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-5 h-5" />
               <span className="text-sm font-medium hidden sm:inline">Customers</span>
             </Button>
             
-            <div className="w-px h-5 bg-white/20 mx-1 hidden sm:block" />
+            <div className="w-px h-6 bg-slate-200 mx-0.5 sm:mx-1" />
             
             <ProfileDropdown />
           </div>
@@ -196,36 +196,30 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Tools Grid - Salesforce card style */}
+          {/* Tools Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
             {tools.map((tool) => (
               <div
                 key={tool.path}
                 onClick={() => navigate(tool.path)}
-                className="group cursor-pointer bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="group cursor-pointer bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden active:scale-[0.98]"
               >
                 {/* Colored top bar */}
                 <div className={`h-1.5 bg-gradient-to-r ${tool.color}`} />
                 
                 <div className="p-4 sm:p-5">
                   {/* Icon */}
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${tool.bgColor} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                    <tool.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${tool.iconColor}`} strokeWidth={1.75} />
+                  <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl ${tool.bgColor} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform duration-300`}>
+                    <tool.icon className={`w-6 h-6 sm:w-7 sm:h-7 ${tool.iconColor}`} strokeWidth={1.5} />
                   </div>
                   
                   {/* Title & Subtitle */}
-                  <h3 className="text-sm sm:text-base font-semibold text-slate-800 leading-tight mb-1 group-hover:text-slate-900">
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-800 leading-tight mb-1.5 group-hover:text-slate-900">
                     {tool.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 leading-snug">
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                     {tool.subtitle}
                   </p>
-                  
-                  {/* Arrow indicator on hover */}
-                  <div className="flex items-center mt-3 text-slate-400 group-hover:text-slate-600 transition-colors">
-                    <span className="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
-                    <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                  </div>
                 </div>
               </div>
             ))}
