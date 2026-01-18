@@ -94,9 +94,9 @@ const LandingPage = () => {
         subtitle: "Super Admin Only",
         icon: FileEdit,
         path: "/custom-invoice-v2",
-        color: "from-violet-500 to-violet-600",
-        bgColor: "bg-violet-50",
-        iconColor: "text-violet-600",
+        color: "from-indigo-500 to-indigo-600",
+        bgColor: "bg-indigo-50",
+        iconColor: "text-indigo-600",
       },
     ];
   }
