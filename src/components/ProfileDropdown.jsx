@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Building2, LogOut, ChevronDown, Check } from 'lucide-react';
+import { Building2, LogOut, ChevronDown, Check, Trophy, CircleUser } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -107,20 +107,17 @@ const ProfileDropdown = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+          className="flex items-center gap-1 px-2 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
         >
-          <User className="w-4 h-4 sm:w-5 sm:h-5" />
-          <span className="text-sm font-medium hidden sm:inline max-w-[80px] truncate">
-            {agentProfile?.first_name || 'Profile'}
-          </span>
-          <ChevronDown className="w-3 h-3 opacity-60" />
+          <CircleUser className="w-5 h-5 sm:w-5 sm:h-5" />
+          <ChevronDown className="w-3 h-3 opacity-60 hidden sm:block" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72">
+      <DropdownMenuContent align="end" className="w-72 bg-white border border-slate-200 shadow-lg z-50">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{agentProfile?.first_name || 'Agent'}</p>
-            <p className="text-xs text-muted-foreground">{agentProfile?.agent_id}</p>
+            <p className="text-sm font-medium text-slate-900">{agentProfile?.first_name || 'Agent'}</p>
+            <p className="text-xs text-slate-500">ID: {agentProfile?.agent_id}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -132,16 +129,16 @@ const ProfileDropdown = () => {
             {isMobile ? (
               <Collapsible open={tenantExpanded} onOpenChange={setTenantExpanded}>
                 <CollapsibleTrigger asChild>
-                  <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm">
+                  <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm cursor-pointer hover:bg-slate-100 rounded-sm">
                     <div className="flex items-center">
-                      <Building2 className="w-4 h-4 mr-2" />
-                      <span className="truncate">{tenant?.name || 'Switch Company'}</span>
+                      <Building2 className="w-4 h-4 mr-2 text-slate-500" />
+                      <span className="truncate text-slate-700">{tenant?.name || 'Switch Company'}</span>
                     </div>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${tenantExpanded ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${tenantExpanded ? 'rotate-180' : ''}`} />
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="max-h-48 overflow-y-auto pl-4 border-l-2 border-muted ml-4 mt-1 mb-1">
+                  <div className="max-h-48 overflow-y-auto pl-4 border-l-2 border-slate-200 ml-4 mt-1 mb-1">
                     {tenants.map((t) => (
                       <div
                         key={t.id}
@@ -149,9 +146,9 @@ const ProfileDropdown = () => {
                           switchTenant(t);
                           setTenantExpanded(false);
                         }}
-                        className={`flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent rounded-sm ${tenant?.id === t.id ? 'bg-accent' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}`}
+                        className={`flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-slate-100 rounded-sm ${tenant?.id === t.id ? 'bg-slate-100' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600' : 'text-slate-700'}`}
                       >
-                        {tenant?.id === t.id && <Check className="w-3 h-3 mr-2" />}
+                        {tenant?.id === t.id && <Check className="w-3 h-3 mr-2 text-primary" />}
                         <span className={tenant?.id === t.id ? '' : 'ml-5'}>{t.name}</span>
                       </div>
                     ))}
@@ -161,16 +158,16 @@ const ProfileDropdown = () => {
             ) : (
               /* Desktop: Use standard submenu */
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Building2 className="w-4 h-4 mr-2" />
+                <DropdownMenuSubTrigger className="text-slate-700">
+                  <Building2 className="w-4 h-4 mr-2 text-slate-500" />
                   <span className="truncate">{tenant?.name || 'Switch Company'}</span>
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-64 max-h-80 overflow-y-auto">
+                <DropdownMenuSubContent className="w-64 max-h-80 overflow-y-auto bg-white border border-slate-200 shadow-lg">
                   {tenants.map((t) => (
                     <DropdownMenuItem
                       key={t.id}
                       onClick={() => switchTenant(t)}
-                      className={`${tenant?.id === t.id ? 'bg-accent' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}`}
+                      className={`${tenant?.id === t.id ? 'bg-slate-100' : ''} ${t.isAllTenants ? 'font-semibold text-amber-600' : 'text-slate-700'}`}
                     >
                       {t.name}
                     </DropdownMenuItem>
@@ -182,7 +179,15 @@ const ProfileDropdown = () => {
           </>
         )}
         
-        <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+        {/* Stats Link */}
+        <DropdownMenuItem onClick={() => navigate('/stats')} className="text-slate-700 cursor-pointer">
+          <Trophy className="w-4 h-4 mr-2 text-amber-500" />
+          View Stats
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">
           <LogOut className="w-4 h-4 mr-2" />
           Log Out
         </DropdownMenuItem>

@@ -1,9 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, Trophy, TrendingUp, UserCheck, FileEdit, Users } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, TrendingUp, UserCheck, FileEdit, Users, ChevronRight } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ProfileDropdown from "@/components/ProfileDropdown";
 
@@ -30,49 +29,70 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
-  // Main tools in sequence (Installation Checklist removed - part of process flow)
+  // Main tools in sequence
   const baseTools = [
     {
       title: "Appointments",
       subtitle: "View your schedule",
       icon: Calendar,
       path: "/appointments",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
     },
     {
       title: "Savings Calculator",
       subtitle: "Calculate savings",
       icon: Calculator,
       path: "/savings-calculator",
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      iconColor: "text-emerald-600",
     },
     {
       title: "Payment Calculator",
       subtitle: "Financing options",
       icon: DollarSign,
       path: "/payment-calculator",
+      color: "from-violet-500 to-violet-600",
+      bgColor: "bg-violet-50",
+      iconColor: "text-violet-600",
     },
     {
       title: "Invoice Generator",
       subtitle: "Create invoices",
       icon: FileText,
       path: "/invoice-generator",
+      color: "from-orange-500 to-orange-600",
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
     },
     {
       title: "Loan Application",
       subtitle: "Apply for financing",
       icon: CreditCard,
       path: "/loan-application",
+      color: "from-pink-500 to-pink-600",
+      bgColor: "bg-pink-50",
+      iconColor: "text-pink-600",
     },
     {
       title: "TPV AI",
       subtitle: "Verification calls",
       icon: Phone,
       path: "/tpv-ai",
+      color: "from-cyan-500 to-cyan-600",
+      bgColor: "bg-cyan-50",
+      iconColor: "text-cyan-600",
     },
     {
       title: "Qualify",
       subtitle: "Scan ID for eligibility",
       icon: UserCheck,
       path: "/qualify",
+      color: "from-amber-500 to-amber-600",
+      bgColor: "bg-amber-50",
+      iconColor: "text-amber-600",
     },
   ];
 
@@ -85,6 +105,9 @@ const LandingPage = () => {
           subtitle: "Analyze deal margins",
           icon: TrendingUp,
           path: "/profit-calculator",
+          color: "from-indigo-500 to-indigo-600",
+          bgColor: "bg-indigo-50",
+          iconColor: "text-indigo-600",
         },
       ]
     : baseTools;
@@ -98,46 +121,48 @@ const LandingPage = () => {
         subtitle: "Super Admin Only",
         icon: FileEdit,
         path: "/custom-invoice-v2",
+        color: "from-slate-500 to-slate-600",
+        bgColor: "bg-slate-100",
+        iconColor: "text-slate-600",
       },
     ];
   }
 
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
-  const tenantLogoSize = tenant ? getTenantLogoSize(tenant.slug, 'header') : 'h-10 sm:h-12';
   const companyName = tenant?.name || "Sales Portal";
 
   // Check if current route is dashboard
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/landing';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm px-4 py-3 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-slate-100">
+      {/* Top Navigation Bar - Salesforce inspired */}
+      <header className="sticky top-0 z-10 bg-[#032D60] shadow-lg px-3 py-2 sm:px-6 sm:py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo/Company - Left */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {tenantLogo && (
               <img 
                 src={tenantLogo} 
                 alt={companyName}
-                className={`${tenantLogoSize} object-contain`}
+                className="h-6 sm:h-10 object-contain brightness-0 invert"
               />
             )}
           </div>
           
           {/* Navigation Links */}
-          <div className="flex items-center gap-1 sm:gap-1.5">
+          <div className="flex items-center gap-0.5 sm:gap-1">
             <Button
               onClick={() => navigate("/dashboard")}
               variant="ghost"
               size="sm"
-              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-md transition-all duration-200 ${
                 isDashboard 
-                  ? 'bg-primary/10 text-primary font-medium' 
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-white/20 text-white font-medium' 
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Grid2X2 className="w-4 h-4" />
               <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
             </Button>
             
@@ -145,61 +170,64 @@ const LandingPage = () => {
               onClick={() => navigate("/customers")}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-md text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
-              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Users className="w-4 h-4" />
               <span className="text-sm font-medium hidden sm:inline">Customers</span>
             </Button>
             
-            <Button
-              onClick={() => navigate("/stats")}
-              variant="ghost"
-              size="sm"
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
-            >
-              <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-sm font-medium hidden sm:inline">Stats</span>
-            </Button>
-            
-            <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
+            <div className="w-px h-5 bg-white/20 mx-1 hidden sm:block" />
             
             <ProfileDropdown />
           </div>
         </div>
       </header>
       
-      <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header section */}
-          <div className="mb-8 sm:mb-10">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              Welcome back
+      {/* Main Content */}
+      <div className="px-3 py-5 sm:px-6 sm:py-8 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Welcome Section */}
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+              Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {agentProfile?.first_name || 'there'}
             </h1>
-            <p className="text-slate-500">
+            <p className="text-sm sm:text-base text-slate-500">
               Select a tool to get started
             </p>
           </div>
 
-          {/* Enhanced Tools Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-            {tools.map((tool, index) => (
-              <Card
+          {/* Tools Grid - Salesforce card style */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {tools.map((tool) => (
+              <div
                 key={tool.path}
                 onClick={() => navigate(tool.path)}
-                className="group cursor-pointer bg-white border border-slate-200/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
+                className="group cursor-pointer bg-white rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
-                <CardContent className="p-5 sm:p-6">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 w-fit mb-4 group-hover:from-primary/15 group-hover:to-primary/10 transition-colors duration-300">
-                    <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" strokeWidth={1.75} />
+                {/* Colored top bar */}
+                <div className={`h-1.5 bg-gradient-to-r ${tool.color}`} />
+                
+                <div className="p-4 sm:p-5">
+                  {/* Icon */}
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${tool.bgColor} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform duration-300`}>
+                    <tool.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${tool.iconColor}`} strokeWidth={1.75} />
                   </div>
-                  <p className="text-base sm:text-lg font-semibold text-slate-900 leading-tight group-hover:text-primary transition-colors duration-200">
+                  
+                  {/* Title & Subtitle */}
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-800 leading-tight mb-1 group-hover:text-slate-900">
                     {tool.title}
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-snug">
                     {tool.subtitle}
                   </p>
-                </CardContent>
-              </Card>
+                  
+                  {/* Arrow indicator on hover */}
+                  <div className="flex items-center mt-3 text-slate-400 group-hover:text-slate-600 transition-colors">
+                    <span className="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
+                    <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
