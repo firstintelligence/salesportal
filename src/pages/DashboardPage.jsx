@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, Plus, User, Phone, MapPin, Package, Search, FileText, ClipboardCheck, PhoneCall, Check, Sparkles, Download, PlayCircle, CreditCard, Shield } from "lucide-react";
+import { Loader2, Plus, Phone, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -307,42 +307,56 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-3 md:px-4 py-2 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/dashboard")}
-            className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
-          >
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            <span className="hidden sm:inline">Back</span>
-          </Button>
+    <div className="min-h-screen bg-slate-100">
+      {/* Header - matching dashboard style */}
+      <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left - Navigation */}
+          <div className="flex items-center gap-2 sm:gap-1.5">
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+            >
+              <Grid2X2 className="w-5 h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium transition-all duration-200"
+            >
+              <Users className="w-5 h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Customers</span>
+            </Button>
+          </div>
+          
+          {/* Center - Title */}
           <div className="flex items-center gap-2">
-            <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
+            <h1 className="text-base sm:text-lg font-bold text-slate-800">
               Customers
             </h1>
             {isViewingAllTenants && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
                 <Shield className="w-2.5 h-2.5" />
                 All Tenants
               </span>
             )}
           </div>
-          <div className="w-8 md:w-16" /> {/* Spacer for centering */}
+          
+          {/* Right - Spacer */}
+          <div className="w-20 sm:w-32" />
         </div>
-      </div>
+      </header>
       
-      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground">
-              {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
-              {isViewingAllTenants && ` across all tenants`}
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
+        <div className="flex items-center justify-between gap-4 mb-5">
+          <p className="text-sm text-slate-500">
+            {filteredDeals.length} customer{filteredDeals.length !== 1 ? 's' : ''} total
+            {isViewingAllTenants && ` across all tenants`}
+          </p>
             
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
@@ -657,30 +671,30 @@ const DashboardPage = () => {
                         )}
                       </div>
 
-                      {/* Row 2: Phone + Address - larger font, no province */}
-                      <div className="flex items-center gap-3 text-muted-foreground mb-2">
+                      {/* Row 2: Phone + Address with province */}
+                      <div className="flex items-center gap-3 text-slate-500 mb-2">
                         <button
                           onClick={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
                           onContextMenu={(e) => handleCopyToClipboard(e, customer.phone?.replace(/\D/g, ''), 'Phone number')}
-                          className="flex items-center gap-1 shrink-0 hover:text-foreground transition-colors active:scale-95"
+                          className="flex items-center gap-1 shrink-0 hover:text-slate-800 transition-colors active:scale-95"
                         >
                           <Phone className="w-3.5 h-3.5" />
                           <span className="text-xs font-medium">{formatPhoneNumber(customer.phone)}</span>
                         </button>
                         <button
                           onClick={(e) => {
-                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
                             handleCopyToClipboard(e, fullAddress, 'Address');
                           }}
                           onContextMenu={(e) => {
-                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
+                            const fullAddress = `${customer.address || ''}${customer.city ? `, ${customer.city}` : ''}${customer.province ? `, ${customer.province}` : ''}${customer.postal_code ? ` ${customer.postal_code}` : ''}`;
                             handleCopyToClipboard(e, fullAddress, 'Address');
                           }}
-                          className="flex items-center gap-1 min-w-0 flex-1 hover:text-foreground transition-colors active:scale-95 text-left"
+                          className="flex items-center gap-1 min-w-0 flex-1 hover:text-slate-800 transition-colors active:scale-95 text-left"
                         >
                           <MapPin className="w-3.5 h-3.5 shrink-0" />
                           <span className="truncate text-xs font-medium">
-                            {customer.address}{customer.city ? `, ${customer.city}` : ''}
+                            {customer.address}{customer.city ? `, ${customer.city}` : ''}{customer.province ? `, ${customer.province}` : ''}
                           </span>
                         </button>
                       </div>
