@@ -314,7 +314,7 @@ const DashboardPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/landing")}
+            onClick={() => navigate("/dashboard")}
             className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
@@ -322,7 +322,7 @@ const DashboardPage = () => {
           </Button>
           <div className="flex items-center gap-2">
             <h1 className="text-sm md:text-lg font-bold text-slate-900 dark:text-white">
-              Dashboard
+              Customers
             </h1>
             {isViewingAllTenants && (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">
