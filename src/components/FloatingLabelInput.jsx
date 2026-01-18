@@ -61,7 +61,7 @@ const FloatingLabelInput = ({
         />
         {/* Display formatted date */}
         <div
-          className={`block px-2.5 pb-2.5 pt-4 w-full min-h-[40px] md:h-[40px] h-[48px] text-sm text-gray-900 bg-white rounded-lg border border-gray-300 ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
+          className={`block px-2.5 pb-2.5 pt-4 w-full min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm text-gray-900 bg-white rounded-lg border border-gray-300 ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
         >
           {formatDateDisplay(value)}
         </div>
