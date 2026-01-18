@@ -833,39 +833,30 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 relative">
-      {/* Sticky action bar for mobile - positioned directly below main header with no gap */}
-      <div className="lg:hidden fixed top-14 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm px-3 py-2">
+    <div className="mx-auto px-0 md:px-4 py-4 md:py-8 relative pb-24 lg:pb-8">
+      {/* Floating action bar for mobile - positioned at bottom */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg px-3 py-3 safe-area-pb">
         <div className="flex items-center gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white px-3 py-3 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center flex-1"
-            style={{ maxWidth: '25%' }}
+            className="bg-red-500 text-white px-3 py-3 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center"
             aria-label="Clear Invoice"
           >
-            <FiTrash2 size={16} />
-            <span className="text-xs font-medium ml-1">Clear</span>
+            <FiTrash2 size={18} />
           </button>
           <button
             onClick={handleSaveToDashboard}
             disabled={isSaving}
-            className="bg-green-600 text-white px-3 py-3 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed flex-1"
-            style={{ maxWidth: '25%' }}
+            className="bg-green-600 text-white px-3 py-3 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
             aria-label="Save Invoice"
           >
             {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-xs font-medium ml-1">...</span>
-              </>
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <>
-                <Save className="h-4 w-4" />
-                <span className="text-xs font-medium ml-1">Save</span>
-              </>
+              <Save className="h-5 w-5" />
             )}
           </button>
-          <div className="flex items-center justify-center gap-2 text-xs flex-1" style={{ maxWidth: '50%' }}>
+          <div className="flex-1 flex items-center justify-center gap-2 text-xs">
             <span className={`font-medium ${!isInvoice ? 'text-blue-600' : 'text-gray-400'}`}>Quote</span>
             <label className="inline-flex items-center cursor-pointer">
               <input
@@ -878,18 +869,16 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
             </label>
             <span className={`font-medium ${isInvoice ? 'text-blue-600' : 'text-gray-400'}`}>Invoice</span>
           </div>
+          <button
+            type="button"
+            onClick={() => setIsSignaturePadOpen(true)}
+            className="bg-primary text-white px-4 py-3 rounded-full shadow-sm hover:bg-primary/90 flex items-center gap-2"
+          >
+            <Pen className="h-5 w-5" />
+            <span className="text-sm font-medium">Sign</span>
+          </button>
         </div>
       </div>
-      
-      {/* Floating signature button for mobile */}
-      <button
-        type="button"
-        onClick={() => setIsSignaturePadOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-primary text-white px-4 py-3 rounded-full shadow-lg hover:bg-primary/90 flex items-center gap-2"
-      >
-        <Pen className="h-5 w-5" />
-        <span className="text-sm font-medium">Sign</span>
-      </button>
       
       {/* Desktop action bar */}
       <div className="hidden lg:block relative mb-8">
@@ -921,12 +910,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                 </>
               )}
             </button>
-          </div>
         </div>
       </div>
       
-      {/* Spacer for sticky bar on mobile */}
-      <div className="lg:hidden h-12"></div>
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
         <div className="w-full lg:w-1/2 lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>

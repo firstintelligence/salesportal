@@ -136,7 +136,7 @@ const DocumentsPage = () => {
 
       <div className="max-w-5xl mx-auto px-3 md:px-4 py-4">
         {/* Toggle Switch */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-1 mb-4 flex">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-1 mb-4 flex mx-0">
           <button
             onClick={() => setActiveTab('invoice')}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
