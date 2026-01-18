@@ -64,12 +64,7 @@ const ProductListItem = memo(({
                   </div>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id} className="pl-4">
-                      <span className="flex items-center justify-between w-full gap-2">
-                        <span className="truncate text-xs">{product.name}</span>
-                        <span className="text-xs text-slate-500 font-medium">
-                          ${product.basePrice.toLocaleString()}
-                        </span>
-                      </span>
+                      <span className="truncate text-xs">{product.name}</span>
                     </SelectItem>
                   ))}
                 </div>
@@ -80,13 +75,13 @@ const ProductListItem = memo(({
 
         {/* Right half on mobile: Qty + Price + Arrow */}
         <div className="w-1/2 md:w-auto md:flex-1 flex items-center gap-1.5 md:gap-2">
-          {/* Quantity - compact, no spinners */}
+        {/* Quantity - compact, no spinners */}
           <Input
             type="number"
             min="1"
             value={item.quantity}
             onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-            className="h-10 w-8 md:w-16 text-center text-xs md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shrink-0"
+            className="h-10 w-8 md:w-16 text-center text-[10px] md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shrink-0"
           />
 
           {/* Price - takes remaining space on mobile */}
