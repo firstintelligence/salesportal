@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, CreditCard, DollarSign, ClipboardCheck, Grid2X2, Calendar, Trophy, Shield, TrendingUp, UserCheck, FileEdit } from "lucide-react";
+import { FileText, Calculator, Phone, CreditCard, DollarSign, Grid2X2, Calendar, Trophy, TrendingUp, UserCheck, FileEdit, Users } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,12 +11,15 @@ import ProfileDropdown from "@/components/ProfileDropdown";
 const SUPER_ADMIN_ID = 'MM231611';
 // Agents who can see profit calculator
 const PROFIT_CALC_AGENTS = ['MM231611', 'WA4929'];
+
 const LandingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { tenant, agentProfile, isSuperAdmin } = useTenant();
   const agentId = localStorage.getItem('agentId');
   const isSuperAdminUser = agentId === SUPER_ADMIN_ID;
   const canSeeProfitCalc = PROFIT_CALC_AGENTS.includes(agentId);
+  
   useEffect(() => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
@@ -103,10 +106,13 @@ const LandingPage = () => {
   const tenantLogoSize = tenant ? getTenantLogoSize(tenant.slug, 'header') : 'h-10 sm:h-12';
   const companyName = tenant?.name || "Sales Portal";
 
+  // Check if current route is dashboard
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/landing';
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm px-4 py-3 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Logo/Company - Left */}
           <div className="flex items-center gap-3">
@@ -119,15 +125,29 @@ const LandingPage = () => {
             )}
           </div>
           
-          {/* Right side controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Navigation Links */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="ghost"
+              size="sm"
+              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg transition-all duration-200 ${
+                isDashboard 
+                  ? 'bg-primary/10 text-primary font-medium' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
+            </Button>
+            
             <Button
               onClick={() => navigate("/customers")}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
             >
-              <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Customers</span>
             </Button>
             
@@ -135,52 +155,47 @@ const LandingPage = () => {
               onClick={() => navigate("/stats")}
               variant="ghost"
               size="sm"
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
             >
               <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Stats</span>
             </Button>
             
-            {isSuperAdminUser && (
-              <Button
-                onClick={() => navigate("/signing-certificates")}
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-sm font-medium hidden sm:inline">Certificates</span>
-              </Button>
-            )}
+            <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
             
             <ProfileDropdown />
           </div>
         </div>
       </header>
       
-      <div className="px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          {/* Simple header */}
-          <p className="text-muted-foreground mb-6 sm:mb-8">
-            Select a tool to get started
-          </p>
+          {/* Header section */}
+          <div className="mb-8 sm:mb-10">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+              Welcome back
+            </h1>
+            <p className="text-slate-500">
+              Select a tool to get started
+            </p>
+          </div>
 
-          {/* Clean Tools Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            {tools.map((tool) => (
+          {/* Enhanced Tools Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+            {tools.map((tool, index) => (
               <Card
                 key={tool.path}
                 onClick={() => navigate(tool.path)}
-                className="group cursor-pointer border border-border bg-card hover:bg-muted/50 hover:border-primary/30 transition-all duration-200 hover:shadow-md"
+                className="group cursor-pointer bg-white border border-slate-200/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
               >
-                <CardContent className="p-4 sm:p-5">
-                  <div className="p-2 rounded-lg bg-primary/10 w-fit mb-3">
-                    <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" strokeWidth={2} />
+                <CardContent className="p-5 sm:p-6">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 w-fit mb-4 group-hover:from-primary/15 group-hover:to-primary/10 transition-colors duration-300">
+                    <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" strokeWidth={1.75} />
                   </div>
-                  <p className="text-base sm:text-lg font-semibold text-foreground leading-tight">
+                  <p className="text-base sm:text-lg font-semibold text-slate-900 leading-tight group-hover:text-primary transition-colors duration-200">
                     {tool.title}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
                     {tool.subtitle}
                   </p>
                 </CardContent>
