@@ -29,74 +29,74 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
-  // Main tools in sequence
+  // Main tools in ROYGBIV spectrum order
   const baseTools = [
     {
       title: "Appointments",
       subtitle: "View your schedule",
       icon: Calendar,
       path: "/appointments",
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      color: "from-red-500 to-red-600",
+      bgColor: "bg-red-50",
+      iconColor: "text-red-600",
     },
     {
       title: "Savings Calculator",
       subtitle: "Calculate savings",
       icon: Calculator,
       path: "/savings-calculator",
-      color: "from-emerald-500 to-emerald-600",
-      bgColor: "bg-emerald-50",
-      iconColor: "text-emerald-600",
+      color: "from-orange-500 to-orange-600",
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
     },
     {
       title: "Payment Calculator",
       subtitle: "Financing options",
       icon: DollarSign,
       path: "/payment-calculator",
-      color: "from-violet-500 to-violet-600",
-      bgColor: "bg-violet-50",
-      iconColor: "text-violet-600",
+      color: "from-amber-500 to-amber-600",
+      bgColor: "bg-amber-50",
+      iconColor: "text-amber-600",
     },
     {
       title: "Invoice Generator",
       subtitle: "Create invoices",
       icon: FileText,
       path: "/invoice-generator",
-      color: "from-orange-500 to-orange-600",
-      bgColor: "bg-orange-50",
-      iconColor: "text-orange-600",
+      color: "from-yellow-500 to-yellow-600",
+      bgColor: "bg-yellow-50",
+      iconColor: "text-yellow-600",
     },
     {
       title: "Loan Application",
       subtitle: "Apply for financing",
       icon: CreditCard,
       path: "/loan-application",
-      color: "from-pink-500 to-pink-600",
-      bgColor: "bg-pink-50",
-      iconColor: "text-pink-600",
+      color: "from-lime-500 to-lime-600",
+      bgColor: "bg-lime-50",
+      iconColor: "text-lime-600",
     },
     {
       title: "TPV AI",
       subtitle: "Verification calls",
       icon: Phone,
       path: "/tpv-ai",
-      color: "from-cyan-500 to-cyan-600",
-      bgColor: "bg-cyan-50",
-      iconColor: "text-cyan-600",
+      color: "from-green-500 to-green-600",
+      bgColor: "bg-green-50",
+      iconColor: "text-green-600",
     },
     {
       title: "Qualify",
       subtitle: "Scan ID for eligibility",
       icon: UserCheck,
       path: "/qualify",
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
+      color: "from-cyan-500 to-cyan-600",
+      bgColor: "bg-cyan-50",
+      iconColor: "text-cyan-600",
     },
   ];
 
-  // Add profit calculator tile if user has permission
+  // Add profit calculator tile if user has permission (Blue in spectrum)
   let tools = canSeeProfitCalc 
     ? [
         ...baseTools,
@@ -105,14 +105,14 @@ const LandingPage = () => {
           subtitle: "Analyze deal margins",
           icon: TrendingUp,
           path: "/profit-calculator",
-          color: "from-indigo-500 to-indigo-600",
-          bgColor: "bg-indigo-50",
-          iconColor: "text-indigo-600",
+          color: "from-blue-500 to-blue-600",
+          bgColor: "bg-blue-50",
+          iconColor: "text-blue-600",
         },
       ]
     : baseTools;
 
-  // Add Custom Invoice V2 tile for super admin only
+  // Add Custom Invoice V2 tile for super admin only (Indigo/Violet in spectrum)
   if (isSuperAdminUser) {
     tools = [
       ...tools,
@@ -121,9 +121,9 @@ const LandingPage = () => {
         subtitle: "Super Admin Only",
         icon: FileEdit,
         path: "/custom-invoice-v2",
-        color: "from-slate-500 to-slate-600",
-        bgColor: "bg-slate-100",
-        iconColor: "text-slate-600",
+        color: "from-violet-500 to-violet-600",
+        bgColor: "bg-violet-50",
+        iconColor: "text-violet-600",
       },
     ];
   }
