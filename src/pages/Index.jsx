@@ -944,7 +944,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     value={invoice.number}
                     onChange={handleInputChange(setInvoice)}
                     name="number"
-                    className="text-[10px] md:text-base"
+                    className="text-[8px] md:text-sm"
                   />
                 </div>
                 <div className="col-span-1">
