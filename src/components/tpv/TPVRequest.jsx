@@ -19,6 +19,7 @@ import InputMask from "react-input-mask";
 import { useTenant } from "@/contexts/TenantContext";
 import { capitalizeWords, formatPostalCode } from "@/utils/inputFormatting";
 import { calculateLoanAmount, calculateMonthlyPayment } from "@/utils/financingCalculations";
+import { getSimplifiedProductName } from "@/utils/productNameSimplifier";
 
 const canadianProvinces = [
   { value: "AB", label: "Alberta" },
@@ -88,11 +89,15 @@ const TPVRequest = ({ onBack, preloadedCustomer, preloadedCalculatorData }) => {
   const { tenant } = useTenant();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Extract products from preloadedCalculatorData if available
+  // Extract products from preloadedCalculatorData if available - use simplified names for TPV
   const getPreloadedProducts = () => {
     if (preloadedCalculatorData?.items && Array.isArray(preloadedCalculatorData.items)) {
-      // Items from invoice generator - extract product names and match to product list
-      return preloadedCalculatorData.items.map(item => item.name || item).filter(Boolean);
+      // Items from invoice generator - use simplified product names for TPV
+      const simplifiedNames = preloadedCalculatorData.items
+        .filter(item => item.productId || item.name)
+        .map(item => getSimplifiedProductName(item.productId, item.name || item));
+      // Remove duplicates
+      return [...new Set(simplifiedNames)];
     }
     if (preloadedCalculatorData?.products && Array.isArray(preloadedCalculatorData.products)) {
       return preloadedCalculatorData.products;
