@@ -36,8 +36,9 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/invoice-render" element={<InvoiceRenderPage />} />
+        <Route path="/dashboard" element={<LandingPage />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/customers" element={<DashboardPage />} />
         <Route path="/customer/:customerId" element={<CustomerDetailPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/invoice-generator" element={<InvoiceGeneratorPage />} />

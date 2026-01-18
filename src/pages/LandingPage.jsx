@@ -122,13 +122,13 @@ const LandingPage = () => {
           {/* Right side controls */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/customers")}
               variant="ghost"
               size="sm"
               className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               <Grid2X2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
+              <span className="text-sm font-medium hidden sm:inline">Customers</span>
             </Button>
             
             <Button
