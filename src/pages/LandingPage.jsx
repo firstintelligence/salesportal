@@ -159,6 +159,16 @@ const LandingPage = () => {
       {/* Main Content */}
       <div className="px-3 py-5 sm:px-6 sm:py-8 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          {/* Welcome Section */}
+          <div className="mb-4 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+              Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {agentProfile?.first_name || 'there'}
+            </h1>
+            <p className="text-sm sm:text-base text-slate-500">
+              Select a tool to get started
+            </p>
+          </div>
+          
           {/* Scan ID CTA Button - Mobile Only */}
           <div className="mb-4 sm:hidden">
             <Button
@@ -168,16 +178,6 @@ const LandingPage = () => {
               <ScanLine className="h-5 w-5" />
               Scan ID
             </Button>
-          </div>
-          
-          {/* Welcome Section */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
-              Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {agentProfile?.first_name || 'there'}
-            </h1>
-            <p className="text-sm sm:text-base text-slate-500">
-              Select a tool to get started
-            </p>
           </div>
 
           {/* Tools Grid */}
