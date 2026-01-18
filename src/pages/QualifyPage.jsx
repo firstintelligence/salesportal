@@ -9,6 +9,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import IDScanner from "@/components/qualify/IDScanner";
 import IDScanResult from "@/components/qualify/IDScanResult";
 import ApprovalScreen from "@/components/qualify/ApprovalScreen";
+import { findOrCreateCustomer } from "@/utils/customerService";
 
 const QualifyPage = () => {
   const navigate = useNavigate();
@@ -63,26 +64,32 @@ const QualifyPage = () => {
       // Get valid tenant_id (null if super admin "all tenants" view)
       const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
       
-      // First, create a customer profile
-      const { data: customerData, error: customerError } = await supabase
-        .from('customers')
-        .insert({
-          first_name: data.firstName,
-          last_name: data.lastName,
+      // Find existing customer or create new one
+      // Matches by: exact name, exact phone, or exact email
+      const { customerId, isNew, error: customerFindError } = await findOrCreateCustomer(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: null, // Email not available from ID
+          phone: 'N/A', // Phone not available from ID
           address: data.address,
           city: data.city,
           province: data.province || 'ON',
-          postal_code: data.postalCode,
-          phone: 'N/A', // Phone not available from ID
-          agent_id: agentId,
-          tenant_id: validTenantId
-        })
-        .select()
-        .single();
+          postalCode: data.postalCode,
+        },
+        validTenantId,
+        agentId
+      );
 
-      if (customerError) {
-        console.error('Error creating customer:', customerError);
+      if (customerFindError) {
+        console.error('Error finding/creating customer:', customerFindError);
         throw new Error('Failed to create customer profile');
+      }
+      
+      if (isNew) {
+        console.log('Created new customer from ID scan:', customerId);
+      } else {
+        console.log('Found existing customer from ID scan:', customerId);
       }
 
       // Generate filename: LastName_FirstName_Address
@@ -122,7 +129,7 @@ const QualifyPage = () => {
       const { error: scanError } = await supabase
         .from('id_scans')
         .insert({
-          customer_id: customerData.id,
+          customer_id: customerId,
           first_name: data.firstName,
           last_name: data.lastName,
           date_of_birth: data.dateOfBirth || null,
@@ -146,7 +153,7 @@ const QualifyPage = () => {
 
       setApprovedProfile({
         ...data,
-        customerId: customerData.id
+        customerId: customerId
       });
       setStep('approved');
       toast.success('Profile created successfully!');

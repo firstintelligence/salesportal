@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantCompanyInfo, getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { formatPhoneNumber } from "@/utils/inputFormatting";
+import { findOrCreateCustomer } from "@/utils/customerService";
 
 // Helper function to get today's date in Toronto timezone
 const getTodayInToronto = () => {
@@ -646,49 +647,28 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         return;
       }
 
-      // Create or update customer with tenant_id and agent_id
-      const customerData = {
-        first_name: billTo.firstName,
-        last_name: billTo.lastName,
-        email: billTo.email || null,
-        phone: billTo.phone,
-        address: billTo.address,
-        city: billTo.city || null,
-        province: billTo.province || 'ON',
-        postal_code: billTo.postalCode || null,
-        tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
-        agent_id: agentId, // Track which agent created this customer
-      };
+      // Find existing customer or create new one
+      // Matches by: exact name, exact phone, or exact email
+      const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
+        {
+          firstName: billTo.firstName,
+          lastName: billTo.lastName,
+          email: billTo.email,
+          phone: billTo.phone,
+          address: billTo.address,
+          city: billTo.city,
+          province: billTo.province || 'ON',
+          postalCode: billTo.postalCode,
+        },
+        tenant?.id || null,
+        agentId
+      );
 
-      // Check if customer exists by phone number within the same tenant
-      const { data: existingCustomer } = await supabase
-        .from("customers")
-        .select("id")
-        .eq("phone", billTo.phone)
-        .eq("tenant_id", tenant?.id)
-        .single();
-
-      let customerId;
-      if (existingCustomer) {
-        // Update existing customer
-        const { error: updateError } = await supabase
-          .from("customers")
-          .update(customerData)
-          .eq("id", existingCustomer.id);
-        
-        if (updateError) throw updateError;
-        customerId = existingCustomer.id;
-      } else {
-        // Create new customer
-        const { data: newCustomer, error: insertError } = await supabase
-          .from("customers")
-          .insert(customerData)
-          .select("id")
-          .single();
-        
-        if (insertError) throw insertError;
-        customerId = newCustomer.id;
-        setCustomerId(newCustomer.id); // Update state for PDF signing context
+      if (customerError) throw customerError;
+      
+      let customerId = foundCustomerId;
+      if (isNew) {
+        setCustomerId(customerId); // Update state for PDF signing context
       }
 
       // Get simplified product list for TPV
