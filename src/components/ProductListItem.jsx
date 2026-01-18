@@ -54,7 +54,7 @@ const ProductListItem = memo(({
               <SelectValue placeholder="Product..." />
             </SelectTrigger>
             <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-[300px] w-[calc(100vw-2rem)] md:w-[var(--radix-select-trigger-width)] md:min-w-[400px]">
-              <SelectItem value="custom" className="font-medium text-primary">
+              <SelectItem value="custom" className="font-medium text-primary pl-8">
                 + Custom Product
               </SelectItem>
               {Object.entries(productCategories).map(([category, products]) => (
@@ -63,7 +63,7 @@ const ProductListItem = memo(({
                     {category}
                   </div>
                   {products.map((product) => (
-                    <SelectItem key={product.id} value={product.id} className="pl-4">
+                    <SelectItem key={product.id} value={product.id} className="pl-8">
                       <span className="truncate text-xs">{product.name}</span>
                     </SelectItem>
                   ))}
