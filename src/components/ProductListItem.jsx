@@ -59,7 +59,7 @@ const ProductListItem = memo(({
               </SelectItem>
               {Object.entries(productCategories).map(([category, products]) => (
                 <div key={category}>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 bg-slate-50 sticky top-0">
+                  <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 bg-white sticky top-0 z-10 border-b border-slate-100 shadow-sm">
                     {category}
                   </div>
                   {products.map((product) => (
