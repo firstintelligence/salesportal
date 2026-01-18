@@ -2,10 +2,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  ArrowLeft, Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
+  Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
   Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
   CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
-  Globe, Fingerprint, ScanLine, User
+  Globe, Fingerprint, ScanLine, Grid2X2, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -299,15 +299,15 @@ const CustomerDetailPage = () => {
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4">
+      <div className="min-h-screen bg-slate-100 p-4">
         <div className="max-w-4xl mx-auto">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+          <Button variant="outline" onClick={() => navigate("/customers")}>
+            <Grid2X2 className="w-4 h-4 mr-2" />
+            Back to Customers
           </Button>
-          <Card className="mt-6">
+          <Card className="mt-6 bg-white">
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Customer not found.</p>
+              <p className="text-slate-500">Customer not found.</p>
             </CardContent>
           </Card>
         </div>
@@ -319,142 +319,181 @@ const CustomerDetailPage = () => {
   
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Dashboard
+    <div className="min-h-screen bg-slate-100">
+      {/* Header - matching dashboard/customers style */}
+      <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left - Navigation */}
+          <div className="flex items-center gap-2 sm:gap-1.5">
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+            >
+              <Grid2X2 className="w-5 h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
             </Button>
             
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Customer</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete {customer.first_name} {customer.last_name}? This action cannot be undone and will remove all associated data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction 
-                    onClick={handleDeleteCustomer}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    disabled={deleting}
-                  >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Button
+              onClick={() => navigate("/customers")}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+            >
+              <Users className="w-5 h-5" />
+              <span className="text-sm font-medium hidden sm:inline">Customers</span>
+            </Button>
           </div>
+          
+          {/* Right - Delete */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Customer</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete {customer.first_name} {customer.last_name}? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDeleteCustomer}
+                  className="bg-red-500 text-white hover:bg-red-600"
+                  disabled={deleting}
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Customer Profile Card */}
-        <Card className="overflow-hidden">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {customer.first_name} {customer.last_name}
-                </h1>
-                <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <Phone className="w-4 h-4" />
-                    {customer.phone}
-                  </span>
-                  {customer.email && (
-                    <span className="flex items-center gap-1.5">
-                      <Mail className="w-4 h-4" />
-                      {customer.email}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  {customer.address}
-                  {customer.city && `, ${customer.city}`}
-                  {customer.province && `, ${customer.province}`}
-                  {customer.postal_code && ` ${customer.postal_code}`}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Calendar className="w-3.5 h-3.5" />
-                  Added {formatDate(customer.created_at)}
-                </div>
-                {invoiceProfile && (
-                  <div className="mt-2">
-                    <Badge variant="secondary" className="text-xs">
-                      <DollarSign className="w-3 h-3 mr-1" />
-                      {formatCurrency(invoiceProfile.grandTotal)}
-                    </Badge>
-                  </div>
-                )}
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
+        {/* Customer Profile Card - Clean Design */}
+        <Card className="bg-white border border-slate-200 shadow-sm overflow-hidden">
+          {/* Colored top bar */}
+          <div className="h-1.5 bg-gradient-to-r from-blue-500 to-blue-600" />
+          
+          <CardContent className="p-5 sm:p-6">
+            {/* Top row: Name and Date */}
+            <div className="flex items-start justify-between mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
+                {customer.first_name} {customer.last_name}
+              </h1>
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-50 px-2.5 py-1.5 rounded-lg">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Added {formatDate(customer.created_at)}</span>
               </div>
             </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+            
+            {/* Contact Info Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+              {/* Phone */}
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium">Phone</p>
+                  <p className="text-sm font-semibold text-slate-800">{customer.phone}</p>
+                </div>
+              </div>
+              
+              {/* Email */}
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-violet-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium">Email</p>
+                  <p className="text-sm font-semibold text-slate-800">{customer.email || '—'}</p>
+                </div>
+              </div>
+              
+              {/* Address - Full width */}
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg sm:col-span-2">
+                <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-400 font-medium">Address</p>
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {customer.address}
+                    {customer.city && `, ${customer.city}`}
+                    {customer.province && `, ${customer.province}`}
+                    {customer.postal_code && ` ${customer.postal_code}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Invoice Total Badge */}
+            {invoiceProfile && (
+              <div className="flex items-center gap-2 mb-5">
+                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-sm px-3 py-1">
+                  <DollarSign className="w-3.5 h-3.5 mr-1" />
+                  {formatCurrency(invoiceProfile.grandTotal)}
+                </Badge>
+              </div>
+            )}
+            
+            {/* Quick Actions */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5"
+                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-colors"
                 onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
               >
-                <FileText className="w-4 h-4" />
-                <span className="text-xs">{invoiceProfile ? 'Edit Invoice' : 'Invoice'}</span>
+                <FileText className="w-5 h-5" />
+                <span className="text-xs font-medium">{invoiceProfile ? 'Edit Invoice' : 'Invoice'}</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5"
+                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-cyan-50 hover:border-cyan-200 hover:text-cyan-600 transition-colors"
                 onClick={navigateToTpv}
               >
-                <Phone className="w-4 h-4" />
-                <span className="text-xs">TPV</span>
+                <Phone className="w-5 h-5" />
+                <span className="text-xs font-medium">TPV</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5"
+                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600 transition-colors"
                 onClick={navigateToLoanApplication}
               >
-                <CreditCard className="w-4 h-4" />
-                <span className="text-xs">Loan</span>
+                <CreditCard className="w-5 h-5" />
+                <span className="text-xs font-medium">Loan</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5"
+                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-violet-50 hover:border-violet-200 hover:text-violet-600 transition-colors"
                 onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
               >
-                <Calculator className="w-4 h-4" />
-                <span className="text-xs">Calculator</span>
+                <Calculator className="w-5 h-5" />
+                <span className="text-xs font-medium">Calculator</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5"
+                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-colors"
                 onClick={navigateToChecklist}
               >
-                <ClipboardCheck className="w-4 h-4" />
-                <span className="text-xs">Checklist</span>
+                <ClipboardCheck className="w-5 h-5" />
+                <span className="text-xs font-medium">Checklist</span>
               </Button>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
         {/* Activity Section */}
