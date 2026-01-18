@@ -944,7 +944,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     value={invoice.number}
                     onChange={handleInputChange(setInvoice)}
                     name="number"
-                    className="text-[8px] md:text-sm"
+                    className="text-[7px] md:text-sm"
                   />
                 </div>
                 <div className="col-span-1">
@@ -955,7 +955,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     value={invoice.date}
                     onChange={handleDateChange}
                     name="date"
-                    className="text-[10px] md:text-base"
+                    className="text-xs md:text-base"
                   />
                 </div>
                 <div className="col-span-1">
@@ -966,7 +966,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     value={invoice.paymentDate}
                     onChange={handleDateChange}
                     name="paymentDate"
-                    className="text-[10px] md:text-base"
+                    className="text-xs md:text-base"
                   />
                 </div>
               </div>
