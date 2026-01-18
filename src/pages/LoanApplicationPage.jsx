@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { findOrCreateCustomer } from "@/utils/customerService";
 
 
 const LoanApplicationPage = () => {
@@ -735,38 +736,40 @@ const LoanApplicationPage = () => {
       });
       
       if (!customerId && isValidTenant) {
-        // Always create a new customer when starting fresh (no existing customerId)
-        // This allows duplicate phone numbers/emails for testing purposes
-        // Updates only happen when editing an existing profile (customerId is set from navigation)
+        // Find existing customer or create new one
+        // Matches by: exact name, exact phone, or exact email
         const agentId = localStorage.getItem('agentId');
         const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '') || '';
         const customerPhone = phoneDigits || 'N/A';
         
-        const { data: newCustomer, error: insertError } = await supabase
-          .from("customers")
-          .insert({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email || null,
+        const { customerId: foundCustomerId, isNew, error: customerFindError } = await findOrCreateCustomer(
+          {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
             phone: customerPhone,
             address: formData.address || 'N/A',
-            city: formData.city || null,
-            province: formData.province || null,
-            postal_code: formData.postalCode || null,
-            tenant_id: tenant.id,
-            agent_id: agentId,
-          })
-          .select("id")
-          .single();
+            city: formData.city,
+            province: formData.province,
+            postalCode: formData.postalCode,
+          },
+          tenant.id,
+          agentId
+        );
         
-        if (!insertError && newCustomer) {
-          customerId = newCustomer.id;
-          setCreatedCustomerId(newCustomer.id);
-          console.log('Created new customer from loan application:', customerId);
-          toast.success('Customer profile saved to dashboard');
-        } else if (insertError) {
-          console.error('Error creating customer:', insertError);
-          toast.error('Failed to save customer profile: ' + insertError.message);
+        if (!customerFindError && foundCustomerId) {
+          customerId = foundCustomerId;
+          setCreatedCustomerId(foundCustomerId);
+          if (isNew) {
+            console.log('Created new customer from loan application:', customerId);
+            toast.success('Customer profile saved to dashboard');
+          } else {
+            console.log('Found existing customer:', customerId);
+            toast.success('Linked to existing customer profile');
+          }
+        } else if (customerFindError) {
+          console.error('Error finding/creating customer:', customerFindError);
+          toast.error('Failed to save customer profile: ' + customerFindError.message);
         }
       } else if (!isValidTenant && !customerId) {
         console.warn('Cannot create customer: No valid tenant selected. Super Admin must select a specific tenant to save profiles.');
@@ -821,33 +824,18 @@ const LoanApplicationPage = () => {
         };
         
         try {
-          // Check if loan application exists for this customer
-          const { data: existingLoanApp } = await supabase
+          // ALWAYS create a new loan application record (never update)
+          // Each loan application is its own document attached to the customer profile
+          const { data: newLoanApp, error: insertError } = await supabase
             .from("loan_applications")
+            .insert(loanAppData)
             .select("id")
-            .eq("customer_id", customerId)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
+            .single();
           
-          if (existingLoanApp) {
-            // Update existing loan application
-            await supabase
-              .from("loan_applications")
-              .update(loanAppData)
-              .eq("id", existingLoanApp.id);
-            console.log('Updated loan application:', existingLoanApp.id);
-          } else {
-            // Create new loan application
-            const { data: newLoanApp, error: insertError } = await supabase
-              .from("loan_applications")
-              .insert(loanAppData)
-              .select("id")
-              .single();
-            
-            if (!insertError) {
-              console.log('Created new loan application:', newLoanApp?.id);
-            }
+          if (!insertError && newLoanApp) {
+            console.log('Created new loan application:', newLoanApp.id);
+          } else if (insertError) {
+            console.error('Error creating loan application:', insertError);
           }
         } catch (loanAppError) {
           console.error('Error saving loan application data:', loanAppError);
