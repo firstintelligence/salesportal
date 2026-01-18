@@ -75,27 +75,14 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           <div>
             <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Promo Term</label>
             <Select 
-              value={(financing.loanTerm || 24).toString()} 
+              value={(financing.loanTerm || 60).toString()} 
               onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
             >
               <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
                 <SelectValue className="text-left" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                {availableTerms.length > 0 ? (
-                  availableTerms.map(term => (
-                    <SelectItem key={term} value={term.toString()}>
-                      {term} months
-                    </SelectItem>
-                  ))
-                ) : (
-                  <>
-                    <SelectItem value="24">24 months</SelectItem>
-                    <SelectItem value="36">36 months</SelectItem>
-                    <SelectItem value="48">48 months</SelectItem>
-                    <SelectItem value="60">60 months</SelectItem>
-                  </>
-                )}
+                <SelectItem value="60">60 months</SelectItem>
               </SelectContent>
             </Select>
           </div>
