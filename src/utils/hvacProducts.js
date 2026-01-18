@@ -2,35 +2,27 @@ export const hvacProducts = [
   // Heat Pumps by Tonnage
   {
     id: 'heat-pump-2-ton',
-    name: '2 Ton Heat Pump (24,000 BTU)',
-    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
-    basePrice: 12500,
+    name: '2 Ton Heat Pump',
+    description: '24,000 BTU\nOutdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
+    basePrice: 18000,
     category: 'Heat Pumps',
     btu: 24000
   },
   {
     id: 'heat-pump-3-ton',
-    name: '3 Ton Heat Pump (36,000 BTU)',
-    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
-    basePrice: 13500,
+    name: '3 Ton Heat Pump',
+    description: '36,000 BTU\nOutdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
+    basePrice: 20000,
     category: 'Heat Pumps',
     btu: 36000
   },
   {
     id: 'heat-pump-4-ton',
-    name: '4 Ton Heat Pump (48,000 BTU)',
-    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
-    basePrice: 14500,
+    name: '4 Ton Heat Pump',
+    description: '48,000 BTU\nOutdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
+    basePrice: 22000,
     category: 'Heat Pumps',
     btu: 48000
-  },
-  {
-    id: 'heat-pump-5-ton',
-    name: '5 Ton Heat Pump (60,000 BTU)',
-    description: 'Outdoor Unit\nIndoor Coil\nSmart Thermostat\nSnow Stand\nElectrical Hookup\nProfessional Installation',
-    basePrice: 15500,
-    category: 'Heat Pumps',
-    btu: 60000
   },
   
   // Ductless Heat Pumps
@@ -58,49 +50,56 @@ export const hvacProducts = [
   
   // Furnaces - All 95% AFUE
   {
-    id: 'furnace-gas-40k',
-    name: 'Gas Furnace 95% AFUE (40,000 BTU)',
+    id: 'furnace-gas-45k',
+    name: 'Gas Furnace 95% AFUE (45,000 BTU)',
     description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
-    basePrice: 4000,
+    basePrice: 4500,
     category: 'Furnaces',
     efficiency: 95,
-    btu: 40000
+    btu: 45000
   },
   {
-    id: 'furnace-gas-60k',
-    name: 'Gas Furnace 95% AFUE (60,000 BTU)',
+    id: 'furnace-gas-70k',
+    name: 'Gas Furnace 95% AFUE (70,000 BTU)',
     description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
-    basePrice: 6000,
+    basePrice: 7000,
     category: 'Furnaces',
     efficiency: 95,
-    btu: 60000
+    btu: 70000
   },
   {
-    id: 'furnace-gas-80k',
-    name: 'Gas Furnace 95% AFUE (80,000 BTU)',
+    id: 'furnace-gas-90k',
+    name: 'Gas Furnace 95% AFUE (90,000 BTU)',
     description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
-    basePrice: 8000,
+    basePrice: 9000,
     category: 'Furnaces',
     efficiency: 95,
-    btu: 80000
+    btu: 90000
   },
   {
-    id: 'furnace-gas-100k',
-    name: 'Gas Furnace 95% AFUE (100,000 BTU)',
+    id: 'furnace-gas-110k',
+    name: 'Gas Furnace 95% AFUE (110,000 BTU)',
     description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
-    basePrice: 10000,
+    basePrice: 11000,
     category: 'Furnaces',
     efficiency: 95,
-    btu: 100000
+    btu: 110000
   },
+  
+  // Boilers
   {
-    id: 'furnace-gas-120k',
-    name: 'Gas Furnace 95% AFUE (120,000 BTU)',
-    description: '95% high-efficiency condensing gas furnace with variable speed blower and professional installation',
+    id: 'boiler-system',
+    name: 'Boiler System',
+    description: 'High-efficiency boiler system for hydronic heating with professional installation',
     basePrice: 12000,
-    category: 'Furnaces',
-    efficiency: 95,
-    btu: 120000
+    category: 'Boilers'
+  },
+  {
+    id: 'combi-boiler',
+    name: 'Combi Boiler',
+    description: 'High-efficiency combination boiler for heating and hot water with professional installation',
+    basePrice: 16000,
+    category: 'Boilers'
   },
   
   // Air Conditioning
@@ -250,21 +249,21 @@ export const hvacProducts = [
     id: 'smart-home-battery-10-12kw',
     name: 'Smart Storage Home Battery (10-12 kW)',
     description: '10-12kW lithium-ion home battery storage system with smart controls',
-    basePrice: 30000,
+    basePrice: 34000,
     category: 'Energy Storage'
   },
   {
     id: 'smart-home-battery-15-16kw',
     name: 'Smart Storage Home Battery (15-16 kW)',
     description: '15-16kW lithium-ion home battery storage system with smart controls',
-    basePrice: 35000,
+    basePrice: 36000,
     category: 'Energy Storage'
   },
   {
     id: 'smart-home-battery-20kw',
     name: 'Smart Storage Home Battery (20 kW)',
     description: '20kW lithium-ion home battery storage system with smart controls',
-    basePrice: 40000,
+    basePrice: 38000,
     category: 'Energy Storage'
   },
   
@@ -330,13 +329,6 @@ export const hvacProducts = [
     description: 'Indoor air handler unit for HVAC systems with professional installation',
     basePrice: 4500,
     category: 'Heat Pumps'
-  },
-  {
-    id: 'boiler',
-    name: 'Boiler System',
-    description: 'High-efficiency boiler system for hydronic heating with professional installation',
-    basePrice: 8000,
-    category: 'Furnaces'
   },
   
   // Additional Water Heating
