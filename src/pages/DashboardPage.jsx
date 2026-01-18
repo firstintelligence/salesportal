@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Phone, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users } from "lucide-react";
+import { Loader2, Plus, Phone, PhoneCall, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
