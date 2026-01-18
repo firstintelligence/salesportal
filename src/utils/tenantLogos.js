@@ -5,7 +5,7 @@ const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 // Use public folder URLs for SVGs (more reliable than ES module imports for SVGs)
 const edisonEnergyLogo = '/assets/edison-energy-logo.svg';
 const energyExpertsLogo = '/assets/energy-experts-logo.svg';
-const renoProsLogo = '/assets/reno-pros-logo.svg';
+const renoProsLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 
 // Tenant logo mappings
@@ -88,11 +88,11 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       invoicePrefix: "EE"
     },
     'renopros': {
-      name: "Reno Pros",
+      name: "MTEBY Corporation",
       address: "1201-1200 Bay Street, Toronto, ON M4W 1J2",
       phone: "1-888-885-RENO (7366)",
       email: "info@renopros.io",
-      invoicePrefix: "RENO"
+      invoicePrefix: "MT"
     },
     'provincial': {
       name: "Provincial Energy Group",
