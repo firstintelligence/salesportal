@@ -5,8 +5,9 @@ import {
   Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
   Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
   CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
-  Globe, Fingerprint, ScanLine, Grid2X2, Users
+  Globe, Fingerprint, ScanLine, Grid2X2, Users, Copy, Navigation
 } from "lucide-react";
+import { formatPhoneNumber } from "@/utils/phoneFormat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -318,12 +319,33 @@ const CustomerDetailPage = () => {
   const latestTpv = tpvRequests[0];
   
 
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied`);
+  };
+
+  const fullAddress = [
+    customer.address,
+    customer.city,
+    customer.province,
+    customer.postal_code
+  ].filter(Boolean).join(', ');
+
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Header - matching dashboard/customers style */}
       <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Left - Navigation */}
+          {/* Left - Tenant indicator */}
+          <div className="flex items-center">
+            {tenant && (
+              <span className="text-xs text-slate-500 font-medium truncate max-w-[120px] sm:max-w-none">
+                {tenant.name}
+              </span>
+            )}
+          </div>
+          
+          {/* Right - Navigation */}
           <div className="flex items-center gap-2 sm:gap-1.5">
             <Button
               onClick={() => navigate("/dashboard")}
@@ -345,34 +367,6 @@ const CustomerDetailPage = () => {
               <span className="text-sm font-medium hidden sm:inline">Customers</span>
             </Button>
           </div>
-          
-          {/* Right - Delete */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Customer</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete {customer.first_name} {customer.last_name}? This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleDeleteCustomer}
-                  className="bg-red-500 text-white hover:bg-red-600"
-                  disabled={deleting}
-                >
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </header>
 
@@ -382,62 +376,53 @@ const CustomerDetailPage = () => {
           {/* Colored top bar */}
           <div className="h-1.5 bg-gradient-to-r from-blue-500 to-blue-600" />
           
-          <CardContent className="p-5 sm:p-6">
+          <CardContent className="p-4 sm:p-6">
             {/* Top row: Name and Date */}
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-3">
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
                 {customer.first_name} {customer.last_name}
               </h1>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-50 px-2.5 py-1.5 rounded-lg">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Added {formatDate(customer.created_at)}</span>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <Calendar className="w-3 h-3" />
+                <span>{formatDate(customer.created_at)}</span>
               </div>
             </div>
             
-            {/* Contact Info Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-              {/* Phone */}
-              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Phone className="w-4 h-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Phone</p>
-                  <p className="text-sm font-semibold text-slate-800">{customer.phone}</p>
-                </div>
-              </div>
+            {/* Simple Contact Info - Click to copy */}
+            <div className="space-y-1.5 mb-4">
+              <button 
+                onClick={() => copyToClipboard(formatPhoneNumber(customer.phone), 'Phone')}
+                className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors group w-full text-left"
+              >
+                <Phone className="w-3.5 h-3.5 text-slate-400" />
+                <span>{formatPhoneNumber(customer.phone)}</span>
+                <Copy className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
               
-              {/* Email */}
-              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                <div className="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-violet-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Email</p>
-                  <p className="text-sm font-semibold text-slate-800">{customer.email || '—'}</p>
-                </div>
-              </div>
+              {customer.email && (
+                <button 
+                  onClick={() => copyToClipboard(customer.email, 'Email')}
+                  className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors group w-full text-left"
+                >
+                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{customer.email}</span>
+                  <Copy className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              )}
               
-              {/* Address - Full width */}
-              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg sm:col-span-2">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4 text-emerald-600" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-slate-400 font-medium">Address</p>
-                  <p className="text-sm font-semibold text-slate-800 truncate">
-                    {customer.address}
-                    {customer.city && `, ${customer.city}`}
-                    {customer.province && `, ${customer.province}`}
-                    {customer.postal_code && ` ${customer.postal_code}`}
-                  </p>
-                </div>
-              </div>
+              <button 
+                onClick={() => copyToClipboard(fullAddress, 'Address')}
+                className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors group w-full text-left"
+              >
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="truncate">{fullAddress}</span>
+                <Copy className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              </button>
             </div>
             
             {/* Invoice Total Badge */}
             {invoiceProfile && (
-              <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center gap-2 mb-4">
                 <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-sm px-3 py-1">
                   <DollarSign className="w-3.5 h-3.5 mr-1" />
                   {formatCurrency(invoiceProfile.grandTotal)}
@@ -445,52 +430,52 @@ const CustomerDetailPage = () => {
               </div>
             )}
             
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {/* Quick Actions - Inline on mobile */}
+            <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-5 sm:gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-colors"
+                className="h-8 px-3 gap-1.5 bg-white hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
                 onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
               >
-                <FileText className="w-5 h-5" />
-                <span className="text-xs font-medium">{invoiceProfile ? 'Edit Invoice' : 'Invoice'}</span>
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs font-medium">{invoiceProfile ? 'Invoice' : 'Invoice'}</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-cyan-50 hover:border-cyan-200 hover:text-cyan-600 transition-colors"
+                className="h-8 px-3 gap-1.5 bg-white hover:bg-cyan-50 hover:border-cyan-200 hover:text-cyan-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
                 onClick={navigateToTpv}
               >
-                <Phone className="w-5 h-5" />
+                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs font-medium">TPV</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600 transition-colors"
+                className="h-8 px-3 gap-1.5 bg-white hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
                 onClick={navigateToLoanApplication}
               >
-                <CreditCard className="w-5 h-5" />
+                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs font-medium">Loan</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-violet-50 hover:border-violet-200 hover:text-violet-600 transition-colors"
+                className="h-8 px-3 gap-1.5 bg-white hover:bg-violet-50 hover:border-violet-200 hover:text-violet-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
                 onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
               >
-                <Calculator className="w-5 h-5" />
-                <span className="text-xs font-medium">Calculator</span>
+                <Calculator className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs font-medium">Calc</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-col h-auto py-3 gap-1.5 bg-white hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-colors"
+                className="h-8 px-3 gap-1.5 bg-white hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
                 onClick={navigateToChecklist}
               >
-                <ClipboardCheck className="w-5 h-5" />
-                <span className="text-xs font-medium">Checklist</span>
+                <ClipboardCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs font-medium">Check</span>
               </Button>
             </div>
           </CardContent>
@@ -722,111 +707,105 @@ const CustomerDetailPage = () => {
 
         {/* Document Signatures Section (Admin Only) */}
         {isAdmin && documentSignatures.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Fingerprint className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">Document Signatures</h2>
-              <Badge variant="secondary" className="text-xs">Admin Only</Badge>
+              <Fingerprint className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-semibold text-foreground">Signatures</h2>
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Admin</Badge>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {documentSignatures.map((sig) => (
-                <Card key={sig.id} className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-full bg-primary/10">
-                          <FileText className="w-4 h-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground capitalize">
+                <Card key={sig.id} className="bg-slate-50 border-slate-200">
+                  <CardContent className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      {/* Left: Doc info */}
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-4 h-4 text-primary shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground capitalize truncate">
                             {sig.document_type?.replace(/_/g, ' ') || 'Document'}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            Signed {formatDateTime(sig.signed_at)}
+                          <p className="text-[10px] text-muted-foreground">
+                            {formatDateTime(sig.signed_at)}
                           </p>
                         </div>
                       </div>
-                      <Badge variant="outline" className="capitalize">
-                        {sig.signature_type?.replace(/_/g, ' ') || 'Customer'}
-                      </Badge>
+                      
+                      {/* Right: Location + Map link */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {sig.latitude && sig.longitude && (
+                          <a
+                            href={`https://www.google.com/maps?q=${sig.latitude},${sig.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-medium hover:bg-blue-100 transition-colors"
+                          >
+                            <Navigation className="w-3 h-3" />
+                            Map
+                          </a>
+                        )}
+                        {sig.document_url && (
+                          <a
+                            href={sig.document_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-[10px] font-medium hover:bg-primary/20 transition-colors"
+                          >
+                            <Download className="w-3 h-3" />
+                            PDF
+                          </a>
+                        )}
+                      </div>
                     </div>
                     
-                    {/* Signing Location Details */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700 mb-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Globe className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Signing Location</span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <p className="text-muted-foreground text-xs">Location</p>
-                          <p className="font-medium">{sig.location_string || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">IP Address</p>
-                          <p className="font-medium font-mono text-xs">{sig.ip_address || 'N/A'}</p>
-                        </div>
-                        {sig.city && (
-                          <div>
-                            <p className="text-muted-foreground text-xs">City</p>
-                            <p className="font-medium">{sig.city}, {sig.region}</p>
-                          </div>
-                        )}
-                        {sig.country && (
-                          <div>
-                            <p className="text-muted-foreground text-xs">Country</p>
-                            <p className="font-medium">{sig.country}</p>
-                          </div>
-                        )}
-                        {sig.latitude && sig.longitude && (
-                          <div>
-                            <p className="text-muted-foreground text-xs">Coordinates</p>
-                            <p className="font-medium font-mono text-xs">
-                              {parseFloat(sig.latitude).toFixed(4)}, {parseFloat(sig.longitude).toFixed(4)}
-                            </p>
-                          </div>
-                        )}
-                        {sig.timezone && (
-                          <div>
-                            <p className="text-muted-foreground text-xs">Timezone</p>
-                            <p className="font-medium">{sig.timezone}</p>
-                          </div>
-                        )}
-                        {sig.isp && (
-                          <div className="sm:col-span-2">
-                            <p className="text-muted-foreground text-xs">ISP</p>
-                            <p className="font-medium truncate">{sig.isp}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Download Button and Agent Info */}
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs text-muted-foreground">
-                        <span>Signed by: {sig.customer_name || 'Unknown'}</span>
-                        <span className="mx-2">•</span>
-                        <span>Agent: {sig.agent_id}</span>
-                      </div>
-                      {sig.document_url && (
-                        <a
-                          href={sig.document_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Download PDF
-                        </a>
-                      )}
-                    </div>
+                    {/* Compact location info */}
+                    {sig.location_string && (
+                      <p className="text-[10px] text-muted-foreground mt-1.5 truncate">
+                        📍 {sig.location_string}
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               ))}
             </div>
           </div>
         )}
+
+        {/* Delete Customer Button - at the very bottom */}
+        <div className="pt-4 pb-8">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-red-500 border-red-200 hover:text-red-600 hover:bg-red-50 hover:border-red-300"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Customer
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Customer</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete {customer.first_name} {customer.last_name}? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDeleteCustomer}
+                  className="bg-red-500 text-white hover:bg-red-600"
+                  disabled={deleting}
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );
