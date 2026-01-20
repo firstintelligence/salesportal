@@ -30,6 +30,7 @@ serve(async (req) => {
       'AA9097': '+16477169097',
       'HB6400': '+16473776400',
       'NH8397': '+19053248397', // Nick Henry - Reno Pros & George's
+      'CH5149': '+10000000000', // Chady - update with real number
       // Polaron agents
       'CI11': '+10000000001', // Placeholder - update with real number
       'LA11': '+10000000002', // Placeholder - update with real number
