@@ -350,62 +350,20 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
     setSavedSignatureDataUrl(dataUrl);
   };
 
-  // Get user's location using geolocation API with IP fallback
+  // Location tracking temporarily disabled - return simple location from form data
   const getUserLocation = () => {
-    return new Promise(async (resolve) => {
-      // Helper to get IP-based location as fallback
-      const getIpLocation = async () => {
-        try {
-          const response = await fetch('https://ipapi.co/json/');
-          const data = await response.json();
-          if (data && data.city) {
-            return [data.city, data.region, data.postal].filter(Boolean).join(', ');
-          }
-          return null;
-        } catch {
-          return null;
-        }
-      };
-
-      // Helper to reverse geocode coordinates
-      const reverseGeocode = async (latitude, longitude) => {
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-          );
-          const data = await response.json();
-          
-          if (data && data.address) {
-            const { house_number, road, city, town, village, state, postcode } = data.address;
-            const streetAddress = [house_number, road].filter(Boolean).join(' ');
-            const locality = city || town || village || '';
-            return [streetAddress, locality, state, postcode].filter(Boolean).join(', ');
-          }
-          return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-        } catch {
-          return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-        }
-      };
-
-      // Try browser geolocation first
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            const location = await reverseGeocode(latitude, longitude);
-            resolve(location);
-          },
-          async () => {
-            // Browser geolocation failed, try IP-based fallback
-            const ipLocation = await getIpLocation();
-            resolve(ipLocation || 'Location unavailable');
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+    return new Promise((resolve) => {
+      // Use customer address from form if available
+      const locationParts = [
+        formData.city,
+        formData.province,
+        formData.postalCode
+      ].filter(Boolean);
+      
+      if (locationParts.length > 0) {
+        resolve(locationParts.join(', '));
       } else {
-        // No geolocation support, try IP-based fallback
-        const ipLocation = await getIpLocation();
-        resolve(ipLocation || 'Location unavailable');
+        resolve('Ontario, Canada');
       }
     });
   };

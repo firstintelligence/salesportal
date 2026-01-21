@@ -1,6 +1,6 @@
 import { supabase } from '../integrations/supabase/client';
 import { getTenantCompanyInfo } from './tenantLogos';
-import { recordDocumentSignature, captureSigningLocation } from './signingLocationService';
+import { recordDocumentSignature } from './signingLocationService';
 import { calculateSubTotal, calculateTaxAmount } from './invoiceCalculations';
 
 export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'georges', signingContext = null, options = {}) => {
@@ -8,23 +8,13 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
     try {
       console.log('Starting server-side PDF generation...');
       
-      // Check if current user is super admin - signing location stamp only visible to super admins
-      const isSuperAdmin = options.isSuperAdmin || false;
+      // Location tracking temporarily disabled
+      const signingLocation = null;
       
-      // Capture signing location BEFORE rendering for stamp on invoice (always capture for database, but only display for super admins)
-      let signingLocation = null;
-      try {
-        signingLocation = await captureSigningLocation();
-        console.log('Captured signing location:', signingLocation.location_string);
-      } catch (locError) {
-        console.error('Error capturing signing location:', locError);
-      }
-      
-      // Add signing location to invoice data for rendering ONLY if super admin
-      // The location is still recorded in the database for all documents
+      // Use invoice data as-is (no location data added)
       const invoiceDataWithLocation = {
         ...invoiceData,
-        signingLocation: isSuperAdmin ? signingLocation : null
+        signingLocation: null
       };
       
       // Render invoice to HTML
