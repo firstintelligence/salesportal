@@ -960,15 +960,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
       return;
     }
     
-    if (!savedSignatureDataUrl) {
-      toast.error('Signature is required');
-      return;
-    }
-    
-    if (!formData.signatureDate) {
-      toast.error('Signature date is required');
-      return;
-    }
+    // Signature is now optional - PDF can be generated without it
     
     await generatePDF();
   };
@@ -1582,7 +1574,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div>
-                  <Label htmlFor="signature">Signature *</Label>
+                  <Label htmlFor="signature">Signature (Optional)</Label>
                   <div 
                     className="border border-border rounded-md bg-white cursor-pointer hover:border-primary transition-colors min-h-32 flex items-center justify-center relative overflow-hidden"
                     onClick={() => setIsSignaturePadOpen(true)}
@@ -1605,7 +1597,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                   )}
                 </div>
                 <div className="w-full">
-                  <Label htmlFor="signatureDate">Date *</Label>
+                  <Label htmlFor="signatureDate">Date (Optional)</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
