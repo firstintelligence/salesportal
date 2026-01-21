@@ -712,7 +712,7 @@ const CustomerDetailPage = () => {
           </div>
         )}
 
-        {/* Document Signatures Section (Admin Only) */}
+        {/* Document Signatures Section (Admin Only) - Location tracking temporarily disabled */}
         {isAdmin && documentSignatures.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -739,19 +739,8 @@ const CustomerDetailPage = () => {
                         </div>
                       </div>
                       
-                      {/* Right: Location + Map link */}
+                      {/* Right: PDF link only (location tracking disabled) */}
                       <div className="flex items-center gap-2 shrink-0">
-                        {sig.latitude && sig.longitude && (
-                          <a
-                            href={`https://www.google.com/maps?q=${sig.latitude},${sig.longitude}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-medium hover:bg-blue-100 transition-colors"
-                          >
-                            <Navigation className="w-3 h-3" />
-                            Map
-                          </a>
-                        )}
                         {sig.document_url && (
                           <a
                             href={sig.document_url}
@@ -765,13 +754,6 @@ const CustomerDetailPage = () => {
                         )}
                       </div>
                     </div>
-                    
-                    {/* Compact location info */}
-                    {sig.location_string && (
-                      <p className="text-[10px] text-muted-foreground mt-1.5 truncate">
-                        📍 {sig.location_string}
-                      </p>
-                    )}
                   </CardContent>
                 </Card>
               ))}
