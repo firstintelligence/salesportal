@@ -91,7 +91,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       name: "MTEBY Corporation",
       address: "1201-1200 Bay Street, Toronto, ON M4W 1J2",
       phone: "1-888-885-RENO (7366)",
-      email: "info@renopros.io",
+      email: "customercare@mteby.com",
       invoicePrefix: "MT"
     },
     'provincial': {
