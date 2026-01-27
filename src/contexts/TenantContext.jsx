@@ -78,6 +78,16 @@ export const TenantProvider = ({ children }) => {
         setAgentProfile(profile);
         setAccessibleTenants(accessibleTenantsList);
         
+        // Clear any previously selected tenant that's no longer accessible
+        const previousSelectedTenantId = localStorage.getItem('selectedTenantId');
+        if (previousSelectedTenantId && 
+            previousSelectedTenantId !== SUPER_ADMIN_TENANT.id &&
+            !accessibleTenantsList.some(t => t.id === previousSelectedTenantId)) {
+          // User no longer has access to previously selected tenant - clear it
+          localStorage.removeItem('selectedTenantId');
+          localStorage.removeItem('tenant');
+        }
+        
         // If super admin, default to the Super Admin tenant (all tenants view)
         if (profile.is_super_admin) {
           const selectedTenantId = localStorage.getItem('selectedTenantId');
