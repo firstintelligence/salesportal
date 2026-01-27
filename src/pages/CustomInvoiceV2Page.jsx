@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts/TenantContext';
-import { getTenantCompanyInfo, getTenantLogo } from '@/utils/tenantLogos';
+import { getTenantCompanyInfo, getTenantDocumentLogo } from '@/utils/tenantLogos';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -130,7 +130,7 @@ const CustomInvoiceV2Page = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Tenant info
-  const tenantLogo = tenant?.slug ? getTenantLogo(tenant.slug) : null;
+  const tenantLogo = tenant?.slug ? getTenantDocumentLogo(tenant.slug) : null;
   const tenantCompanyInfo = tenant?.slug ? getTenantCompanyInfo(tenant.slug) : null;
 
   // Update customer name when first/last name changes

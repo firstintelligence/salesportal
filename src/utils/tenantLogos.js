@@ -5,10 +5,11 @@ const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 // Use public folder URLs for SVGs (more reliable than ES module imports for SVGs)
 const edisonEnergyLogo = '/assets/edison-energy-logo.svg';
 const energyExpertsLogo = '/assets/energy-experts-logo.svg';
-const renoProsLogo = '/assets/mteby-logo.svg';
+const renoProsLogo = '/assets/reno-pros-logo.svg';
+const mtebyLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 
-// Tenant logo mappings
+// Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
   const logos = {
     'georges': georgesLogo,
@@ -23,6 +24,17 @@ export const getTenantLogo = (tenantSlug) => {
   };
   
   return logos[tenantSlug] || null;
+};
+
+// Tenant logo mappings for documents (PDFs, invoices, etc.)
+// Some tenants use a different logo for documents than for the CRM
+export const getTenantDocumentLogo = (tenantSlug) => {
+  const documentLogos = {
+    'renopros': mtebyLogo, // MTEBY logo for documents
+  };
+  
+  // Return document-specific logo if exists, otherwise fall back to regular logo
+  return documentLogos[tenantSlug] || getTenantLogo(tenantSlug);
 };
 
 // Default logo for login page (shows all available tenant logos)
