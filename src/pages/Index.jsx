@@ -21,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSimplifiedProductList } from "../utils/productNameSimplifier";
 import { toast } from "sonner";
 import { useTenant } from "@/contexts/TenantContext";
-import { getTenantCompanyInfo, getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
+import { getTenantCompanyInfo, getTenantDocumentLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { formatPhoneNumber } from "@/utils/inputFormatting";
 import { findOrCreateCustomer } from "@/utils/customerService";
 
@@ -120,7 +120,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // CRITICAL: Don't render anything until tenant is fully loaded to prevent cross-tenant data exposure
   const tenantSlug = tenant?.slug;
   const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;
-  const tenantLogo = tenantSlug ? getTenantLogo(tenantSlug) : null;
+  const tenantLogo = tenantSlug ? getTenantDocumentLogo(tenantSlug) : null;
   const tenantLogoSize = tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : 'h-12';
   
   // Tenant-specific localStorage key to ensure complete data isolation
@@ -207,7 +207,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   useEffect(() => {
     if (tenant?.slug) {
       const companyInfo = getTenantCompanyInfo(tenant.slug);
-      const logo = getTenantLogo(tenant.slug);
+      const logo = getTenantDocumentLogo(tenant.slug);
       const logoSize = getTenantLogoSize(tenant.slug, 'invoice');
       setYourCompany({
         name: companyInfo.name,
@@ -1225,7 +1225,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                           >
                             {(() => {
                               const computedLogoSize = tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : yourCompany.logoSize;
-                              const computedLogo = tenantSlug ? getTenantLogo(tenantSlug) : yourCompany.logo;
+                              const computedLogo = tenantSlug ? getTenantDocumentLogo(tenantSlug) : yourCompany.logo;
                               console.log('DEBUG Invoice preview:', { tenantSlug, computedLogoSize, computedLogo, yourCompanyLogoSize: yourCompany.logoSize });
                               return (
                                 <InvoiceTemplate
