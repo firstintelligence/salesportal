@@ -7,7 +7,7 @@ import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombinatio
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
-    0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99
+    0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99, 17.99, 18.99
   ];
 
   const monthlyPayment = calculateMonthlyPayment(
