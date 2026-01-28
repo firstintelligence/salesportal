@@ -913,8 +913,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-        <div className="w-full lg:w-1/2 lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        <div className="w-full lg:w-[53%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
@@ -1126,7 +1126,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           />
         </div>
 
-        <div className="w-full lg:w-1/2 lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
+        <div className="w-full lg:w-[47%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
             <div className="flex gap-2 w-full sm:w-auto justify-end">

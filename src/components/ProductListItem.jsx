@@ -81,11 +81,11 @@ const ProductListItem = memo(({
             min="1"
             value={item.quantity}
             onChange={(e) => onItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
-            className="h-10 w-8 md:w-16 text-center text-[10px] md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shrink-0"
+            className="h-10 w-8 md:w-10 text-center text-[10px] md:text-sm bg-slate-50 border-slate-200 px-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shrink-0"
           />
 
-          {/* Price - takes remaining space on mobile */}
-          <div className="relative flex-1 min-w-0">
+          {/* Price - takes remaining space on mobile, wider on desktop */}
+          <div className="relative flex-1 min-w-0 md:min-w-[120px]">
             <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] md:text-xs">$</span>
             <Input
               type="number"
@@ -96,7 +96,7 @@ const ProductListItem = memo(({
               onFocus={(e) => { if (item.amount === 0) e.target.value = ''; }}
               onBlur={(e) => { if (e.target.value === '') onItemChange(index, 'amount', 0); }}
               placeholder="0"
-              className="h-10 pl-4 pr-1 text-[10px] md:text-sm bg-slate-50 border-slate-200"
+              className="h-10 pl-4 pr-1 w-full text-[10px] md:text-sm bg-slate-50 border-slate-200"
             />
           </div>
 
