@@ -43,6 +43,7 @@ serve(async (req) => {
       'AK47': '+14379875094',
       'YG23': '+10000000007', // Placeholder - update with real number
       'AR4777': '+14165944777', // Radi
+      'PN2182': '+16474252182', // Phil
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
