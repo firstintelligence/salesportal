@@ -173,6 +173,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
     employmentStatus: "",
     employerCity: "",
     employerProvince: "",
+    lastIndustry: "",
     
     // Consents
     privacyConsent: false,
@@ -1384,13 +1385,35 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               </div>
               {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div>
+              <div>
                   <Select
                     value={formData.employmentStatus}
-                    onValueChange={(value) => handleSelectChange("employmentStatus", value)}
+                    onValueChange={(value) => {
+                      handleSelectChange("employmentStatus", value);
+                      // Clear employment fields when switching to retired
+                      if (value === 'retired') {
+                        setFormData(prev => ({
+                          ...prev,
+                          employmentStatus: value,
+                          businessName: '',
+                          positionTitle: '',
+                          employerAddress: '',
+                          timeAtJob: '',
+                          employerCity: '',
+                          employerProvince: '',
+                        }));
+                      } else if (formData.employmentStatus === 'retired') {
+                        // Switching away from retired, clear retired-specific field
+                        setFormData(prev => ({
+                          ...prev,
+                          employmentStatus: value,
+                          lastIndustry: '',
+                        }));
+                      }
+                    }}
                   >
                     <SelectTrigger className="h-[48px] md:h-[40px]">
-                      <SelectValue placeholder="Employment Status" />
+                      <SelectValue placeholder="Employment Status *" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="employed">Employed</SelectItem>
@@ -1402,77 +1425,101 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
-                <FloatingLabelInput
-                  id="businessName"
-                  name="businessName"
-                  label="Business Name"
-                  value={formData.businessName}
-                  onChange={handleInputChange}
-                />
-                <FloatingLabelInput
-                  id="positionTitle"
-                  name="positionTitle"
-                  label="Position"
-                  value={formData.positionTitle}
-                  onChange={handleInputChange}
-                />
-                <FloatingLabelInput
-                  id="grossMonthlyIncome"
-                  name="grossMonthlyIncome"
-                  label="Monthly Income $"
-                  type="number"
-                  value={formData.grossMonthlyIncome}
-                  onChange={handleInputChange}
-                  autoCapitalize={false}
-                />
-                <FloatingLabelInput
-                  id="timeAtJob"
-                  name="timeAtJob"
-                  label="Years at Job"
-                  type="number"
-                  value={formData.timeAtJob}
-                  onChange={handleInputChange}
-                  autoCapitalize={false}
-                />
-                <FloatingLabelInput
-                  id="employerAddress"
-                  name="employerAddress"
-                  label="Work Address"
-                  value={formData.employerAddress}
-                  onChange={handleInputChange}
-                />
-                <FloatingLabelInput
-                  id="employerCity"
-                  name="employerCity"
-                  label="Work City"
-                  value={formData.employerCity}
-                  onChange={handleInputChange}
-                />
-                <div>
-                  <Select
-                    value={formData.employerProvince}
-                    onValueChange={(value) => handleSelectChange("employerProvince", value)}
-                  >
-                    <SelectTrigger className="h-[48px] md:h-[40px]">
-                      <SelectValue placeholder="Work Province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ON">ON</SelectItem>
-                      <SelectItem value="QC">QC</SelectItem>
-                      <SelectItem value="BC">BC</SelectItem>
-                      <SelectItem value="AB">AB</SelectItem>
-                      <SelectItem value="MB">MB</SelectItem>
-                      <SelectItem value="SK">SK</SelectItem>
-                      <SelectItem value="NS">NS</SelectItem>
-                      <SelectItem value="NB">NB</SelectItem>
-                      <SelectItem value="NL">NL</SelectItem>
-                      <SelectItem value="PE">PE</SelectItem>
-                      <SelectItem value="NT">NT</SelectItem>
-                      <SelectItem value="YT">YT</SelectItem>
-                      <SelectItem value="NU">NU</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
+                {formData.employmentStatus === 'retired' ? (
+                  <>
+                    <FloatingLabelInput
+                      id="lastIndustry"
+                      name="lastIndustry"
+                      label="Last Industry / Job *"
+                      value={formData.lastIndustry}
+                      onChange={handleInputChange}
+                    />
+                    <FloatingLabelInput
+                      id="grossMonthlyIncome"
+                      name="grossMonthlyIncome"
+                      label="Monthly Income $ *"
+                      type="number"
+                      value={formData.grossMonthlyIncome}
+                      onChange={handleInputChange}
+                      autoCapitalize={false}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FloatingLabelInput
+                      id="businessName"
+                      name="businessName"
+                      label={`Business Name${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      value={formData.businessName}
+                      onChange={handleInputChange}
+                    />
+                    <FloatingLabelInput
+                      id="positionTitle"
+                      name="positionTitle"
+                      label={`Position${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      value={formData.positionTitle}
+                      onChange={handleInputChange}
+                    />
+                    <FloatingLabelInput
+                      id="grossMonthlyIncome"
+                      name="grossMonthlyIncome"
+                      label={`Monthly Income $${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      type="number"
+                      value={formData.grossMonthlyIncome}
+                      onChange={handleInputChange}
+                      autoCapitalize={false}
+                    />
+                    <FloatingLabelInput
+                      id="employerAddress"
+                      name="employerAddress"
+                      label={`Work Address${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      value={formData.employerAddress}
+                      onChange={handleInputChange}
+                    />
+                    <FloatingLabelInput
+                      id="employerCity"
+                      name="employerCity"
+                      label={`Work City${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      value={formData.employerCity}
+                      onChange={handleInputChange}
+                    />
+                    <div>
+                      <Select
+                        value={formData.employerProvince}
+                        onValueChange={(value) => handleSelectChange("employerProvince", value)}
+                      >
+                        <SelectTrigger className="h-[48px] md:h-[40px]">
+                          <SelectValue placeholder={`Work Province${formData.employmentStatus === 'employed' ? ' *' : ''}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ON">ON</SelectItem>
+                          <SelectItem value="QC">QC</SelectItem>
+                          <SelectItem value="BC">BC</SelectItem>
+                          <SelectItem value="AB">AB</SelectItem>
+                          <SelectItem value="MB">MB</SelectItem>
+                          <SelectItem value="SK">SK</SelectItem>
+                          <SelectItem value="NS">NS</SelectItem>
+                          <SelectItem value="NB">NB</SelectItem>
+                          <SelectItem value="NL">NL</SelectItem>
+                          <SelectItem value="PE">PE</SelectItem>
+                          <SelectItem value="NT">NT</SelectItem>
+                          <SelectItem value="YT">YT</SelectItem>
+                          <SelectItem value="NU">NU</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <FloatingLabelInput
+                      id="timeAtJob"
+                      name="timeAtJob"
+                      label={`Years at Job${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      type="number"
+                      value={formData.timeAtJob}
+                      onChange={handleInputChange}
+                      autoCapitalize={false}
+                    />
+                  </>
+                )}
               </div>
             </div>
 
