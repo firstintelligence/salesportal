@@ -631,144 +631,219 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     hasLoadedInitialData.current = true;
   };
 
-  // Save customer profile to dashboard
-  const handleSaveToDashboard = async () => {
-    // Validate required fields
+  // Core save logic - saves customer + product config to backend, returns customerId
+  const saveCustomerAndProducts = async () => {
     if (!billTo.firstName || !billTo.lastName || !billTo.phone || !billTo.address) {
       toast.error("Please fill in customer name, phone, and address before saving");
-      return;
+      return null;
     }
 
+    const agentId = localStorage.getItem("agentId");
+    if (!agentId) {
+      toast.error("Please login to save customer profiles");
+      return null;
+    }
+
+    const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
+      {
+        firstName: billTo.firstName,
+        lastName: billTo.lastName,
+        email: billTo.email,
+        phone: billTo.phone,
+        address: billTo.address,
+        city: billTo.city,
+        province: billTo.province || 'ON',
+        postalCode: billTo.postalCode,
+      },
+      tenant?.id || null,
+      agentId
+    );
+
+    if (customerError) throw customerError;
+    
+    const resolvedCustomerId = foundCustomerId;
+    if (isNew) {
+      setCustomerId(resolvedCustomerId);
+    }
+
+    const simplifiedProducts = getSimplifiedProductList(items);
+    const fullProductConfiguration = {
+      items: items.map(item => ({
+        id: item.id,
+        name: item.name || '',
+        description: item.description || '',
+        productId: item.productId || '',
+        quantity: item.quantity || 1,
+        amount: item.amount || 0,
+        total: item.total || 0
+      })),
+      financing: {
+        financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
+        loanAmount: financing.loanAmount || 0,
+        amortizationPeriod: financing.amortizationPeriod || 180,
+        loanTerm: financing.loanTerm || 24,
+        interestRate: financing.interestRate || 0
+      },
+      rebatesIncentives: rebatesIncentives,
+      subTotal: subTotal,
+      taxAmount: taxAmount,
+      taxPercentage: taxPercentage,
+      grandTotal: grandTotal
+    };
+
+    const tpvData = {
+      customer_id: resolvedCustomerId,
+      tenant_id: tenant?.id || null,
+      agent_id: agentId,
+      customer_name: `${billTo.firstName} ${billTo.lastName}`,
+      first_name: billTo.firstName,
+      last_name: billTo.lastName,
+      customer_phone: billTo.phone,
+      customer_address: billTo.address,
+      city: billTo.city || null,
+      province: billTo.province || 'ON',
+      postal_code: billTo.postalCode || null,
+      email: billTo.email || null,
+      products: simplifiedProducts,
+      sales_price: grandTotal.toString(),
+      interest_rate: financing.interestRate?.toString() || null,
+      promotional_term: financing.loanTerm?.toString() || null,
+      amortization: financing.amortizationPeriod?.toString() || null,
+      monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
+        financing.loanAmount,
+        financing.interestRate || 0,
+        financing.amortizationPeriod
+      ).toString() : null,
+      status: 'draft',
+      items_json: fullProductConfiguration
+    };
+
+    const { data: existingTpv } = await supabase
+      .from("tpv_requests")
+      .select("id")
+      .eq("customer_id", resolvedCustomerId)
+      .eq("status", "draft")
+      .single();
+
+    if (existingTpv) {
+      await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
+    } else {
+      await supabase.from("tpv_requests").insert(tpvData);
+    }
+
+    const invoiceProfile = {
+      customerId: resolvedCustomerId,
+      billTo,
+      items,
+      financing,
+      grandTotal,
+      subTotal,
+      taxAmount,
+      taxPercentage,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(`invoice_profile_${tenantSlug}_${resolvedCustomerId}`, JSON.stringify(invoiceProfile));
+
+    return resolvedCustomerId;
+  };
+
+  // Save customer profile to dashboard
+  const handleSaveToDashboard = async () => {
     setIsSaving(true);
     try {
-      const agentId = localStorage.getItem("agentId");
-      if (!agentId) {
-        toast.error("Please login to save customer profiles");
-        return;
+      const savedId = await saveCustomerAndProducts();
+      if (savedId) {
+        toast.success("Customer profile saved to dashboard!");
+        navigate(`/customer/${savedId}`);
       }
-
-      // Find existing customer or create new one
-      // Matches by: exact name, exact phone, or exact email
-      const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
-        {
-          firstName: billTo.firstName,
-          lastName: billTo.lastName,
-          email: billTo.email,
-          phone: billTo.phone,
-          address: billTo.address,
-          city: billTo.city,
-          province: billTo.province || 'ON',
-          postalCode: billTo.postalCode,
-        },
-        tenant?.id || null,
-        agentId
-      );
-
-      if (customerError) throw customerError;
-      
-      let customerId = foundCustomerId;
-      if (isNew) {
-        setCustomerId(customerId); // Update state for PDF signing context
-      }
-
-      // Get simplified product list for TPV
-      const simplifiedProducts = getSimplifiedProductList(items);
-
-      // Create TPV request with invoice data (draft status)
-      // Include full items_json for complete product configuration restoration
-      // items_json contains both items array and financing object for full restoration
-      const fullProductConfiguration = {
-        items: items.map(item => ({
-          id: item.id,
-          name: item.name || '',
-          description: item.description || '',
-          productId: item.productId || '',
-          quantity: item.quantity || 1,
-          amount: item.amount || 0,
-          total: item.total || 0
-        })),
-        financing: {
-          financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
-          loanAmount: financing.loanAmount || 0,
-          amortizationPeriod: financing.amortizationPeriod || 180,
-          loanTerm: financing.loanTerm || 24,
-          interestRate: financing.interestRate || 0
-        },
-        rebatesIncentives: rebatesIncentives,
-        subTotal: subTotal,
-        taxAmount: taxAmount,
-        taxPercentage: taxPercentage,
-        grandTotal: grandTotal
-      };
-
-      const tpvData = {
-        customer_id: customerId,
-        tenant_id: tenant?.id || null, // CRITICAL: Associate with current tenant
-        agent_id: agentId,
-        customer_name: `${billTo.firstName} ${billTo.lastName}`,
-        first_name: billTo.firstName,
-        last_name: billTo.lastName,
-        customer_phone: billTo.phone,
-        customer_address: billTo.address,
-        city: billTo.city || null,
-        province: billTo.province || 'ON',
-        postal_code: billTo.postalCode || null,
-        email: billTo.email || null,
-        products: simplifiedProducts,
-        sales_price: grandTotal.toString(),
-        interest_rate: financing.interestRate?.toString() || null,
-        promotional_term: financing.loanTerm?.toString() || null,
-        amortization: financing.amortizationPeriod?.toString() || null,
-        monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
-          financing.loanAmount,
-          financing.interestRate || 0,
-          financing.amortizationPeriod
-        ).toString() : null,
-        status: 'draft',
-        items_json: fullProductConfiguration // Store full product configuration with financing
-      };
-
-      // Check if draft TPV exists for this customer
-      const { data: existingTpv } = await supabase
-        .from("tpv_requests")
-        .select("id")
-        .eq("customer_id", customerId)
-        .eq("status", "draft")
-        .single();
-
-      if (existingTpv) {
-        await supabase
-          .from("tpv_requests")
-          .update(tpvData)
-          .eq("id", existingTpv.id);
-      } else {
-        await supabase
-          .from("tpv_requests")
-          .insert(tpvData);
-      }
-
-      // Store invoice data in localStorage for prefilling other tools
-      const invoiceProfile = {
-        customerId,
-        billTo,
-        items,
-        financing,
-        grandTotal,
-        subTotal,
-        taxAmount,
-        taxPercentage,
-        savedAt: new Date().toISOString()
-      };
-      localStorage.setItem(`invoice_profile_${tenantSlug}_${customerId}`, JSON.stringify(invoiceProfile));
-
-      toast.success("Customer profile saved to dashboard!");
-      
-      // Navigate to customer detail page
-      navigate(`/customer/${customerId}`);
-
     } catch (error) {
       console.error("Error saving to dashboard:", error);
       toast.error("Failed to save customer profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Save & navigate to TPV
+  const handleRequestTPV = async () => {
+    setIsSaving(true);
+    try {
+      const savedId = await saveCustomerAndProducts();
+      if (savedId) {
+        toast.success("Profile saved!");
+        navigate('/tpv-ai', {
+          state: {
+            customer: {
+              id: savedId,
+              first_name: billTo.firstName,
+              last_name: billTo.lastName,
+              phone: billTo.phone,
+              email: billTo.email,
+              address: billTo.address,
+              city: billTo.city,
+              province: billTo.province,
+              postal_code: billTo.postalCode
+            },
+            calculatorData: {
+              purchaseAmount: grandTotal,
+              interestRate: financing.interestRate,
+              promoTerm: financing.loanTerm,
+              amortizationPeriod: financing.amortizationPeriod,
+              items: items
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error saving before TPV:", error);
+      toast.error("Failed to save profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Save & navigate to Loan Application
+  const handleGenerateLoanApp = async () => {
+    setIsSaving(true);
+    try {
+      const savedId = await saveCustomerAndProducts();
+      if (savedId) {
+        toast.success("Profile saved!");
+        navigate('/loan-application', {
+          state: {
+            customer: {
+              id: savedId,
+              first_name: billTo.firstName,
+              last_name: billTo.lastName,
+              phone: billTo.phone,
+              email: billTo.email,
+              address: billTo.address,
+              city: billTo.city,
+              province: billTo.province,
+              postal_code: billTo.postalCode
+            },
+            invoiceProfile: {
+              items,
+              financing,
+              grandTotal,
+              subTotal,
+              taxAmount,
+              taxPercentage
+            },
+            prefillData: {
+              salesPrice: grandTotal,
+              monthlyPayment: financing.loanAmount ? calculateMonthlyPayment(
+                financing.loanAmount,
+                financing.interestRate || 0,
+                financing.amortizationPeriod
+              ) : null
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error saving before loan app:", error);
+      toast.error("Failed to save profile");
     } finally {
       setIsSaving(false);
     }
@@ -784,111 +859,10 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         let resolvedCustomerId = customerId;
         if (billTo.firstName && billTo.lastName && billTo.phone && billTo.address) {
           try {
-            const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
-              {
-                firstName: billTo.firstName,
-                lastName: billTo.lastName,
-                email: billTo.email,
-                phone: billTo.phone,
-                address: billTo.address,
-                city: billTo.city,
-                province: billTo.province || 'ON',
-                postalCode: billTo.postalCode,
-              },
-              tenant?.id || null,
-              agentId
-            );
-
-            if (!customerError && foundCustomerId) {
-              resolvedCustomerId = foundCustomerId;
-              if (isNew) {
-                setCustomerId(foundCustomerId);
-              }
-
-              // Save full product configuration to tpv_requests (items_json)
-              const simplifiedProducts = getSimplifiedProductList(items);
-              const fullProductConfiguration = {
-                items: items.map(item => ({
-                  id: item.id,
-                  name: item.name || '',
-                  description: item.description || '',
-                  productId: item.productId || '',
-                  quantity: item.quantity || 1,
-                  amount: item.amount || 0,
-                  total: item.total || 0
-                })),
-                financing: {
-                  financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
-                  loanAmount: financing.loanAmount || 0,
-                  amortizationPeriod: financing.amortizationPeriod || 180,
-                  loanTerm: financing.loanTerm || 24,
-                  interestRate: financing.interestRate || 0
-                },
-                rebatesIncentives: rebatesIncentives,
-                subTotal: subTotal,
-                taxAmount: taxAmount,
-                taxPercentage: taxPercentage,
-                grandTotal: grandTotal
-              };
-
-              const tpvData = {
-                customer_id: resolvedCustomerId,
-                tenant_id: tenant?.id || null,
-                agent_id: agentId,
-                customer_name: `${billTo.firstName} ${billTo.lastName}`,
-                first_name: billTo.firstName,
-                last_name: billTo.lastName,
-                customer_phone: billTo.phone,
-                customer_address: billTo.address,
-                city: billTo.city || null,
-                province: billTo.province || 'ON',
-                postal_code: billTo.postalCode || null,
-                email: billTo.email || null,
-                products: simplifiedProducts,
-                sales_price: grandTotal.toString(),
-                interest_rate: financing.interestRate?.toString() || null,
-                promotional_term: financing.loanTerm?.toString() || null,
-                amortization: financing.amortizationPeriod?.toString() || null,
-                monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
-                  financing.loanAmount,
-                  financing.interestRate || 0,
-                  financing.amortizationPeriod
-                ).toString() : null,
-                status: 'draft',
-                items_json: fullProductConfiguration
-              };
-
-              // Upsert: update existing draft or create new one
-              const { data: existingTpv } = await supabase
-                .from("tpv_requests")
-                .select("id")
-                .eq("customer_id", resolvedCustomerId)
-                .eq("status", "draft")
-                .single();
-
-              if (existingTpv) {
-                await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
-              } else {
-                await supabase.from("tpv_requests").insert(tpvData);
-              }
-
-              // Save invoice profile to localStorage
-              const invoiceProfile = {
-                customerId: resolvedCustomerId,
-                billTo,
-                items,
-                financing,
-                grandTotal,
-                subTotal,
-                taxAmount,
-                taxPercentage,
-                savedAt: new Date().toISOString()
-              };
-              localStorage.setItem(`invoice_profile_${tenantSlug}_${resolvedCustomerId}`, JSON.stringify(invoiceProfile));
-            }
+            const savedId = await saveCustomerAndProducts();
+            if (savedId) resolvedCustomerId = savedId;
           } catch (saveError) {
             console.error('Error auto-saving customer profile during PDF generation:', saveError);
-            // Don't block PDF generation if save fails
           }
         }
 
@@ -911,7 +885,6 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           coApplicantSignature: coApplicantSignatureDataUrl
         };
         
-        // Build signing context for document signature recording
         const signingContext = {
           documentType: isInvoice ? 'invoice' : 'quote',
           documentId: crypto.randomUUID(),
@@ -922,7 +895,6 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           signatureType: 'customer'
         };
         
-        // Only super admins see the signing location stamp on the PDF
         const isSuperAdmin = agentId === 'MM231611';
         await generatePDF(formData, 4, tenantSlug, signingContext, { isSuperAdmin });
         
@@ -1267,73 +1239,21 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               <Button 
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/tpv-ai', {
-                  state: {
-                    customer: customerId ? {
-                      id: customerId,
-                      first_name: billTo.firstName,
-                      last_name: billTo.lastName,
-                      phone: billTo.phone,
-                      email: billTo.email,
-                      address: billTo.address,
-                      city: billTo.city,
-                      province: billTo.province,
-                      postal_code: billTo.postalCode
-                    } : null,
-                    calculatorData: {
-                      purchaseAmount: grandTotal,
-                      interestRate: financing.interestRate,
-                      promoTerm: financing.loanTerm,
-                      amortizationPeriod: financing.amortizationPeriod,
-                      items: items
-                    }
-                  }
-                })}
+                onClick={handleRequestTPV}
+                disabled={isSaving}
                 className="flex-1"
               >
-                <Phone className="mr-1.5 h-4 w-4" />
+                {isSaving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Phone className="mr-1.5 h-4 w-4" />}
                 Request TPV
               </Button>
               <Button 
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  const customer = customerId ? {
-                    id: customerId,
-                    first_name: billTo.firstName,
-                    last_name: billTo.lastName,
-                    phone: billTo.phone,
-                    email: billTo.email,
-                    address: billTo.address,
-                    city: billTo.city,
-                    province: billTo.province,
-                    postal_code: billTo.postalCode
-                  } : null;
-                  navigate('/loan-application', { 
-                    state: { 
-                      customer,
-                      invoiceProfile: {
-                        items,
-                        financing,
-                        grandTotal,
-                        subTotal,
-                        taxAmount,
-                        taxPercentage
-                      },
-                      prefillData: {
-                        salesPrice: grandTotal,
-                        monthlyPayment: financing.loanAmount ? calculateMonthlyPayment(
-                          financing.loanAmount,
-                          financing.interestRate || 0,
-                          financing.amortizationPeriod
-                        ) : null
-                      }
-                    }
-                  });
-                }}
+                onClick={handleGenerateLoanApp}
+                disabled={isSaving}
                 className="flex-1"
               >
-                <CreditCard className="mr-1.5 h-4 w-4" />
+                {isSaving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CreditCard className="mr-1.5 h-4 w-4" />}
                 Generate Loan Application
               </Button>
             </div>
