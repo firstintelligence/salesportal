@@ -41,7 +41,7 @@ const IDScanner = ({ onScanComplete, onCancel }) => {
     setMode(null);
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
     
     const video = videoRef.current;
@@ -53,10 +53,33 @@ const IDScanner = ({ onScanComplete, onCancel }) => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
     
-    const imageData = canvas.toDataURL('image/jpeg', 0.9);
-    setImagePreview(imageData);
+    const imageData = canvas.toDataURL('image/jpeg', 0.7);
+    // Compress camera captures too
+    const compressed = await compressImage(imageData);
+    setImagePreview(compressed);
     stopCamera();
     setMode('preview');
+  };
+
+  const compressImage = (dataUrl, maxWidth = 1280) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = dataUrl;
+    });
   };
 
   const handleFileUpload = (e) => {
@@ -69,8 +92,9 @@ const IDScanner = ({ onScanComplete, onCancel }) => {
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
+    reader.onload = async (e) => {
+      const compressed = await compressImage(e.target.result);
+      setImagePreview(compressed);
       setMode('preview');
     };
     reader.readAsDataURL(file);
