@@ -46,6 +46,7 @@ serve(async (req) => {
       'PN2182': '+16474252182', // Phil
       'ZD4590': '+14168564590', // Zsolt
       'ZD7539': '+17802377539', // Zsolt
+      'GS8773': '+15194948773', // Gabe
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
