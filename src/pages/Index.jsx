@@ -13,7 +13,7 @@ import { templates } from "../utils/templateRegistry";
 import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw, Loader2, Pen, Save, Phone, CreditCard, FileText } from "lucide-react";
+import { RefreshCw, Loader2, Pen, Save, Phone, CreditCard, FileText, UserCheck } from "lucide-react";
 import { addDays, format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
@@ -24,6 +24,9 @@ import { useTenant } from "@/contexts/TenantContext";
 import { getTenantCompanyInfo, getTenantDocumentLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { formatPhoneNumber } from "@/utils/inputFormatting";
 import { findOrCreateCustomer } from "@/utils/customerService";
+import IDScanner from "@/components/qualify/IDScanner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { capitalizeWords, formatPostalCode } from "@/utils/inputFormatting";
 
 // Helper function to get today's date in Toronto timezone
 const getTodayInToronto = () => {
@@ -202,6 +205,45 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   const [savedSignatureDataUrl, setSavedSignatureDataUrl] = useState(null);
   const [isCoApplicantSignaturePadOpen, setIsCoApplicantSignaturePadOpen] = useState(false);
   const [coApplicantSignatureDataUrl, setCoApplicantSignatureDataUrl] = useState(null);
+  const [isIdScannerOpen, setIsIdScannerOpen] = useState(false);
+
+  // Handle ID scan completion - populate bill-to fields
+  const toTitleCase = (str) => {
+    if (!str) return str;
+    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const handleIdScanComplete = (scanData) => {
+    setIsIdScannerOpen(false);
+    const firstName = toTitleCase(scanData.firstName);
+    const lastName = toTitleCase(scanData.lastName);
+    const address = toTitleCase(scanData.address);
+    const city = toTitleCase(scanData.city);
+    
+    let province = scanData.province || '';
+    if (province.toLowerCase() === 'ontario') {
+      province = 'ON';
+    } else if (province.length > 2) {
+      const provinceMap = {
+        'quebec': 'QC', 'british columbia': 'BC', 'alberta': 'AB',
+        'manitoba': 'MB', 'saskatchewan': 'SK', 'nova scotia': 'NS',
+        'new brunswick': 'NB', 'newfoundland': 'NL', 'prince edward island': 'PE'
+      };
+      province = provinceMap[province.toLowerCase()] || province.substring(0, 2).toUpperCase();
+    }
+    
+    setBillTo(prev => ({
+      ...prev,
+      firstName: prev.firstName || firstName || '',
+      lastName: prev.lastName || lastName || '',
+      address: prev.address || address || '',
+      city: prev.city || city || '',
+      province: prev.province || province || 'ON',
+      postalCode: prev.postalCode || scanData.postalCode || '',
+    }));
+    
+    toast.success('ID scanned! Customer info autofilled.');
+  };
 
   // Update company info when tenant changes
   useEffect(() => {
@@ -999,6 +1041,24 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <div className="w-full lg:w-[53%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>
+            {/* Quick Scan ID at Top */}
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 md:p-5 mb-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-sm md:text-base text-foreground">Quick Start</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground">Scan ID to autofill customer fields</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="default"
+                  className="shrink-0 h-11 px-5 text-sm md:text-base"
+                  onClick={() => setIsIdScannerOpen(true)}
+                >
+                  <UserCheck className="w-5 h-5 mr-2" />
+                  Scan ID
+                </Button>
+              </div>
+            </div>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg md:text-2xl font-semibold">
@@ -1361,6 +1421,15 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           </div>
         </div>
       </div>
+      {/* ID Scanner Dialog */}
+      <Dialog open={isIdScannerOpen} onOpenChange={setIsIdScannerOpen}>
+        <DialogContent className="max-w-md">
+          <IDScanner 
+            onScanComplete={handleIdScanComplete}
+            onCancel={() => setIsIdScannerOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
