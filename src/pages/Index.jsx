@@ -968,37 +968,33 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       </div>
       
       {/* Desktop action bar */}
-      <div className="hidden lg:block relative mb-8">
-        <div className="flex items-center justify-center">
-          <div className="absolute left-0 flex gap-2">
-            <button
-              onClick={clearForm}
-              className="bg-red-500 text-white px-3 py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2"
-              aria-label="Clear Invoice"
-            >
-              <FiTrash2 size={18} />
-              <span className="text-sm font-medium">Clear</span>
-            </button>
-            <button
-              onClick={handleSaveToDashboard}
-              disabled={isSaving}
-              className="bg-green-600 text-white px-3 py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              aria-label="Save Invoice"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm font-medium">Saving...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  <span className="text-sm font-medium">Save</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+      <div className="hidden lg:flex items-center gap-2 mb-4">
+        <button
+          onClick={clearForm}
+          className="bg-red-500 text-white px-3 py-2 rounded-full shadow-lg hover:bg-red-600 flex items-center gap-2"
+          aria-label="Clear Invoice"
+        >
+          <FiTrash2 size={18} />
+          <span className="text-sm font-medium">Clear</span>
+        </button>
+        <button
+          onClick={handleSaveToDashboard}
+          disabled={isSaving}
+          className="bg-green-600 text-white px-3 py-2 rounded-full shadow-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          aria-label="Save Invoice"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm font-medium">Saving...</span>
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              <span className="text-sm font-medium">Save</span>
+            </>
+          )}
+        </button>
       </div>
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <div className="w-full lg:w-[53%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
