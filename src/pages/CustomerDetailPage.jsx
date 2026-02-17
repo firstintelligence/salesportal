@@ -122,45 +122,40 @@ const CustomerDetailPage = () => {
       if (checklistError) throw checklistError;
       setChecklists(checklistData || []);
 
-      // Fetch document signatures and ID scans for this customer (admin can see all)
-      if (agentId === 'MM231611') {
-        // First try by customer_id
-        const { data: sigData, error: sigError } = await supabase
-          .from("document_signatures")
-          .select("*")
-          .eq("customer_id", customerId)
-          .order("signed_at", { ascending: false });
-        
-        if (!sigError && sigData && sigData.length > 0) {
-          setDocumentSignatures(sigData);
-        } else {
-          // Fallback: try matching by customer name if no customer_id match
-          if (customerData) {
-            const customerFullName = `${customerData.first_name || ''} ${customerData.last_name || ''}`.trim();
-            if (customerFullName) {
-              const { data: sigByName, error: sigByNameError } = await supabase
-                .from("document_signatures")
-                .select("*")
-                .ilike("customer_name", `%${customerFullName}%`)
-                .order("signed_at", { ascending: false });
-              
-              if (!sigByNameError && sigByName) {
-                setDocumentSignatures(sigByName);
-              }
-            }
+      // Fetch document signatures for this customer
+      const { data: sigData, error: sigError } = await supabase
+        .from("document_signatures")
+        .select("*")
+        .eq("customer_id", customerId)
+        .order("signed_at", { ascending: false });
+      
+      if (!sigError && sigData && sigData.length > 0) {
+        setDocumentSignatures(sigData);
+      } else if (agentId === 'MM231611' && customerData) {
+        // Admin fallback: try matching by customer name
+        const customerFullName = `${customerData.first_name || ''} ${customerData.last_name || ''}`.trim();
+        if (customerFullName) {
+          const { data: sigByName, error: sigByNameError } = await supabase
+            .from("document_signatures")
+            .select("*")
+            .ilike("customer_name", `%${customerFullName}%`)
+            .order("signed_at", { ascending: false });
+          
+          if (!sigByNameError && sigByName) {
+            setDocumentSignatures(sigByName);
           }
         }
+      }
 
-        // Fetch ID scans for this customer
-        const { data: idScanData, error: idScanError } = await supabase
-          .from("id_scans")
-          .select("*")
-          .eq("customer_id", customerId)
-          .order("created_at", { ascending: false });
-        
-        if (!idScanError && idScanData) {
-          setIdScans(idScanData);
-        }
+      // Fetch ID scans for this customer
+      const { data: idScanData, error: idScanError } = await supabase
+        .from("id_scans")
+        .select("*")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false });
+      
+      if (!idScanError && idScanData) {
+        setIdScans(idScanData);
       }
 
       // Fetch document deliveries for this customer
@@ -637,6 +632,27 @@ const CustomerDetailPage = () => {
                 date: cl.submitted_at || cl.created_at,
                 color: cl.status === 'completed' ? 'text-emerald-600' : 'text-amber-600',
                 bg: cl.status === 'completed' ? 'bg-emerald-100' : 'bg-amber-100',
+              });
+            });
+
+            // ID Scans
+            idScans.forEach((scan) => {
+              const idImageUrl = scan.id_image_path 
+                ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/documents/${scan.id_image_path}`
+                : null;
+              events.push({
+                id: `idscan-${scan.id}`,
+                type: 'id_scan',
+                icon: ScanLine,
+                label: `ID Scanned — ${scan.first_name} ${scan.last_name}`,
+                date: scan.created_at,
+                color: 'text-amber-600',
+                bg: 'bg-amber-100',
+                extra: idImageUrl ? (
+                  <a href={idImageUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline mt-1">
+                    <Download className="w-3 h-3" /> Download ID
+                  </a>
+                ) : null,
               });
             });
 
