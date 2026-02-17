@@ -778,6 +778,120 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     if (!isDownloading) {
       setIsDownloading(true);
       try {
+        const agentId = localStorage.getItem('agentId') || 'unknown';
+        
+        // Auto-save customer profile to dashboard before generating PDF
+        let resolvedCustomerId = customerId;
+        if (billTo.firstName && billTo.lastName && billTo.phone && billTo.address) {
+          try {
+            const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
+              {
+                firstName: billTo.firstName,
+                lastName: billTo.lastName,
+                email: billTo.email,
+                phone: billTo.phone,
+                address: billTo.address,
+                city: billTo.city,
+                province: billTo.province || 'ON',
+                postalCode: billTo.postalCode,
+              },
+              tenant?.id || null,
+              agentId
+            );
+
+            if (!customerError && foundCustomerId) {
+              resolvedCustomerId = foundCustomerId;
+              if (isNew) {
+                setCustomerId(foundCustomerId);
+              }
+
+              // Save full product configuration to tpv_requests (items_json)
+              const simplifiedProducts = getSimplifiedProductList(items);
+              const fullProductConfiguration = {
+                items: items.map(item => ({
+                  id: item.id,
+                  name: item.name || '',
+                  description: item.description || '',
+                  productId: item.productId || '',
+                  quantity: item.quantity || 1,
+                  amount: item.amount || 0,
+                  total: item.total || 0
+                })),
+                financing: {
+                  financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
+                  loanAmount: financing.loanAmount || 0,
+                  amortizationPeriod: financing.amortizationPeriod || 180,
+                  loanTerm: financing.loanTerm || 24,
+                  interestRate: financing.interestRate || 0
+                },
+                rebatesIncentives: rebatesIncentives,
+                subTotal: subTotal,
+                taxAmount: taxAmount,
+                taxPercentage: taxPercentage,
+                grandTotal: grandTotal
+              };
+
+              const tpvData = {
+                customer_id: resolvedCustomerId,
+                tenant_id: tenant?.id || null,
+                agent_id: agentId,
+                customer_name: `${billTo.firstName} ${billTo.lastName}`,
+                first_name: billTo.firstName,
+                last_name: billTo.lastName,
+                customer_phone: billTo.phone,
+                customer_address: billTo.address,
+                city: billTo.city || null,
+                province: billTo.province || 'ON',
+                postal_code: billTo.postalCode || null,
+                email: billTo.email || null,
+                products: simplifiedProducts,
+                sales_price: grandTotal.toString(),
+                interest_rate: financing.interestRate?.toString() || null,
+                promotional_term: financing.loanTerm?.toString() || null,
+                amortization: financing.amortizationPeriod?.toString() || null,
+                monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
+                  financing.loanAmount,
+                  financing.interestRate || 0,
+                  financing.amortizationPeriod
+                ).toString() : null,
+                status: 'draft',
+                items_json: fullProductConfiguration
+              };
+
+              // Upsert: update existing draft or create new one
+              const { data: existingTpv } = await supabase
+                .from("tpv_requests")
+                .select("id")
+                .eq("customer_id", resolvedCustomerId)
+                .eq("status", "draft")
+                .single();
+
+              if (existingTpv) {
+                await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
+              } else {
+                await supabase.from("tpv_requests").insert(tpvData);
+              }
+
+              // Save invoice profile to localStorage
+              const invoiceProfile = {
+                customerId: resolvedCustomerId,
+                billTo,
+                items,
+                financing,
+                grandTotal,
+                subTotal,
+                taxAmount,
+                taxPercentage,
+                savedAt: new Date().toISOString()
+              };
+              localStorage.setItem(`invoice_profile_${tenantSlug}_${resolvedCustomerId}`, JSON.stringify(invoiceProfile));
+            }
+          } catch (saveError) {
+            console.error('Error auto-saving customer profile during PDF generation:', saveError);
+            // Don't block PDF generation if save fails
+          }
+        }
+
         const formData = {
           invoice,
           billTo,
@@ -801,17 +915,18 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         const signingContext = {
           documentType: isInvoice ? 'invoice' : 'quote',
           documentId: crypto.randomUUID(),
-          customerId: customerId, // Use customer ID from state if available
+          customerId: resolvedCustomerId,
           customerName: `${billTo.firstName || ''} ${billTo.lastName || ''}`.trim(),
-          agentId: localStorage.getItem('agentId') || 'unknown',
+          agentId: agentId,
           tenantId: tenant?.id || null,
           signatureType: 'customer'
         };
         
         // Only super admins see the signing location stamp on the PDF
-        const agentId = localStorage.getItem('agentId');
         const isSuperAdmin = agentId === 'MM231611';
         await generatePDF(formData, 4, tenantSlug, signingContext, { isSuperAdmin });
+        
+        toast.success("Invoice saved & PDF downloaded!");
       } catch (error) {
         console.error('Error generating PDF:', error);
       } finally {
