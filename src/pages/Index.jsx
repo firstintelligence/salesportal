@@ -13,7 +13,7 @@ import { templates } from "../utils/templateRegistry";
 import { generatePDF } from "../utils/pdfGenerator";
 import { Button } from "@/components/ui/button";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; 
-import { RefreshCw, Loader2, Pen, Save, Phone } from "lucide-react";
+import { RefreshCw, Loader2, Pen, Save, Phone, CreditCard, FileText } from "lucide-react";
 import { addDays, format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { generateInvoiceNumber, getProvincialTax, calculateLoanAmount, calculateMonthlyPayment } from "../utils/financingCalculations";
@@ -1242,11 +1242,31 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         </div>
 
         <div className="w-full lg:w-[47%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-            <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
-            <div className="flex gap-2 w-full sm:w-auto justify-end">
+          <div className="flex flex-col gap-3 mb-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
+              <Button 
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Generate Invoice
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="flex gap-2">
               <Button 
                 variant="outline"
+                size="sm"
                 onClick={() => navigate('/tpv-ai', {
                   state: {
                     customer: customerId ? {
@@ -1269,24 +1289,52 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
                     }
                   }
                 })}
-                className="flex-1 sm:flex-initial"
+                className="flex-1"
               >
-                <Phone className="mr-2 h-4 w-4" />
+                <Phone className="mr-1.5 h-4 w-4" />
                 Request TPV
               </Button>
               <Button 
-                onClick={handleDownloadPDF}
-                disabled={isDownloading}
-                className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const customer = customerId ? {
+                    id: customerId,
+                    first_name: billTo.firstName,
+                    last_name: billTo.lastName,
+                    phone: billTo.phone,
+                    email: billTo.email,
+                    address: billTo.address,
+                    city: billTo.city,
+                    province: billTo.province,
+                    postal_code: billTo.postalCode
+                  } : null;
+                  navigate('/loan-application', { 
+                    state: { 
+                      customer,
+                      invoiceProfile: {
+                        items,
+                        financing,
+                        grandTotal,
+                        subTotal,
+                        taxAmount,
+                        taxPercentage
+                      },
+                      prefillData: {
+                        salesPrice: grandTotal,
+                        monthlyPayment: financing.loanAmount ? calculateMonthlyPayment(
+                          financing.loanAmount,
+                          financing.interestRate || 0,
+                          financing.amortizationPeriod
+                        ) : null
+                      }
+                    }
+                  });
+                }}
+                className="flex-1"
               >
-                {isDownloading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Downloading...
-                  </>
-                ) : (
-                  'Download PDF'
-                )}
+                <CreditCard className="mr-1.5 h-4 w-4" />
+                Generate Loan Application
               </Button>
             </div>
           </div>
