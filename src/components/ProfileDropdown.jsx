@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Building2, LogOut, ChevronDown, Check, Trophy, UserCircle2, UserCog, ArrowLeftRight, Search } from 'lucide-react';
+import { Building2, LogOut, ChevronDown, Check, Trophy, UserCircle2, UserCog, ArrowLeftRight, Search, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -274,6 +274,12 @@ const ProfileDropdown = () => {
           <DropdownMenuItem onClick={() => navigate('/stats')} className="text-slate-700 cursor-pointer">
             <Trophy className="w-4 h-4 mr-2 text-amber-500" />
             View Stats
+          </DropdownMenuItem>
+
+          {/* Help Link */}
+          <DropdownMenuItem onClick={() => navigate('/help')} className="text-slate-700 cursor-pointer">
+            <HelpCircle className="w-4 h-4 mr-2 text-blue-500" />
+            How to Use
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />
