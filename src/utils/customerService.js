@@ -60,22 +60,13 @@ export const findOrCreateCustomer = async (customerData, tenantId, agentId) => {
       return { customerId: null, isNew: false, error: searchError };
     }
 
-    // Find a match by name, phone, or email
+    // Find a match by phone or email only (not name)
     let matchedCustomer = null;
 
     if (existingCustomers && existingCustomers.length > 0) {
       for (const customer of existingCustomers) {
-        const customerFirstName = customer.first_name?.trim().toLowerCase();
-        const customerLastName = customer.last_name?.trim().toLowerCase();
         const customerPhone = cleanPhoneNumber(customer.phone);
         const customerEmail = customer.email?.trim().toLowerCase();
-
-        // Match by exact full name (first + last)
-        const nameMatch = 
-          trimmedFirstName && 
-          trimmedLastName && 
-          customerFirstName === trimmedFirstName && 
-          customerLastName === trimmedLastName;
 
         // Match by exact phone number (digits only, must have at least 10 digits)
         const phoneMatch = 
@@ -92,9 +83,9 @@ export const findOrCreateCustomer = async (customerData, tenantId, agentId) => {
           customerEmail && 
           customerEmail === trimmedEmail;
 
-        if (nameMatch || phoneMatch || emailMatch) {
+        if (phoneMatch || emailMatch) {
           matchedCustomer = customer;
-          const matchType = nameMatch ? 'name' : (phoneMatch ? 'phone' : 'email');
+          const matchType = phoneMatch ? 'phone' : 'email';
           console.log(`Found existing customer by ${matchType}:`, customer.id);
           break;
         }
@@ -102,25 +93,24 @@ export const findOrCreateCustomer = async (customerData, tenantId, agentId) => {
     }
 
     if (matchedCustomer) {
-      // Customer exists - optionally update their info with latest data
-      // (We update to ensure address/contact info stays current)
-      const updateData = {};
+      // Customer exists - update their info with latest data
+      // Always overwrite name/address/contact so corrections are applied
+      const updateData = { updated_at: new Date().toISOString() };
+      if (firstName) updateData.first_name = firstName;
+      if (lastName) updateData.last_name = lastName;
       if (address && address !== 'N/A') updateData.address = address;
       if (city) updateData.city = city;
       if (province) updateData.province = province;
       if (postalCode) updateData.postal_code = postalCode;
-      if (email && !matchedCustomer.email) updateData.email = email;
-      if (cleanedPhone && cleanedPhone.length >= 10 && (!matchedCustomer.phone || matchedCustomer.phone === 'N/A')) {
+      if (email) updateData.email = email;
+      if (cleanedPhone && cleanedPhone.length >= 10) {
         updateData.phone = cleanedPhone;
       }
 
-      // Only update if there's something to update
-      if (Object.keys(updateData).length > 0) {
-        await supabase
-          .from("customers")
-          .update(updateData)
-          .eq("id", matchedCustomer.id);
-      }
+      await supabase
+        .from("customers")
+        .update(updateData)
+        .eq("id", matchedCustomer.id);
 
       return { 
         customerId: matchedCustomer.id, 
