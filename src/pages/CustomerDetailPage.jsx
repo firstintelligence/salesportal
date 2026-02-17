@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
-  Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
+  Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
   CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
-  Globe, Fingerprint, ScanLine, Grid2X2, Users, Copy, Navigation, Send
+  Globe, Fingerprint, ScanLine, Grid2X2, Users, Copy, Navigation, Send,
+  Activity, User
 } from "lucide-react";
 import DocumentDeliveryModal from "@/components/DocumentDeliveryModal";
 import { formatPhoneNumber } from "@/utils/phoneFormat";
@@ -439,15 +440,64 @@ const CustomerDetailPage = () => {
               </button>
             </div>
             
-            {/* Invoice Total Badge */}
-            {invoiceProfile && (
-              <div className="flex items-center gap-2 mb-4">
-                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-sm px-3 py-1">
-                  <DollarSign className="w-3.5 h-3.5 mr-1" />
-                  {formatCurrency(invoiceProfile.grandTotal)}
-                </Badge>
-              </div>
-            )}
+            {/* Payment Details Summary */}
+            {(invoiceProfile || tpvRequests[0]) && (() => {
+              const latestTpvData = tpvRequests[0];
+              const salesPrice = invoiceProfile?.grandTotal || latestTpvData?.sales_price;
+              const monthlyPayment = invoiceProfile?.financing?.monthlyPayment || latestTpvData?.monthly_payment;
+              const interestRate = invoiceProfile?.financing?.interestRate || latestTpvData?.interest_rate;
+              const promoTerm = invoiceProfile?.financing?.loanTerm || latestTpvData?.promotional_term;
+              const amortization = invoiceProfile?.financing?.amortizationPeriod || latestTpvData?.amortization;
+              const products = latestTpvData?.products;
+              
+              return (
+                <div className="bg-slate-50 rounded-lg p-3 mb-4 border border-slate-200">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-xs font-semibold text-slate-700">Payment Details</span>
+                  </div>
+                  {products && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {products.split(',').map((p, i) => (
+                        <span key={i} className="text-[10px] bg-white border border-slate-200 rounded px-1.5 py-0.5 text-slate-600">{p.trim()}</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    {salesPrice && (
+                      <div>
+                        <p className="text-slate-400 text-[10px]">Sale Price</p>
+                        <p className="font-bold text-emerald-700">{formatCurrency(salesPrice)}</p>
+                      </div>
+                    )}
+                    {monthlyPayment && (
+                      <div>
+                        <p className="text-slate-400 text-[10px]">Monthly</p>
+                        <p className="font-semibold text-slate-700">{formatCurrency(monthlyPayment)}</p>
+                      </div>
+                    )}
+                    {interestRate && (
+                      <div>
+                        <p className="text-slate-400 text-[10px]">Rate</p>
+                        <p className="font-semibold text-slate-700">{interestRate}%</p>
+                      </div>
+                    )}
+                    {promoTerm && (
+                      <div>
+                        <p className="text-slate-400 text-[10px]">Term</p>
+                        <p className="font-semibold text-slate-700">{promoTerm} mo</p>
+                      </div>
+                    )}
+                    {amortization && (
+                      <div>
+                        <p className="text-slate-400 text-[10px]">Amortization</p>
+                        <p className="font-semibold text-slate-700">{amortization} mo</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
             
             {/* Quick Actions - Inline on mobile */}
             <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-5 sm:gap-2">
@@ -508,159 +558,137 @@ const CustomerDetailPage = () => {
           </CardContent>
         </Card>
 
-        {/* Activity Section */}
+        {/* Activity Timeline */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-primary" />
             <h2 className="text-lg font-semibold text-foreground">Activity</h2>
-            {tpvRequests.length === 0 && checklists.length === 0 && (
-              <Button size="sm" onClick={navigateToTpv}>
-                <Plus className="w-4 h-4 mr-1.5" />
-                Start TPV
-              </Button>
-            )}
           </div>
 
-          {tpvRequests.length === 0 && checklists.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                  <Phone className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground mb-4">No activity yet. Start a TPV verification to begin.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {/* TPV Requests */}
-              {tpvRequests.map((tpv) => {
-                const statusConfig = getStatusConfig(tpv.status);
-                const StatusIcon = statusConfig.icon;
-                
-                return (
-                  <Card key={tpv.id} className={`${statusConfig.bg} ${statusConfig.border} border`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-full ${statusConfig.bg}`}>
-                            <Phone className={`w-4 h-4 ${statusConfig.color}`} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">TPV Verification</p>
-                            <p className="text-xs text-muted-foreground">{formatDateTime(tpv.created_at)}</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className={`${statusConfig.color} ${statusConfig.border} capitalize`}>
-                          <StatusIcon className="w-3 h-3 mr-1" />
-                          {tpv.status}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                        <div>
-                          <p className="text-muted-foreground text-xs">Products</p>
-                          <p className="font-medium truncate">{tpv.products || "N/A"}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Sale Price</p>
-                          <p className="font-medium">{formatCurrency(tpv.sales_price)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Monthly</p>
-                          <p className="font-medium">{formatCurrency(tpv.monthly_payment)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Rate</p>
-                          <p className="font-medium">{tpv.interest_rate ? `${tpv.interest_rate}%` : "N/A"}</p>
-                        </div>
-                      </div>
+          {(() => {
+            // Build unified timeline from all data sources
+            const events = [];
 
-                      {/* Actions: Recording and Generate Invoice */}
-                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3 flex-wrap">
-                        {tpv.recording_url && (
-                          <a 
-                            href={tpv.recording_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
-                          >
-                            <PlayCircle className="w-3.5 h-3.5" />
-                            Listen to Recording
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs h-7"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Navigate to invoice generator with this TPV's data prefilled
-                            navigate('/invoice-generator', { 
-                              state: { 
-                                customer,
-                                invoiceProfile,
-                                calculatorData: {
-                                  products: tpv.products,
-                                  salesPrice: tpv.sales_price,
-                                  interestRate: tpv.interest_rate,
-                                  monthlyPayment: tpv.monthly_payment,
-                                  amortization: tpv.amortization,
-                                  promotionalTerm: tpv.promotional_term
-                                }
-                              } 
-                            });
-                          }}
-                        >
-                          <FileText className="w-3 h-3 mr-1" />
-                          Generate Invoice
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+            // Profile creation
+            if (customer.created_at) {
+              events.push({
+                id: 'profile-created',
+                type: 'profile',
+                icon: User,
+                label: 'Profile Created',
+                date: customer.created_at,
+                color: 'text-slate-500',
+                bg: 'bg-slate-100',
+              });
+            }
 
-              {/* Installation Checklists */}
-              {checklists.map((checklist) => {
-                const statusConfig = getStatusConfig(checklist.status);
-                const StatusIcon = statusConfig.icon;
-                
-                return (
-                  <Card 
-                    key={checklist.id} 
-                    className={`${statusConfig.bg} ${statusConfig.border} border cursor-pointer hover:shadow-md transition-shadow`}
-                    onClick={() => navigate(`/installation-checklist/${checklist.id}`)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-full ${statusConfig.bg}`}>
-                            <ClipboardCheck className={`w-4 h-4 ${statusConfig.color}`} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">Installation Checklist</p>
-                            <p className="text-xs text-muted-foreground">
-                              {checklist.submitted_at 
-                                ? `Submitted ${formatDateTime(checklist.submitted_at)}`
-                                : `Created ${formatDateTime(checklist.created_at)}`
-                              }
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={`${statusConfig.color} ${statusConfig.border} capitalize`}>
-                            <StatusIcon className="w-3 h-3 mr-1" />
-                            {checklist.status}
-                          </Badge>
-                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                        </div>
+            // TPV Requests
+            tpvRequests.forEach((tpv) => {
+              const completed = tpv.status?.toLowerCase() === 'completed';
+              events.push({
+                id: `tpv-${tpv.id}`,
+                type: 'tpv',
+                icon: Phone,
+                label: `TPV Verification — ${tpv.status || 'initiated'}`,
+                date: tpv.created_at,
+                color: completed ? 'text-emerald-600' : 'text-blue-600',
+                bg: completed ? 'bg-emerald-100' : 'bg-blue-100',
+                extra: tpv.recording_url ? (
+                  <a href={tpv.recording_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline mt-1">
+                    <PlayCircle className="w-3 h-3" /> Listen to Recording <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                ) : null,
+              });
+            });
+
+            // Document Signatures (invoices, loan apps)
+            documentSignatures.forEach((sig) => {
+              const typeLabel = sig.document_type === 'invoice' || sig.document_type === 'custom_invoice'
+                ? 'Invoice Signed'
+                : sig.document_type === 'loan_application' || sig.document_type === 'loan_agreement'
+                  ? 'Loan Agreement Signed'
+                  : `${sig.document_type?.replace(/_/g, ' ')} Signed`;
+              
+              const IconComp = (sig.document_type === 'invoice' || sig.document_type === 'custom_invoice') ? FileText : CreditCard;
+              
+              events.push({
+                id: `sig-${sig.id}`,
+                type: 'signature',
+                icon: IconComp,
+                label: typeLabel,
+                date: sig.signed_at,
+                color: 'text-emerald-600',
+                bg: 'bg-emerald-100',
+                extra: sig.document_url ? (
+                  <a href={sig.document_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline mt-1">
+                    <Download className="w-3 h-3" /> Download PDF
+                  </a>
+                ) : null,
+              });
+            });
+
+            // Checklists
+            checklists.forEach((cl) => {
+              events.push({
+                id: `checklist-${cl.id}`,
+                type: 'checklist',
+                icon: ClipboardCheck,
+                label: `Installation Checklist — ${cl.status}`,
+                date: cl.submitted_at || cl.created_at,
+                color: cl.status === 'completed' ? 'text-emerald-600' : 'text-amber-600',
+                bg: cl.status === 'completed' ? 'bg-emerald-100' : 'bg-amber-100',
+              });
+            });
+
+            // Document Deliveries
+            documentDeliveries.forEach((dd) => {
+              events.push({
+                id: `delivery-${dd.id}`,
+                type: 'delivery',
+                icon: Send,
+                label: `Documents Sent to ${dd.recipient_email}`,
+                date: dd.sent_at,
+                color: 'text-green-600',
+                bg: 'bg-green-100',
+              });
+            });
+
+            // Sort by date descending
+            events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (events.length === 0) {
+              return (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                      <Activity className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">No activity yet.</p>
+                  </CardContent>
+                </Card>
+              );
+            }
+
+            return (
+              <div className="space-y-1">
+                {events.map((event) => {
+                  const IconComp = event.icon;
+                  return (
+                    <div key={event.id} className="flex items-start gap-3 py-2">
+                      <div className={`p-1.5 rounded-full ${event.bg} shrink-0 mt-0.5`}>
+                        <IconComp className={`w-3.5 h-3.5 ${event.color}`} />
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground">{event.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{formatDateTime(event.date)}</p>
+                        {event.extra}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
 
         {/* ID Scans Section (Admin Only) */}
