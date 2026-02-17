@@ -118,7 +118,7 @@ const DashboardPage = () => {
             invoice_amount
           )
         `)
-        .order("created_at", { ascending: false });
+        .order("updated_at", { ascending: false });
 
       // If viewing all tenants (Super Admin mode), don't filter by tenant
       // Otherwise, filter by the selected tenant
