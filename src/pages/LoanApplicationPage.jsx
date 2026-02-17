@@ -984,6 +984,36 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
       return;
     }
     
+    if (!formData.employmentStatus) {
+      toast.error('Please select an employment status');
+      return;
+    }
+    
+    // Employment-specific validation
+    if (formData.employmentStatus === 'retired') {
+      if (!formData.lastIndustry) {
+        toast.error('Please enter your last industry or job');
+        return;
+      }
+      if (!formData.grossMonthlyIncome) {
+        toast.error('Please enter your monthly income');
+        return;
+      }
+    } else if (formData.employmentStatus === 'employed') {
+      const missingFields = [];
+      if (!formData.businessName) missingFields.push('Business Name');
+      if (!formData.positionTitle) missingFields.push('Position');
+      if (!formData.grossMonthlyIncome) missingFields.push('Monthly Income');
+      if (!formData.employerAddress) missingFields.push('Work Address');
+      if (!formData.employerCity) missingFields.push('Work City');
+      if (!formData.employerProvince) missingFields.push('Work Province');
+      if (!formData.timeAtJob) missingFields.push('Years at Job');
+      if (missingFields.length > 0) {
+        toast.error(`Please fill in: ${missingFields.join(', ')}`);
+        return;
+      }
+    }
+    
     if (!formData.privacyConsent || !formData.creditConsent) {
       toast.error('You must agree to the Privacy Policy and Credit Authorization');
       return;
@@ -1055,7 +1085,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                 <FloatingLabelInput
                   id="firstName"
                   name="firstName"
-                  label="First Name *"
+                  label="First Name"
                   value={formData.firstName}
                   onChange={handleInputChange}
                 />
@@ -1069,7 +1099,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                 <FloatingLabelInput
                   id="lastName"
                   name="lastName"
-                  label="Last Name *"
+                  label="Last Name"
                   value={formData.lastName}
                   onChange={handleInputChange}
                 />
@@ -1086,7 +1116,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                         {formData.birthdate ? (
                           parseLocalDate(formData.birthdate)?.toLocaleDateString("en-US")
                         ) : (
-                          <span className="text-gray-500">Birthdate *</span>
+                          <span className="text-gray-500">Birthdate</span>
                         )}
                         <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                       </Button>
@@ -1113,7 +1143,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     required
                   >
                     <SelectTrigger className="h-[48px] md:h-[40px]">
-                      <SelectValue placeholder="Marital Status *" />
+                      <SelectValue placeholder="Marital Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="single">Single</SelectItem>
@@ -1127,7 +1157,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                 <FloatingLabelInput
                   id="homePhone"
                   name="homePhone"
-                  label="Phone Number *"
+                  label="Phone Number"
                   value={formData.homePhone}
                   onChange={handleInputChange}
                 />
@@ -1169,7 +1199,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                   <FloatingLabelInput
                     id="address"
                     name="address"
-                    label="Address *"
+                    label="Address"
                     value={formData.address}
                     onChange={handleInputChange}
                   />
@@ -1413,7 +1443,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     }}
                   >
                     <SelectTrigger className="h-[48px] md:h-[40px]">
-                      <SelectValue placeholder="Employment Status *" />
+                      <SelectValue placeholder="Employment Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="employed">Employed</SelectItem>
@@ -1431,14 +1461,14 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     <FloatingLabelInput
                       id="lastIndustry"
                       name="lastIndustry"
-                      label="Last Industry / Job *"
+                      label="Last Industry / Job"
                       value={formData.lastIndustry}
                       onChange={handleInputChange}
                     />
                     <FloatingLabelInput
                       id="grossMonthlyIncome"
                       name="grossMonthlyIncome"
-                      label="Monthly Income $ *"
+                      label="Monthly Income $"
                       type="number"
                       value={formData.grossMonthlyIncome}
                       onChange={handleInputChange}
@@ -1450,21 +1480,21 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     <FloatingLabelInput
                       id="businessName"
                       name="businessName"
-                      label={`Business Name${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Business Name"
                       value={formData.businessName}
                       onChange={handleInputChange}
                     />
                     <FloatingLabelInput
                       id="positionTitle"
                       name="positionTitle"
-                      label={`Position${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Position"
                       value={formData.positionTitle}
                       onChange={handleInputChange}
                     />
                     <FloatingLabelInput
                       id="grossMonthlyIncome"
                       name="grossMonthlyIncome"
-                      label={`Monthly Income $${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Monthly Income $"
                       type="number"
                       value={formData.grossMonthlyIncome}
                       onChange={handleInputChange}
@@ -1473,14 +1503,14 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     <FloatingLabelInput
                       id="employerAddress"
                       name="employerAddress"
-                      label={`Work Address${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Work Address"
                       value={formData.employerAddress}
                       onChange={handleInputChange}
                     />
                     <FloatingLabelInput
                       id="employerCity"
                       name="employerCity"
-                      label={`Work City${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Work City"
                       value={formData.employerCity}
                       onChange={handleInputChange}
                     />
@@ -1490,7 +1520,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                         onValueChange={(value) => handleSelectChange("employerProvince", value)}
                       >
                         <SelectTrigger className="h-[48px] md:h-[40px]">
-                          <SelectValue placeholder={`Work Province${formData.employmentStatus === 'employed' ? ' *' : ''}`} />
+                          <SelectValue placeholder="Work Province" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="ON">ON</SelectItem>
@@ -1512,7 +1542,7 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     <FloatingLabelInput
                       id="timeAtJob"
                       name="timeAtJob"
-                      label={`Years at Job${formData.employmentStatus === 'employed' ? ' *' : ''}`}
+                      label="Years at Job"
                       type="number"
                       value={formData.timeAtJob}
                       onChange={handleInputChange}
