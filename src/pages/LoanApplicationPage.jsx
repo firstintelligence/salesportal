@@ -851,7 +851,13 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
       return;
     }
     
-    // Check for valid tenant (Super Admin "all tenants" mode has isAllTenants=true with non-UUID id)
+    const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '');
+    if (!phoneDigits) {
+      toast.error('Please enter a phone number');
+      return;
+    }
+    
+    // Check for valid tenant
     if (!tenant?.id || tenant?.isAllTenants) {
       toast.error('Please select a specific tenant (not "Super Admin") to save profiles.');
       return;
@@ -860,67 +866,88 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
     setIsSaving(true);
     try {
       const agentId = localStorage.getItem('agentId');
-      const phoneDigits = formData.homePhone?.replace(/\D/g, '') || formData.mobilePhone?.replace(/\D/g, '');
       
-      if (!phoneDigits) {
-        toast.error('Please enter a phone number');
-        setIsSaving(false);
-        return;
-      }
+      // Use unified find-or-create customer logic
+      const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
+        {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: phoneDigits,
+          address: formData.address || 'N/A',
+          city: formData.city,
+          province: formData.province,
+          postalCode: formData.postalCode,
+        },
+        tenant.id,
+        agentId
+      );
       
-      // Check if customer already exists by phone number within the same tenant
-      const { data: existingCustomer } = await supabase
-        .from("customers")
+      if (customerError) throw customerError;
+      
+      const customerId = foundCustomerId;
+      setCreatedCustomerId(customerId);
+      
+      // Save loan application data to database
+      const loanAppData = {
+        customer_id: customerId,
+        tenant_id: tenant.id,
+        agent_id: agentId,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        middle_name: formData.middleName || null,
+        birthdate: formData.birthdate || null,
+        home_phone: formData.homePhone || null,
+        mobile_phone: formData.mobilePhone || null,
+        marital_status: formData.maritalStatus || null,
+        email: formData.email || null,
+        sin: formData.sin || null,
+        address: formData.address || null,
+        unit_no: formData.unitNo || null,
+        city: formData.city || null,
+        province: formData.province || null,
+        postal_code: formData.postalCode || null,
+        housing_status: formData.housingStatus || null,
+        years_at_address: formData.yearsAtAddress || null,
+        monthly_housing_costs: formData.monthlyHousingCosts || null,
+        photo_id_type: formData.photoIdType || null,
+        photo_id_province: formData.photoIdProvince || null,
+        photo_id_number: formData.photoIdNumber || null,
+        photo_id_expiry: formData.photoIdExpiry || null,
+        business_name: formData.businessName || null,
+        position_title: formData.positionTitle || null,
+        gross_monthly_income: formData.grossMonthlyIncome || null,
+        employer_address: formData.employerAddress || null,
+        time_at_job: formData.timeAtJob || null,
+        employment_status: formData.employmentStatus || null,
+        employer_city: formData.employerCity || null,
+        employer_province: formData.employerProvince || null,
+        privacy_consent: formData.privacyConsent,
+        electronic_consent: formData.electronicConsent,
+        credit_consent: formData.creditConsent,
+        signature_date: formData.signatureDate || null,
+      };
+      
+      // Check for existing loan application for this customer
+      const { data: existingLoanApp } = await supabase
+        .from("loan_applications")
         .select("id")
-        .eq("tenant_id", tenant.id)
-        .or(`phone.eq.${phoneDigits},phone.eq.${formData.homePhone},phone.eq.${formData.mobilePhone}`)
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false })
+        .limit(1)
         .maybeSingle();
       
-      let customerId;
-      
-      if (existingCustomer) {
-        // Update existing customer
-        customerId = existingCustomer.id;
-        const { error: updateError } = await supabase
-          .from("customers")
-          .update({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email || null,
-            address: formData.address || null,
-            city: formData.city || null,
-            province: formData.province || null,
-            postal_code: formData.postalCode || null,
-          })
-          .eq("id", customerId);
-        
-        if (updateError) throw updateError;
-        toast.success('Customer profile updated!');
+      if (existingLoanApp) {
+        await supabase.from("loan_applications").update(loanAppData).eq("id", existingLoanApp.id);
       } else {
-        // Create new customer
-        const { data: newCustomer, error: insertError } = await supabase
-          .from("customers")
-          .insert({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email || null,
-            phone: phoneDigits,
-            address: formData.address || null,
-            city: formData.city || null,
-            province: formData.province || null,
-            postal_code: formData.postalCode || null,
-            tenant_id: tenant.id,
-            agent_id: agentId,
-          })
-          .select("id")
-          .single();
-        
-        if (insertError) throw insertError;
-        customerId = newCustomer.id;
-        toast.success('Customer profile saved!');
+        await supabase.from("loan_applications").insert(loanAppData);
       }
       
-      setCreatedCustomerId(customerId);
+      if (isNew) {
+        toast.success('Customer profile created & loan application saved!');
+      } else {
+        toast.success('Customer profile updated & loan application saved!');
+      }
       
       // Navigate to customer detail page
       navigate(`/customer/${customerId}`);
@@ -1228,7 +1255,6 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     autoCapitalize={false}
                   />
                 </div>
-              </div>
               </div>
             </div>
 
