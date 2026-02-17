@@ -158,8 +158,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     financeCompany: "Financeit Canada Inc.",
     loanAmount: preloadedCalculatorData?.loanAmount || 0,
     amortizationPeriod: preloadedCalculatorData?.amortizationPeriod || 180,
-    loanTerm: preloadedCalculatorData?.promoTerm || 24,
-    interestRate: preloadedCalculatorData?.interestRate || 0
+    loanTerm: preloadedCalculatorData?.promoTerm || 60,
+    interestRate: preloadedCalculatorData?.interestRate || 8.99
   }));
   const [rebatesIncentives, setRebatesIncentives] = useState({
     federalRebate: 0,
@@ -653,8 +653,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       financeCompany: "Financeit Canada Inc.",
       loanAmount: 0,
       amortizationPeriod: 180,
-      loanTerm: 24,
-      interestRate: 0
+      loanTerm: 60,
+      interestRate: 8.99
     });
     setRebatesIncentives({
       federalRebate: 0,
