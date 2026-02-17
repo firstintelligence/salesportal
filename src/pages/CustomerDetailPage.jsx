@@ -5,8 +5,9 @@ import {
   Loader2, FileText, CreditCard, Phone, ClipboardCheck, 
   Calculator, Plus, DollarSign, Trash2, Mail, MapPin, Calendar,
   CheckCircle2, Clock, AlertCircle, ExternalLink, PlayCircle, Download,
-  Globe, Fingerprint, ScanLine, Grid2X2, Users, Copy, Navigation
+  Globe, Fingerprint, ScanLine, Grid2X2, Users, Copy, Navigation, Send
 } from "lucide-react";
+import DocumentDeliveryModal from "@/components/DocumentDeliveryModal";
 import { formatPhoneNumber } from "@/utils/phoneFormat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,6 +40,8 @@ const CustomerDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [documentDeliveries, setDocumentDeliveries] = useState([]);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
 
   const tenantSlug = tenant?.slug;
 
@@ -158,6 +161,15 @@ const CustomerDetailPage = () => {
           setIdScans(idScanData);
         }
       }
+
+      // Fetch document deliveries for this customer
+      const { data: deliveryData } = await supabase
+        .from("document_deliveries")
+        .select("*")
+        .eq("customer_id", customerId)
+        .order("sent_at", { ascending: false });
+      
+      setDocumentDeliveries(deliveryData || []);
 
     } catch (error) {
       console.error("Error fetching customer data:", error);
@@ -438,7 +450,7 @@ const CustomerDetailPage = () => {
             )}
             
             {/* Quick Actions - Inline on mobile */}
-            <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-5 sm:gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-6 sm:gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
@@ -446,7 +458,7 @@ const CustomerDetailPage = () => {
                 onClick={() => navigate('/invoice-generator', { state: { customer, invoiceProfile } })}
               >
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs font-medium">{invoiceProfile ? 'Invoice' : 'Invoice'}</span>
+                <span className="text-xs font-medium">Invoice</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -483,6 +495,23 @@ const CustomerDetailPage = () => {
               >
                 <ClipboardCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs font-medium">Check</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={`h-8 px-3 gap-1.5 transition-colors sm:flex-col sm:h-auto sm:py-3 ${
+                  documentDeliveries.length > 0 
+                    ? "bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100" 
+                    : "bg-white hover:bg-green-50 hover:border-green-200 hover:text-green-600"
+                }`}
+                onClick={() => setShowDeliveryModal(true)}
+              >
+                {documentDeliveries.length > 0 ? (
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                ) : (
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+                <span className="text-xs font-medium">Docs</span>
               </Button>
             </div>
           </CardContent>
@@ -796,6 +825,13 @@ const CustomerDetailPage = () => {
           </AlertDialog>
         </div>
       </div>
+
+      <DocumentDeliveryModal
+        open={showDeliveryModal}
+        onOpenChange={setShowDeliveryModal}
+        customer={customer}
+        onDeliveryComplete={fetchCustomerData}
+      />
     </div>
   );
 };
