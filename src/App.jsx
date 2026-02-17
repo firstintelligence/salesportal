@@ -26,6 +26,7 @@ import CustomInvoiceV2Page from "./pages/CustomInvoiceV2Page";
 import CalculatorPage from "./pages/CalculatorPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import HelpPage from "./pages/HelpPage";
+import EmailTemplatesPage from "./pages/EmailTemplatesPage";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const AppContent = () => {
         <Route path="/qualify" element={<QualifyPage />} />
         <Route path="/custom-invoice-v2" element={<CustomInvoiceV2Page />} />
         <Route path="/help" element={<HelpPage />} />
+        <Route path="/email-templates" element={<EmailTemplatesPage />} />
       </Routes>
     </>
   );
