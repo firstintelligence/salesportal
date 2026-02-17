@@ -1025,19 +1025,19 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
           <div className="border-t-2 border-green-600 mb-6"></div>
           
           {/* Quick Scan ID at Top */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 md:p-4 mb-6">
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 md:p-5 mb-6">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="font-semibold text-sm text-foreground">Quick Start</h3>
-                <p className="text-xs text-muted-foreground">Scan ID to autofill fields</p>
+                <h3 className="font-semibold text-sm md:text-base text-foreground">Quick Start</h3>
+                <p className="text-xs md:text-sm text-muted-foreground">Scan ID to autofill fields</p>
               </div>
               <Button
                 type="button"
                 variant="default"
-                className="shrink-0"
+                className="shrink-0 h-11 px-5 text-sm md:text-base"
                 onClick={() => setIsIdScannerOpen(true)}
               >
-                <UserCheck className="w-4 h-4 mr-2" />
+                <UserCheck className="w-5 h-5 mr-2" />
                 Scan ID
               </Button>
             </div>
@@ -1369,10 +1369,10 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               <Button
                 type="button"
                 variant="outline"
-                className="w-full border-primary text-primary hover:bg-primary/10"
+                className="w-full border-primary text-primary hover:bg-primary/10 h-11 text-sm md:text-base"
                 onClick={() => setIsIdScannerOpen(true)}
               >
-                <UserCheck className="w-4 h-4 mr-2" />
+                <UserCheck className="w-5 h-5 mr-2" />
                 Scan ID to Auto-Fill
               </Button>
             </div>
