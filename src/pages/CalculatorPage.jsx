@@ -115,7 +115,7 @@ const CalculatorPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/landing")}
+            onClick={() => navigate(-1)}
             className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white h-8 px-2"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
