@@ -676,6 +676,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // Core save logic - saves customer + product config to backend, returns customerId
   const saveCustomerAndProducts = async () => {
     if (!billTo.firstName || !billTo.lastName || !billTo.phone || !billTo.address) {
+      console.warn("Save skipped - missing fields:", { firstName: billTo.firstName, lastName: billTo.lastName, phone: billTo.phone, address: billTo.address });
       toast.error("Please fill in customer name, phone, and address before saving");
       return null;
     }
@@ -688,6 +689,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
     // Use null tenant_id when viewing all tenants (super admin mode)
     const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
+    console.log("Saving customer profile:", { firstName: billTo.firstName, lastName: billTo.lastName, tenantId: validTenantId, agentId });
 
     const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
       {
@@ -704,7 +706,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       agentId
     );
 
-    if (customerError) throw customerError;
+    if (customerError) {
+      console.error("Customer save error:", customerError);
+      throw customerError;
+    }
+    
+    console.log("Customer saved successfully:", { customerId: foundCustomerId, isNew });
     
     const resolvedCustomerId = foundCustomerId;
     if (isNew) {
@@ -902,12 +909,25 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         
         // Auto-save customer profile to dashboard before generating PDF
         let resolvedCustomerId = customerId;
-        if (billTo.firstName && billTo.lastName && billTo.phone && billTo.address) {
+        const canSaveProfile = billTo.firstName && billTo.lastName && billTo.phone && billTo.address;
+        if (!canSaveProfile && billTo.firstName) {
+          console.warn("Customer profile NOT saved - missing required fields:", {
+            firstName: !!billTo.firstName, lastName: !!billTo.lastName, 
+            phone: !!billTo.phone, address: !!billTo.address
+          });
+        }
+        if (canSaveProfile) {
           try {
             const savedId = await saveCustomerAndProducts();
-            if (savedId) resolvedCustomerId = savedId;
+            if (savedId) {
+              resolvedCustomerId = savedId;
+              console.log("Auto-save during PDF generation succeeded:", savedId);
+            } else {
+              console.warn("Auto-save returned null - customer profile was NOT saved");
+            }
           } catch (saveError) {
             console.error('Error auto-saving customer profile during PDF generation:', saveError);
+            toast.error("Warning: Invoice generated but customer profile was NOT saved to dashboard");
           }
         }
 
