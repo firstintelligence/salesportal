@@ -178,6 +178,60 @@ export type Database = {
           },
         ]
       }
+      document_deliveries: {
+        Row: {
+          agent_id: string
+          created_at: string
+          customer_id: string
+          documents_sent: string[]
+          id: string
+          recipient_email: string
+          sent_at: string
+          status: string
+          subject: string | null
+          tenant_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          customer_id: string
+          documents_sent?: string[]
+          id?: string
+          recipient_email: string
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenant_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          customer_id?: string
+          documents_sent?: string[]
+          id?: string
+          recipient_email?: string
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_deliveries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_deliveries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_signatures: {
         Row: {
           agent_id: string
@@ -264,6 +318,50 @@ export type Database = {
           },
           {
             foreignKeyName: "document_signatures_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          created_at: string
+          from_email: string | null
+          from_name: string | null
+          id: string
+          subject: string
+          template_type: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          body_html?: string
+          created_at?: string
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          subject?: string
+          template_type?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string
+          created_at?: string
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          subject?: string
+          template_type?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
