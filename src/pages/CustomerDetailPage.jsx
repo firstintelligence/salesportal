@@ -450,7 +450,7 @@ const CustomerDetailPage = () => {
             )}
             
             {/* Quick Actions - Inline on mobile */}
-            <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-6 sm:gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:grid sm:grid-cols-5 sm:gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
@@ -477,15 +477,6 @@ const CustomerDetailPage = () => {
               >
                 <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs font-medium">Loan</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="h-8 px-3 gap-1.5 bg-white hover:bg-violet-50 hover:border-violet-200 hover:text-violet-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
-                onClick={() => navigate('/payment-calculator', { state: { customer, invoiceProfile } })}
-              >
-                <Calculator className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs font-medium">Calc</span>
               </Button>
               <Button 
                 variant="outline" 
