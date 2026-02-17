@@ -61,7 +61,7 @@ const IDScanner = ({ onScanComplete, onCancel }) => {
     setMode('preview');
   };
 
-  const compressImage = (dataUrl, maxWidth = 1280) => {
+  const compressImage = (dataUrl, maxWidth = 800) => {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
@@ -76,7 +76,7 @@ const IDScanner = ({ onScanComplete, onCancel }) => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        resolve(canvas.toDataURL('image/jpeg', 0.5));
       };
       img.src = dataUrl;
     });
