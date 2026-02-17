@@ -926,7 +926,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         <div className="flex items-center gap-2">
           <button
             onClick={clearForm}
-            className="bg-red-500 text-white px-3 py-3 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center"
+            className="bg-red-500 text-white px-5 py-3 rounded-full shadow-sm hover:bg-red-600 flex items-center justify-center"
             aria-label="Clear Invoice"
           >
             <FiTrash2 size={18} />
@@ -934,7 +934,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           <button
             onClick={handleSaveToDashboard}
             disabled={isSaving}
-            className="bg-green-600 text-white px-3 py-3 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-green-600 text-white px-5 py-3 rounded-full shadow-sm hover:bg-green-700 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
             aria-label="Save Invoice"
           >
             {isSaving ? (
@@ -959,7 +959,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           <button
             type="button"
             onClick={() => setIsSignaturePadOpen(true)}
-            className="bg-primary text-white px-4 py-3 rounded-full shadow-sm hover:bg-primary/90 flex items-center gap-2"
+            className="bg-primary text-white px-6 py-3 rounded-full shadow-sm hover:bg-primary/90 flex items-center gap-2"
           >
             <Pen className="h-5 w-5" />
             <span className="text-sm font-medium">Sign</span>
