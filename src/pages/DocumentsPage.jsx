@@ -98,11 +98,7 @@ const DocumentsPage = () => {
   }, [customer?.id]);
 
   const handleBack = () => {
-    if (customer?.id) {
-      navigate(`/customer/${customer.id}`);
-    } else {
-      navigate("/landing");
-    }
+    navigate(-1);
   };
 
   const mergedInvoiceProfile = loadedItems ? {

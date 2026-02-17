@@ -151,7 +151,7 @@ const EmailTemplatesPage = () => {
       <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
