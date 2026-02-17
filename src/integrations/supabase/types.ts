@@ -453,9 +453,11 @@ export type Database = {
           created_at: string
           customer_id: string | null
           id: string
+          product_type: string | null
+          questionnaire_data: Json | null
           status: string
           submitted_at: string | null
-          tpv_request_id: string
+          tpv_request_id: string | null
           updated_at: string
         }
         Insert: {
@@ -463,9 +465,11 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          product_type?: string | null
+          questionnaire_data?: Json | null
           status?: string
           submitted_at?: string | null
-          tpv_request_id: string
+          tpv_request_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -473,9 +477,11 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          product_type?: string | null
+          questionnaire_data?: Json | null
           status?: string
           submitted_at?: string | null
-          tpv_request_id?: string
+          tpv_request_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -629,6 +635,50 @@ export type Database = {
           },
           {
             foreignKeyName: "loan_applications_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technicians: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          specialty: string | null
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          specialty?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          specialty?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technicians_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"

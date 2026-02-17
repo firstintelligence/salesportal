@@ -9,6 +9,7 @@ import {
   Activity, User
 } from "lucide-react";
 import DocumentDeliveryModal from "@/components/DocumentDeliveryModal";
+import DispatchView from "@/components/dispatch/DispatchView";
 import { formatPhoneNumber } from "@/utils/phoneFormat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -256,6 +257,10 @@ const CustomerDetailPage = () => {
     const latestTpv = tpvRequests[0];
     navigate('/installation-checklist', { state: { customer, tpvRequest: latestTpv || null } });
   };
+
+  // Check if checklist exists for dispatch
+  const latestChecklist = checklists.length > 0 ? checklists[0] : null;
+  const canDispatch = isAdmin && latestChecklist?.status === 'completed';
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -823,6 +828,14 @@ const CustomerDetailPage = () => {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Dispatch Section (Super Admin Only) */}
+        {canDispatch && (
+          <DispatchView
+            customer={customer}
+            checklistId={latestChecklist.id}
+          />
         )}
 
         {/* Delete Customer Button - at the very bottom */}
