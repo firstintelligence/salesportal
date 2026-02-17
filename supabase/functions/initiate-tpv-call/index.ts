@@ -44,6 +44,8 @@ serve(async (req) => {
       'YG23': '+10000000007', // Placeholder - update with real number
       'AR4777': '+14165944777', // Radi
       'PN2182': '+16474252182', // Phil
+      'ZD4590': '+14168564590', // Zsolt
+      'ZD7539': '+17802377539', // Zsolt
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
