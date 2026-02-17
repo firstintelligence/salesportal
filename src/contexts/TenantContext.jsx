@@ -29,6 +29,9 @@ export const TenantProvider = ({ children }) => {
   const [agentProfile, setAgentProfile] = useState(null);
   const [accessibleTenants, setAccessibleTenants] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Impersonation state - only for super admin
+  const [realAgentProfile, setRealAgentProfile] = useState(null);
+  const [isImpersonating, setIsImpersonating] = useState(false);
 
   const loadTenantData = async (agentId) => {
     try {
@@ -148,21 +151,124 @@ export const TenantProvider = ({ children }) => {
     localStorage.setItem('selectedTenantId', newTenant.id);
   };
 
+  // Login as another agent (super admin only)
+  const loginAsAgent = async (targetAgentId) => {
+    // Only allow if current real user is super admin
+    const currentReal = realAgentProfile || agentProfile;
+    if (!currentReal?.is_super_admin) return false;
+
+    try {
+      const { data: targetProfile, error } = await supabase
+        .from('agent_profiles')
+        .select('*')
+        .eq('agent_id', targetAgentId)
+        .single();
+
+      if (error || !targetProfile) return false;
+
+      // Store the real admin profile if not already impersonating
+      if (!isImpersonating) {
+        setRealAgentProfile(agentProfile);
+        localStorage.setItem('realAgentProfile', JSON.stringify(agentProfile));
+        localStorage.setItem('realAgentId', agentProfile.agent_id);
+      }
+
+      // Load target agent's tenant data
+      const { data: tenantAccess } = await supabase
+        .from('agent_tenant_access')
+        .select('tenant_id, tenants(*)')
+        .eq('agent_id', targetAgentId);
+
+      let targetTenantsList = [];
+      if (tenantAccess) {
+        targetTenantsList = tenantAccess.map(ta => ta.tenants).filter(Boolean);
+      }
+
+      let targetTenant = null;
+      if (targetTenantsList.length > 0) {
+        targetTenant = targetTenantsList[0];
+      } else if (targetProfile.tenant_id) {
+        const { data: t } = await supabase
+          .from('tenants')
+          .select('*')
+          .eq('id', targetProfile.tenant_id)
+          .single();
+        if (t) {
+          targetTenant = t;
+          targetTenantsList = [t];
+        }
+      }
+
+      setAgentProfile(targetProfile);
+      setAccessibleTenants(targetTenantsList);
+      setTenant(targetTenant);
+      setOriginalTenant(targetTenant);
+      setIsImpersonating(true);
+
+      localStorage.setItem('agentProfile', JSON.stringify(targetProfile));
+      localStorage.setItem('agentId', targetProfile.agent_id);
+      localStorage.setItem('isImpersonating', 'true');
+      localStorage.setItem('tenant', JSON.stringify(targetTenant));
+      localStorage.setItem('selectedTenantId', targetTenant?.id || '');
+      localStorage.setItem('accessibleTenants', JSON.stringify(targetTenantsList));
+      if (targetProfile.phone) {
+        localStorage.setItem('agentPhone', targetProfile.phone);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error impersonating agent:', error);
+      return false;
+    }
+  };
+
+  // Stop impersonating and return to super admin
+  const stopImpersonating = async () => {
+    const adminProfile = realAgentProfile || JSON.parse(localStorage.getItem('realAgentProfile') || 'null');
+    if (!adminProfile) return;
+
+    // Restore admin profile
+    setAgentProfile(adminProfile);
+    setRealAgentProfile(null);
+    setIsImpersonating(false);
+
+    localStorage.setItem('agentProfile', JSON.stringify(adminProfile));
+    localStorage.setItem('agentId', adminProfile.agent_id);
+    localStorage.removeItem('realAgentProfile');
+    localStorage.removeItem('realAgentId');
+    localStorage.removeItem('isImpersonating');
+    if (adminProfile.phone) {
+      localStorage.setItem('agentPhone', adminProfile.phone);
+    }
+
+    // Reload admin's tenant data
+    await loadTenantData(adminProfile.agent_id);
+  };
+
   const initializeFromStorage = () => {
     try {
       const storedProfile = localStorage.getItem('agentProfile');
       const storedOriginalTenant = localStorage.getItem('originalTenant');
       const storedAccessibleTenants = localStorage.getItem('accessibleTenants');
+      const storedRealProfile = localStorage.getItem('realAgentProfile');
+      const storedIsImpersonating = localStorage.getItem('isImpersonating') === 'true';
       
       if (storedAccessibleTenants) {
         setAccessibleTenants(JSON.parse(storedAccessibleTenants));
+      }
+
+      if (storedRealProfile) {
+        setRealAgentProfile(JSON.parse(storedRealProfile));
+        setIsImpersonating(storedIsImpersonating);
       }
       
       if (storedProfile) {
         const profile = JSON.parse(storedProfile);
         setAgentProfile(profile);
         
-        if (profile.is_super_admin) {
+        // When impersonating, use the impersonated agent's tenant
+        // When not impersonating and super admin, use super admin logic
+        if (!storedIsImpersonating && profile.is_super_admin) {
           const selectedTenantId = localStorage.getItem('selectedTenantId');
           if (selectedTenantId === SUPER_ADMIN_TENANT.id) {
             setTenant(SUPER_ADMIN_TENANT);
@@ -179,7 +285,6 @@ export const TenantProvider = ({ children }) => {
               setTenant(SUPER_ADMIN_TENANT);
             }
           } else {
-            // Default to Super Admin tenant
             setTenant(SUPER_ADMIN_TENANT);
           }
         } else {
@@ -208,11 +313,16 @@ export const TenantProvider = ({ children }) => {
     setOriginalTenant(null);
     setAgentProfile(null);
     setAccessibleTenants([]);
+    setRealAgentProfile(null);
+    setIsImpersonating(false);
     localStorage.removeItem('agentProfile');
     localStorage.removeItem('tenant');
     localStorage.removeItem('originalTenant');
     localStorage.removeItem('selectedTenantId');
     localStorage.removeItem('accessibleTenants');
+    localStorage.removeItem('realAgentProfile');
+    localStorage.removeItem('realAgentId');
+    localStorage.removeItem('isImpersonating');
   };
 
   // Helper to check if currently viewing all tenants
@@ -220,6 +330,11 @@ export const TenantProvider = ({ children }) => {
   
   // Helper to check if agent has multi-tenant access
   const hasMultiTenantAccess = accessibleTenants.length > 1;
+
+  // The real super admin status - check the real profile if impersonating
+  const isTrulySuperAdmin = isImpersonating 
+    ? (realAgentProfile?.is_super_admin || false) 
+    : (agentProfile?.is_super_admin || false);
 
   const value = {
     tenant,
@@ -230,10 +345,15 @@ export const TenantProvider = ({ children }) => {
     loadTenantData,
     switchTenant,
     clearTenantData,
-    isSuperAdmin: agentProfile?.is_super_admin || false,
+    isSuperAdmin: isTrulySuperAdmin,
     isViewingAllTenants,
     hasMultiTenantAccess,
     SUPER_ADMIN_TENANT,
+    // Impersonation
+    isImpersonating,
+    realAgentProfile,
+    loginAsAgent,
+    stopImpersonating,
   };
 
   return (
