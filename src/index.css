@@ -95,11 +95,16 @@
     text-size-adjust: 100%;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    background-color: hsl(var(--background));
   }
   
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   
   /* Prevent zoom on input focus on iOS */
