@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Phone, PhoneCall, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users, User, Send } from "lucide-react";
+import { Loader2, Plus, Phone, PhoneCall, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users, User, Send, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -121,6 +121,11 @@ const DashboardPage = () => {
             id,
             sent_at,
             status
+          ),
+          id_scans!customer_id(
+            id,
+            id_image_path,
+            created_at
           )
         `)
         .order("updated_at", { ascending: false });
@@ -593,6 +598,7 @@ const DashboardPage = () => {
                 
                 const checklistCompleted = false; // TODO: check from installation_checklists table
                 const docsSent = (customer.document_deliveries || []).some(d => d.status === 'sent');
+                const hasIdScan = (customer.id_scans || []).length > 0;
                 
                 // Document badge click handler - download file instead of opening in blocked iframe
                 const handleDocumentClick = (e, url, type) => {
@@ -720,8 +726,14 @@ const DashboardPage = () => {
                       )}
 
                       {/* Row 4: Document badges (compact) */}
-                      {(tpvRecording || loanFilled || invoiceFilled) && (
+                      {(tpvRecording || loanFilled || invoiceFilled || hasIdScan) && (
                         <div className="flex flex-wrap gap-1.5 mb-2">
+                          {hasIdScan && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-medium">
+                              <ScanLine className="w-2.5 h-2.5" />
+                              ID
+                            </span>
+                          )}
                           {tpvRecording && (
                             <button
                               onClick={(e) => handleDocumentClick(e, tpvRecording, 'TPV recording')}
