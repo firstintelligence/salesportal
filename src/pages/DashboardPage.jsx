@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Phone, PhoneCall, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users, User } from "lucide-react";
+import { Loader2, Plus, Phone, PhoneCall, MapPin, Search, FileText, ClipboardCheck, Check, Download, PlayCircle, CreditCard, Shield, Grid2X2, Users, User, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -116,6 +116,11 @@ const DashboardPage = () => {
             signature_type,
             signed_at,
             invoice_amount
+          ),
+          document_deliveries!customer_id(
+            id,
+            sent_at,
+            status
           )
         `)
         .order("updated_at", { ascending: false });
@@ -587,6 +592,7 @@ const DashboardPage = () => {
                 const invoiceSigned = invoiceFilled && !!invoiceDocument?.signature_type;
                 
                 const checklistCompleted = false; // TODO: check from installation_checklists table
+                const docsSent = (customer.document_deliveries || []).some(d => d.status === 'sent');
                 
                 // Document badge click handler - download file instead of opening in blocked iframe
                 const handleDocumentClick = (e, url, type) => {
@@ -781,6 +787,15 @@ const DashboardPage = () => {
                           icon={ClipboardCheck}
                           label={checklistCompleted ? "Checklist Complete" : "Checklist"}
                           onClick={(e) => handleActionClick(e, 'checklist', customer)}
+                        />
+                        <ActionButton 
+                          completed={docsSent}
+                          icon={Send}
+                          label={docsSent ? "Docs Sent" : "Send Docs"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/customer/${customer.id}`);
+                          }}
                         />
                       </div>
                     </CardContent>
