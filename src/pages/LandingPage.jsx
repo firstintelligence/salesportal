@@ -14,7 +14,7 @@ const PROFIT_CALC_AGENTS = ['MM231611', 'WA4929'];
 const LandingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { tenant, agentProfile, isSuperAdmin } = useTenant();
+  const { tenant, agentProfile, isSuperAdmin, isImpersonating } = useTenant();
   const agentId = localStorage.getItem('agentId');
   const isSuperAdminUser = agentId === SUPER_ADMIN_ID;
   const canSeeProfitCalc = PROFIT_CALC_AGENTS.includes(agentId);
@@ -108,9 +108,9 @@ const LandingPage = () => {
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/landing';
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className={`min-h-screen bg-slate-100 ${isImpersonating ? 'pt-9' : ''}`}>
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
+      <header className={`sticky ${isImpersonating ? 'top-9' : 'top-0'} z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo/Company - Left */}
           <div className="flex items-center gap-2">
