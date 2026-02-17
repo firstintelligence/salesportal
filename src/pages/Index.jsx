@@ -686,6 +686,9 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       return null;
     }
 
+    // Use null tenant_id when viewing all tenants (super admin mode)
+    const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
+
     const { customerId: foundCustomerId, isNew, error: customerError } = await findOrCreateCustomer(
       {
         firstName: billTo.firstName,
@@ -697,7 +700,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         province: billTo.province || 'ON',
         postalCode: billTo.postalCode,
       },
-      tenant?.id || null,
+      validTenantId,
       agentId
     );
 
@@ -735,7 +738,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
 
     const tpvData = {
       customer_id: resolvedCustomerId,
-      tenant_id: tenant?.id || null,
+      tenant_id: validTenantId,
       agent_id: agentId,
       customer_name: `${billTo.firstName} ${billTo.lastName}`,
       first_name: billTo.firstName,
