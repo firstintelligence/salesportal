@@ -553,7 +553,7 @@ const DashboardPage = () => {
                   new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
                 );
                 const latestTpv = sortedTpvRequests[0];
-                const displayAgent = agentId === "MM231611" && latestTpv ? getAgentName(latestTpv.agent_id) : null;
+                const displayAgent = agentId === "MM231611" ? getAgentName(latestTpv?.agent_id || customer.agent_id) : null;
                 const fullName = customer.first_name && customer.last_name 
                   ? `${customer.first_name} ${customer.last_name}`
                   : "Unnamed";
