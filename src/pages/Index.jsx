@@ -765,7 +765,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       .select("id")
       .eq("customer_id", resolvedCustomerId)
       .eq("status", "draft")
-      .single();
+      .maybeSingle();
 
     if (existingTpv) {
       await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
