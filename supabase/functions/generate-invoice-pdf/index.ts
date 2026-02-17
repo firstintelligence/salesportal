@@ -129,7 +129,23 @@ serve(async (req) => {
         const signature = invoiceData.signature; // Signature is at top level
         const customerName = firstName && lastName ? `${firstName} ${lastName}` : (invoiceData.billTo?.name || '');
         const companyName = tenantInfo?.name || "George's Plumbing and Heating";
-        const currentDate = formatDateFull(new Date());
+        
+        // Use invoice date from form data (already in Toronto timezone) instead of UTC new Date()
+        let currentDate: string;
+        if (invoiceData.invoice?.date) {
+          // Parse the yyyy-MM-dd date from the form and format it nicely
+          const [year, month, day] = invoiceData.invoice.date.split('-').map(Number);
+          const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+          currentDate = `${months[month - 1]} ${day}, ${year}`;
+        } else {
+          // Fallback: create date in Eastern Time
+          const nowUtc = new Date();
+          const eastern = new Date(nowUtc.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+          currentDate = formatDateFull(eastern);
+        }
         
         console.log('Customer Name:', customerName);
         console.log('Company Name:', companyName);
