@@ -61,9 +61,9 @@ const FloatingLabelInput = ({
         />
         {/* Display formatted date */}
         <div
-          className={`block px-2.5 pb-2.5 pt-4 w-full min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm text-gray-900 bg-white rounded-lg border border-gray-300 ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
+          className={`flex items-center px-2.5 w-full min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm text-gray-900 bg-white rounded-lg border border-gray-300 ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
         >
-          {formatDateDisplay(value)}
+          <span className="w-full text-center">{formatDateDisplay(value)}</span>
         </div>
         <label
           htmlFor={id}
