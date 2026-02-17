@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import FloatingLabelInput from "@/components/FloatingLabelInput";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Calendar as CalendarIcon, Pen, Save, Loader2, UserCheck, ChevronDown } from "lucide-react";
@@ -1023,53 +1024,41 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               </div>
               {/* Single continuous grid for mobile - fields flow naturally */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                <FloatingLabelInput
+                  id="firstName"
+                  name="firstName"
+                  label="First Name *"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="middleName"
+                  name="middleName"
+                  label="Middle Name"
+                  value={formData.middleName}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="lastName"
+                  name="lastName"
+                  label="Last Name *"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
                 <div>
-                  <Label htmlFor="firstName">First Name *</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="given-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="middleName">Middle Name</Label>
-                  <Input
-                    id="middleName"
-                    name="middleName"
-                    value={formData.middleName}
-                    onChange={handleInputChange}
-                    autoComplete="additional-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name *</Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                    autoComplete="family-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="birthdate">Birthdate *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-between text-left font-normal",
+                          "w-full justify-between text-left font-normal h-[48px] md:h-[40px]",
                           !formData.birthdate && "text-muted-foreground"
                         )}
                       >
                         {formData.birthdate ? (
                           parseLocalDate(formData.birthdate)?.toLocaleDateString("en-US")
                         ) : (
-                          <span>mm/dd/yyyy</span>
+                          <span className="text-gray-500">Birthdate *</span>
                         )}
                         <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                       </Button>
@@ -1090,14 +1079,13 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                   </Popover>
                 </div>
                 <div>
-                  <Label htmlFor="maritalStatus">Marital Status *</Label>
                   <Select
                     value={formData.maritalStatus}
                     onValueChange={(value) => handleSelectChange("maritalStatus", value)}
                     required
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="Marital Status *" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="single">Single</SelectItem>
@@ -1108,52 +1096,37 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="homePhone">Phone Number *</Label>
-                  <Input
-                    id="homePhone"
-                    name="homePhone"
-                    type="tel"
-                    value={formData.homePhone}
-                    onChange={handleInputChange}
-                    autoComplete="tel-national"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    autoComplete="email"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mobilePhone">Mobile Phone</Label>
-                  <Input
-                    id="mobilePhone"
-                    name="mobilePhone"
-                    type="tel"
-                    value={formData.mobilePhone}
-                    onChange={handleInputChange}
-                    autoComplete="tel-national"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="sin">SIN (Optional)</Label>
-                  <Input
-                    id="sin"
-                    name="sin"
-                    type="text"
-                    value={formData.sin}
-                    onChange={handleInputChange}
-                    maxLength={11}
-                    placeholder="XXX-XXX-XXX"
-                  />
-                </div>
+                <FloatingLabelInput
+                  id="homePhone"
+                  name="homePhone"
+                  label="Phone Number *"
+                  value={formData.homePhone}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
+                <FloatingLabelInput
+                  id="mobilePhone"
+                  name="mobilePhone"
+                  label="Mobile Phone"
+                  value={formData.mobilePhone}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="sin"
+                  name="sin"
+                  label="SIN (Optional)"
+                  value={formData.sin}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
               </div>
             </div>
 
@@ -1165,43 +1138,35 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div className="col-span-2 md:col-span-2">
-                  <Label htmlFor="address">Address *</Label>
-                  <Input
+                  <FloatingLabelInput
                     id="address"
                     name="address"
+                    label="Address *"
                     value={formData.address}
                     onChange={handleInputChange}
-                    autoComplete="off"
                   />
                 </div>
+                <FloatingLabelInput
+                  id="unitNo"
+                  name="unitNo"
+                  label="Unit No."
+                  value={formData.unitNo}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="city"
+                  name="city"
+                  label="City"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                />
                 <div>
-                  <Label htmlFor="unitNo">Unit No.</Label>
-                  <Input
-                    id="unitNo"
-                    name="unitNo"
-                    value={formData.unitNo}
-                    onChange={handleInputChange}
-                    autoComplete="address-line2"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    autoComplete="address-level2"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="province">Province</Label>
                   <Select
                     value={formData.province}
                     onValueChange={(value) => handleSelectChange("province", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select province" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="Province" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ON">ON</SelectItem>
@@ -1220,24 +1185,21 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
+                <FloatingLabelInput
+                  id="postalCode"
+                  name="postalCode"
+                  label="Postal Code"
+                  value={formData.postalCode}
+                  onChange={handleInputChange}
+                  isPostalCode={true}
+                />
                 <div>
-                  <Label htmlFor="postalCode">Postal Code</Label>
-                  <Input
-                    id="postalCode"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    autoComplete="postal-code"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="housingStatus">Housing Status</Label>
                   <Select
                     value={formData.housingStatus}
                     onValueChange={(value) => handleSelectChange("housingStatus", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="Housing Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="own">Own</SelectItem>
@@ -1246,30 +1208,27 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="yearsAtAddress">Years at Address</Label>
-                  <Input
-                    id="yearsAtAddress"
-                    name="yearsAtAddress"
+                <FloatingLabelInput
+                  id="yearsAtAddress"
+                  name="yearsAtAddress"
+                  label="Years at Address"
+                  type="number"
+                  value={formData.yearsAtAddress}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
+                <div className="relative">
+                  <FloatingLabelInput
+                    id="monthlyHousingCosts"
+                    name="monthlyHousingCosts"
+                    label="Monthly Housing $"
                     type="number"
-                    value={formData.yearsAtAddress}
+                    value={formData.monthlyHousingCosts}
                     onChange={handleInputChange}
+                    autoCapitalize={false}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="monthlyHousingCosts">Monthly Housing</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
-                    <Input
-                      id="monthlyHousingCosts"
-                      name="monthlyHousingCosts"
-                      type="number"
-                      value={formData.monthlyHousingCosts}
-                      onChange={handleInputChange}
-                      className="pl-7"
-                    />
-                  </div>
-                </div>
+              </div>
               </div>
             </div>
 
@@ -1296,13 +1255,12 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="photoIdType">ID Type</Label>
                   <Select
                     value={formData.photoIdType}
                     onValueChange={(value) => handleSelectChange("photoIdType", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select ID type" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="ID Type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="drivers_license">Driver's License</SelectItem>
@@ -1317,13 +1275,12 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="photoIdProvince">ID Province</Label>
                   <Select
                     value={formData.photoIdProvince}
                     onValueChange={(value) => handleSelectChange("photoIdProvince", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Province" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="ID Province" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ON">ON</SelectItem>
@@ -1339,30 +1296,28 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
+                <FloatingLabelInput
+                  id="photoIdNumber"
+                  name="photoIdNumber"
+                  label="ID Number"
+                  value={formData.photoIdNumber}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
                 <div>
-                  <Label htmlFor="photoIdNumber">ID Number</Label>
-                  <Input
-                    id="photoIdNumber"
-                    name="photoIdNumber"
-                    value={formData.photoIdNumber}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="photoIdExpiry">ID Expiry</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-between text-left font-normal",
+                          "w-full justify-between text-left font-normal h-[48px] md:h-[40px]",
                           !formData.photoIdExpiry && "text-muted-foreground"
                         )}
                       >
                         {formData.photoIdExpiry ? (
                           parseLocalDate(formData.photoIdExpiry)?.toLocaleDateString("en-US")
                         ) : (
-                          <span>mm/dd/yyyy</span>
+                          <span className="text-gray-500">ID Expiry</span>
                         )}
                         <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                       </Button>
@@ -1404,13 +1359,12 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
               {/* Single continuous grid for mobile */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <Label htmlFor="employmentStatus">Status</Label>
                   <Select
                     value={formData.employmentStatus}
                     onValueChange={(value) => handleSelectChange("employmentStatus", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="Employment Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="employed">Employed</SelectItem>
@@ -1422,76 +1376,59 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                     </SelectContent>
                   </Select>
                 </div>
+                <FloatingLabelInput
+                  id="businessName"
+                  name="businessName"
+                  label="Business Name"
+                  value={formData.businessName}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="positionTitle"
+                  name="positionTitle"
+                  label="Position"
+                  value={formData.positionTitle}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="grossMonthlyIncome"
+                  name="grossMonthlyIncome"
+                  label="Monthly Income $"
+                  type="number"
+                  value={formData.grossMonthlyIncome}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
+                <FloatingLabelInput
+                  id="timeAtJob"
+                  name="timeAtJob"
+                  label="Years at Job"
+                  type="number"
+                  value={formData.timeAtJob}
+                  onChange={handleInputChange}
+                  autoCapitalize={false}
+                />
+                <FloatingLabelInput
+                  id="employerAddress"
+                  name="employerAddress"
+                  label="Work Address"
+                  value={formData.employerAddress}
+                  onChange={handleInputChange}
+                />
+                <FloatingLabelInput
+                  id="employerCity"
+                  name="employerCity"
+                  label="Work City"
+                  value={formData.employerCity}
+                  onChange={handleInputChange}
+                />
                 <div>
-                  <Label htmlFor="businessName">Business Name</Label>
-                  <Input
-                    id="businessName"
-                    name="businessName"
-                    value={formData.businessName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="positionTitle">Position</Label>
-                  <Input
-                    id="positionTitle"
-                    name="positionTitle"
-                    value={formData.positionTitle}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="grossMonthlyIncome">Monthly Income</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
-                    <Input
-                      id="grossMonthlyIncome"
-                      name="grossMonthlyIncome"
-                      type="number"
-                      value={formData.grossMonthlyIncome}
-                      onChange={handleInputChange}
-                      className="pl-7"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="timeAtJob">Years at Job</Label>
-                  <Input
-                    id="timeAtJob"
-                    name="timeAtJob"
-                    type="number"
-                    value={formData.timeAtJob}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="employerAddress">Work Address</Label>
-                  <Input
-                    id="employerAddress"
-                    name="employerAddress"
-                    value={formData.employerAddress}
-                    onChange={handleInputChange}
-                    autoComplete="off"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="employerCity">Work City</Label>
-                  <Input
-                    id="employerCity"
-                    name="employerCity"
-                    value={formData.employerCity}
-                    onChange={handleInputChange}
-                    autoComplete="work address-level2"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="employerProvince">Work Province</Label>
                   <Select
                     value={formData.employerProvince}
                     onValueChange={(value) => handleSelectChange("employerProvince", value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Province" />
+                    <SelectTrigger className="h-[48px] md:h-[40px]">
+                      <SelectValue placeholder="Work Province" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ON">ON</SelectItem>
@@ -1597,20 +1534,19 @@ const LoanApplicationPage = ({ embedded = false, embeddedCustomer = null, embedd
                   )}
                 </div>
                 <div className="w-full">
-                  <Label htmlFor="signatureDate">Date (Optional)</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-between text-left font-normal",
+                          "w-full justify-between text-left font-normal h-[48px] md:h-[40px]",
                           !formData.signatureDate && "text-muted-foreground"
                         )}
                       >
                         {formData.signatureDate ? (
                           parseLocalDate(formData.signatureDate)?.toLocaleDateString("en-US")
                         ) : (
-                          <span>mm/dd/yyyy</span>
+                          <span className="text-gray-500">Date (Optional)</span>
                         )}
                         <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                       </Button>
