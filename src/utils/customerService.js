@@ -60,13 +60,22 @@ export const findOrCreateCustomer = async (customerData, tenantId, agentId) => {
       return { customerId: null, isNew: false, error: searchError };
     }
 
-    // Find a match by phone or email only (not name)
+    // Find a match by name, phone, or email
     let matchedCustomer = null;
 
     if (existingCustomers && existingCustomers.length > 0) {
       for (const customer of existingCustomers) {
+        const customerFirstName = customer.first_name?.trim().toLowerCase();
+        const customerLastName = customer.last_name?.trim().toLowerCase();
         const customerPhone = cleanPhoneNumber(customer.phone);
         const customerEmail = customer.email?.trim().toLowerCase();
+
+        // Match by exact full name (first + last)
+        const nameMatch = 
+          trimmedFirstName && 
+          trimmedLastName && 
+          customerFirstName === trimmedFirstName && 
+          customerLastName === trimmedLastName;
 
         // Match by exact phone number (digits only, must have at least 10 digits)
         const phoneMatch = 
@@ -83,9 +92,9 @@ export const findOrCreateCustomer = async (customerData, tenantId, agentId) => {
           customerEmail && 
           customerEmail === trimmedEmail;
 
-        if (phoneMatch || emailMatch) {
+        if (nameMatch || phoneMatch || emailMatch) {
           matchedCustomer = customer;
-          const matchType = phoneMatch ? 'phone' : 'email';
+          const matchType = nameMatch ? 'name' : (phoneMatch ? 'phone' : 'email');
           console.log(`Found existing customer by ${matchType}:`, customer.id);
           break;
         }
