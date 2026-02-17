@@ -14,7 +14,7 @@ const TPVAiPage = () => {
     }
   }, [navigate]);
 
-  return <TPVRequest onBack={() => navigate("/landing")} preloadedCustomer={customer} preloadedCalculatorData={calculatorData} />;
+  return <TPVRequest onBack={() => navigate(-1)} preloadedCustomer={customer} preloadedCalculatorData={calculatorData} />;
 };
 
 export default TPVAiPage;
