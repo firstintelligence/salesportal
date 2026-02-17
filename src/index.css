@@ -89,16 +89,16 @@
     @apply border-border;
   }
   
-  html {
+  html, body {
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   
   body {
     @apply bg-background text-foreground;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
   }
   
   /* Prevent zoom on input focus on iOS */
