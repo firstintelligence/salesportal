@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -103,6 +103,32 @@ const ProductListItem = memo(({
           {/* Total display - hidden on mobile, shown on md+ */}
           <div className="hidden md:flex w-24 h-10 items-center justify-end px-2 bg-slate-100 border border-slate-200 rounded-md text-sm font-semibold text-slate-700 shrink-0">
             ${parseFloat(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
+
+          {/* Reorder buttons */}
+          <div className="flex flex-col shrink-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-4 w-6 md:h-5 md:w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
+              onClick={() => onMoveUp(index)}
+              disabled={isFirst}
+              title="Move up"
+            >
+              <ArrowUp className="h-3 w-3 md:h-3.5 md:w-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-4 w-6 md:h-5 md:w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
+              onClick={() => onMoveDown(index)}
+              disabled={isLast}
+              title="Move down"
+            >
+              <ArrowDown className="h-3 w-3 md:h-3.5 md:w-3.5" />
+            </Button>
           </div>
 
           {/* Details toggle - smaller on mobile */}
