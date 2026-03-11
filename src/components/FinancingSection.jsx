@@ -69,20 +69,36 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
       </div>
       
       <div className="space-y-3">
-        {/* Finance Company, Loan Amount, Admin Fee - displayed as plain text */}
+        {/* Finance Company Selector */}
+        <div>
+          <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Finance Company</label>
+          <Select 
+            value={financing.financeCompany || 'Financeit Canada Inc.'} 
+            onValueChange={(value) => handleFinancingChange('financeCompany', value)}
+          >
+            <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+              {FINANCE_COMPANIES.map(c => (
+                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Loan Amount + Admin Fee */}
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] md:text-xs text-gray-600">Finance Company:</span>
-            <span className="text-xs md:text-sm font-semibold text-gray-900">{financing.financeCompany}</span>
-          </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[10px] md:text-xs text-gray-600">Loan Amount:</span>
             <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(financing.loanAmount || 0)}</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] md:text-xs text-gray-600">Admin Fee:</span>
-            <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}</span>
-          </div>
+          {!isUEI && (
+            <div className="flex items-baseline gap-1">
+              <span className="text-[10px] md:text-xs text-gray-600">Admin Fee:</span>
+              <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}</span>
+            </div>
+          )}
         </div>
 
         {/* Promo Term + Amortization - 2 columns */}

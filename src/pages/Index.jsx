@@ -517,20 +517,22 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // Update financing loan amount when grand total changes
   // Auto-set amortization based on loan amount: 240 months for >= $10,000, 180 months for < $10,000
   useEffect(() => {
-    const loanAmount = calculateLoanAmount(calculatedGrandTotal);
     setFinancing(prev => {
+      const isUEI = prev.financeCompany === 'UEI Financial';
+      const loanAmount = isUEI ? calculatedGrandTotal : calculateLoanAmount(calculatedGrandTotal);
       const updates = { ...prev, loanAmount };
       
-      // Auto-default amortization based on loan amount threshold
-      if (loanAmount >= 10000) {
-        // Default to 240 months for loan amounts >= $10,000
-        if (prev.amortizationPeriod !== 240) {
-          updates.amortizationPeriod = 240;
-        }
-      } else {
-        // Default to 180 months for loan amounts < $10,000
-        if (prev.amortizationPeriod !== 180) {
-          updates.amortizationPeriod = 180;
+      // Skip auto-amortization adjustment for UEI Financial (uses its own defaults)
+      if (!isUEI) {
+        // Auto-default amortization based on loan amount threshold
+        if (loanAmount >= 10000) {
+          if (prev.amortizationPeriod !== 240) {
+            updates.amortizationPeriod = 240;
+          }
+        } else {
+          if (prev.amortizationPeriod !== 180) {
+            updates.amortizationPeriod = 180;
+          }
         }
       }
       
