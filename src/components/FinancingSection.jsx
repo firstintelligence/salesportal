@@ -5,10 +5,20 @@ import { Switch } from "@/components/ui/switch";
 import { calculateMonthlyPayment } from '../utils/financingCalculations';
 import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombination } from '../utils/dealerFeeCalculations';
 
+const FINANCE_COMPANIES = [
+  { value: 'Financeit Canada Inc.', label: 'Financeit Canada Inc.' },
+  { value: 'UEI Financial', label: 'UEI Financial' },
+];
+
+const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
+const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
+
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99, 17.99, 18.99
   ];
+
+  const isUEI = financing.financeCompany === 'UEI Financial';
 
   const monthlyPayment = calculateMonthlyPayment(
     financing.loanAmount || 0, 
@@ -16,7 +26,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
     financing.amortizationPeriod || 180
   ) || 0;
 
-  const adminFee = Math.min(financing.loanAmount * 0.0149, 149);
+  const adminFee = isUEI ? 0 : Math.min(financing.loanAmount * 0.0149, 149);
 
   // Calculate dealer fee based on invoice amount (excluding admin fee)
   const dealerFee = calculateDealerFee(
@@ -29,7 +39,12 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   const availableTerms = getAvailableTermsForRate(financing.interestRate);
 
   const handleFinancingChange = (field, value) => {
-    setFinancing(prev => ({ ...prev, [field]: value }));
+    if (field === 'financeCompany') {
+      const defaults = value === 'UEI Financial' ? UEI_DEFAULTS : FINANCEIT_DEFAULTS;
+      setFinancing(prev => ({ ...prev, financeCompany: value, ...defaults }));
+    } else {
+      setFinancing(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   // Format number with commas
@@ -54,20 +69,36 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
       </div>
       
       <div className="space-y-3">
-        {/* Finance Company, Loan Amount, Admin Fee - displayed as plain text */}
+        {/* Finance Company Selector */}
+        <div>
+          <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Finance Company</label>
+          <Select 
+            value={financing.financeCompany || 'Financeit Canada Inc.'} 
+            onValueChange={(value) => handleFinancingChange('financeCompany', value)}
+          >
+            <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+              {FINANCE_COMPANIES.map(c => (
+                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Loan Amount + Admin Fee */}
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] md:text-xs text-gray-600">Finance Company:</span>
-            <span className="text-xs md:text-sm font-semibold text-gray-900">{financing.financeCompany}</span>
-          </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[10px] md:text-xs text-gray-600">Loan Amount:</span>
             <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(financing.loanAmount || 0)}</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] md:text-xs text-gray-600">Admin Fee:</span>
-            <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}</span>
-          </div>
+          {!isUEI && (
+            <div className="flex items-baseline gap-1">
+              <span className="text-[10px] md:text-xs text-gray-600">Admin Fee:</span>
+              <span className="text-xs md:text-sm font-semibold text-gray-900">${formatWithCommas(Math.min((financing.loanAmount || 0) * 0.0149, 149))}</span>
+            </div>
+          )}
         </div>
 
         {/* Promo Term + Amortization - 2 columns */}
