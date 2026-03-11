@@ -39,7 +39,12 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   const availableTerms = getAvailableTermsForRate(financing.interestRate);
 
   const handleFinancingChange = (field, value) => {
-    setFinancing(prev => ({ ...prev, [field]: value }));
+    if (field === 'financeCompany') {
+      const defaults = value === 'UEI Financial' ? UEI_DEFAULTS : FINANCEIT_DEFAULTS;
+      setFinancing(prev => ({ ...prev, financeCompany: value, ...defaults }));
+    } else {
+      setFinancing(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   // Format number with commas
