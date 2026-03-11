@@ -538,7 +538,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       
       return updates;
     });
-  }, [calculatedGrandTotal]);
+  }, [calculatedGrandTotal, financing.financeCompany]);
 
   const handleTemplateClick = (templateNumber) => {
     const formData = {
