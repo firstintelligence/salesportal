@@ -5,10 +5,20 @@ import { Switch } from "@/components/ui/switch";
 import { calculateMonthlyPayment } from '../utils/financingCalculations';
 import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombination } from '../utils/dealerFeeCalculations';
 
+const FINANCE_COMPANIES = [
+  { value: 'Financeit Canada Inc.', label: 'Financeit Canada Inc.' },
+  { value: 'UEI Financial', label: 'UEI Financial' },
+];
+
+const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
+const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
+
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99, 17.99, 18.99
   ];
+
+  const isUEI = financing.financeCompany === 'UEI Financial';
 
   const monthlyPayment = calculateMonthlyPayment(
     financing.loanAmount || 0, 
@@ -16,7 +26,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
     financing.amortizationPeriod || 180
   ) || 0;
 
-  const adminFee = Math.min(financing.loanAmount * 0.0149, 149);
+  const adminFee = isUEI ? 0 : Math.min(financing.loanAmount * 0.0149, 149);
 
   // Calculate dealer fee based on invoice amount (excluding admin fee)
   const dealerFee = calculateDealerFee(
