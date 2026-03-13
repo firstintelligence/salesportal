@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine } from "lucide-react";
+import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine, Truck } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Button } from "@/components/ui/button";
@@ -90,13 +90,22 @@ const LandingPage = () => {
     tools = [
       ...tools,
       {
+        title: "Dispatch",
+        subtitle: "Assign jobs to contractors",
+        icon: Truck,
+        path: "/dispatch-queue",
+        color: "from-indigo-500 to-indigo-600",
+        bgColor: "bg-indigo-50",
+        iconColor: "text-indigo-600",
+      },
+      {
         title: "Custom Invoice V2",
         subtitle: "Super Admin Only",
         icon: FileEdit,
         path: "/custom-invoice-v2",
-        color: "from-indigo-500 to-indigo-600",
-        bgColor: "bg-indigo-50",
-        iconColor: "text-indigo-600",
+        color: "from-violet-500 to-violet-600",
+        bgColor: "bg-violet-50",
+        iconColor: "text-violet-600",
       },
     ];
   }

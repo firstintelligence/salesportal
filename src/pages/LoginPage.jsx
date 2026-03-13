@@ -38,7 +38,12 @@ const LoginPage = () => {
           localStorage.setItem("agentPhone", profile.phone);
         }
         toast.success("Access granted");
-        navigate("/landing");
+        // Route contractors to their portal
+        if (profile.is_contractor) {
+          navigate("/contractor-portal");
+        } else {
+          navigate("/landing");
+        }
       } else {
         toast.error("Invalid Agent ID");
         setAgentId("");
