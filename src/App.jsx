@@ -28,6 +28,8 @@ import DocumentsPage from "./pages/DocumentsPage";
 import HelpPage from "./pages/HelpPage";
 import EmailTemplatesPage from "./pages/EmailTemplatesPage";
 import TechniciansPage from "./pages/TechniciansPage";
+import ContractorPortalPage from "./pages/ContractorPortalPage";
+import DispatchQueuePage from "./pages/DispatchQueuePage";
 
 const queryClient = new QueryClient();
 
