@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           first_name: string
           id: string
+          is_contractor: boolean | null
           is_super_admin: boolean | null
           last_name: string | null
           phone: string | null
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           first_name: string
           id?: string
+          is_contractor?: boolean | null
           is_super_admin?: boolean | null
           last_name?: string | null
           phone?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           created_at?: string
           first_name?: string
           id?: string
+          is_contractor?: boolean | null
           is_super_admin?: boolean | null
           last_name?: string | null
           phone?: string | null
@@ -174,6 +177,57 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dispatch_photos: {
+        Row: {
+          ai_label: string | null
+          category: string | null
+          created_at: string
+          customer_id: string
+          dispatch_id: string
+          id: string
+          photo_type: string
+          photo_url: string
+          uploaded_by: string
+        }
+        Insert: {
+          ai_label?: string | null
+          category?: string | null
+          created_at?: string
+          customer_id: string
+          dispatch_id: string
+          id?: string
+          photo_type?: string
+          photo_url: string
+          uploaded_by: string
+        }
+        Update: {
+          ai_label?: string | null
+          category?: string | null
+          created_at?: string
+          customer_id?: string
+          dispatch_id?: string
+          id?: string
+          photo_type?: string
+          photo_url?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatch_photos_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_photos_dispatch_id_fkey"
+            columns: ["dispatch_id"]
+            isOneToOne: false
+            referencedRelation: "job_dispatches"
             referencedColumns: ["id"]
           },
         ]
@@ -497,6 +551,66 @@ export type Database = {
             columns: ["tpv_request_id"]
             isOneToOne: true
             referencedRelation: "tpv_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_dispatches: {
+        Row: {
+          completed_at: string | null
+          contractor_agent_id: string
+          created_at: string
+          customer_id: string
+          dispatched_at: string | null
+          dispatched_by: string
+          id: string
+          notes: string | null
+          products: string | null
+          status: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          contractor_agent_id: string
+          created_at?: string
+          customer_id: string
+          dispatched_at?: string | null
+          dispatched_by: string
+          id?: string
+          notes?: string | null
+          products?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          contractor_agent_id?: string
+          created_at?: string
+          customer_id?: string
+          dispatched_at?: string | null
+          dispatched_by?: string
+          id?: string
+          notes?: string | null
+          products?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_dispatches_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_dispatches_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
