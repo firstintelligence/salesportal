@@ -60,22 +60,35 @@ const DispatchQueuePage = () => {
         .order("dispatched_at", { ascending: false });
       setDispatches(dispatchData || []);
 
-      // Load customers that have completed checklists (ready for dispatch)
-      const { data: checklistData } = await supabase
-        .from("installation_checklists")
-        .select("customer_id, status, customers(*)")
-        .eq("status", "completed");
-
       // Get customer IDs already dispatched
       const dispatchedCustomerIds = new Set(
         (dispatchData || []).map(d => d.customer_id)
       );
 
-      // Undispatched = checklist completed but no dispatch record
-      const undispatched = (checklistData || [])
-        .filter(c => c.customers && !dispatchedCustomerIds.has(c.customer_id))
-        .map(c => c.customers)
-        .filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
+      // Load ALL customers not yet dispatched
+      const { data: allCustomers } = await supabase
+        .from("customers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      // Load checklist statuses for all customers
+      const { data: checklistData } = await supabase
+        .from("installation_checklists")
+        .select("customer_id, status");
+
+      const checklistMap = {};
+      (checklistData || []).forEach(c => {
+        if (!checklistMap[c.customer_id] || c.status === 'completed') {
+          checklistMap[c.customer_id] = c.status;
+        }
+      });
+
+      const undispatched = (allCustomers || [])
+        .filter(c => !dispatchedCustomerIds.has(c.id))
+        .map(c => ({
+          ...c,
+          checklist_status: checklistMap[c.id] || 'not_started',
+        }));
 
       setCustomers(undispatched);
     } catch (error) {
@@ -197,7 +210,18 @@ const DispatchQueuePage = () => {
                       {formatPhoneNumber(customer.phone)}
                     </p>
                   </div>
-                  <Badge className="bg-amber-100 text-amber-800">Pending</Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className="bg-amber-100 text-amber-800">Pending</Badge>
+                    {customer.checklist_status === 'completed' ? (
+                      <Badge className="bg-emerald-100 text-emerald-800 text-[10px]">
+                        <CheckCircle className="w-3 h-3 mr-0.5" /> Checklist Done
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-orange-600 border-orange-300 text-[10px]">
+                        <Clock className="w-3 h-3 mr-0.5" /> Checklist Incomplete
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
