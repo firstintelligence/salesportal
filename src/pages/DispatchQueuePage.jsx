@@ -210,7 +210,18 @@ const DispatchQueuePage = () => {
                       {formatPhoneNumber(customer.phone)}
                     </p>
                   </div>
-                  <Badge className="bg-amber-100 text-amber-800">Pending</Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className="bg-amber-100 text-amber-800">Pending</Badge>
+                    {customer.checklist_status === 'completed' ? (
+                      <Badge className="bg-emerald-100 text-emerald-800 text-[10px]">
+                        <CheckCircle className="w-3 h-3 mr-0.5" /> Checklist Done
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-orange-600 border-orange-300 text-[10px]">
+                        <Clock className="w-3 h-3 mr-0.5" /> Checklist Incomplete
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
