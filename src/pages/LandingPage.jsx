@@ -90,13 +90,22 @@ const LandingPage = () => {
     tools = [
       ...tools,
       {
+        title: "Dispatch",
+        subtitle: "Assign jobs to contractors",
+        icon: Truck,
+        path: "/dispatch-queue",
+        color: "from-indigo-500 to-indigo-600",
+        bgColor: "bg-indigo-50",
+        iconColor: "text-indigo-600",
+      },
+      {
         title: "Custom Invoice V2",
         subtitle: "Super Admin Only",
         icon: FileEdit,
         path: "/custom-invoice-v2",
-        color: "from-indigo-500 to-indigo-600",
-        bgColor: "bg-indigo-50",
-        iconColor: "text-indigo-600",
+        color: "from-violet-500 to-violet-600",
+        bgColor: "bg-violet-50",
+        iconColor: "text-violet-600",
       },
     ];
   }
