@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine, Truck } from "lucide-react";
+import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine, Truck, MessageSquare } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,15 @@ const LandingPage = () => {
       color: "from-yellow-500 to-yellow-600",
       bgColor: "bg-yellow-50",
       iconColor: "text-yellow-600",
+    },
+    {
+      title: "Chat",
+      subtitle: "AI assistant & photos",
+      icon: MessageSquare,
+      path: "/chat",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      iconColor: "text-purple-600",
     },
     {
       title: "TPV AI",
