@@ -48,6 +48,7 @@ serve(async (req) => {
       'ZD7539': '+17802377539', // Zsolt
       'GS8773': '+15194948773', // Gabe
       'SS7326': '+14168367326', // Sean
+      'SH8662': '+18196648662', // Saleem Haqani - Reno Pros, George's, Provincial
     };
 
     if (!VALID_AGENTS[formData.agentId]) {
