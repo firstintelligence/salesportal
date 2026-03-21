@@ -31,6 +31,7 @@ import TechniciansPage from "./pages/TechniciansPage";
 import ContractorPortalPage from "./pages/ContractorPortalPage";
 import DispatchQueuePage from "./pages/DispatchQueuePage";
 import ChatPage from "./pages/ChatPage";
+import PricingPage from "./pages/PricingPage";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const AppContent = () => {
         <Route path="/contractor-portal" element={<ContractorPortalPage />} />
         <Route path="/dispatch-queue" element={<DispatchQueuePage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
       </Routes>
     </>
   );
