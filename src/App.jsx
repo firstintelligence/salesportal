@@ -71,6 +71,7 @@ const AppContent = () => {
         <Route path="/contractor-portal" element={<ContractorPortalPage />} />
         <Route path="/dispatch-queue" element={<DispatchQueuePage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
       </Routes>
     </>
   );
