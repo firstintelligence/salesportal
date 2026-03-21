@@ -68,6 +68,14 @@ const LandingPage = () => {
       iconColor: "text-purple-600",
     },
     {
+      title: "Pricing",
+      subtitle: "Products & pricing",
+      icon: BadgeDollarSign,
+      path: "/pricing",
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+    {
       title: "TPV AI",
       subtitle: "Verification calls",
       icon: Phone,
