@@ -59,6 +59,15 @@ const LandingPage = () => {
       iconColor: "text-yellow-600",
     },
     {
+      title: "Chat",
+      subtitle: "AI assistant & photos",
+      icon: MessageSquare,
+      path: "/chat",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      iconColor: "text-purple-600",
+    },
+    {
       title: "TPV AI",
       subtitle: "Verification calls",
       icon: Phone,
