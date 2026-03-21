@@ -24,24 +24,24 @@ serve(async (req) => {
     // Validate agent ID
     const VALID_AGENTS: Record<string, string> = {
       // George's agents
-      'MM23': '+19059043544',
+      'MM231611': '+19059043544', // MoMo - Super Admin
       'WK8448': '+16476258448',
       'TB0195': '+14168750195',
       'AA9097': '+16477169097',
       'HB6400': '+16473776400',
       'NH8397': '+19053248397', // Nick Henry - Reno Pros & George's
-      'CH5149': '+10000000000', // Chady - update with real number
+      'CH5149': '+10000000000', // Chady
       // Polaron agents
-      'CI11': '+10000000001', // Placeholder - update with real number
-      'LA11': '+10000000002', // Placeholder - update with real number
-      'AW11': '+10000000003', // Placeholder - update with real number
+      'CI11': '+10000000001',
+      'LA11': '+10000000002',
+      'AW11': '+10000000003',
       'MA11': '+19059043544',
-      'MW11': '+10000000005', // Placeholder - update with real number
+      'MW11': '+10000000005',
       'WLead6': '+14168398267',
       // Energy Experts agents
       'WA4929': '+16479234929',
       'AK47': '+14379875094',
-      'YG23': '+10000000007', // Placeholder - update with real number
+      'YG23': '+10000000007',
       'AR4777': '+14165944777', // Radi
       'PN2182': '+16474252182', // Phil
       'ZD4590': '+14168564590', // Zsolt
