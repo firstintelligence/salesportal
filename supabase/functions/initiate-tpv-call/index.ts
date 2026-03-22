@@ -7,6 +7,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const normalizeNorthAmericanPhone = (phoneInput: unknown) => {
+  const digitsOnly = String(phoneInput ?? '').replace(/\D/g, '');
+
+  // Accept 10-digit local format, or 11-digit format that already includes country code "1"
+  const localDigits =
+    digitsOnly.length === 11 && digitsOnly.startsWith('1')
+      ? digitsOnly.slice(1)
+      : digitsOnly;
+
+  if (localDigits.length !== 10) {
+    throw new Error('Invalid customer phone number. Please enter a valid 10-digit number.');
+  }
+
+  return {
+    localDigits,
+    e164: `+1${localDigits}`,
+  };
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -67,9 +86,8 @@ serve(async (req) => {
     const assistantId = TENANT_VAPI_ASSISTANTS[tenantSlug] || TENANT_VAPI_ASSISTANTS['georges'];
     console.log('Using VAPI assistant ID for tenant:', tenantSlug, assistantId);
 
-    // Format phone number for VAPI (add +1 country code and remove formatting)
-    const cleanPhone = formData.phoneNumber.replace(/\D/g, ''); // Remove all non-digits
-    const formattedPhone = `+1${cleanPhone}`; // Add country code
+    // Normalize customer phone to prevent invalid +11... formatting
+    const { localDigits: cleanPhone, e164: formattedPhone } = normalizeNorthAmericanPhone(formData.phoneNumber);
     console.log('Formatted phone for VAPI:', formattedPhone);
 
     // Prepare the VAPI call request with all form fields as dynamic variables
@@ -153,7 +171,7 @@ serve(async (req) => {
           const { data: existingCustomer } = await supabase
             .from('customers')
             .select('id')
-            .eq('phone', cleanPhone.length === 10 ? cleanPhone : formData.phoneNumber.replace(/\D/g, ''))
+              .eq('phone', cleanPhone)
             .eq('tenant_id', formData.tenantId)
             .maybeSingle();
           
@@ -167,7 +185,7 @@ serve(async (req) => {
               .insert({
                 first_name: formData.firstName,
                 last_name: formData.lastName,
-                phone: cleanPhone.length === 10 ? cleanPhone : formData.phoneNumber.replace(/\D/g, ''),
+                  phone: cleanPhone,
                 email: formData.email || null,
                 address: formData.address,
                 city: formData.city || null,
@@ -197,7 +215,7 @@ serve(async (req) => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             customer_name: formData.customerName, // Full name
-            customer_phone: formData.phoneNumber,
+            customer_phone: cleanPhone,
             customer_address: formData.address,
             city: formData.city,
             province: formData.province,
