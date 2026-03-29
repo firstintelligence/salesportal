@@ -113,6 +113,10 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
                 <SelectValue className="text-left" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <SelectItem value="12">12 months</SelectItem>
+                <SelectItem value="24">24 months</SelectItem>
+                <SelectItem value="36">36 months</SelectItem>
+                <SelectItem value="48">48 months</SelectItem>
                 <SelectItem value="60">60 months</SelectItem>
               </SelectContent>
             </Select>
