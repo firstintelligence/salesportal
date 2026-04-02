@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { formatPhoneNumber, formatPostalCode, capitalizeWords } from "@/utils/inputFormatting";
 import { useTenant } from "@/contexts/TenantContext";
+import { useHierarchyVisibility } from "@/hooks/useHierarchyVisibility";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
