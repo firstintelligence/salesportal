@@ -147,9 +147,13 @@ const StatsPage = () => {
       navigate("/");
       return;
     }
+    // Check URL param for viewing specific agent's stats
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewAgent = urlParams.get("agent");
+    
     setAgentId(storedAgentId);
-    setSelectedAgent("all");
-    fetchTenantAgents(storedAgentId);
+    setSelectedAgent(viewAgent || "all");
+    fetchTenantAgents(storedAgentId, viewAgent);
   }, [navigate]);
 
   const fetchTenantAgents = async (currentAgentId) => {
