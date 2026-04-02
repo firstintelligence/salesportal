@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { formatPhoneNumber, formatPostalCode, capitalizeWords } from "@/utils/inputFormatting";
 import { useTenant } from "@/contexts/TenantContext";
+import { useHierarchyVisibility } from "@/hooks/useHierarchyVisibility";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -94,6 +95,19 @@ const DashboardPage = () => {
       
       const isAdmin = adminCheck === true;
       
+      // Get hierarchy subordinates for non-admin agents
+      let hierarchyAgentIds = null;
+      if (!isAdmin) {
+        const { data: subordinates } = await supabase.rpc("get_subordinates", {
+          root_agent_id: currentAgentId,
+        });
+        hierarchyAgentIds = [currentAgentId, ...(subordinates || []).map((r) => r.agent_id)];
+      }
+
+      // Check for URL param to filter by specific agent
+      const urlParams = new URLSearchParams(window.location.search);
+      const filterAgent = urlParams.get("agent");
+      
       // Build query
       let query = supabase
         .from("customers")
@@ -136,9 +150,13 @@ const DashboardPage = () => {
         query = query.eq("tenant_id", tenantId);
       }
 
-      // Only filter by agent_id if NOT a super admin
-      if (!isAdmin) {
-        query = query.eq("agent_id", currentAgentId);
+      // Apply agent filtering
+      if (filterAgent && (isAdmin || (hierarchyAgentIds && hierarchyAgentIds.includes(filterAgent)))) {
+        // Filtering by a specific agent from URL param (if allowed)
+        query = query.eq("agent_id", filterAgent);
+      } else if (!isAdmin && hierarchyAgentIds) {
+        // Non-admin: show self + subordinates via hierarchy
+        query = query.in("agent_id", hierarchyAgentIds);
       }
 
       const { data, error } = await query;

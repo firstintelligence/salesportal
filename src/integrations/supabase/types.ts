@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_hierarchy: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          parent_agent_id: string | null
+          position_title: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          parent_agent_id?: string | null
+          position_title?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          parent_agent_id?: string | null
+          position_title?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agent_profiles: {
         Row: {
           agent_id: string
@@ -946,6 +976,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_subordinates: {
+        Args: { root_agent_id: string }
+        Returns: {
+          agent_id: string
+          depth: number
+        }[]
+      }
       is_admin_agent: { Args: { agent_id: string }; Returns: boolean }
     }
     Enums: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTenant, SUPER_ADMIN_TENANT } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Building2, LogOut, ChevronDown, Check, Trophy, UserCircle2, UserCog, ArrowLeftRight, Search, HelpCircle } from 'lucide-react';
+import { Building2, LogOut, ChevronDown, Check, Trophy, UserCircle2, UserCog, ArrowLeftRight, Search, HelpCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -270,6 +270,12 @@ const ProfileDropdown = () => {
             </>
           )}
           
+          {/* Users/Team Hierarchy */}
+          <DropdownMenuItem onClick={() => navigate('/users')} className="text-slate-700 cursor-pointer">
+            <Users className="w-4 h-4 mr-2 text-emerald-500" />
+            Team Hierarchy
+          </DropdownMenuItem>
+
           {/* Stats Link */}
           <DropdownMenuItem onClick={() => navigate('/stats')} className="text-slate-700 cursor-pointer">
             <Trophy className="w-4 h-4 mr-2 text-amber-500" />

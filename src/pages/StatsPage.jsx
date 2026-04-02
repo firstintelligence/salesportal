@@ -147,12 +147,16 @@ const StatsPage = () => {
       navigate("/");
       return;
     }
+    // Check URL param for viewing specific agent's stats
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewAgent = urlParams.get("agent");
+    
     setAgentId(storedAgentId);
-    setSelectedAgent("all");
-    fetchTenantAgents(storedAgentId);
+    setSelectedAgent(viewAgent || "all");
+    fetchTenantAgents(storedAgentId, viewAgent);
   }, [navigate]);
 
-  const fetchTenantAgents = async (currentAgentId) => {
+  const fetchTenantAgents = async (currentAgentId, viewAgent = null) => {
     try {
       setLoading(true);
       
@@ -169,17 +173,32 @@ const StatsPage = () => {
         return;
       }
       
+      // Check if super admin
+      const { data: adminCheck } = await supabase.rpc('is_admin_agent', { agent_id: currentAgentId });
+      const isAdmin = adminCheck === true;
+      
       // Get all agents from the same tenant
-      const { data: agents, error: agentsError } = await supabase
+      const { data: allAgents, error: agentsError } = await supabase
         .from("agent_profiles")
         .select("*")
         .eq("tenant_id", currentAgent.tenant_id);
       
       if (agentsError) throw agentsError;
       
-      const agentIds = agents.map(a => a.agent_id);
+      let visibleAgents = allAgents;
+      
+      // If not super admin, filter by hierarchy
+      if (!isAdmin) {
+        const { data: subordinates } = await supabase.rpc("get_subordinates", {
+          root_agent_id: currentAgentId,
+        });
+        const visibleIds = new Set([currentAgentId, ...(subordinates || []).map(s => s.agent_id)]);
+        visibleAgents = allAgents.filter(a => visibleIds.has(a.agent_id));
+      }
+      
+      const agentIds = visibleAgents.map(a => a.agent_id);
       const names = {};
-      agents.forEach(a => {
+      visibleAgents.forEach(a => {
         names[a.agent_id] = a.first_name;
       });
       
