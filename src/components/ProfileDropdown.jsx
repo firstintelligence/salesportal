@@ -270,6 +270,12 @@ const ProfileDropdown = () => {
             </>
           )}
           
+          {/* Users/Team Hierarchy */}
+          <DropdownMenuItem onClick={() => navigate('/users')} className="text-slate-700 cursor-pointer">
+            <Users className="w-4 h-4 mr-2 text-emerald-500" />
+            Team Hierarchy
+          </DropdownMenuItem>
+
           {/* Stats Link */}
           <DropdownMenuItem onClick={() => navigate('/stats')} className="text-slate-700 cursor-pointer">
             <Trophy className="w-4 h-4 mr-2 text-amber-500" />
