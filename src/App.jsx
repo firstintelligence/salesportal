@@ -32,6 +32,7 @@ import ContractorPortalPage from "./pages/ContractorPortalPage";
 import DispatchQueuePage from "./pages/DispatchQueuePage";
 import ChatPage from "./pages/ChatPage";
 import PricingPage from "./pages/PricingPage";
+import UsersPage from "./pages/UsersPage";
 
 const queryClient = new QueryClient();
 
