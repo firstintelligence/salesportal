@@ -30,7 +30,7 @@ export const getTenantLogo = (tenantSlug) => {
 // Some tenants use a different logo for documents than for the CRM
 export const getTenantDocumentLogo = (tenantSlug) => {
   const documentLogos = {
-    'renopros': mtebyLogo, // MTEBY logo for documents
+    'renopros': renoProsLogo, // Reno Pros logo for documents
   };
   
   // Return document-specific logo if exists, otherwise fall back to regular logo
