@@ -38,10 +38,8 @@ const UsersPage = () => {
   const [editingAgent, setEditingAgent] = useState(null);
   const currentAgentId = localStorage.getItem("agentId");
 
-  const RESTRICTED_AGENTS = ['SF8235', 'MS8487'];
-
   useEffect(() => {
-    if (!localStorage.getItem("authenticated") || RESTRICTED_AGENTS.includes(currentAgentId)) {
+    if (!localStorage.getItem("authenticated") || !isSuperAdmin) {
       navigate("/landing");
       return;
     }
