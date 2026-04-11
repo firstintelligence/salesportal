@@ -270,8 +270,8 @@ const ProfileDropdown = () => {
             </>
           )}
           
-          {/* Users/Team Hierarchy - hidden for restricted agents */}
-          {!['SF8235', 'MS8487'].includes(localStorage.getItem('agentId')) && (
+          {/* Users/Team Hierarchy - super admin only */}
+          {isSuperAdmin && (
             <DropdownMenuItem onClick={() => navigate('/users')} className="text-slate-700 cursor-pointer">
               <Users className="w-4 h-4 mr-2 text-emerald-500" />
               Team Hierarchy
