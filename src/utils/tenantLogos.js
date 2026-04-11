@@ -104,7 +104,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       address: "1201-1200 Bay Street, Toronto, ON M4W 1J2",
       phone: "1-888-885-RENO (7366)",
       email: "customercare@mteby.com",
-      invoicePrefix: "MT"
+      invoicePrefix: "RP"
     },
     'provincial': {
       name: "Provincial Energy Group",
