@@ -195,8 +195,8 @@ const ProfileDropdown = () => {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           
-          {/* Tenant Switcher - hide when impersonating */}
-          {showTenantSwitcher && !isImpersonating && (
+          {/* Tenant Switcher */}
+          {showTenantSwitcher && (
             <>
               {isMobile ? (
                 <Collapsible open={tenantExpanded} onOpenChange={setTenantExpanded}>
