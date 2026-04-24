@@ -306,6 +306,14 @@ export const TenantProvider = ({ children }) => {
 
   useEffect(() => {
     initializeFromStorage();
+    // Refresh accessible tenants from DB in the background so newly granted
+    // tenant access shows up without requiring the user to log out and back in.
+    const storedAgentId = localStorage.getItem('agentId');
+    if (storedAgentId) {
+      loadTenantData(storedAgentId).catch((err) =>
+        console.error('Background tenant refresh failed:', err)
+      );
+    }
   }, []);
 
   const clearTenantData = () => {
