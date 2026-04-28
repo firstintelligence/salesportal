@@ -22,6 +22,7 @@ export const getTenantLogo = (tenantSlug) => {
     'energyexperts': energyExpertsLogo,
     'renopros': renoProsLogo,
     'provincial': provincialEnergyGroupLogo,
+    'kmc': kmcLogo,
   };
   
   return logos[tenantSlug] || null;
