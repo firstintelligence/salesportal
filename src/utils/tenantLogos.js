@@ -116,6 +116,13 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@provincialenergygroup.com",
       invoicePrefix: "PROV"
     },
+    'kmc': {
+      name: "KMC Heating and Cooling Services",
+      address: "123 Main Street, Brantford, ON M1M 1M1",
+      phone: "(365) 998-8125",
+      email: "info@kmcheatingandcooling.ca",
+      invoicePrefix: "KMC"
+    },
   };
   
   return companies[tenantSlug] || companies['georges'];
