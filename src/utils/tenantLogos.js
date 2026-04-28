@@ -8,6 +8,7 @@ const energyExpertsLogo = '/assets/energy-experts-logo.svg';
 const renoProsLogo = '/assets/reno-pros-logo.svg';
 const mtebyLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
+const kmcLogo = '/assets/kmc-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
