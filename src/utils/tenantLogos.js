@@ -167,6 +167,10 @@ export const getTenantColors = (tenantSlug) => {
       primary: 'hsl(199, 98%, 37%)',
       secondary: 'hsl(199, 98%, 27%)',
     },
+    'kmc': {
+      primary: 'hsl(217, 91%, 40%)',
+      secondary: 'hsl(0, 84%, 50%)',
+    },
   };
   
   return colors[tenantSlug] || colors['georges'];
