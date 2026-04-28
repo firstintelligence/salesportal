@@ -8,6 +8,7 @@ const energyExpertsLogo = '/assets/energy-experts-logo.svg';
 const renoProsLogo = '/assets/reno-pros-logo.svg';
 const mtebyLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
+const kmcLogo = '/assets/kmc-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
@@ -21,6 +22,7 @@ export const getTenantLogo = (tenantSlug) => {
     'energyexperts': energyExpertsLogo,
     'renopros': renoProsLogo,
     'provincial': provincialEnergyGroupLogo,
+    'kmc': kmcLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -45,6 +47,7 @@ export const getDefaultLogos = () => ({
   energyexperts: energyExpertsLogo,
   renopros: renoProsLogo,
   provincial: provincialEnergyGroupLogo,
+  kmc: kmcLogo,
 });
 
 // Tenant company info
@@ -113,6 +116,13 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@provincialenergygroup.com",
       invoicePrefix: "PROV"
     },
+    'kmc': {
+      name: "KMC Heating and Cooling Services",
+      address: "123 Main Street, Brantford, ON M1M 1M1",
+      phone: "(365) 998-8125",
+      email: "info@kmcheatingandcooling.ca",
+      invoicePrefix: "KMC"
+    },
   };
   
   return companies[tenantSlug] || companies['georges'];
@@ -156,6 +166,10 @@ export const getTenantColors = (tenantSlug) => {
     'provincial': {
       primary: 'hsl(199, 98%, 37%)',
       secondary: 'hsl(199, 98%, 27%)',
+    },
+    'kmc': {
+      primary: 'hsl(217, 91%, 40%)',
+      secondary: 'hsl(0, 84%, 50%)',
     },
   };
   
