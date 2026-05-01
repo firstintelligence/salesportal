@@ -171,11 +171,11 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                   {isInvoice ? 'Invoice' : 'Quote'} From
                 </h3>
                 <p className="text-sm">
-                  <strong>{yourCompany.name || "George's Plumbing and Heating"}</strong>
+                  <strong>{yourCompany.name || ""}</strong>
                 </p>
-                <p className="text-xs">
-                  {yourCompany.address 
-                    ? (() => {
+                {yourCompany.address && (
+                  <p className="text-xs">
+                    {(() => {
                         const address = yourCompany.address;
                         // If address already has commas, use as is
                         if (address.includes(',')) {
@@ -207,12 +207,11 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                         }
                         
                         return address;
-                      })()
-                    : "14 Rathmine Street, London, ON N5Z 1Z3"
-                  }
-                </p>
-                <p className="text-xs">{yourCompany.phone || "(519) 851-2704"}</p>
-                <p className="text-xs">{yourCompany.email || "info@georgesplumbingandheating.ca"}</p>
+                    })()}
+                  </p>
+                )}
+                {yourCompany.phone && <p className="text-xs">{yourCompany.phone}</p>}
+                {yourCompany.email && <p className="text-xs">{yourCompany.email}</p>}
               </div>
             </div>
 

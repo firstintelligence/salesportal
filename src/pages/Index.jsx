@@ -586,7 +586,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     });
     setYourCompany({
       name: tenantCompanyInfo?.name || "Your Company",
-      address: tenantCompanyInfo?.address || "789 Oak St, Businessville, USA",
+      address: tenantCompanyInfo?.address ?? "",
       phone: tenantCompanyInfo?.phone || "(555) 555-5555",
       email: tenantCompanyInfo?.email || "",
       logo: tenantLogo,
