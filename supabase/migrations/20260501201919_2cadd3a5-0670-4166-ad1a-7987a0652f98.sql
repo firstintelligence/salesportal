@@ -1,0 +1,1 @@
+UPDATE public.tenants SET address = NULL WHERE slug = 'kmc';
