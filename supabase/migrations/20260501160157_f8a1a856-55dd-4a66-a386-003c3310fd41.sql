@@ -1,0 +1,1 @@
+UPDATE public.tenants SET name='KMC Heating and Cooling Services Inc.' WHERE id='d967f6ef-09f1-4af3-9071-13a5de9b0ecf';
