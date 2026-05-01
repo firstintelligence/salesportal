@@ -117,7 +117,7 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       invoicePrefix: "PROV"
     },
     'kmc': {
-      name: "KMC Heating and Cooling Services",
+      name: "KMC Heating and Cooling Services Inc.",
       address: "",
       phone: "(365) 998-8125",
       email: "info@kmcheatingandcooling.ca",
