@@ -102,7 +102,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // Track customer ID for document signature linking
   const [customerId, setCustomerId] = useState(preloadedCustomer?.id || null);
   const navigate = useNavigate();
-  const { tenant, loading: tenantLoading } = useTenant();
+  const { tenant, loading: tenantLoading, isSuperAdmin } = useTenant();
   
   // Track whether we've already loaded initial form data to avoid overwriting user input
   const hasLoadedInitialData = useRef(false);
