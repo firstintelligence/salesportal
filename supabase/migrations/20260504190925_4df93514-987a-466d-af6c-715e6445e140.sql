@@ -1,0 +1,2 @@
+ALTER TABLE public.tpv_requests DROP CONSTRAINT IF EXISTS tpv_requests_customer_id_fkey;
+ALTER TABLE public.tpv_requests ADD CONSTRAINT tpv_requests_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id) ON DELETE CASCADE;
