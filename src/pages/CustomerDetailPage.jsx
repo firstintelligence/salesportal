@@ -510,15 +510,17 @@ const CustomerDetailPage = () => {
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs font-medium">Invoice</span>
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="h-8 px-3 gap-1.5 bg-white hover:bg-cyan-50 hover:border-cyan-200 hover:text-cyan-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
-                onClick={navigateToTpv}
-              >
-                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs font-medium">TPV</span>
-              </Button>
+              {isSuperAdmin && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 bg-white hover:bg-cyan-50 hover:border-cyan-200 hover:text-cyan-600 transition-colors sm:flex-col sm:h-auto sm:py-3"
+                  onClick={navigateToTpv}
+                >
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs font-medium">TPV</span>
+                </Button>
+              )}
               <Button 
                 variant="outline" 
                 size="sm"
