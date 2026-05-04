@@ -1317,16 +1317,18 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               </Button>
             </div>
             <div className="flex gap-2">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={handleRequestTPV}
-                disabled={isSaving}
-                className="flex-1"
-              >
-                {isSaving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Phone className="mr-1.5 h-4 w-4" />}
-                Request TPV
-              </Button>
+              {isSuperAdmin && (
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRequestTPV}
+                  disabled={isSaving}
+                  className="flex-1"
+                >
+                  {isSaving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Phone className="mr-1.5 h-4 w-4" />}
+                  Request TPV
+                </Button>
+              )}
               <Button 
                 variant="outline"
                 size="sm"
