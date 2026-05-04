@@ -792,12 +792,14 @@ const DashboardPage = () => {
 
                       {/* Row 5: Action Buttons */}
                       <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <ActionButton 
-                          completed={tpvCompleted}
-                          icon={PhoneCall}
-                          label={tpvCompleted ? "TPV Complete" : "Start TPV"}
-                          onClick={(e) => handleActionClick(e, 'tpv', customer)}
-                        />
+                        {isSuperAdmin && (
+                          <ActionButton 
+                            completed={tpvCompleted}
+                            icon={PhoneCall}
+                            label={tpvCompleted ? "TPV Complete" : "Start TPV"}
+                            onClick={(e) => handleActionClick(e, 'tpv', customer)}
+                          />
+                        )}
                         <ActionButton 
                           completed={loanSigned}
                           inProgress={loanFilled && !loanSigned}
