@@ -9,6 +9,7 @@ const renoProsLogo = '/assets/reno-pros-logo.svg';
 const mtebyLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 const kmcLogo = '/assets/kmc-logo.png';
+const siaLogo = '/assets/sia-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
@@ -23,6 +24,7 @@ export const getTenantLogo = (tenantSlug) => {
     'renopros': renoProsLogo,
     'provincial': provincialEnergyGroupLogo,
     'kmc': kmcLogo,
+    'sia': siaLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -48,6 +50,7 @@ export const getDefaultLogos = () => ({
   renopros: renoProsLogo,
   provincial: provincialEnergyGroupLogo,
   kmc: kmcLogo,
+  sia: siaLogo,
 });
 
 // Tenant company info
@@ -123,6 +126,13 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@kmcheatingandcooling.ca",
       invoicePrefix: "KMC"
     },
+    'sia': {
+      name: "SIA Heating and Cooling",
+      address: "102 Oak Ave, Richmond Hill, ON L4C 6R7",
+      phone: "(647) 482-3654",
+      email: "",
+      invoicePrefix: "SIA"
+    },
   };
   
   return companies[tenantSlug] || companies['georges'];
@@ -170,6 +180,10 @@ export const getTenantColors = (tenantSlug) => {
     'kmc': {
       primary: 'hsl(217, 91%, 40%)',
       secondary: 'hsl(0, 84%, 50%)',
+    },
+    'sia': {
+      primary: 'hsl(199, 89%, 55%)',
+      secondary: 'hsl(0, 84%, 55%)',
     },
   };
   
