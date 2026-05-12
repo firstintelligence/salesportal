@@ -8,10 +8,12 @@ import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombinatio
 const FINANCE_COMPANIES = [
   { value: 'Financeit Canada Inc.', label: 'Financeit Canada Inc.' },
   { value: 'UEI Financial', label: 'UEI Financial' },
+  { value: 'Abode Financial', label: 'Abode Financial' },
 ];
 
 const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
 const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
+const ABODE_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.95 };
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
   const interestRates = [
