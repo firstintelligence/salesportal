@@ -181,6 +181,10 @@ export const getTenantColors = (tenantSlug) => {
       primary: 'hsl(217, 91%, 40%)',
       secondary: 'hsl(0, 84%, 50%)',
     },
+    'sia': {
+      primary: 'hsl(199, 89%, 55%)',
+      secondary: 'hsl(0, 84%, 55%)',
+    },
   };
   
   return colors[tenantSlug] || colors['georges'];
