@@ -16,9 +16,13 @@ const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
 const ABODE_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.95 };
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
-  const interestRates = [
+  const allInterestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99, 17.99, 18.99
   ];
+
+  const abodeInterestRates = [8.95, 10.95, 12.95];
+
+  const interestRates = financing.financeCompany === 'Abode Financial' ? abodeInterestRates : allInterestRates;
 
   const isUEI = financing.financeCompany === 'UEI Financial';
 
