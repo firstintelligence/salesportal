@@ -8,15 +8,21 @@ import { calculateDealerFee, getAvailableTermsForRate, isValidRateTermCombinatio
 const FINANCE_COMPANIES = [
   { value: 'Financeit Canada Inc.', label: 'Financeit Canada Inc.' },
   { value: 'UEI Financial', label: 'UEI Financial' },
+  { value: 'Abode Financial', label: 'Abode Financial' },
 ];
 
 const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
 const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
+const ABODE_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.95 };
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
-  const interestRates = [
+  const allInterestRates = [
     0, 2.99, 3.99, 4.99, 5.99, 6.99, 7.99, 8.99, 9.99, 10.99, 11.99, 12.99, 13.99, 16.99, 17.99, 18.99
   ];
+
+  const abodeInterestRates = [8.95, 10.95, 12.95];
+
+  const interestRates = financing.financeCompany === 'Abode Financial' ? abodeInterestRates : allInterestRates;
 
   const isUEI = financing.financeCompany === 'UEI Financial';
 
@@ -40,7 +46,14 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
   const handleFinancingChange = (field, value) => {
     if (field === 'financeCompany') {
-      const defaults = value === 'UEI Financial' ? UEI_DEFAULTS : FINANCEIT_DEFAULTS;
+      let defaults;
+      if (value === 'UEI Financial') {
+        defaults = UEI_DEFAULTS;
+      } else if (value === 'Abode Financial') {
+        defaults = ABODE_DEFAULTS;
+      } else {
+        defaults = FINANCEIT_DEFAULTS;
+      }
       setFinancing(prev => ({ ...prev, financeCompany: value, ...defaults }));
     } else {
       setFinancing(prev => ({ ...prev, [field]: value }));
