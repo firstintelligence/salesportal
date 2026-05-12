@@ -46,7 +46,14 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
 
   const handleFinancingChange = (field, value) => {
     if (field === 'financeCompany') {
-      const defaults = value === 'UEI Financial' ? UEI_DEFAULTS : FINANCEIT_DEFAULTS;
+      let defaults;
+      if (value === 'UEI Financial') {
+        defaults = UEI_DEFAULTS;
+      } else if (value === 'Abode Financial') {
+        defaults = ABODE_DEFAULTS;
+      } else {
+        defaults = FINANCEIT_DEFAULTS;
+      }
       setFinancing(prev => ({ ...prev, financeCompany: value, ...defaults }));
     } else {
       setFinancing(prev => ({ ...prev, [field]: value }));
