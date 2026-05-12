@@ -126,6 +126,13 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "info@kmcheatingandcooling.ca",
       invoicePrefix: "KMC"
     },
+    'sia': {
+      name: "SIA Heating and Cooling",
+      address: "102 Oak Ave, Richmond Hill, ON L4C 6R7",
+      phone: "(647) 482-3654",
+      email: "",
+      invoicePrefix: "SIA"
+    },
   };
   
   return companies[tenantSlug] || companies['georges'];
