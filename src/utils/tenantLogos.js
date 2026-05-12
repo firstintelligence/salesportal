@@ -50,6 +50,7 @@ export const getDefaultLogos = () => ({
   renopros: renoProsLogo,
   provincial: provincialEnergyGroupLogo,
   kmc: kmcLogo,
+  sia: siaLogo,
 });
 
 // Tenant company info
