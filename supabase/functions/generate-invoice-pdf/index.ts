@@ -62,6 +62,12 @@ serve(async (req) => {
           left: '0.25in',
         },
         use_print: true,
+        // PDFShift's Chromium does NOT have Helvetica installed. The HTML embeds
+        // a Helvetica Neue web font via <link>, so we must wait for network idle
+        // before rendering, otherwise the font won't be loaded in time and the
+        // PDF falls back to DejaVu/Liberation Sans.
+        wait_for: 'networkidle0',
+        delay: 800,
       }),
     });
 
