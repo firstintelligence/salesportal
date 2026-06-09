@@ -439,34 +439,41 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           grandTotal
         };
 
-        const { data: latest, error: latestError } = await supabase
-          .from("tpv_requests")
-          .select("id")
-          .eq("customer_id", customerId)
-          .eq("status", "draft")
-          .order("updated_at", { ascending: false })
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const agentId = localStorage.getItem("agentId");
+        if (!agentId) return;
 
-        if (latestError) throw latestError;
-
-        if (!latest?.id) return; // No existing record to update; explicit save will create one
-
-        const { error: updateError } = await supabase
-          .from("tpv_requests")
-          .update({
-            items_json: fullProductConfiguration,
+        const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
+        const { error: saveError } = await supabase.rpc("save_invoice_draft", {
+          p_customer_id: customerId,
+          p_tenant_id: validTenantId,
+          p_agent_id: agentId,
+          p_tpv_data: {
+            customer_name: `${billTo.firstName} ${billTo.lastName}`,
+            first_name: billTo.firstName,
+            last_name: billTo.lastName,
+            customer_phone: billTo.phone,
+            customer_address: billTo.address,
+            city: billTo.city || null,
+            province: billTo.province || 'ON',
+            postal_code: billTo.postalCode || null,
+            email: billTo.email || null,
             products: getSimplifiedProductList(items),
             sales_price: grandTotal.toString(),
             interest_rate: financing.interestRate?.toString() || null,
             promotional_term: financing.loanTerm?.toString() || null,
             amortization: financing.amortizationPeriod?.toString() || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", latest.id);
+            monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
+              financing.loanAmount,
+              financing.interestRate || 0,
+              financing.amortizationPeriod,
+              financing.financeCompany
+            ).toString() : null,
+            status: 'draft',
+            items_json: fullProductConfiguration,
+          },
+        });
 
-        if (updateError) throw updateError;
+        if (saveError) throw saveError;
       } catch (err) {
         console.error("Invoice autosave failed:", err);
       }
@@ -475,7 +482,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [customerId, items, financing, rebatesIncentives, subTotal, taxAmount, taxPercentage, grandTotal]);
+  }, [customerId, billTo, items, financing, rebatesIncentives, subTotal, taxAmount, taxPercentage, grandTotal, tenant?.id, tenant?.isAllTenants]);
 
   // No longer persist form data to localStorage - each session starts fresh
   // Data is only saved when navigating to specific tools via state props
