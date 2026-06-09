@@ -110,12 +110,15 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         'page-break-inside', 'break-inside', 'white-space'
       ];
 
-      // NOTE: PDFShift's headless Chromium does NOT have Helvetica installed.
-      // Without an embedded web font, "font-family: Helvetica" silently falls back
-      // to the system default sans-serif (e.g. DejaVu Sans), so the downloaded PDF
-      // doesn't match the in-app preview. We embed a Helvetica Neue web font via
-      // @font-face so the PDF renderer has an actual Helvetica face to use.
-      const HELVETICA_STACK = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+      // PDFShift's headless Chromium does NOT have Helvetica installed.
+      // We previously embedded "Helvetica Neue" from cdnfonts, but that font ships
+      // WITHOUT a proper ToUnicode CMap — once PDFShift embeds it, the PDF's text
+      // cannot be selected or copied (glyphs don't map back to characters).
+      //
+      // Fix: use Google Fonts "Arimo", which is metric-compatible with Helvetica/Arial
+      // (visually indistinguishable) AND ships with proper Unicode mapping, so text
+      // in the generated PDF remains selectable.
+      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", Arimo, Arial, sans-serif';
 
       const inlineEssentialStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
@@ -128,27 +131,22 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
           }
         });
 
-        // Always force Helvetica, overriding any computed/inherited font (Tailwind's ui-sans-serif stack)
+        // Always force Helvetica stack, overriding any computed/inherited font
         styleString += `font-family:${HELVETICA_STACK} !important;`;
 
         const existingStyle = element.getAttribute('style') || '';
-        // Strip any pre-existing font-family declarations from inline style to avoid conflicts
         const cleanedExisting = existingStyle.replace(/font-family\s*:[^;]+;?/gi, '');
         element.setAttribute('style', cleanedExisting + styleString);
         
         Array.from(element.children).forEach(child => inlineEssentialStyles(child));
       };
       
-      // Inline styles on every rendered root (React.Fragment can yield multiple)
       Array.from(pdfContainer.children).forEach(child => inlineEssentialStyles(child));
 
-      // Embed a real Helvetica Neue web font so PDFShift's Chromium has the glyphs.
-      // cdnfonts hosts a freely-loadable Helvetica Neue family. We also keep the
-      // hard !important font-family override so every element resolves to it.
-      const fontFaceCss = `
-        @import url('https://fonts.cdnfonts.com/css/helvetica-neue-9');
-      `;
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-neue-9"><style>${fontFaceCss}@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}body *{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
+      // Load Arimo (Helvetica-compatible, properly Unicode-mapped) from Google Fonts.
+      // Google Fonts serves WOFF2 with full ToUnicode CMaps, so text in the PDF
+      // remains selectable/copyable.
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap"><style>@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:Helvetica,"Helvetica Neue",Arimo,Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:Helvetica,"Helvetica Neue",Arimo,Arial,sans-serif !important;}body *{font-family:Helvetica,"Helvetica Neue",Arimo,Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
       
       // Cleanup DOM
       root.unmount();
