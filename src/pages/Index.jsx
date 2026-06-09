@@ -860,40 +860,16 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       updated_at: new Date().toISOString()
     };
 
-    const { data: existingTpv, error: existingTpvError } = await supabase
-      .from("tpv_requests")
-      .select("id")
-      .eq("customer_id", resolvedCustomerId)
-      .eq("status", "draft")
-      .order("updated_at", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const { error: saveDraftError } = await supabase.rpc("save_invoice_draft", {
+      p_customer_id: resolvedCustomerId,
+      p_tenant_id: validTenantId,
+      p_agent_id: agentId,
+      p_tpv_data: tpvData,
+    });
 
-    if (existingTpvError) {
-      console.error("Error finding draft invoice record:", existingTpvError);
-      throw existingTpvError;
-    }
-
-    if (existingTpv) {
-      const { error: updateError } = await supabase
-        .from("tpv_requests")
-        .update(tpvData)
-        .eq("id", existingTpv.id);
-
-      if (updateError) {
-        console.error("Error updating invoice products:", updateError);
-        throw updateError;
-      }
-    } else {
-      const { error: insertError } = await supabase
-        .from("tpv_requests")
-        .insert(tpvData);
-
-      if (insertError) {
-        console.error("Error saving invoice products:", insertError);
-        throw insertError;
-      }
+    if (saveDraftError) {
+      console.error("Error saving invoice products:", saveDraftError);
+      throw saveDraftError;
     }
 
     const invoiceProfile = {
