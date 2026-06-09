@@ -97,19 +97,21 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
 
       await convertImagesToBase64(pdfContainer);
       
-      // Inline only essential visual styles
+      // Inline only essential visual styles (font-family handled separately to force Helvetica)
       const essentialProps = [
         'color', 'background-color', 'background', 'border', 'border-top', 'border-right', 
         'border-bottom', 'border-left', 'border-color', 'border-width', 'border-style',
         'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
         'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
         'width', 'height', 'max-width', 'max-height', 'min-width', 'min-height',
-        'font-size', 'font-weight', 'font-family', 'line-height', 'text-align',
+        'font-size', 'font-weight', 'line-height', 'text-align',
         'display', 'flex', 'flex-direction', 'justify-content', 'align-items',
         'gap', 'grid', 'grid-template-columns', 'position', 'top', 'left', 'right', 'bottom',
         'page-break-inside', 'break-inside', 'white-space'
       ];
-      
+
+      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
+
       const inlineEssentialStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
         let styleString = '';
@@ -120,11 +122,14 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
             styleString += `${prop}:${value};`;
           }
         });
-        
-        if (styleString) {
-          const existingStyle = element.getAttribute('style') || '';
-          element.setAttribute('style', existingStyle + styleString);
-        }
+
+        // Always force Helvetica, overriding any computed/inherited font (Tailwind's ui-sans-serif stack)
+        styleString += `font-family:${HELVETICA_STACK} !important;`;
+
+        const existingStyle = element.getAttribute('style') || '';
+        // Strip any pre-existing font-family declarations from inline style to avoid conflicts
+        const cleanedExisting = existingStyle.replace(/font-family\s*:[^;]+;?/gi, '');
+        element.setAttribute('style', cleanedExisting + styleString);
         
         Array.from(element.children).forEach(child => inlineEssentialStyles(child));
       };
