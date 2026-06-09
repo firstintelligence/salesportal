@@ -45,26 +45,19 @@ const FloatingLabelInput = ({
     onChange({ target: { name: e.target.name, value: newValue } });
   };
 
-  // For date type, show formatted display with hidden native input
+  // For date type, use visible native input styled to match the form
   if (isDateType) {
     return (
       <div className="relative">
-        {/* Hidden native date input for picking */}
         <input
           type="date"
           id={id}
           name={name}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+          className={`block px-2.5 pt-5 pb-1 w-full min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm text-gray-900 bg-white rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
           value={value}
           onChange={onChange}
           disabled={disabled}
         />
-        {/* Display formatted date */}
-        <div
-          className={`flex items-center px-2.5 w-full min-h-[40px] md:h-[40px] h-[48px] text-xs md:text-sm text-gray-900 bg-white rounded-lg border border-gray-300 ${disabled ? 'cursor-not-allowed bg-gray-50' : ''} ${className}`}
-        >
-          <span className="w-full text-center">{formatDateDisplay(value)}</span>
-        </div>
         <label
           htmlFor={id}
           className="absolute text-sm duration-300 transform z-10 origin-[0] bg-white px-2 start-1 pointer-events-none whitespace-nowrap scale-75 -translate-y-4 top-2 text-gray-500"
