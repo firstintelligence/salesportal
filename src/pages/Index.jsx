@@ -275,10 +275,10 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       
-      // Check if we're on mobile (no padding) or desktop (p-4 padding)
+      // Check if we're on mobile (no padding) or desktop (p-1 padding)
       const isMobile = window.innerWidth < 1024;
-      const horizontalPadding = isMobile ? 0 : 32; // p-4 left + right on desktop only
-      const verticalPadding = isMobile ? 0 : 32; // p-4 top + bottom on desktop only
+      const horizontalPadding = isMobile ? 0 : 8; // p-1 left + right on desktop only
+      const verticalPadding = isMobile ? 0 : 8; // p-1 top + bottom on desktop only
 
       const availableWidth = containerWidth - horizontalPadding;
       const availableHeight = containerHeight - verticalPadding;
@@ -1066,7 +1066,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         </button>
       </div>
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <div className="w-full lg:w-[53%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
+        <div className="w-full lg:w-[48%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>
             {/* Quick Scan ID at Top */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 md:p-5 mb-6">
@@ -1296,7 +1296,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           />
         </div>
 
-        <div className="w-full lg:w-[47%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
+        <div className="w-full lg:w-[52%] lg:bg-white lg:p-4 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
           <div className="flex flex-col gap-3 mb-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
@@ -1348,7 +1348,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               ref={previewContainerRef}
               className="lg:bg-gray-200 lg:rounded lg:border lg:border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
             >
-              <div className="p-0 lg:p-4 w-full flex flex-col items-center gap-6" style={{ maxWidth: '100%' }}>
+              <div className="p-0 lg:p-1 w-full flex flex-col items-center gap-6" style={{ maxWidth: '100%' }}>
                 {(() => {
                   const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
                   const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
