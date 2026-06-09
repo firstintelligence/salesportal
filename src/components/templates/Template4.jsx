@@ -89,6 +89,12 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
   // Calculate monthly payment dynamically using proper defaults
   const calculateMonthlyPayment = () => {
     const principal = financing.loanAmount || 0;
+
+    // UEI Financial: fixed payment factor (0.0131) on 144-month amortization at 11.90%
+    if (financing.financeCompany === 'UEI Financial') {
+      return principal * 0.0131;
+    }
+
     const term = financing.amortizationPeriod || 180;
     const rate = (financing.interestRate || 0) / 100 / 12;
     
