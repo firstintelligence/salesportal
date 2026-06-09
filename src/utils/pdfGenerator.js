@@ -353,7 +353,7 @@ export const generatePDFClientSide = async (invoiceData, templateNumber) => {
         width: ${contentWidthPX}px;
         min-height: ${contentHeightPX}px;
         background-color: white;
-        font-family: Arial, sans-serif;
+        font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
         overflow: visible;
         padding: 0;
         margin: 0;
