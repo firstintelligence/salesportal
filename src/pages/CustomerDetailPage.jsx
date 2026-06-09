@@ -99,7 +99,7 @@ const CustomerDetailPage = () => {
       financing: {
         financeCompany: savedConfig.financing?.financeCompany || 'Financeit Canada Inc.',
         loanAmount: savedConfig.financing?.loanAmount || 0,
-        interestRate: savedConfig.financing?.interestRate ?? parseFloat(latestWithItems.interest_rate) || 0,
+        interestRate: savedConfig.financing?.interestRate ?? (parseFloat(latestWithItems.interest_rate) || 0),
         loanTerm: savedConfig.financing?.loanTerm || parseInt(latestWithItems.promotional_term) || 24,
         amortizationPeriod: savedConfig.financing?.amortizationPeriod || parseInt(latestWithItems.amortization) || 180,
       },
@@ -107,7 +107,7 @@ const CustomerDetailPage = () => {
       subTotal: savedConfig.subTotal,
       taxAmount: savedConfig.taxAmount,
       taxPercentage: savedConfig.taxPercentage,
-      grandTotal: savedConfig.grandTotal ?? parseFloat(latestWithItems.sales_price) || 0,
+      grandTotal: savedConfig.grandTotal ?? (parseFloat(latestWithItems.sales_price) || 0),
       savedAt: latestWithItems.updated_at || latestWithItems.created_at,
     });
   };
