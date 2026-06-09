@@ -115,10 +115,9 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       // WITHOUT a proper ToUnicode CMap — once PDFShift embeds it, the PDF's text
       // cannot be selected or copied (glyphs don't map back to characters).
       //
-      // Fix: use Google Fonts "Arimo", which is metric-compatible with Helvetica/Arial
-      // (visually indistinguishable) AND ships with proper Unicode mapping, so text
-      // in the generated PDF remains selectable.
-      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", Arimo, Arial, sans-serif';
+      // Using Google Fonts "Open Sans", which is clean and professional with proper
+      // Unicode mapping, so text in the generated PDF remains selectable.
+      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", "Open Sans", Arial, sans-serif';
 
       const inlineEssentialStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
