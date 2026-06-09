@@ -984,6 +984,15 @@ export type Database = {
         }[]
       }
       is_admin_agent: { Args: { agent_id: string }; Returns: boolean }
+      save_invoice_draft: {
+        Args: {
+          p_agent_id: string
+          p_customer_id: string
+          p_tenant_id: string
+          p_tpv_data: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

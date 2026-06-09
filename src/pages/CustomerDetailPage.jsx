@@ -74,6 +74,44 @@ const CustomerDetailPage = () => {
     }
   };
 
+  const loadInvoiceProfileFromTpv = (tpvData) => {
+    const latestWithItems = tpvData?.find((tpv) => tpv.items_json);
+    if (!latestWithItems?.items_json) return;
+
+    const savedConfig = latestWithItems.items_json;
+    if (Array.isArray(savedConfig)) {
+      setInvoiceProfile({
+        items: savedConfig.map((item) => ({ ...item, id: item.id || crypto.randomUUID() })),
+        financing: {
+          financeCompany: 'Financeit Canada Inc.',
+          interestRate: parseFloat(latestWithItems.interest_rate) || 0,
+          loanTerm: parseInt(latestWithItems.promotional_term) || 24,
+          amortizationPeriod: parseInt(latestWithItems.amortization) || 180,
+        },
+        grandTotal: parseFloat(latestWithItems.sales_price) || 0,
+        savedAt: latestWithItems.updated_at || latestWithItems.created_at,
+      });
+      return;
+    }
+
+    setInvoiceProfile({
+      items: (savedConfig.items || []).map((item) => ({ ...item, id: item.id || crypto.randomUUID() })),
+      financing: {
+        financeCompany: savedConfig.financing?.financeCompany || 'Financeit Canada Inc.',
+        loanAmount: savedConfig.financing?.loanAmount || 0,
+        interestRate: savedConfig.financing?.interestRate ?? (parseFloat(latestWithItems.interest_rate) || 0),
+        loanTerm: savedConfig.financing?.loanTerm || parseInt(latestWithItems.promotional_term) || 24,
+        amortizationPeriod: savedConfig.financing?.amortizationPeriod || parseInt(latestWithItems.amortization) || 180,
+      },
+      rebatesIncentives: savedConfig.rebatesIncentives || null,
+      subTotal: savedConfig.subTotal,
+      taxAmount: savedConfig.taxAmount,
+      taxPercentage: savedConfig.taxPercentage,
+      grandTotal: savedConfig.grandTotal ?? (parseFloat(latestWithItems.sales_price) || 0),
+      savedAt: latestWithItems.updated_at || latestWithItems.created_at,
+    });
+  };
+
   const fetchCustomerData = async () => {
     try {
       setLoading(true);
@@ -113,6 +151,7 @@ const CustomerDetailPage = () => {
 
       if (tpvError) throw tpvError;
       setTpvRequests(tpvData || []);
+      loadInvoiceProfileFromTpv(tpvData || []);
 
       const { data: checklistData, error: checklistError } = await supabase
         .from("installation_checklists")

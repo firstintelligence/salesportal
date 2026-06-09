@@ -439,27 +439,41 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           grandTotal
         };
 
-        const { data: latest } = await supabase
-          .from("tpv_requests")
-          .select("id")
-          .eq("customer_id", customerId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const agentId = localStorage.getItem("agentId");
+        if (!agentId) return;
 
-        if (!latest?.id) return; // No existing record to update; explicit save will create one
-
-        await supabase
-          .from("tpv_requests")
-          .update({
-            items_json: fullProductConfiguration,
+        const validTenantId = tenant?.isAllTenants ? null : tenant?.id || null;
+        const { error: saveError } = await supabase.rpc("save_invoice_draft", {
+          p_customer_id: customerId,
+          p_tenant_id: validTenantId,
+          p_agent_id: agentId,
+          p_tpv_data: {
+            customer_name: `${billTo.firstName} ${billTo.lastName}`,
+            first_name: billTo.firstName,
+            last_name: billTo.lastName,
+            customer_phone: billTo.phone,
+            customer_address: billTo.address,
+            city: billTo.city || null,
+            province: billTo.province || 'ON',
+            postal_code: billTo.postalCode || null,
+            email: billTo.email || null,
             products: getSimplifiedProductList(items),
             sales_price: grandTotal.toString(),
             interest_rate: financing.interestRate?.toString() || null,
             promotional_term: financing.loanTerm?.toString() || null,
             amortization: financing.amortizationPeriod?.toString() || null,
-          })
-          .eq("id", latest.id);
+            monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
+              financing.loanAmount,
+              financing.interestRate || 0,
+              financing.amortizationPeriod,
+              financing.financeCompany
+            ).toString() : null,
+            status: 'draft',
+            items_json: fullProductConfiguration,
+          },
+        });
+
+        if (saveError) throw saveError;
       } catch (err) {
         console.error("Invoice autosave failed:", err);
       }
@@ -468,7 +482,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [customerId, items, financing, rebatesIncentives, subTotal, taxAmount, taxPercentage, grandTotal]);
+  }, [customerId, billTo, items, financing, rebatesIncentives, subTotal, taxAmount, taxPercentage, grandTotal, tenant?.id, tenant?.isAllTenants]);
 
   // No longer persist form data to localStorage - each session starts fresh
   // Data is only saved when navigating to specific tools via state props
@@ -790,9 +804,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     console.log("Customer saved successfully:", { customerId: foundCustomerId, isNew });
     
     const resolvedCustomerId = foundCustomerId;
-    if (isNew) {
-      setCustomerId(resolvedCustomerId);
-    }
+    setCustomerId(resolvedCustomerId);
 
     const simplifiedProducts = getSimplifiedProductList(items);
     const fullProductConfiguration = {
@@ -844,20 +856,20 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         financing.financeCompany
       ).toString() : null,
       status: 'draft',
-      items_json: fullProductConfiguration
+      items_json: fullProductConfiguration,
+      updated_at: new Date().toISOString()
     };
 
-    const { data: existingTpv } = await supabase
-      .from("tpv_requests")
-      .select("id")
-      .eq("customer_id", resolvedCustomerId)
-      .eq("status", "draft")
-      .maybeSingle();
+    const { error: saveDraftError } = await supabase.rpc("save_invoice_draft", {
+      p_customer_id: resolvedCustomerId,
+      p_tenant_id: validTenantId,
+      p_agent_id: agentId,
+      p_tpv_data: tpvData,
+    });
 
-    if (existingTpv) {
-      await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
-    } else {
-      await supabase.from("tpv_requests").insert(tpvData);
+    if (saveDraftError) {
+      console.error("Error saving invoice products:", saveDraftError);
+      throw saveDraftError;
     }
 
     const invoiceProfile = {
@@ -1001,11 +1013,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               resolvedCustomerId = savedId;
               console.log("Auto-save during PDF generation succeeded:", savedId);
             } else {
-              console.warn("Auto-save returned null - customer profile was NOT saved");
+              throw new Error("Auto-save returned null - customer profile was NOT saved");
             }
           } catch (saveError) {
             console.error('Error auto-saving customer profile during PDF generation:', saveError);
-            toast.error("Warning: Invoice generated but customer profile was NOT saved to dashboard");
+            toast.error("Customer profile could not be saved, so the PDF was not generated");
+            throw saveError;
           }
         }
 
