@@ -1296,7 +1296,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           />
         </div>
 
-        <div className="w-full lg:w-[47%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
+        <div className="w-full lg:w-[52%] lg:bg-white lg:p-4 lg:rounded-lg lg:shadow-md order-2 lg:order-2">
           <div className="flex flex-col gap-3 mb-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg md:text-2xl font-semibold">{isInvoice ? 'Invoice' : 'Quote'} Preview</h2>
