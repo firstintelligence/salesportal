@@ -12,7 +12,7 @@ const FINANCE_COMPANIES = [
 ];
 
 const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
-const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.99 };
+const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.90, loanTerm: 144 };
 const ABODE_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.95 };
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
@@ -21,15 +21,20 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   ];
 
   const abodeInterestRates = [8.95, 10.95, 12.95];
-
-  const interestRates = financing.financeCompany === 'Abode Financial' ? abodeInterestRates : allInterestRates;
+  const ueiInterestRates = [11.90];
 
   const isUEI = financing.financeCompany === 'UEI Financial';
+  const interestRates = isUEI
+    ? ueiInterestRates
+    : financing.financeCompany === 'Abode Financial'
+      ? abodeInterestRates
+      : allInterestRates;
 
   const monthlyPayment = calculateMonthlyPayment(
     financing.loanAmount || 0, 
     financing.interestRate || 0, 
-    financing.amortizationPeriod || 180
+    financing.amortizationPeriod || 180,
+    financing.financeCompany
   ) || 0;
 
   const adminFee = isUEI ? 0 : Math.min(financing.loanAmount * 0.0149, 149);
@@ -114,26 +119,28 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           )}
         </div>
 
-        {/* Promo Term + Amortization - 2 columns */}
-        <div className="grid grid-cols-2 gap-2 md:gap-4">
-          <div>
-            <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Promo Term</label>
-            <Select 
-              value={(financing.loanTerm || 60).toString()} 
-              onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
-            >
-              <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
-                <SelectValue className="text-left" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                <SelectItem value="12">12 months</SelectItem>
-                <SelectItem value="24">24 months</SelectItem>
-                <SelectItem value="36">36 months</SelectItem>
-                <SelectItem value="48">48 months</SelectItem>
-                <SelectItem value="60">60 months</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Promo Term + Amortization */}
+        <div className={`grid ${isUEI ? 'grid-cols-1' : 'grid-cols-2'} gap-2 md:gap-4`}>
+          {!isUEI && (
+            <div>
+              <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Promo Term</label>
+              <Select 
+                value={(financing.loanTerm || 60).toString()} 
+                onValueChange={(value) => handleFinancingChange('loanTerm', parseInt(value))}
+              >
+                <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
+                  <SelectValue className="text-left" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                  <SelectItem value="12">12 months</SelectItem>
+                  <SelectItem value="24">24 months</SelectItem>
+                  <SelectItem value="36">36 months</SelectItem>
+                  <SelectItem value="48">48 months</SelectItem>
+                  <SelectItem value="60">60 months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <label className="block text-[10px] md:text-xs font-medium text-gray-700 mb-1">Amortization</label>

@@ -89,6 +89,12 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
   // Calculate monthly payment dynamically using proper defaults
   const calculateMonthlyPayment = () => {
     const principal = financing.loanAmount || 0;
+
+    // UEI Financial: fixed payment factor (0.0131) on 144-month amortization at 11.90%
+    if (financing.financeCompany === 'UEI Financial') {
+      return principal * 0.0131;
+    }
+
     const term = financing.amortizationPeriod || 180;
     const rate = (financing.interestRate || 0) / 100 / 12;
     
@@ -262,9 +268,11 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                       <div className="grid grid-cols-1 gap-1 text-sm">
                         <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                         <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}{financing.financeCompany !== 'UEI Financial' ? ` (incl. $${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)` : ''}</p>
-                        <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
-                        <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
-                        <p><strong>Interest Rate:</strong> {financing.interestRate || 0}%</p>
+                        <p><strong>Amortization Period:</strong> {financing.financeCompany === 'UEI Financial' ? 144 : (financing.amortizationPeriod || 180)} months</p>
+                        {financing.financeCompany !== 'UEI Financial' && (
+                          <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
+                        )}
+                        <p><strong>Interest Rate:</strong> {financing.financeCompany === 'UEI Financial' ? '11.90' : (financing.interestRate || 0)}%</p>
                         <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                       </div>
                     </div>
