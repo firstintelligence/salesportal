@@ -110,7 +110,12 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         'page-break-inside', 'break-inside', 'white-space'
       ];
 
-      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
+      // NOTE: PDFShift's headless Chromium does NOT have Helvetica installed.
+      // Without an embedded web font, "font-family: Helvetica" silently falls back
+      // to the system default sans-serif (e.g. DejaVu Sans), so the downloaded PDF
+      // doesn't match the in-app preview. We embed a Helvetica Neue web font via
+      // @font-face so the PDF renderer has an actual Helvetica face to use.
+      const HELVETICA_STACK = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
       const inlineEssentialStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
@@ -134,9 +139,16 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         Array.from(element.children).forEach(child => inlineEssentialStyles(child));
       };
       
-      inlineEssentialStyles(pdfContainer.firstElementChild);
-      
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:Helvetica,"Helvetica Neue",Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:Helvetica,"Helvetica Neue",Arial,sans-serif !important;}body *{font-family:Helvetica,"Helvetica Neue",Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
+      // Inline styles on every rendered root (React.Fragment can yield multiple)
+      Array.from(pdfContainer.children).forEach(child => inlineEssentialStyles(child));
+
+      // Embed a real Helvetica Neue web font so PDFShift's Chromium has the glyphs.
+      // cdnfonts hosts a freely-loadable Helvetica Neue family. We also keep the
+      // hard !important font-family override so every element resolves to it.
+      const fontFaceCss = `
+        @import url('https://fonts.cdnfonts.com/css/helvetica-neue-9');
+      `;
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-neue-9"><style>${fontFaceCss}@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}body *{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
       
       // Cleanup DOM
       root.unmount();
