@@ -396,6 +396,80 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     }
   }, [preloadedCustomer, formDataKey, tenantCompanyInfo, tenantLogo, tenantLogoSize]);
 
+  // Auto-save changes to items/financing/rebates back to the customer's most recent tpv_requests row
+  const autosaveTimerRef = useRef(null);
+  const skipAutosaveRef = useRef(true);
+
+  useEffect(() => {
+    // Whenever we load a different customer, skip the first autosave trigger
+    // (which is caused by hydrating state from the preloaded profile)
+    skipAutosaveRef.current = true;
+  }, [preloadedCustomer?.id]);
+
+  useEffect(() => {
+    if (!customerId) return;
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(async () => {
+      try {
+        const fullProductConfiguration = {
+          items: items.map(item => ({
+            id: item.id,
+            name: item.name || '',
+            description: item.description || '',
+            productId: item.productId || '',
+            quantity: item.quantity || 1,
+            amount: item.amount || 0,
+            total: item.total || 0
+          })),
+          financing: {
+            financeCompany: financing.financeCompany || 'Financeit Canada Inc.',
+            loanAmount: financing.loanAmount || 0,
+            amortizationPeriod: financing.amortizationPeriod || 180,
+            loanTerm: financing.loanTerm || 24,
+            interestRate: financing.interestRate || 0
+          },
+          rebatesIncentives,
+          subTotal,
+          taxAmount,
+          taxPercentage,
+          grandTotal
+        };
+
+        const { data: latest } = await supabase
+          .from("tpv_requests")
+          .select("id")
+          .eq("customer_id", customerId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!latest?.id) return; // No existing record to update; explicit save will create one
+
+        await supabase
+          .from("tpv_requests")
+          .update({
+            items_json: fullProductConfiguration,
+            products: getSimplifiedProductList(items),
+            sales_price: grandTotal.toString(),
+            interest_rate: financing.interestRate?.toString() || null,
+            promotional_term: financing.loanTerm?.toString() || null,
+            amortization: financing.amortizationPeriod?.toString() || null,
+          })
+          .eq("id", latest.id);
+      } catch (err) {
+        console.error("Invoice autosave failed:", err);
+      }
+    }, 1200);
+
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+  }, [customerId, items, financing, rebatesIncentives, subTotal, taxAmount, taxPercentage, grandTotal]);
+
   // No longer persist form data to localStorage - each session starts fresh
   // Data is only saved when navigating to specific tools via state props
 
