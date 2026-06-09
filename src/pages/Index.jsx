@@ -1348,7 +1348,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               ref={previewContainerRef}
               className="lg:bg-gray-200 lg:rounded lg:border lg:border-gray-400 overflow-y-auto overflow-x-hidden max-h-[800px] w-full"
             >
-              <div className="p-0 lg:p-4 w-full flex flex-col items-center gap-6" style={{ maxWidth: '100%' }}>
+              <div className="p-0 lg:p-1 w-full flex flex-col items-center gap-6" style={{ maxWidth: '100%' }}>
                 {(() => {
                   const pageHeight = 1123; // US Letter height (11 inches at 72 DPI)
                   const pageWidth = 794; // US Letter width (8.5 inches at 72 DPI)
