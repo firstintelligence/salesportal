@@ -439,17 +439,21 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
           grandTotal
         };
 
-        const { data: latest } = await supabase
+        const { data: latest, error: latestError } = await supabase
           .from("tpv_requests")
           .select("id")
           .eq("customer_id", customerId)
+          .eq("status", "draft")
+          .order("updated_at", { ascending: false })
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
 
+        if (latestError) throw latestError;
+
         if (!latest?.id) return; // No existing record to update; explicit save will create one
 
-        await supabase
+        const { error: updateError } = await supabase
           .from("tpv_requests")
           .update({
             items_json: fullProductConfiguration,
@@ -458,8 +462,11 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
             interest_rate: financing.interestRate?.toString() || null,
             promotional_term: financing.loanTerm?.toString() || null,
             amortization: financing.amortizationPeriod?.toString() || null,
+            updated_at: new Date().toISOString(),
           })
           .eq("id", latest.id);
+
+        if (updateError) throw updateError;
       } catch (err) {
         console.error("Invoice autosave failed:", err);
       }
@@ -790,9 +797,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     console.log("Customer saved successfully:", { customerId: foundCustomerId, isNew });
     
     const resolvedCustomerId = foundCustomerId;
-    if (isNew) {
-      setCustomerId(resolvedCustomerId);
-    }
+    setCustomerId(resolvedCustomerId);
 
     const simplifiedProducts = getSimplifiedProductList(items);
     const fullProductConfiguration = {
@@ -844,20 +849,44 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         financing.financeCompany
       ).toString() : null,
       status: 'draft',
-      items_json: fullProductConfiguration
+      items_json: fullProductConfiguration,
+      updated_at: new Date().toISOString()
     };
 
-    const { data: existingTpv } = await supabase
+    const { data: existingTpv, error: existingTpvError } = await supabase
       .from("tpv_requests")
       .select("id")
       .eq("customer_id", resolvedCustomerId)
       .eq("status", "draft")
+      .order("updated_at", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
 
+    if (existingTpvError) {
+      console.error("Error finding draft invoice record:", existingTpvError);
+      throw existingTpvError;
+    }
+
     if (existingTpv) {
-      await supabase.from("tpv_requests").update(tpvData).eq("id", existingTpv.id);
+      const { error: updateError } = await supabase
+        .from("tpv_requests")
+        .update(tpvData)
+        .eq("id", existingTpv.id);
+
+      if (updateError) {
+        console.error("Error updating invoice products:", updateError);
+        throw updateError;
+      }
     } else {
-      await supabase.from("tpv_requests").insert(tpvData);
+      const { error: insertError } = await supabase
+        .from("tpv_requests")
+        .insert(tpvData);
+
+      if (insertError) {
+        console.error("Error saving invoice products:", insertError);
+        throw insertError;
+      }
     }
 
     const invoiceProfile = {
@@ -1001,11 +1030,12 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               resolvedCustomerId = savedId;
               console.log("Auto-save during PDF generation succeeded:", savedId);
             } else {
-              console.warn("Auto-save returned null - customer profile was NOT saved");
+              throw new Error("Auto-save returned null - customer profile was NOT saved");
             }
           } catch (saveError) {
             console.error('Error auto-saving customer profile during PDF generation:', saveError);
-            toast.error("Warning: Invoice generated but customer profile was NOT saved to dashboard");
+            toast.error("Customer profile could not be saved, so the PDF was not generated");
+            throw saveError;
           }
         }
 
