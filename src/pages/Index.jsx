@@ -766,7 +766,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
       monthly_payment: financing.loanAmount ? calculateMonthlyPayment(
         financing.loanAmount,
         financing.interestRate || 0,
-        financing.amortizationPeriod
+        financing.amortizationPeriod,
+        financing.financeCompany
       ).toString() : null,
       status: 'draft',
       items_json: fullProductConfiguration
