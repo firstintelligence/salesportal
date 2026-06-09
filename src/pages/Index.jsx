@@ -890,7 +890,8 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
               monthlyPayment: financing.loanAmount ? calculateMonthlyPayment(
                 financing.loanAmount,
                 financing.interestRate || 0,
-                financing.amortizationPeriod
+                financing.amortizationPeriod,
+                financing.financeCompany
               ) : null
             }
           }
