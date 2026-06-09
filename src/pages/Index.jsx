@@ -1066,7 +1066,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         </button>
       </div>
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <div className="w-full lg:w-[53%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
+        <div className="w-full lg:w-[48%] lg:bg-white lg:p-6 lg:rounded-lg lg:shadow-md order-1 lg:order-1">
           <form>
             {/* Quick Scan ID at Top */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 md:p-5 mb-6">
