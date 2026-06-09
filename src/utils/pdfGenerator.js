@@ -27,7 +27,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         left: -9999px;
         width: 794px;
         background-color: white;
-        font-family: Arial, sans-serif;
+        font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
       `;
       
       // Get the template and Consumer Protection Act page, then render them
