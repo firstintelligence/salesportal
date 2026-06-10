@@ -13,7 +13,7 @@ const ConsumerProtectionActPage = ({ companyInfo }) => {
         pageBreakBefore: "always",
         pageBreakAfter: "avoid",
         pageBreakInside: "avoid",
-        fontFamily: 'Helvetica, "Helvetica Neue", Arial, sans-serif'
+        fontFamily: '"Open Sans", Arial, sans-serif'
       }}
     >
       <h2 style={{ 
