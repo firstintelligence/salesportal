@@ -188,20 +188,13 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
 
       if (error) {
         console.error('Error calling PDF generation function:', error);
-        console.log('Falling back to client-side PDF generation...');
-        // Fall back to client-side generation
-        await generatePDFClientSide(invoiceData, templateNumber);
-        resolve();
-        return;
+        throw new Error('Server PDF generation failed. Please try again so the exported PDF keeps selectable text.');
       }
 
       // Check if data is valid
       if (!data || !(data instanceof Blob)) {
         console.error('Invalid PDF response from server');
-        console.log('Falling back to client-side PDF generation...');
-        await generatePDFClientSide(invoiceData, templateNumber);
-        resolve();
-        return;
+        throw new Error('Invalid PDF response from server. Please try again so the exported PDF keeps selectable text.');
       }
 
       // The response is already a Blob from the edge function
