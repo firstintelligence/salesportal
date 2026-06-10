@@ -27,7 +27,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         left: -9999px;
         width: 794px;
         background-color: white;
-        font-family: Helvetica, "Helvetica Neue", "Open Sans", Arial, sans-serif;
+        font-family: "Open Sans", Arial, sans-serif;
       `;
       
       // Get the template and Consumer Protection Act page, then render them
@@ -110,14 +110,13 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
         'page-break-inside', 'break-inside', 'white-space'
       ];
 
-      // PDFShift's headless Chromium does NOT have Helvetica installed.
-      // We previously embedded "Helvetica Neue" from cdnfonts, but that font ships
-      // WITHOUT a proper ToUnicode CMap — once PDFShift embeds it, the PDF's text
-      // cannot be selected or copied (glyphs don't map back to characters).
-      //
-      // Using Google Fonts "Open Sans", which is clean and professional with proper
-      // Unicode mapping, so text in the generated PDF remains selectable.
-      const HELVETICA_STACK = 'Helvetica, "Helvetica Neue", "Open Sans", Arial, sans-serif';
+      // PDFShift's headless Chromium does NOT ship with Helvetica. If the CSS
+      // stack lists Helvetica first, Chromium falls back to a substitute font
+      // whose ToUnicode CMap may be broken — making the resulting PDF text
+      // un-highlightable. We pin a single web-loaded font (Open Sans) first
+      // so preview and exported PDF render with the exact same typeface and
+      // the PDF keeps proper selectable text.
+      const HELVETICA_STACK = '"Open Sans", Arial, sans-serif';
 
       const inlineEssentialStyles = (element) => {
         const computedStyle = window.getComputedStyle(element);
@@ -130,7 +129,7 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
           }
         });
 
-        // Always force Helvetica stack, overriding any computed/inherited font
+        // Force the unified Open Sans stack, overriding any inherited font
         styleString += `font-family:${HELVETICA_STACK} !important;`;
 
         const existingStyle = element.getAttribute('style') || '';
@@ -142,9 +141,10 @@ export const generatePDF = async (invoiceData, templateNumber, tenantSlug = 'geo
       
       Array.from(pdfContainer.children).forEach(child => inlineEssentialStyles(child));
 
-      // Load Open Sans from Google Fonts. Google Fonts serves WOFF2 with full
-      // ToUnicode CMaps, so text in the PDF remains selectable/copyable.
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap"><style>@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:Helvetica,"Helvetica Neue","Open Sans",Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:Helvetica,"Helvetica Neue","Open Sans",Arial,sans-serif !important;}body *{font-family:Helvetica,"Helvetica Neue","Open Sans",Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
+      // Load Open Sans from Google Fonts and wait for it to load before
+      // PDFShift renders, so the rendered PDF uses Open Sans glyphs (which
+      // carry proper ToUnicode CMaps — text stays selectable).
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap"><style>@page{margin:0.25in;}*{margin:0;padding:0;box-sizing:border-box;font-family:"Open Sans",Arial,sans-serif !important;}html,body{margin:0;padding:0;background:white;font-family:"Open Sans",Arial,sans-serif !important;}body *{font-family:"Open Sans",Arial,sans-serif !important;}p{display:block;margin-bottom:0.25rem;}div{display:block;}h1,h2,h3,h4,h5,h6{display:block;}body>*:last-child{page-break-after:avoid !important;margin-bottom:0 !important;padding-bottom:0 !important;}</style></head><body>${pdfContainer.innerHTML.trim()}</body></html>`;
       
       // Cleanup DOM
       root.unmount();

@@ -54,9 +54,9 @@ const InvoiceRenderPage = () => {
       minHeight: '100vh',
       padding: 0,
       margin: 0,
-      fontFamily: 'Helvetica, "Helvetica Neue", Arial, sans-serif'
+      fontFamily: '"Open Sans", Arial, sans-serif'
     }}>
-      <style>{`* { font-family: Helvetica, "Helvetica Neue", Arial, sans-serif !important; }`}</style>
+      <style>{`* { font-family: "Open Sans", Arial, sans-serif !important; }`}</style>
       <InvoiceTemplate data={invoiceData} templateNumber={templateNumber} />
     </div>
   );
