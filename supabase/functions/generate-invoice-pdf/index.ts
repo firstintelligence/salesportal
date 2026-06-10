@@ -62,12 +62,11 @@ serve(async (req) => {
           left: '0.25in',
         },
         use_print: true,
-        // PDFShift's Chromium does NOT have Helvetica installed. The HTML embeds
-        // a Helvetica Neue web font via <link>, so we must wait for network idle
-        // before rendering, otherwise the font won't be loaded in time and the
-        // PDF falls back to DejaVu/Liberation Sans.
-        wait_for: 'networkidle0',
-        delay: 800,
+        // Give the embedded Open Sans web font time to load before rendering.
+        // PDFShift does not accept Puppeteer's "networkidle0" value here; using
+        // that caused the edge function to fail and the app to fall back to the
+        // old html2canvas image PDF, which makes text impossible to highlight.
+        delay: 1800,
       }),
     });
 
