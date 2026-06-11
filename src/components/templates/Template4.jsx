@@ -90,7 +90,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
   const calculateMonthlyPayment = () => {
     const principal = financing.loanAmount || 0;
 
-    // UEI Financial: fixed payment factor (0.0131) on 144-month amortization at 11.90%
+    // UEI Financial: fixed payment factor (0.0131) on 144-month amortization at 11.9%
     if (financing.financeCompany === 'UEI Financial') {
       return principal * 0.0131;
     }
@@ -272,7 +272,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                         {financing.financeCompany !== 'UEI Financial' && (
                           <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
                         )}
-                        <p><strong>Interest Rate:</strong> {financing.financeCompany === 'UEI Financial' ? '11.90' : (financing.interestRate || 0)}%</p>
+                        <p><strong>Interest Rate:</strong> {financing.financeCompany === 'UEI Financial' ? '11.9' : (financing.interestRate || 0)}%</p>
                         <p><strong>Monthly Payment:</strong> ${calculateMonthlyPayment().toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                       </div>
                     </div>
