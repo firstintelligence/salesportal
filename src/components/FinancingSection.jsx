@@ -12,7 +12,7 @@ const FINANCE_COMPANIES = [
 ];
 
 const FINANCEIT_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.99 };
-const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.90, loanTerm: 144 };
+const UEI_DEFAULTS = { amortizationPeriod: 144, interestRate: 11.9, loanTerm: 144 };
 const ABODE_DEFAULTS = { amortizationPeriod: 180, interestRate: 8.95 };
 
 const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showContractorFees = false, setShowContractorFees = () => {} }) => {
@@ -21,7 +21,7 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
   ];
 
   const abodeInterestRates = [8.95, 10.95, 12.95];
-  const ueiInterestRates = [11.90];
+  const ueiInterestRates = [11.9];
 
   const isUEI = financing.financeCompany === 'UEI Financial';
   const interestRates = isUEI
