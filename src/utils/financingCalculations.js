@@ -4,8 +4,16 @@ export const calculateLoanAmount = (invoiceTotal) => {
   return invoiceTotal + fee;
 };
 
+// UEI Financial uses a fixed payment factor for the 144-month term only.
+const UEI_PAYMENT_FACTOR_144 = 0.0131;
+
 // Calculate monthly payment using loan amount, interest rate, and amortization period.
 export const calculateMonthlyPayment = (loanAmount, interestRate, amortizationPeriod, financeCompany) => {
+  // UEI Financial @ 144 months uses the hardcoded payment factor
+  if (financeCompany === 'UEI Financial' && amortizationPeriod === 144) {
+    return loanAmount * UEI_PAYMENT_FACTOR_144;
+  }
+
   if (interestRate === 0) {
     return loanAmount / amortizationPeriod;
   }
