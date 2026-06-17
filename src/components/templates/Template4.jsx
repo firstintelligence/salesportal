@@ -94,6 +94,11 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
     
     if (principal === 0 || term === 0) return 0;
     
+    // UEI Financial @ 144 months uses hardcoded factor 0.0131
+    if (financing.financeCompany === 'UEI Financial' && term === 144) {
+      return principal * 0.0131;
+    }
+    
     if (rate === 0) {
       return principal / term;
     }
