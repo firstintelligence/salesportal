@@ -262,7 +262,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
                       <div className="grid grid-cols-1 gap-1 text-sm">
                         <p><strong>Finance Company:</strong> {financing.financeCompany || "Financeit Canada Inc."}</p>
                         <p><strong>Loan Amount:</strong> ${(financing.loanAmount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}{financing.financeCompany !== 'UEI Financial' ? ` (incl. $${Math.min((financing.loanAmount || 0) * 0.0149, 149).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} admin fee)` : ''}</p>
-                        <p><strong>Amortization Period:</strong> {financing.financeCompany === 'UEI Financial' ? 144 : (financing.amortizationPeriod || 180)} months</p>
+                        <p><strong>Amortization Period:</strong> {financing.amortizationPeriod || 180} months</p>
                         {financing.financeCompany !== 'UEI Financial' && (
                           <p><strong>Promotional Term:</strong> {financing.loanTerm || 24} months</p>
                         )}
