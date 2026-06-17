@@ -151,21 +151,31 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
               <SelectTrigger className="text-left h-[40px] text-xs md:text-sm bg-white border-gray-300">
                 <SelectValue className="text-left" />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                <SelectItem value="12">12 months</SelectItem>
-                <SelectItem value="24">24 months</SelectItem>
-                <SelectItem value="36">36 months</SelectItem>
-                <SelectItem value="48">48 months</SelectItem>
-                <SelectItem value="60">60 months</SelectItem>
-                <SelectItem value="72">72 months</SelectItem>
-                <SelectItem value="84">84 months</SelectItem>
-                <SelectItem value="96">96 months</SelectItem>
-                <SelectItem value="108">108 months</SelectItem>
-                <SelectItem value="120">120 months</SelectItem>
-                <SelectItem value="132">132 months</SelectItem>
-                <SelectItem value="144">144 months</SelectItem>
-                <SelectItem value="180">180 months</SelectItem>
-                <SelectItem value="240">240 months</SelectItem>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                {isUEI ? (
+                  <>
+                    <SelectItem value="60">60 months</SelectItem>
+                    <SelectItem value="120">120 months</SelectItem>
+                    <SelectItem value="144">144 months</SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="12">12 months</SelectItem>
+                    <SelectItem value="24">24 months</SelectItem>
+                    <SelectItem value="36">36 months</SelectItem>
+                    <SelectItem value="48">48 months</SelectItem>
+                    <SelectItem value="60">60 months</SelectItem>
+                    <SelectItem value="72">72 months</SelectItem>
+                    <SelectItem value="84">84 months</SelectItem>
+                    <SelectItem value="96">96 months</SelectItem>
+                    <SelectItem value="108">108 months</SelectItem>
+                    <SelectItem value="120">120 months</SelectItem>
+                    <SelectItem value="132">132 months</SelectItem>
+                    <SelectItem value="144">144 months</SelectItem>
+                    <SelectItem value="180">180 months</SelectItem>
+                    <SelectItem value="240">240 months</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
