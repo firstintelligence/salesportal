@@ -70,10 +70,32 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
     return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
+  const isEnabled = financing.enabled !== false;
+
   return (
-    <div className="mb-6 bg-green-50 p-3 md:p-4 rounded-lg h-full">
-      <h2 className="text-base md:text-lg font-semibold mb-2">Financing Payment Details</h2>
-      
+    <div className={`mb-6 p-3 md:p-4 rounded-lg h-full ${isEnabled ? 'bg-green-50' : 'bg-slate-100'}`}>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-base md:text-lg font-semibold">
+          {isEnabled ? 'Financing Payment Details' : 'Cash Payment'}
+        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">Financing {isEnabled ? 'ON' : 'OFF'}</span>
+          <Switch
+            checked={isEnabled}
+            onCheckedChange={(checked) => setFinancing(prev => ({ ...prev, enabled: checked }))}
+            className="data-[state=checked]:bg-green-600"
+          />
+        </div>
+      </div>
+
+      {!isEnabled && (
+        <p className="text-xs md:text-sm text-gray-600 mt-2">
+          Customer is paying cash. Financing details will be omitted from the invoice.
+        </p>
+      )}
+
+      {isEnabled && (
+      <>
       <div className="flex items-center justify-between mb-3 md:mb-4">
         <span className="text-xs md:text-sm font-medium">Show Contractor Fees</span>
         <div className="flex items-center gap-2">
