@@ -261,7 +261,7 @@ const Template4 = ({ data, showTermsAndConditions = true }) => {
               <div className="grid grid-cols-2 gap-2" style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                 <div style={{pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                   {/* Financing Section */}
-                  {financing && (
+                  {financing && financing.enabled !== false && (
                     <div className="mb-4 p-3 rounded" style={{backgroundColor: '#e8f5e8', border: '1px solid #90c695', pageBreakInside: 'avoid', breakInside: 'avoid'}}>
                       <h3 className="text-sm font-semibold mb-2" style={{color: '#000000'}}>Financing Payment Details</h3>
                       <div className="grid grid-cols-1 gap-1 text-sm">
