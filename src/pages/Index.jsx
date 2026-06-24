@@ -155,6 +155,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
     };
   });
   const [financing, setFinancing] = useState(() => ({
+    enabled: true,
     financeCompany: "Financeit Canada Inc.",
     loanAmount: preloadedCalculatorData?.loanAmount || 0,
     amortizationPeriod: preloadedCalculatorData?.amortizationPeriod || 180,
