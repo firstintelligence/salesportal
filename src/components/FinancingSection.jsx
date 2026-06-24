@@ -247,6 +247,8 @@ const FinancingSection = ({ financing, setFinancing, invoiceAmount = 0, showCont
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };
