@@ -115,8 +115,8 @@ export const getTenantCompanyInfo = (tenantSlug) => {
     'provincial': {
       name: "Provincial Energy Group",
       address: "100 King Street West, Toronto, ON M5X 1A9",
-      phone: "",
-      email: "info@provincialenergygroup.com",
+      phone: "+1 888-660-2323",
+      email: "management@provincialenergygroup.com",
       invoicePrefix: "PROV"
     },
     'kmc': {
