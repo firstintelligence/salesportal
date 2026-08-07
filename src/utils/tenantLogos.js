@@ -10,6 +10,7 @@ const mtebyLogo = '/assets/mteby-logo.svg';
 const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 const kmcLogo = '/assets/kmc-logo.png';
 const siaLogo = '/assets/sia-logo.png';
+const circuitSavvyLogo = '/assets/circuit-savvy-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
@@ -25,6 +26,7 @@ export const getTenantLogo = (tenantSlug) => {
     'provincial': provincialEnergyGroupLogo,
     'kmc': kmcLogo,
     'sia': siaLogo,
+    'circuitsavvy': circuitSavvyLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -51,6 +53,7 @@ export const getDefaultLogos = () => ({
   provincial: provincialEnergyGroupLogo,
   kmc: kmcLogo,
   sia: siaLogo,
+  circuitsavvy: circuitSavvyLogo,
 });
 
 // Tenant company info
@@ -133,6 +136,13 @@ export const getTenantCompanyInfo = (tenantSlug) => {
       email: "",
       invoicePrefix: "SIA"
     },
+    'circuitsavvy': {
+      name: "Circuit Savvy Electric",
+      address: "3880 Duke of York Blvd #402, Mississauga, ON L5B 4M7",
+      phone: "(905) 334-0732",
+      email: "info@circuitsavvyelectric.ca",
+      invoicePrefix: "CSE"
+    },
   };
   
   return companies[tenantSlug] || companies['georges'];
@@ -184,6 +194,10 @@ export const getTenantColors = (tenantSlug) => {
     'sia': {
       primary: 'hsl(199, 89%, 55%)',
       secondary: 'hsl(0, 84%, 55%)',
+    },
+    'circuitsavvy': {
+      primary: 'hsl(217, 45%, 22%)',
+      secondary: 'hsl(88, 60%, 55%)',
     },
   };
   
