@@ -131,7 +131,7 @@ const CustomInvoiceV2Page = () => {
 
   // Tenant info
   const tenantLogo = tenant?.slug ? getTenantDocumentLogo(tenant.slug) : null;
-  const tenantCompanyInfo = tenant?.slug ? getTenantCompanyInfo(tenant.slug) : null;
+  const tenantCompanyInfo = tenant?.slug ? getTenantCompanyInfo(tenant.slug, tenant) : null;
 
   // Update customer name when first/last name changes
   useEffect(() => {
