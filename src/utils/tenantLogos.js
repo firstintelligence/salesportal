@@ -57,7 +57,7 @@ export const getDefaultLogos = () => ({
 });
 
 // Tenant company info
-export const getTenantCompanyInfo = (tenantSlug) => {
+export const getTenantCompanyInfo = (tenantSlug, tenantRecord = null) => {
   const companies = {
     'georges': {
       name: "George's Plumbing and Heating",
@@ -145,7 +145,28 @@ export const getTenantCompanyInfo = (tenantSlug) => {
     },
   };
   
-  return companies[tenantSlug] || companies['georges'];
+  if (companies[tenantSlug]) return companies[tenantSlug];
+
+  // Unknown slug: never silently fall back to another company's branding.
+  // Build the info from the tenant record itself when we have it.
+  if (tenantRecord?.name) {
+    const initials = tenantRecord.name
+      .replace(/[^a-zA-Z ]/g, '')
+      .split(' ')
+      .filter(Boolean)
+      .map(w => w[0].toUpperCase())
+      .join('')
+      .slice(0, 4);
+    return {
+      name: tenantRecord.name,
+      address: tenantRecord.address || '',
+      phone: tenantRecord.phone || '',
+      email: tenantRecord.email || '',
+      invoicePrefix: initials || 'INV'
+    };
+  }
+
+  return companies['georges'];
 };
 
 // Tenant color schemes
