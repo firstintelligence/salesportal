@@ -249,7 +249,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   // Update company info when tenant changes
   useEffect(() => {
     if (tenant?.slug) {
-      const companyInfo = getTenantCompanyInfo(tenant.slug);
+      const companyInfo = getTenantCompanyInfo(tenant.slug, tenant);
       const logo = getTenantDocumentLogo(tenant.slug);
       const logoSize = getTenantLogoSize(tenant.slug, 'invoice');
       setYourCompany({
@@ -260,8 +260,14 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
         logo: logo,
         logoSize: logoSize
       });
+      // Keep the invoice number prefix in sync with the selected company
+      setInvoice((prev) => {
+        if (!prev.number) return prev;
+        const digits = prev.number.replace(/^[A-Za-z]+/, '');
+        return { ...prev, number: `${companyInfo.invoicePrefix}${digits}` };
+      });
     }
-  }, [tenant?.slug]);
+  }, [tenant?.slug, tenant?.id]);
 
   const refreshNotes = () => {
     const randomIndex = Math.floor(Math.random() * noteOptions.length);
