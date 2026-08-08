@@ -57,7 +57,7 @@ export const getDefaultLogos = () => ({
 });
 
 // Tenant company info
-export const getTenantCompanyInfo = (tenantSlug) => {
+export const getTenantCompanyInfo = (tenantSlug, tenantRecord = null) => {
   const companies = {
     'georges': {
       name: "George's Plumbing and Heating",
