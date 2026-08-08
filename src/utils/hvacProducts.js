@@ -47,6 +47,13 @@ export const hvacProducts = [
     basePrice: 22000,
     category: 'Ductless Heat Pumps'
   },
+  {
+    id: 'ductless-heat-pump-4-head',
+    name: '4 Head Ductless Heat Pump',
+    description: 'Four zone ductless mini-split heat pump with professional installation',
+    basePrice: 28000,
+    category: 'Ductless Heat Pumps'
+  },
   
   // Furnaces - All 95% AFUE
   {
