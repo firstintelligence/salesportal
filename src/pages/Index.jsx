@@ -122,7 +122,7 @@ const Index = ({ preloadedCustomer, preloadedInvoiceProfile, preloadedCalculator
   
   // CRITICAL: Don't render anything until tenant is fully loaded to prevent cross-tenant data exposure
   const tenantSlug = tenant?.slug;
-  const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug) : null;
+  const tenantCompanyInfo = tenantSlug ? getTenantCompanyInfo(tenantSlug, tenant) : null;
   const tenantLogo = tenantSlug ? getTenantDocumentLogo(tenantSlug) : null;
   const tenantLogoSize = tenantSlug ? getTenantLogoSize(tenantSlug, 'invoice') : 'h-12';
   
