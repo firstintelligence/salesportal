@@ -56,6 +56,7 @@ export const productPricing = {
   'ductless-heat-pump-1-head': { cost: 3500, min: 9000, max: 12000 },
   'ductless-heat-pump-2-head': { cost: 5500, min: 12000, max: 16000 },
   'ductless-heat-pump-3-head': { cost: 8000, min: 17000, max: 22000 },
+  'ductless-heat-pump-4-head': { cost: 10500, min: 22000, max: 28000 },
 
   // Furnaces
   'furnace-gas-45k':        { cost: 1800, min: 3500, max: 4500 },
