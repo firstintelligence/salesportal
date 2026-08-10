@@ -1,4 +1,5 @@
 import polaronLogo from '@/assets/polaron-logo-transparent.png';
+import mythicLogo from '@/assets/mythic-logo.png';
 
 const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
@@ -11,7 +12,6 @@ const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 const kmcLogo = '/assets/kmc-logo.png';
 const siaLogo = '/assets/sia-logo.png';
 const circuitSavvyLogo = '/assets/circuit-savvy-logo.png';
-const mythicLogo = '/assets/mythic-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
