@@ -11,6 +11,7 @@ const provincialEnergyGroupLogo = '/assets/provincial-energy-group-logo.svg';
 const kmcLogo = '/assets/kmc-logo.png';
 const siaLogo = '/assets/sia-logo.png';
 const circuitSavvyLogo = '/assets/circuit-savvy-logo.png';
+const mythicLogo = '/assets/mythic-logo.png';
 
 // Tenant logo mappings for CRM/Dashboard display
 export const getTenantLogo = (tenantSlug) => {
@@ -27,6 +28,7 @@ export const getTenantLogo = (tenantSlug) => {
     'kmc': kmcLogo,
     'sia': siaLogo,
     'circuitsavvy': circuitSavvyLogo,
+    'mythic': mythicLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -54,6 +56,7 @@ export const getDefaultLogos = () => ({
   kmc: kmcLogo,
   sia: siaLogo,
   circuitsavvy: circuitSavvyLogo,
+  mythic: mythicLogo,
 });
 
 // Tenant company info
@@ -143,6 +146,13 @@ export const getTenantCompanyInfo = (tenantSlug, tenantRecord = null) => {
       email: "info@circuitsavvyelectric.ca",
       invoicePrefix: "CSE"
     },
+    'mythic': {
+      name: "Mythic Heating & Cooling",
+      address: "9624 Lake Rd No. 44, Kettle and Stony Point First Nation, No. 44, ON N0N 1J1",
+      phone: "(519) 491-2619",
+      email: "cass@mythicappliances.ca",
+      invoicePrefix: "MHCL"
+    },
   };
   
   if (companies[tenantSlug]) return companies[tenantSlug];
@@ -219,6 +229,10 @@ export const getTenantColors = (tenantSlug) => {
     'circuitsavvy': {
       primary: 'hsl(217, 45%, 22%)',
       secondary: 'hsl(88, 60%, 55%)',
+    },
+    'mythic': {
+      primary: 'hsl(25, 95%, 53%)',
+      secondary: 'hsl(205, 90%, 50%)',
     },
   };
   
