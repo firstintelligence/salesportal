@@ -257,6 +257,10 @@ export const getTenantLogoSize = (tenantSlug, context = 'header') => {
       header: 'h-7 sm:h-8',
       invoice: 'h-8',
     },
+    'mythic': {
+      header: 'h-10 sm:h-12',
+      invoice: 'h-[9rem]',
+    },
   };
   
   if (overrides[tenantSlug] && overrides[tenantSlug][context]) {
