@@ -263,7 +263,7 @@ export const getTenantLogoSize = (tenantSlug, context = 'header') => {
     },
     'circuitsavvy': {
       header: 'h-10 sm:h-12',
-      invoice: 'h-[9rem]',
+      invoice: 'h-[6.75rem]',
     },
   };
   
