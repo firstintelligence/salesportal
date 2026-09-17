@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, PenLine, Loader2, FileCheck } from "lucide-react";
+import { ArrowLeft, PenLine, Loader2, FileCheck, Download, RotateCcw } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -42,10 +42,18 @@ const RebatesPage = () => {
   const [signature, setSignature] = useState(null);
   const [showPad, setShowPad] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [downloadName, setDownloadName] = useState("");
 
   useEffect(() => {
     if (!localStorage.getItem("authenticated")) navigate("/");
   }, [navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,6 +85,7 @@ const RebatesPage = () => {
       const pdfDoc = await PDFDocument.load(bytes);
       const page = pdfDoc.getPages()[PAGE_INDEX];
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const pdfForm = pdfDoc.getForm();
 
       const black = rgb(0, 0, 0);
       const draw = (text, pos) =>
@@ -98,19 +107,17 @@ const RebatesPage = () => {
         height: pngImage.height * scale,
       });
 
-
-
+      // Remove the interactive widgets after drawing the final values. This
+      // prevents PDF viewers from adding gray field highlighting.
+      pdfForm.getFields().forEach((field) => pdfForm.removeField(field));
       const saved = await pdfDoc.save();
       const blob = new Blob([saved], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
       const safeName = form.legalName.trim().replace(/[^a-z0-9]+/gi, "-");
-      link.href = url;
-      link.download = `HRSP-Participant-Agreement-${safeName}.pdf`;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      setPreviewUrl(url);
+      setDownloadName(`HRSP-Participant-Agreement-${safeName}.pdf`);
 
-      toast({ title: "Signed agreement generated" });
+      toast({ title: "Agreement ready to review" });
     } catch (err) {
       console.error("Error generating agreement:", err);
       toast({
@@ -122,6 +129,42 @@ const RebatesPage = () => {
       setIsGenerating(false);
     }
   };
+
+  const handleDownload = () => {
+    if (!previewUrl) return;
+    const link = document.createElement("a");
+    link.href = previewUrl;
+    link.download = downloadName;
+    link.click();
+  };
+
+  if (previewUrl) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex flex-col">
+        <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-slate-200 px-3 py-2.5 sm:px-6 sm:py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <Button variant="outline" size="sm" onClick={() => setPreviewUrl(null)} className="h-9 px-2 sm:px-3">
+              <RotateCcw className="h-4 w-4 mr-1.5" />
+              <span className="text-xs sm:text-sm">Back to Form</span>
+            </Button>
+            <h1 className="text-sm sm:text-lg font-bold text-slate-800 text-center">Review Agreement</h1>
+            <Button size="sm" onClick={handleDownload} className="h-9 px-2 sm:px-3">
+              <Download className="h-4 w-4 mr-1.5" />
+              <span className="text-xs sm:text-sm">Download</span>
+            </Button>
+          </div>
+        </header>
+
+        <main className="flex-1 p-2 sm:p-4">
+          <iframe
+            src={`${previewUrl}#page=6&view=FitH`}
+            title="Completed HRSP participant agreement"
+            className="w-full h-[calc(100vh-5rem)] bg-white border border-slate-300 shadow-sm"
+          />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -220,6 +263,8 @@ const RebatesPage = () => {
         isOpen={showPad}
         onClose={() => setShowPad(false)}
         initialSignature={signature}
+        minPenWidth={3}
+        maxPenWidth={6}
         onSave={(dataUrl) => {
           setSignature(dataUrl);
           setShowPad(false);

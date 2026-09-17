@@ -3,7 +3,14 @@ import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Trash2, Check, X } from "lucide-react";
 
-const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) => {
+const FullscreenSignaturePad = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialSignature,
+  minPenWidth = 1.5,
+  maxPenWidth = 3,
+}) => {
   const signatureRef = useRef(null);
   const containerRef = useRef(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
@@ -315,8 +322,8 @@ const FullscreenSignaturePad = ({ isOpen, onClose, onSave, initialSignature }) =
                 }}
                 backgroundColor="white"
                 penColor="black"
-                minWidth={1.5}
-                maxWidth={3}
+                minWidth={minPenWidth}
+                maxWidth={maxPenWidth}
               />
             )}
           </div>
