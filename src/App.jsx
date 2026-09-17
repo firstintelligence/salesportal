@@ -75,6 +75,7 @@ const AppContent = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/rebates" element={<RebatesPage />} />
       </Routes>
     </>
   );
