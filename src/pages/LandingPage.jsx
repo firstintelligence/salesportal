@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine, Truck, MessageSquare, BadgeDollarSign } from "lucide-react";
+import { FileText, Calculator, Phone, DollarSign, Grid2X2, Calendar, TrendingUp, FileEdit, Users, ScanLine, Truck, MessageSquare, BadgeDollarSign, PiggyBank } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { getTenantLogo, getTenantLogoSize } from "@/utils/tenantLogos";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,15 @@ const LandingPage = () => {
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
+    },
+    {
+      title: "Rebates",
+      subtitle: "HRSP participant agreement",
+      icon: PiggyBank,
+      path: "/rebates",
+      color: "from-teal-500 to-teal-600",
+      bgColor: "bg-teal-50",
+      iconColor: "text-teal-600",
     },
   ];
 

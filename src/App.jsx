@@ -33,6 +33,7 @@ import DispatchQueuePage from "./pages/DispatchQueuePage";
 import ChatPage from "./pages/ChatPage";
 import PricingPage from "./pages/PricingPage";
 import UsersPage from "./pages/UsersPage";
+import RebatesPage from "./pages/RebatesPage";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const AppContent = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/rebates" element={<RebatesPage />} />
       </Routes>
     </>
   );
