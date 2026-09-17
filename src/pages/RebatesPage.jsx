@@ -9,14 +9,13 @@ import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
 
 const AGREEMENT_URL = "/templates/HRSP-Heat-Pump-Participant-Agreement.pdf";
 
-// Coordinates (PDF points, origin bottom-left) of the four lines on page 6
+// Page 6 of the agreement holds the participant fields.
+// Legal name + email are fillable form fields; signature + date are signature
+// widgets, so their values are drawn at the widget rectangles.
 const PAGE_INDEX = 5;
-const LINES = {
-  legalName: { x: 163, y: 213 },
-  signature: { x: 149, y: 174 },
-  signatureDate: { x: 117, y: 132 },
-  email: { x: 173, y: 100 },
-};
+const SIGNATURE_RECT = { x: 146.28, y: 170.64, width: 335.4, height: 28.8 };
+const DATE_POS = { x: 118, y: 140 };
+
 
 const todayISO = () => {
   const d = new Date();
@@ -78,25 +77,28 @@ const RebatesPage = () => {
       const pdfDoc = await PDFDocument.load(bytes);
       const page = pdfDoc.getPages()[PAGE_INDEX];
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const black = rgb(0, 0, 0);
 
+      const black = rgb(0, 0, 0);
       const draw = (text, pos) =>
         page.drawText(text, { x: pos.x, y: pos.y, size: 11, font, color: black });
 
-      draw(form.legalName.trim(), LINES.legalName);
-      draw(formatDate(form.signatureDate), LINES.signatureDate);
-      draw(form.email.trim(), LINES.email);
+      // The widget boxes sit well above the printed lines, so values are drawn
+      // directly onto the lines for a clean, print-accurate result.
+      draw(form.legalName.trim(), { x: 163, y: 213 });
+      draw(formatDate(form.signatureDate), { x: 118, y: 132 });
+      draw(form.email.trim(), { x: 173, y: 100 });
+
 
       const pngImage = await pdfDoc.embedPng(signature);
-      const maxWidth = 200;
-      const maxHeight = 34;
-      const scale = Math.min(maxWidth / pngImage.width, maxHeight / pngImage.height);
+      const scale = Math.min(200 / pngImage.width, 30 / pngImage.height);
       page.drawImage(pngImage, {
-        x: LINES.signature.x,
-        y: LINES.signature.y,
+        x: SIGNATURE_RECT.x + 4,
+        y: 176,
         width: pngImage.width * scale,
         height: pngImage.height * scale,
       });
+
+
 
       const saved = await pdfDoc.save();
       const blob = new Blob([saved], { type: "application/pdf" });
