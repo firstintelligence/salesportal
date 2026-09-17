@@ -90,16 +90,14 @@ const RebatesPage = () => {
 
 
       const pngImage = await pdfDoc.embedPng(signature);
-      const scale = Math.min(
-        200 / pngImage.width,
-        SIGNATURE_RECT.height / pngImage.height
-      );
+      const scale = Math.min(200 / pngImage.width, 30 / pngImage.height);
       page.drawImage(pngImage, {
         x: SIGNATURE_RECT.x + 4,
-        y: SIGNATURE_RECT.y + 2,
+        y: 176,
         width: pngImage.width * scale,
         height: pngImage.height * scale,
       });
+
 
 
       const saved = await pdfDoc.save();
