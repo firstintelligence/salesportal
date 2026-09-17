@@ -9,14 +9,13 @@ import FullscreenSignaturePad from "@/components/FullscreenSignaturePad";
 
 const AGREEMENT_URL = "/templates/HRSP-Heat-Pump-Participant-Agreement.pdf";
 
-// Coordinates (PDF points, origin bottom-left) of the four lines on page 6
+// Page 6 of the agreement holds the participant fields.
+// Legal name + email are fillable form fields; signature + date are signature
+// widgets, so their values are drawn at the widget rectangles.
 const PAGE_INDEX = 5;
-const LINES = {
-  legalName: { x: 163, y: 213 },
-  signature: { x: 149, y: 174 },
-  signatureDate: { x: 117, y: 132 },
-  email: { x: 173, y: 100 },
-};
+const SIGNATURE_RECT = { x: 146.28, y: 170.64, width: 335.4, height: 28.8 };
+const DATE_POS = { x: 118, y: 140 };
+
 
 const todayISO = () => {
   const d = new Date();
