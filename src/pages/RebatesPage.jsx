@@ -78,30 +78,16 @@ const RebatesPage = () => {
       const page = pdfDoc.getPages()[PAGE_INDEX];
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      // Fill the two text form fields
-      const pdfForm = pdfDoc.getForm();
-      const setText = (name, value) => {
-        try {
-          const field = pdfForm.getTextField(name);
-          field.setFontSize(11);
-          field.setText(value);
-          field.enableReadOnly();
-        } catch (e) {
-          console.warn(`Field "${name}" not fillable, drawing instead`, e);
-        }
-      };
-      setText("Participant Legal Name", form.legalName.trim());
-      setText("Participant Email Address", form.email.trim());
-      pdfForm.updateFieldAppearances(font);
+      const black = rgb(0, 0, 0);
+      const draw = (text, pos) =>
+        page.drawText(text, { x: pos.x, y: pos.y, size: 11, font, color: black });
 
-      // Signature date sits in a signature widget - draw it directly
-      page.drawText(formatDate(form.signatureDate), {
-        x: DATE_POS.x,
-        y: DATE_POS.y,
-        size: 11,
-        font,
-        color: rgb(0, 0, 0),
-      });
+      // The widget boxes sit well above the printed lines, so values are drawn
+      // directly onto the lines for a clean, print-accurate result.
+      draw(form.legalName.trim(), { x: 163, y: 213 });
+      draw(formatDate(form.signatureDate), { x: 118, y: 132 });
+      draw(form.email.trim(), { x: 173, y: 100 });
+
 
       const pngImage = await pdfDoc.embedPng(signature);
       const scale = Math.min(
