@@ -77,25 +77,44 @@ const RebatesPage = () => {
       const pdfDoc = await PDFDocument.load(bytes);
       const page = pdfDoc.getPages()[PAGE_INDEX];
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const black = rgb(0, 0, 0);
 
-      const draw = (text, pos) =>
-        page.drawText(text, { x: pos.x, y: pos.y, size: 11, font, color: black });
+      // Fill the two text form fields
+      const pdfForm = pdfDoc.getForm();
+      const setText = (name, value) => {
+        try {
+          const field = pdfForm.getTextField(name);
+          field.setFontSize(11);
+          field.setText(value);
+          field.enableReadOnly();
+        } catch (e) {
+          console.warn(`Field "${name}" not fillable, drawing instead`, e);
+        }
+      };
+      setText("Participant Legal Name", form.legalName.trim());
+      setText("Participant Email Address", form.email.trim());
+      pdfForm.updateFieldAppearances(font);
 
-      draw(form.legalName.trim(), LINES.legalName);
-      draw(formatDate(form.signatureDate), LINES.signatureDate);
-      draw(form.email.trim(), LINES.email);
+      // Signature date sits in a signature widget - draw it directly
+      page.drawText(formatDate(form.signatureDate), {
+        x: DATE_POS.x,
+        y: DATE_POS.y,
+        size: 11,
+        font,
+        color: rgb(0, 0, 0),
+      });
 
       const pngImage = await pdfDoc.embedPng(signature);
-      const maxWidth = 200;
-      const maxHeight = 34;
-      const scale = Math.min(maxWidth / pngImage.width, maxHeight / pngImage.height);
+      const scale = Math.min(
+        200 / pngImage.width,
+        SIGNATURE_RECT.height / pngImage.height
+      );
       page.drawImage(pngImage, {
-        x: LINES.signature.x,
-        y: LINES.signature.y,
+        x: SIGNATURE_RECT.x + 4,
+        y: SIGNATURE_RECT.y + 2,
         width: pngImage.width * scale,
         height: pngImage.height * scale,
       });
+
 
       const saved = await pdfDoc.save();
       const blob = new Blob([saved], { type: "application/pdf" });
