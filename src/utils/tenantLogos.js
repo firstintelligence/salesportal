@@ -1,5 +1,6 @@
 import polaronLogo from '@/assets/polaron-logo-transparent.png';
 import mythicLogo from '@/assets/mythic-logo.png';
+import ecoAirLogo from '@/assets/ecoair-logo.png';
 
 const georgesLogo = '/lovable-uploads/62b81d29-a2f1-4fb2-85a9-c836aa3c2bb1.png';
 
@@ -29,6 +30,7 @@ export const getTenantLogo = (tenantSlug) => {
     'sia': siaLogo,
     'circuitsavvy': circuitSavvyLogo,
     'mythic': mythicLogo,
+    'ecoair': ecoAirLogo,
   };
   
   return logos[tenantSlug] || null;
@@ -57,6 +59,7 @@ export const getDefaultLogos = () => ({
   sia: siaLogo,
   circuitsavvy: circuitSavvyLogo,
   mythic: mythicLogo,
+  ecoair: ecoAirLogo,
 });
 
 // Tenant company info
@@ -153,6 +156,13 @@ export const getTenantCompanyInfo = (tenantSlug, tenantRecord = null) => {
       email: "cass@mythicappliances.ca",
       invoicePrefix: "MHCL"
     },
+    'ecoair': {
+      name: "Eco Air HVAC",
+      address: "1890 Hubert St, Greater Sudbury, ON P3N 1M1",
+      phone: "(249) 878-7006",
+      email: "ecoairhvac@hotmail.com",
+      invoicePrefix: "EAH"
+    },
   };
   
   if (companies[tenantSlug]) return companies[tenantSlug];
@@ -234,6 +244,10 @@ export const getTenantColors = (tenantSlug) => {
       primary: 'hsl(25, 95%, 53%)',
       secondary: 'hsl(205, 90%, 50%)',
     },
+    'ecoair': {
+      primary: 'hsl(3, 68%, 45%)',
+      secondary: 'hsl(0, 0%, 10%)',
+    },
   };
   
   return colors[tenantSlug] || colors['georges'];
@@ -264,6 +278,10 @@ export const getTenantLogoSize = (tenantSlug, context = 'header') => {
     'circuitsavvy': {
       header: 'h-10 sm:h-12',
       invoice: 'h-[6.75rem]',
+    },
+    'ecoair': {
+      header: 'h-10 sm:h-12',
+      invoice: 'h-[7rem]',
     },
   };
   
