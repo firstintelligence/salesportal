@@ -158,7 +158,7 @@ export const getTenantCompanyInfo = (tenantSlug, tenantRecord = null) => {
     },
     'ecoair': {
       name: "Eco Air HVAC",
-      address: "1890 Hubert St, Greater Sudbury, ON P3N 1M1",
+      address: "1890 Hubert St, Sudbury, ON P3N 1M1",
       phone: "(249) 878-7006",
       email: "ecoairhvac@hotmail.com",
       invoicePrefix: "EAH"
