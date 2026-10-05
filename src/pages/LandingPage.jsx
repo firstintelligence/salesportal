@@ -138,6 +138,7 @@ const LandingPage = () => {
   }
 
   const tenantLogo = tenant ? getTenantLogo(tenant.slug) : null;
+  const tenantLogoSize = tenant ? getTenantLogoSize(tenant.slug, 'header') : 'h-10 sm:h-12';
   const companyName = tenant?.name || "Sales Portal";
 
   // Check if current route is dashboard
@@ -154,7 +155,7 @@ const LandingPage = () => {
               <img 
                 src={tenantLogo} 
                 alt={companyName}
-                className="h-7 sm:h-10 object-contain"
+                className={`${tenantLogoSize} max-w-[180px] object-contain`}
               />
             )}
           </div>

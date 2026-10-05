@@ -4,3 +4,4 @@
 - [x] Remove gray fillable-field backgrounds in completed rebate PDFs.
 - [x] Show the completed rebate PDF before offering download.
 - [x] Confirm the Rebates tile and page are available to every authenticated agent, including Chad.
+- [x] Restore Eco Air HVAC branding in the CRM header and generated invoices.
